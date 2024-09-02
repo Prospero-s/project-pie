@@ -36,7 +36,7 @@ const useCompanyDetails = (siren: string) => {
         openNotificationWithIcon(
           'error',
           'Erreur de validation',
-          'Le SIREN doit contenir uniquement des chiffres et ne doit pas dépasser 9 caractères.',
+          `Le SIREN "${siren}" est incorrect. Le SIREN doit contenir uniquement des chiffres et ne doit pas dépasser 9 caractères.`,
         );
         router.back();
         return;
@@ -55,6 +55,10 @@ const useCompanyDetails = (siren: string) => {
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/api/company/${siren}/details`,
           );
+
+          if (response.status === 404) {
+            throw new Error('SIREN invalide');
+          }
 
           const data = await response.json();
 
@@ -153,14 +157,20 @@ const useCompanyDetails = (siren: string) => {
             setCompany(formattedCompany);
             setLoading(false);
           }, 100);
-        } catch (error) {
+        } catch (error: unknown) {
           clearInterval(timerRef.current);
           setPercent(100);
           setTimeout(() => {
+            const errorMessage =
+              error instanceof Error
+                ? error.message
+                : "Une erreur inconnue s'est produite";
             openNotificationWithIcon(
               'error',
               'Erreur de récupération',
-              "Le SIREN est incorrect ou n'existe pas.",
+              errorMessage === 'SIREN invalide'
+                ? `Le SIREN "${siren}" est invalide.`
+                : "Une erreur s'est produite lors de la récupération des données.",
             );
             setLoading(false);
             router.back();

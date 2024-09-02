@@ -1,6 +1,6 @@
 import { WalletFilled, WalletOutlined } from '@ant-design/icons';
 import { Button, notification } from 'antd';
-import { deleteDoc, doc, getDoc,setDoc } from 'firebase/firestore';
+import { deleteDoc, doc, getDoc, setDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 
 import { firestore } from '@/firebase/firebaseConfig';
@@ -11,14 +11,23 @@ interface FavoriteButtonProps {
   startupName: string;
 }
 
-const FavoriteButton: React.FC<FavoriteButtonProps> = ({ SIREN, startupName }) => {
+const FavoriteButton: React.FC<FavoriteButtonProps> = ({
+  SIREN,
+  startupName,
+}) => {
   const { user } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     if (user) {
       const checkFavorite = async () => {
-        const favoriteDocRef = doc(firestore, 'users', user.uid, 'favorites', SIREN);
+        const favoriteDocRef = doc(
+          firestore,
+          'users',
+          user.id,
+          'favorites',
+          SIREN,
+        );
         const favoriteDoc = await getDoc(favoriteDocRef);
         if (favoriteDoc.exists()) {
           setIsFavorite(true);
@@ -31,10 +40,10 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({ SIREN, startupName }) =
 
   const toggleFavorite = async () => {
     if (!user) {
-      console.error("User not logged in");
+      console.error('User not logged in');
       return;
     }
-    const favoriteDocRef = doc(firestore, 'users', user.uid, 'favorites', SIREN);
+    const favoriteDocRef = doc(firestore, 'users', user.id, 'favorites', SIREN);
     try {
       if (isFavorite) {
         await deleteDoc(favoriteDocRef);

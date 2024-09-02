@@ -1,12 +1,12 @@
 import { UserOutlined } from '@ant-design/icons';
+import { User } from '@supabase/supabase-js';
 import { Avatar } from 'antd';
-import { signOut, User } from 'firebase/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import { openNotificationWithIcon } from '@/components/Notification/NotifAlert';
-import { auth } from '@/firebase/firebaseConfig';
+import { supabase } from '@/supabase/supabaseClient';
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -19,7 +19,8 @@ const DropdownUser = () => {
   // Fonction de déconnexion
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
       openNotificationWithIcon(
         'success',
         'Déconnexion réussie',
@@ -59,14 +60,19 @@ const DropdownUser = () => {
 
   // get the currently signed-in user
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(currentUser => {
-      if (currentUser) {
-        setUser(currentUser);
-      } else {
-        setUser(null);
-      }
-    });
-    return () => unsubscribe();
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session) {
+          setUser(session.user);
+        } else {
+          setUser(null);
+        }
+      },
+    );
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
   return (
