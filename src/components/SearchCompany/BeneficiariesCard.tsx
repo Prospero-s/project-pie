@@ -1,12 +1,15 @@
+import { useTranslation } from 'react-i18next';
+
 const BeneficiariesCard = ({ beneficiaries }: { beneficiaries: any[] }) => {
+  const { t } = useTranslation('search-company');
   return (
     <div className="mt-5 bg-white shadow overflow-hidden sm:rounded-lg">
       <div className="px-4 py-5 sm:px-6">
         <h3 className="text-lg leading-6 font-medium text-gray-900">
-          Bénéficiaires effectifs
+          {t('beneficiaries')}
         </h3>
         <p className="mt-1 max-w-2xl text-sm text-gray-500">
-          Détails des bénéficiaires effectifs.
+          {t('beneficiaries_details')}
         </p>
       </div>
       <div className="border-t border-gray-200">
@@ -22,7 +25,9 @@ const BeneficiariesCard = ({ beneficiaries }: { beneficiaries: any[] }) => {
             >
               {beneficiaire.nom && (
                 <>
-                  <dt className="text-sm font-medium text-gray-500">Nom</dt>
+                  <dt className="text-sm font-medium text-gray-500">
+                    {t('name')}
+                  </dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                     {beneficiaire.nom}
                   </dd>
@@ -30,7 +35,9 @@ const BeneficiariesCard = ({ beneficiaries }: { beneficiaries: any[] }) => {
               )}
               {beneficiaire.prenoms.length > 0 && (
                 <>
-                  <dt className="text-sm font-medium text-gray-500">Prénoms</dt>
+                  <dt className="text-sm font-medium text-gray-500">
+                    {t('first_name')}
+                  </dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                     {beneficiaire.prenoms.join(', ')}
                   </dd>
@@ -39,7 +46,7 @@ const BeneficiariesCard = ({ beneficiaries }: { beneficiaries: any[] }) => {
               {beneficiaire.dateDeNaissance && (
                 <>
                   <dt className="text-sm font-medium text-gray-500">
-                    Date de naissance
+                    {t('birth_date')}
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                     {beneficiaire.dateDeNaissance}
@@ -49,7 +56,7 @@ const BeneficiariesCard = ({ beneficiaries }: { beneficiaries: any[] }) => {
               {beneficiaire.nationalite && (
                 <>
                   <dt className="text-sm font-medium text-gray-500">
-                    Nationalité
+                    {t('nationality')}
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                     {beneficiaire.nationalite}

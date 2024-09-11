@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import DropdownNotification from './DropdownNotification';
 import DropdownUser from './DropdownUser';
@@ -10,6 +11,7 @@ const Header = (props: {
   sidebarOpen: string | boolean | undefined;
   setSidebarOpen: (arg0: boolean) => void;
 }) => {
+  const { t } = useTranslation('search-company');
   const router = useRouter();
   const [siren, setSiren] = useState('');
 
@@ -115,7 +117,7 @@ const Header = (props: {
 
               <input
                 type="text"
-                placeholder="Saisir un siren..."
+                placeholder={t('placeholder')}
                 value={siren}
                 maxLength={9}
                 onChange={handleInputChange}

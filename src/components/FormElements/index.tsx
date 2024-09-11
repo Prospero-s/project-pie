@@ -1,10 +1,10 @@
 'use client';
-import Breadcrumb from '@/components/Breadcrumbs/Breadcrumb';
 import CheckboxFive from '@/components/Checkboxes/CheckboxFive';
 import CheckboxFour from '@/components/Checkboxes/CheckboxFour';
 import CheckboxOne from '@/components/Checkboxes/CheckboxOne';
 import CheckboxThree from '@/components/Checkboxes/CheckboxThree';
 import CheckboxTwo from '@/components/Checkboxes/CheckboxTwo';
+import Breadcrumb from '@/components/common/Breadcrumbs/Breadcrumb';
 import DatePickerOne from '@/components/FormElements/DatePicker/DatePickerOne';
 import DatePickerTwo from '@/components/FormElements/DatePicker/DatePickerTwo';
 import MultiSelect from '@/components/FormElements/MultiSelect';

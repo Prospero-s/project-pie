@@ -10,6 +10,17 @@ i18n
   .init({
     fallbackLng: 'en',
     supportedLngs: ['fr', 'en'],
+    ns: [
+      'signin',
+      'signup',
+      'forgot-password',
+      'reset-password',
+      'dashboard',
+      'search-company',
+      'sidebar',
+      'entreprises',
+      'company-details',
+    ],
     debug: process.env.NODE_ENV === 'development',
     interpolation: {
       escapeValue: false,

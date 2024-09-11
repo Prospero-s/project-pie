@@ -1,5 +1,6 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { openNotificationWithIcon } from '@/components/Notification/NotifAlert';
 import { SearchCompany } from '@/types/search-company';
@@ -13,8 +14,8 @@ const isEmptyObject = (obj: any): boolean => {
   );
 };
 
-const getValue = (field: any, fallback: any) => {
-  return isEmptyObject(field) ? fallback : field;
+const getValue = (field: any, defaultValue: any) => {
+  return isEmptyObject(field) ? defaultValue : field;
 };
 
 const validateSiren = (siren: string): boolean => {
@@ -23,22 +24,19 @@ const validateSiren = (siren: string): boolean => {
 };
 
 const useCompanyDetails = (siren: string) => {
+  const { t } = useTranslation('company-details');
   const [company, setCompany] = useState<SearchCompany | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [percent, setPercent] = useState<number>(0);
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
   const hasFetchedRef = useRef<string | null>(null);
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCompanyDetails = async () => {
       if (!validateSiren(siren)) {
-        openNotificationWithIcon(
-          'error',
-          'Erreur de validation',
-          `Le SIREN "${siren}" est incorrect. Le SIREN doit contenir uniquement des chiffres et ne doit pas dépasser 9 caractères.`,
-        );
-        router.back();
+        setError(t('invalid_format_siren', { siren }));
         return;
       }
 
@@ -160,21 +158,15 @@ const useCompanyDetails = (siren: string) => {
         } catch (error: unknown) {
           clearInterval(timerRef.current);
           setPercent(100);
-          setTimeout(() => {
-            const errorMessage =
-              error instanceof Error
-                ? error.message
-                : "Une erreur inconnue s'est produite";
-            openNotificationWithIcon(
-              'error',
-              'Erreur de récupération',
-              errorMessage === 'SIREN invalide'
-                ? `Le SIREN "${siren}" est invalide.`
-                : "Une erreur s'est produite lors de la récupération des données.",
-            );
-            setLoading(false);
-            router.back();
-          }, 100);
+          const errorMessage =
+            error instanceof Error ? error.message : t('unknown_error');
+          setError(
+            errorMessage === 'SIREN invalide'
+              ? t('invalid_siren', { siren })
+              : t('data_retrieval_error'),
+          );
+        } finally {
+          setLoading(false);
         }
       }
     };
@@ -183,9 +175,16 @@ const useCompanyDetails = (siren: string) => {
       fetchCompanyDetails();
       hasFetchedRef.current = siren;
     }
-  }, [siren, router]);
+  }, [siren, t]);
 
-  return { company, loading, percent };
+  useEffect(() => {
+    if (error) {
+      openNotificationWithIcon('error', t('validation_error'), error);
+      router.back();
+    }
+  }, [error, router, t]);
+
+  return { company, loading, percent, error };
 };
 
 export default useCompanyDetails;

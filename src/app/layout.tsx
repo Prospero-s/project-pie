@@ -4,27 +4,21 @@ import '@/css/style.css';
 import 'flatpickr/dist/flatpickr.min.css';
 import 'jsvectormap/dist/css/jsvectormap.css';
 
-import { usePathname, useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 import { I18nextProvider } from 'react-i18next';
 
 import Loader from '@/components/common/Loader';
 import FloatingBubble from '@/components/FloatingBubble/FloatingBubble';
+import { LoadingProvider, useLoading } from '@/hooks/LoadingContext'; // Assurez-vous que l'import est correct
+import { AuthProvider } from '@/hooks/useAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 
 import i18n from '../../i18n';
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [pageLoading, setPageLoading] = useState<boolean>(false);
+const RootLayoutContent = ({ children }: { children: React.ReactNode }) => {
+  const { loading, setLoading } = useLoading(); // Utilisation correcte du hook
   const { changeLanguage, getCurrentLanguage } = useLanguage();
   const [mounted, setMounted] = useState(false);
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const initializeLanguage = useCallback(() => {
     const savedLanguage = localStorage.getItem('i18nextLng');
@@ -41,30 +35,44 @@ export default function RootLayout({
   }, [changeLanguage]);
 
   useEffect(() => {
+    setLoading(true);
     initializeLanguage();
     setMounted(true);
     setTimeout(() => setLoading(false), 1000);
-  }, [initializeLanguage]);
+  }, [initializeLanguage, setLoading]);
 
   useEffect(() => {
-    setPageLoading(true);
-    // Simuler un délai de chargement
-    const timer = setTimeout(() => setPageLoading(false), 500);
-    return () => clearTimeout(timer);
-  }, [pathname, searchParams]);
+    if (window.location.pathname.includes('/dashboard')) {
+      setLoading(false);
+    }
+  }, [setLoading]);
 
   const initialLang = 'en';
 
   return (
     <html lang={mounted ? getCurrentLanguage() : initialLang}>
-      <I18nextProvider i18n={i18n}>
-        <body suppressHydrationWarning={true}>
-          <div className="dark:bg-boxdark-2 dark:text-bodydark">
-            {loading || pageLoading ? <Loader /> : children}
-            {!loading && !pageLoading && <FloatingBubble />}
-          </div>
-        </body>
-      </I18nextProvider>
+      <AuthProvider>
+        <I18nextProvider i18n={i18n}>
+          <body suppressHydrationWarning={true}>
+            <div className="dark:bg-boxdark-2 dark:text-bodydark">
+              {loading ? <Loader /> : children}
+              {!loading && mounted && <FloatingBubble />}
+            </div>
+          </body>
+        </I18nextProvider>
+      </AuthProvider>
     </html>
+  );
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <LoadingProvider>
+      <RootLayoutContent>{children}</RootLayoutContent>
+    </LoadingProvider>
   );
 }

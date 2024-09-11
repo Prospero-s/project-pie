@@ -7,6 +7,7 @@ import L from 'leaflet';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import customMarkerIcon from '/public/images/icon/map-marker.svg';
 import mapNonCharge from '/public/images/icon/map-non-charge.jpg';
@@ -51,6 +52,7 @@ const fetchCoordinates = async (address: string) => {
 };
 
 const SearchCompanyMap = ({ address }: { address: string }) => {
+  const { t } = useTranslation('search-company');
   const [coordinates, setCoordinates] = useState<{
     lat: number;
     lon: number;
@@ -113,10 +115,10 @@ const SearchCompanyMap = ({ address }: { address: string }) => {
         className="rounded-3xl"
         style={{ width: '100%', height: 'auto' }}
         src={mapNonCharge.src}
-        alt="la carte n'a pas pu être chargée"
+        alt={t('map_error')}
       />
       <div className="absolute inset-0 flex items-center justify-center text-white text-xl font-bold bg-black bg-opacity-50 rounded-3xl">
-        Les coordonnées de l'adresse n'ont pas pu être récupérées.
+        {t('map_error')}
       </div>
     </div>
   );

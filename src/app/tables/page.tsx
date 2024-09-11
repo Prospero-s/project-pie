@@ -1,10 +1,9 @@
 import { Metadata } from 'next';
+import dynamic from 'next/dynamic';
 
-import Breadcrumb from '@/components/Breadcrumbs/Breadcrumb';
-import ProtectedRoute from '@/components/Hoc/ProtectedRoute';
-import DefaultLayout from '@/components/Layouts/DefaultLayout';
-import TableInvestement from '@/components/Tables/TableInvestment';
-import { AuthProvider } from '@/hooks/useAuth';
+import DefaultLayout from '@/components/common/Layouts/DefaultLayout';
+
+const ClientTable = dynamic(() => import('./client'), { ssr: false });
 
 export const metadata: Metadata = {
   title: 'Next.js Tables | TailAdmin - Next.js Dashboard Template',
@@ -14,16 +13,9 @@ export const metadata: Metadata = {
 
 const TablesPage = () => {
   return (
-    <AuthProvider>
-      <ProtectedRoute>
-        <DefaultLayout>
-          <Breadcrumb pageName="Enteprises" />
-          <div className="flex flex-col gap-10">
-            <TableInvestement />
-          </div>
-        </DefaultLayout>
-      </ProtectedRoute>
-    </AuthProvider>
+    <DefaultLayout>
+      <ClientTable />
+    </DefaultLayout>
   );
 };
 

@@ -1,0 +1,7 @@
+{
+  "startup_name": "Nom de la startup",
+  "investment_amount": "Montant de l'investissement",
+  "investment_date": "Date de l'investissement",
+  "investment_status": "Statut de l'investissement",
+  "actions": "Actions"
+}

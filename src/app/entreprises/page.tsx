@@ -1,13 +1,13 @@
-import EnteprisePage from '@/components/Entreprise/EntreprisePage';
-import ProtectedRoute from '@/components/Hoc/ProtectedRoute';
-import { AuthProvider } from '@/hooks/useAuth';
+import dynamic from 'next/dynamic';
+
+import DefaultLayout from '@/components/common/Layouts/DefaultLayout';
+
+const ClientEntreprise = dynamic(() => import('./client'), { ssr: false });
 
 export default function Dashboard() {
   return (
-    <AuthProvider>
-      <ProtectedRoute>
-        <EnteprisePage />
-      </ProtectedRoute>
-    </AuthProvider>
+    <DefaultLayout>
+      <ClientEntreprise />
+    </DefaultLayout>
   );
 }

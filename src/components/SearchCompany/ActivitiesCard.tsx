@@ -1,14 +1,16 @@
-import { toCamelCase } from '@/utils/textUtils';
+import { useTranslation } from 'react-i18next';
 
+import { toCamelCase } from '@/utils/textUtils';
 const ActivitiesCard = ({ activities }: { activities: any[] }) => {
+  const { t } = useTranslation('search-company');
   return (
     <div className="mt-5 bg-white shadow overflow-hidden sm:rounded-lg">
       <div className="px-4 py-5 sm:px-6">
         <h3 className="text-lg leading-6 font-medium text-gray-900">
-          Activités
+          {t('activities')}
         </h3>
         <p className="mt-1 max-w-2xl text-sm text-gray-500">
-          Détails des activités de l'entreprise.
+          {t('activities_details')}
         </p>
       </div>
       <div className="border-t border-gray-200">
@@ -26,7 +28,7 @@ const ActivitiesCard = ({ activities }: { activities: any[] }) => {
                 {activite.dateDebut && (
                   <>
                     <dt className="text-sm font-medium text-gray-500">
-                      Date de début
+                      {t('start_date')}
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                       {activite.dateDebut}
@@ -36,7 +38,7 @@ const ActivitiesCard = ({ activities }: { activities: any[] }) => {
                 {activite.formeExercice && (
                   <>
                     <dt className="text-sm font-medium text-gray-500">
-                      Forme d'exercice
+                      {t('exercise_form')}
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                       {toCamelCase(activite.formeExercice)}
@@ -46,7 +48,7 @@ const ActivitiesCard = ({ activities }: { activities: any[] }) => {
                 {activite.descriptionDetaillee && (
                   <>
                     <dt className="text-sm font-medium text-gray-500">
-                      Description détaillée
+                      {t('detailed_description')}
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                       {activite.descriptionDetaillee}
@@ -56,7 +58,7 @@ const ActivitiesCard = ({ activities }: { activities: any[] }) => {
                 {activite.codeApe && (
                   <>
                     <dt className="text-sm font-medium text-gray-500">
-                      Code APE
+                      {t('ape_code')}
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                       {activite.codeApe}
@@ -68,7 +70,7 @@ const ActivitiesCard = ({ activities }: { activities: any[] }) => {
           ) : (
             <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <p className="text-sm text-gray-500">
-                Aucune activité spécifiée.
+                {t('no_activity_specified')}
               </p>
             </div>
           )}

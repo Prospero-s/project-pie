@@ -1,6 +1,8 @@
-import Link from 'next/link';
+'use client';
 
-// Types
+import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
+
 type Investment = {
   id: string;
   startupName: string;
@@ -9,7 +11,6 @@ type Investment = {
   investmentStatus: 'Actif' | 'Sorti' | 'En attente';
 };
 
-// Données fictives
 const investmentsData: Investment[] = [
   {
     id: '1',
@@ -35,21 +36,24 @@ const investmentsData: Investment[] = [
 ];
 
 const TableInvestissement = () => {
+  const { t } = useTranslation('entreprises');
   return (
     <div className="rounded-sm border border-gray-300 bg-white p-6 shadow-lg">
       <div className="max-w-full overflow-x-auto">
         <table className="w-full table-auto text-left">
           <thead>
             <tr className="bg-gray-100 text-gray-700">
-              <th className="px-6 py-4 font-semibold">Entreprise</th>
+              <th className="px-6 py-4 font-semibold">{t('startup_name')}</th>
               <th className="px-6 py-4 font-semibold">
-                Montant de l&apos;investissement
+                {t('investment_amount')}
               </th>
               <th className="px-6 py-4 font-semibold">
-                Date de l&apos;investissement
+                {t('investment_date')}
               </th>
-              <th className="px-6 py-4 font-semibold">Statut</th>
-              <th className="px-6 py-4 font-semibold">Actions</th>
+              <th className="px-6 py-4 font-semibold">
+                {t('investment_status')}
+              </th>
+              <th className="px-6 py-4 font-semibold">{t('actions')}</th>
             </tr>
           </thead>
           <tbody>

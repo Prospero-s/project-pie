@@ -1,0 +1,20 @@
+{
+  "invalid_format_siren": "Le SIREN \"{{siren}}\" est incorrect. Le SIREN doit contenir uniquement des chiffres et ne doit pas dépasser 9 caractères.",
+  "unknown_error": "Une erreur inconnue s'est produite",
+  "data_retrieval_error": "Une erreur s'est produite lors de la récupération des données.",
+  "validation_error": "Erreur de validation",
+  "invalid_siren": "Le SIREN \"{{siren}}\" n'existe pas ou n'est plus valide.",
+  "startup_not_found": "Startup non trouvée",
+  "size": "Taille",
+  "share_capital": "Capital social",
+  "legal_status": "Statut juridique",
+  "creation_date": "Date de création",
+  "market_positioning": "Positionnement sur le marché",
+  "sector": "Secteur",
+  "email": "Email",
+  "ceo": "PDG",
+  "siren": "SIREN",
+  "siret": "SIRET",
+  "startup_details": "Détails de la startup",
+  "startup_details_description": "Détails de la startup."
+}

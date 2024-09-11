@@ -4,11 +4,15 @@ import { Avatar } from 'antd';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { openNotificationWithIcon } from '@/components/Notification/NotifAlert';
+import { useLoading } from '@/hooks/LoadingContext';
 import { supabase } from '@/supabase/supabaseClient';
 
 const DropdownUser = () => {
+  const { t } = useTranslation('header');
+  const { setLoading } = useLoading();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
@@ -18,6 +22,7 @@ const DropdownUser = () => {
 
   // Fonction de déconnexion
   const handleLogout = async () => {
+    setLoading(true);
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
@@ -29,6 +34,8 @@ const DropdownUser = () => {
       router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -85,13 +92,16 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            {user ? user.email : 'Utilisateur'}
-          </span>
-          <span className="block text-xs">analyste financier</span>
+            {user ? user.user_metadata.full_name : 'Utilisateur'}
+          </span>{' '}
         </span>
 
         <span className="h-12 w-12 rounded-full">
-          <Avatar size={50} icon={<UserOutlined />} />
+          <Avatar
+            size={50}
+            icon={!user?.user_metadata?.picture && <UserOutlined />}
+            src={user?.user_metadata?.picture || undefined}
+          />
         </span>
 
         <svg
@@ -111,7 +121,6 @@ const DropdownUser = () => {
         </svg>
       </Link>
 
-      {/* <!-- Dropdown Start --> */}
       <div
         ref={dropdown}
         onFocus={() => setDropdownOpen(true)}
@@ -143,7 +152,7 @@ const DropdownUser = () => {
                   fill=""
                 />
               </svg>
-              Profil
+              {t('profile')}
             </Link>
           </li>
           <li>
@@ -168,7 +177,7 @@ const DropdownUser = () => {
                   fill=""
                 />
               </svg>
-              Paramètres
+              {t('settings')}
             </Link>
           </li>
         </ul>
@@ -193,10 +202,9 @@ const DropdownUser = () => {
               fill=""
             />
           </svg>
-          Se déconnecter
+          {t('logout')}
         </button>
       </div>
-      {/* <!-- Dropdown End --> */}
     </div>
   );
 };

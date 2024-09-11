@@ -1,9 +1,6 @@
 // src/pages/index.tsx
 import { Metadata } from 'next';
 
-import AuthLayout from '@/components/Layouts/AuthLayout';
-import { AuthProvider } from '@/hooks/useAuth';
-
 import SignIn from './auth/signin/page';
 
 export const metadata: Metadata = {
@@ -12,13 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return (
-    <>
-      <AuthProvider>
-        <AuthLayout>
-          <SignIn />
-        </AuthLayout>
-      </AuthProvider>
-    </>
-  );
+  return <SignIn />;
 }
