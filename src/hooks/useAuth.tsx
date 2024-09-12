@@ -1,5 +1,6 @@
 'use client';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Provider, Session, User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import {
