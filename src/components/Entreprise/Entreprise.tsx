@@ -90,7 +90,7 @@ const calculateShareCapital = (growthData: any) => {
 };
 
 const Entreprise = () => {
-  const { t } = useTranslation('company_details');
+  const { t } = useTranslation('company-details');
   const searchParams = useSearchParams();
   const startupId = searchParams.get('id');
 

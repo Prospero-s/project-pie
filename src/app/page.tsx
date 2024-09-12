@@ -1,7 +1,7 @@
 // src/pages/index.tsx
 import { Metadata } from 'next';
 
-import SignIn from './auth/signin/page';
+import Loader from '@/components/common/Loader';
 
 export const metadata: Metadata = {
   title: 'Project PIE Dashboard',
@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return <SignIn />;
+  return <Loader />;
 }

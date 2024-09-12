@@ -29,7 +29,7 @@ interface StartupDetailsProps {
 }
 
 const StartupDetails: React.FC<StartupDetailsProps> = ({ startup }) => {
-  const { t } = useTranslation('company_details');
+  const { t } = useTranslation('company-details');
   const getMarketPositioningIcon = (position: string) => {
     if (position === 'up') {
       return <span style={{ color: 'green' }}>▲</span>;

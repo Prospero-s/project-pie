@@ -20,7 +20,15 @@ interface AuthContextType {
     error: any;
   }>;
   signOut: () => Promise<void>;
-  signWithProvider: (provider: Provider) => Promise<void>;
+  signWithProvider: (
+    provider: Provider,
+    options?: {
+      redirectTo?: string;
+      scopes?: string;
+      queryParams?: Record<string, string>;
+      skipBrowserRedirect?: boolean;
+    },
+  ) => Promise<void>;
 }
 
 const AuthContext = React.createContext<AuthContextType>({
@@ -103,7 +111,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
-        options,
+        options: {
+          redirectTo: window.location.origin + '/dashboard', // Assurez-vous que cette URL est correcte
+          ...options,
+        },
       });
       if (error) throw error;
     } catch (error) {

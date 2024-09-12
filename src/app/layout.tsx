@@ -8,7 +8,7 @@ import 'jsvectormap/dist/css/jsvectormap.css';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 
-import FloatingBubble from '@/components/FloatingBubble/FloatingBubble';
+import FloatingBubble from '@/components/common/FloatingBubble/FloatingBubble';
 import { LoadingProvider, useLoading } from '@/hooks/LoadingContext';
 import RouteGuard from '@/hooks/RouteGuard';
 import { AuthProvider } from '@/hooks/useAuth';

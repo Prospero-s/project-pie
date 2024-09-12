@@ -83,10 +83,12 @@ const ClientSignIn = () => {
   };
 
   const signInWithApple = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'apple',
-    });
-    if (error) {
+    try {
+      await signWithProvider('apple', {
+        redirectTo: window.location.origin + '/dashboard', // Assurez-vous que cette URL est correcte
+      });
+    } catch (error) {
+      console.error('Erreur de connexion avec Apple:', error);
       openNotificationWithIcon(
         'error',
         t('login_error_title'),

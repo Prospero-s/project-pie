@@ -6,7 +6,7 @@ import CardDataStats from '@/components/Dashboard/CardDataStats';
 import ChartOne from '@/components/Dashboard/ChartOne';
 import ChartThree from '@/components/Dashboard/ChartThree';
 import ChartTwo from '@/components/Dashboard/ChartTwo';
-import MapOne from '@/components/Maps/MapOne';
+import MapOne from '@/components/Dashboard/MapOne';
 
 const ClientDashboard = () => {
   const { t } = useTranslation('dashboard');
