@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef } from 'react';
 
+import Loader from '@/components/common/Loader'; // Assurez-vous que le chemin est correct
 import { useAuth } from '@/hooks/useAuth';
 
 import { useLoading } from './LoadingContext';
@@ -11,7 +12,7 @@ const RouteGuard = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const { setLoading } = useLoading();
+  const { loading, setLoading } = useLoading();
   const isFirstRender = useRef(true);
 
   const publicPaths = useMemo(
@@ -25,12 +26,9 @@ const RouteGuard = ({ children }: { children: React.ReactNode }) => {
   );
 
   useEffect(() => {
+    setLoading(true);
     if (isFirstRender.current) {
-      console.log('isFirstRender', isFirstRender.current);
-      console.log('user', user);
-      console.log('pathname', pathname);
       isFirstRender.current = false;
-      setLoading(true);
 
       if (!user && !publicPaths.includes(pathname)) {
         router.push('/auth/signin');
@@ -39,12 +37,14 @@ const RouteGuard = ({ children }: { children: React.ReactNode }) => {
       } else {
         setLoading(false);
       }
+    } else {
+      setLoading(false);
     }
   }, [user, router, setLoading, publicPaths, pathname]);
 
-  useEffect(() => {
-    setLoading(false);
-  }, [pathname, setLoading]);
+  if (loading) {
+    return <Loader />;
+  }
 
   return <>{children}</>;
 };

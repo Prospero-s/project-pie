@@ -1,6 +1,6 @@
 'use client';
 
-import { Session, User } from '@supabase/supabase-js';
+import { Provider, Session, User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import {
   ReactNode,
@@ -16,15 +16,25 @@ import { supabase } from '@/supabase/supabaseClient';
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (
+    email: string,
+    password: string,
+  ) => Promise<{
+    data:
+      | { user: User; session: Session; weakPassword?: any }
+      | { user: null; session: null; weakPassword?: null | undefined };
+    error: any;
+  }>;
   signOut: () => Promise<void>;
+  signWithProvider: (provider: Provider) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
-  signIn: async () => {},
+  signIn: async () => ({ data: { user: null, session: null }, error: null }),
   signOut: async () => {},
+  signWithProvider: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -68,16 +78,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
-    } catch (error) {
-      console.error('Error signing in:', error);
-    }
-    // Ne pas désactiver le loading ici, laissez le `onAuthStateChange` s'en occuper
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    setLoading(false);
+    return { data, error };
   };
 
   const signOut = async () => {
@@ -88,11 +94,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error('Error signing out:', error);
     }
-    // Ne pas désactiver le loading ici non plus
+  };
+
+  const signWithProvider = async (
+    provider: Provider,
+    options?: {
+      redirectTo?: string;
+      scopes?: string;
+      queryParams?: Record<string, string>;
+      skipBrowserRedirect?: boolean;
+    },
+  ) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options,
+      });
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error signing in with provider:', error);
+    }
+    setLoading(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{ user, session, signIn, signOut, signWithProvider }}
+    >
       {children}
     </AuthContext.Provider>
   );

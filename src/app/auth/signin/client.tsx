@@ -16,7 +16,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/supabase/supabaseClient';
 
 const ClientSignIn = () => {
-  const { signIn } = useAuth();
+  const { signIn, signWithProvider } = useAuth();
   const { t } = useTranslation('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,54 +29,56 @@ const ClientSignIn = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await signIn(email, password);
-      openNotificationWithIcon(
-        'success',
-        t('login_success'),
-        t('login_success_message'),
-      );
-    } catch (error: any) {
-      if (error.message.includes('Email not confirmed')) {
-        setShowVerificationModal(true);
-      } else {
+      const { data, error } = await signIn(email, password);
+      if (error) {
+        if (
+          error.status === 400 &&
+          error.message.includes('Email not confirmed')
+        ) {
+          setShowVerificationModal(true);
+        } else {
+          throw error;
+        }
+      } else if (data.user) {
         openNotificationWithIcon(
-          'error',
-          t('login_error'),
-          t('login_error_message'),
+          'success',
+          t('login_success'),
+          t('login_success_message'),
         );
       }
+    } catch (error) {
+      console.error('Erreur de connexion:', error);
+      openNotificationWithIcon(
+        'error',
+        t('login_error'),
+        t('login_error_message'),
+      );
     }
   };
 
   const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-    });
-    if (error) {
+    try {
+      await signWithProvider('google');
+    } catch (error) {
+      console.error('Erreur de connexion avec Google:', error);
       openNotificationWithIcon(
         'error',
-        t('login_error'),
+        t('login_error_title'),
         t('login_error_message'),
       );
     }
   };
 
   const signInWithMicrosoft = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'azure',
-      options: {
-        scopes: 'email openid profile',
-      },
-    });
-    if (error) {
-      console.error('Erreur de connexion Microsoft:', error);
+    try {
+      await signWithProvider('azure');
+    } catch (error) {
+      console.error('Erreur de connexion avec Microsoft:', error);
       openNotificationWithIcon(
         'error',
-        t('login_error'),
+        t('login_error_title'),
         t('login_error_message'),
       );
-    } else if (data) {
-      console.log('Connexion Microsoft réussie:', data);
     }
   };
 
