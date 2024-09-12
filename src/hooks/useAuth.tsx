@@ -1,15 +1,8 @@
 'use client';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Provider, Session, User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
-import {
-  ReactNode,
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import * as React from 'react';
 
 import { useLoading } from '@/hooks/LoadingContext';
 import { supabase } from '@/supabase/supabaseClient';
@@ -30,7 +23,7 @@ interface AuthContextType {
   signWithProvider: (provider: Provider) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({
+const AuthContext = React.createContext<AuthContextType>({
   user: null,
   session: null,
   signIn: async () => ({ data: { user: null, session: null }, error: null }),
@@ -38,13 +31,13 @@ const AuthContext = createContext<AuthContextType>({
   signWithProvider: async () => {},
 });
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = React.useState<User | null>(null);
+  const [session, setSession] = React.useState<Session | null>(null);
   const { setLoading } = useLoading();
   const router = useRouter();
 
-  useEffect(() => {
+  React.useEffect(() => {
     const setServerSession = async () => {
       const {
         data: { session },
@@ -128,4 +121,4 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => React.useContext(AuthContext);
