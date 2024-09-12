@@ -21,7 +21,6 @@ i18n
       'entreprises',
       'company-details',
     ],
-    debug: process.env.NODE_ENV === 'development',
     interpolation: {
       escapeValue: false,
     },

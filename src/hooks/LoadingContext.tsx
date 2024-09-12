@@ -1,14 +1,16 @@
 import React, {
   createContext,
-  Dispatch,
-  SetStateAction,
+  useCallback,
   useContext,
+  useRef,
   useState,
 } from 'react';
 
+import Loader from '@/components/common/Loader';
+
 interface LoadingContextType {
   loading: boolean;
-  setLoading: Dispatch<SetStateAction<boolean>>;
+  setLoading: (value: boolean) => void;
 }
 
 const LoadingContext = createContext<LoadingContextType | null>(null);
@@ -18,11 +20,23 @@ export const LoadingProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoadingState] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const setLoading = useCallback((value: boolean) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      console.log('Loading state changed:', value);
+      setLoadingState(value);
+    }, 300); // Délai de 300ms
+  }, []);
 
   return (
     <LoadingContext.Provider value={{ loading, setLoading }}>
-      {children}
+      {loading ? <Loader /> : children}
     </LoadingContext.Provider>
   );
 };

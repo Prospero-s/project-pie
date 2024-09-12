@@ -28,7 +28,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true',
   );
 
-  // close on click outside
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
       if (!sidebar.current || !trigger.current) return;
@@ -70,15 +69,13 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       }`}
     >
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
-        <Link href="/">
-          <Image
-            width={176}
-            height={32}
-            src={importImage.src}
-            alt="Logo"
-            priority
-          />
-        </Link>
+        <Image
+          width={176}
+          height={32}
+          src={importImage.src}
+          alt="Logo"
+          priority
+        />
 
         <button
           ref={trigger}

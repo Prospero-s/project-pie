@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
@@ -67,7 +66,6 @@ const DropdownNotification = () => {
           />
         </svg>
       </Link>
-
       <div
         ref={dropdown}
         onFocus={() => setDropdownOpen(true)}

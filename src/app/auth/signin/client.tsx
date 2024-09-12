@@ -8,21 +8,19 @@ import {
 import { Button, Input, Modal } from 'antd';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { openNotificationWithIcon } from '@/components/Notification/NotifAlert';
-import { useLoading } from '@/hooks/LoadingContext';
+import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/supabase/supabaseClient';
 
 const ClientSignIn = () => {
+  const { signIn } = useAuth();
   const { t } = useTranslation('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const router = useRouter();
   const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const { setLoading } = useLoading();
 
   const isFormValid = () => {
     return email.trim() !== '' && password.trim() !== '';
@@ -30,39 +28,23 @@ const ClientSignIn = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        if (
-          error.status === 400 &&
-          error.message.includes('Email not confirmed')
-        ) {
-          setShowVerificationModal(true);
-        } else {
-          throw error;
-        }
-      } else if (data.user) {
-        openNotificationWithIcon(
-          'success',
-          t('login_success'),
-          t('login_success_message'),
-        );
-        router.push('/dashboard');
-      }
-    } catch (error) {
-      console.error('Erreur de connexion:', error);
+      await signIn(email, password);
       openNotificationWithIcon(
-        'error',
-        t('login_error'),
-        t('login_error_message'),
+        'success',
+        t('login_success'),
+        t('login_success_message'),
       );
-    } finally {
-      setLoading(false);
+    } catch (error: any) {
+      if (error.message.includes('Email not confirmed')) {
+        setShowVerificationModal(true);
+      } else {
+        openNotificationWithIcon(
+          'error',
+          t('login_error'),
+          t('login_error_message'),
+        );
+      }
     }
   };
 

@@ -1,45 +1,39 @@
 import { UserOutlined } from '@ant-design/icons';
-import { User } from '@supabase/supabase-js';
 import { Avatar } from 'antd';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { openNotificationWithIcon } from '@/components/Notification/NotifAlert';
-import { useLoading } from '@/hooks/LoadingContext';
-import { supabase } from '@/supabase/supabaseClient';
+import { useAuth } from '@/hooks/useAuth';
 
 const DropdownUser = () => {
   const { t } = useTranslation('header');
-  const { setLoading } = useLoading();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const { signOut, user } = useAuth();
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
-  const router = useRouter();
 
   // Fonction de déconnexion
   const handleLogout = async () => {
-    setLoading(true);
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      await signOut();
       openNotificationWithIcon(
         'success',
         'Déconnexion réussie',
         'Vous êtes maintenant déconnecté.',
       );
-      router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);
-    } finally {
-      setLoading(false);
+      openNotificationWithIcon(
+        'error',
+        'Erreur de déconnexion',
+        'Une erreur est survenue lors de la déconnexion.',
+      );
     }
   };
 
-  // close on click outside
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
       if (!dropdown.current) return;
@@ -64,23 +58,6 @@ const DropdownUser = () => {
     document.addEventListener('keydown', keyHandler);
     return () => document.removeEventListener('keydown', keyHandler);
   });
-
-  // get the currently signed-in user
-  useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (session) {
-          setUser(session.user);
-        } else {
-          setUser(null);
-        }
-      },
-    );
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
 
   return (
     <div className="relative">

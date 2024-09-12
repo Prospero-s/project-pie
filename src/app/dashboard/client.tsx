@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CardDataStats from '@/components/Dashboard/CardDataStats';
@@ -8,15 +7,9 @@ import ChartOne from '@/components/Dashboard/ChartOne';
 import ChartThree from '@/components/Dashboard/ChartThree';
 import ChartTwo from '@/components/Dashboard/ChartTwo';
 import MapOne from '@/components/Maps/MapOne';
-import { useLoading } from '@/hooks/LoadingContext';
 
 const ClientDashboard = () => {
   const { t } = useTranslation('dashboard');
-  const { setLoading } = useLoading();
-
-  useEffect(() => {
-    setLoading(false);
-  }, [setLoading]);
 
   return (
     <>

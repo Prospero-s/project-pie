@@ -1,7 +1,7 @@
 'use client';
 
-// eslint-disable-next-line simple-import-sort/imports
 import { Session, User } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
 import {
   ReactNode,
   createContext,
@@ -10,65 +10,92 @@ import {
   useState,
 } from 'react';
 
-import Loader from '@/components/common/Loader';
+import { useLoading } from '@/hooks/LoadingContext';
 import { supabase } from '@/supabase/supabaseClient';
-import { useLoading } from './LoadingContext';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  loading: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
-  loading: true,
+  signIn: async () => {},
+  signOut: async () => {},
 });
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const { loading, setLoading } = useLoading();
-  const [hydrated, setHydrated] = useState(false);
+  const { setLoading } = useLoading();
+  const router = useRouter();
 
   useEffect(() => {
+    const setServerSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        router.push('/dashboard');
+      }
+    };
+
+    setServerSession();
+
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+
+        if (event === 'SIGNED_IN') {
+          router.push('/dashboard');
+        } else if (event === 'SIGNED_OUT') {
+          router.push('/auth/signin');
+        }
       },
     );
 
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, [setLoading]);
+  }, [router, setLoading]);
 
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
+  const signIn = async (email: string, password: string) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error signing in:', error);
+    }
+    // Ne pas désactiver le loading ici, laissez le `onAuthStateChange` s'en occuper
+  };
 
-  if (!hydrated) {
-    return (
-      <div className="h-screen w-screen">
-        <Loader />
-      </div>
-    );
-  }
+  const signOut = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+    // Ne pas désactiver le loading ici non plus
+  };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading }}>
+    <AuthContext.Provider value={{ user, session, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);
