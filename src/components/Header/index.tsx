@@ -1,3 +1,4 @@
+import { User } from '@supabase/supabase-js';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -10,6 +11,7 @@ import DropdownUser from './DropdownUser';
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
   setSidebarOpen: (arg0: boolean) => void;
+  user: User | null;
 }) => {
   const { t } = useTranslation('search-company');
   const router = useRouter();
@@ -132,7 +134,7 @@ const Header = (props: {
           <ul className="flex items-center gap-2 2xsm:gap-4">
             <DropdownNotification />
           </ul>
-          <DropdownUser />
+          <DropdownUser user={props.user} />
         </div>
       </div>
     </header>

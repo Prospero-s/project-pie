@@ -26,7 +26,7 @@ const ChartTwo = () => {
     labels: ['NeuroTech AI', 'EcoDrive Innovations', 'Quantum Solutions'],
     datasets: [
       {
-        label: t('dashboard.investment_amount'),
+        label: t('investment_amount'),
         data: [3000000, 1500000, 2500000],
         backgroundColor: [
           'rgba(75, 192, 192, 0.2)',

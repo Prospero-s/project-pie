@@ -1,8 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useTranslation } from 'react-i18next';
 
+import { useTranslation } from '@/app/i18n/client';
 import { SearchCompany } from '@/types/search-company';
 import { toCamelCase, toLowerCase } from '@/utils/textUtils';
 
@@ -13,11 +13,13 @@ const DynamicSearchCompanyMap = dynamic(() => import('./SearchCompanyMap'), {
 const CompanyInfoCard = ({
   company,
   siren,
+  lng,
 }: {
   company: SearchCompany;
   siren: string;
+  lng: string;
 }) => {
-  const { t } = useTranslation('search-company');
+  const { t } = useTranslation(lng, 'search-company');
   const address = `${company.adresse.numVoie} ${toLowerCase(company.adresse.typeVoie)} ${toLowerCase(company.adresse.voie)}, ${company.adresse.codePostal} ${toCamelCase(company.adresse.commune)}, ${toCamelCase(company.adresse.pays)}`;
 
   return (
@@ -129,7 +131,7 @@ const CompanyInfoCard = ({
           </dl>
         </div>
         <div className="p-4 sm:col-span-2 lg:col-span-1">
-          <DynamicSearchCompanyMap address={address} />
+          <DynamicSearchCompanyMap address={address} lng={lng} />
         </div>
       </div>
     </div>

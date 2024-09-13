@@ -1,8 +1,14 @@
-import { useTranslation } from 'react-i18next';
-
+import { useTranslation } from '@/app/i18n/client';
 import { toCamelCase } from '@/utils/textUtils';
-const ActivitiesCard = ({ activities }: { activities: any[] }) => {
-  const { t } = useTranslation('search-company');
+
+const ActivitiesCard = ({
+  activities,
+  lng,
+}: {
+  activities: any[];
+  lng: string;
+}) => {
+  const { t } = useTranslation(lng, 'search-company');
   return (
     <div className="mt-5 bg-white shadow overflow-hidden sm:rounded-lg">
       <div className="px-4 py-5 sm:px-6">

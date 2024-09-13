@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useTranslation } from 'react-i18next';
+
+import { useTranslation } from '@/app/i18n/client';
 
 type Investment = {
   id: string;
@@ -35,8 +36,8 @@ const investmentsData: Investment[] = [
   },
 ];
 
-const TableInvestissement = () => {
-  const { t } = useTranslation('entreprises');
+const TableInvestissement = ({ lng }: { lng: string }) => {
+  const { t } = useTranslation(lng, 'entreprises');
   return (
     <div className="rounded-sm border border-gray-300 bg-white p-6 shadow-lg">
       <div className="max-w-full overflow-x-auto">

@@ -7,8 +7,8 @@ import L from 'leaflet';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
+import { useTranslation } from '@/app/i18n/client';
 import customMarkerIcon from '/public/images/icon/map-marker.svg';
 import mapNonCharge from '/public/images/icon/map-non-charge.jpg';
 
@@ -51,8 +51,14 @@ const fetchCoordinates = async (address: string) => {
   return null;
 };
 
-const SearchCompanyMap = ({ address }: { address: string }) => {
-  const { t } = useTranslation('search-company');
+const SearchCompanyMap = ({
+  address,
+  lng,
+}: {
+  address: string;
+  lng: string;
+}) => {
+  const { t } = useTranslation(lng, 'search-company');
   const [coordinates, setCoordinates] = useState<{
     lat: number;
     lon: number;

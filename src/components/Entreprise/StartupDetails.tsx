@@ -1,8 +1,8 @@
 import { ApexOptions } from 'apexcharts';
 import React from 'react';
 import ReactApexChart from 'react-apexcharts';
-import { useTranslation } from 'react-i18next';
 
+import { useTranslation } from '@/app/i18n/client';
 import Breadcrumb from '@/components/common/Breadcrumbs/Breadcrumb';
 interface GrowthData {
   funding: number[];
@@ -26,10 +26,11 @@ interface Startup {
 
 interface StartupDetailsProps {
   startup: Startup;
+  lng: string;
 }
 
-const StartupDetails: React.FC<StartupDetailsProps> = ({ startup }) => {
-  const { t } = useTranslation('company-details');
+const StartupDetails: React.FC<StartupDetailsProps> = ({ startup, lng }) => {
+  const { t } = useTranslation(lng, 'company-details');
   const getMarketPositioningIcon = (position: string) => {
     if (position === 'up') {
       return <span style={{ color: 'green' }}>▲</span>;

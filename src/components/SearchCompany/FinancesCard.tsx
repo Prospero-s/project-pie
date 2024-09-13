@@ -1,13 +1,15 @@
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@/app/i18n/client';
 
 const FinancesCard = ({
   capital,
   currency,
+  lng,
 }: {
   capital: any;
   currency: string;
+  lng: string;
 }) => {
-  const { t } = useTranslation('search-company');
+  const { t } = useTranslation(lng, 'search-company');
   const formattedCapital =
     capital !== null
       ? new Intl.NumberFormat('fr-FR', {

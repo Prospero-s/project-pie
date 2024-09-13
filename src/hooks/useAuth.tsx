@@ -1,11 +1,10 @@
 'use client';
 
 import { Provider, Session, User } from '@supabase/supabase-js';
-import { useRouter } from 'next/navigation';
 import * as React from 'react';
+import { useEffect } from 'react';
 
-import { useLoading } from '@/hooks/LoadingContext';
-import { supabase } from '@/supabase/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 
 interface AuthContextType {
   user: User | null;
@@ -42,57 +41,55 @@ const AuthContext = React.createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = React.useState<User | null>(null);
   const [session, setSession] = React.useState<Session | null>(null);
-  const { setLoading } = useLoading();
-  const router = useRouter();
 
-  React.useEffect(() => {
-    const setServerSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        router.push('/dashboard');
-      }
-    };
-
-    setServerSession();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         setUser(session?.user ?? null);
-        setLoading(false);
+        setSession(session);
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setSession(null);
+      }
+    });
 
-        if (event === 'SIGNED_IN') {
-          router.push('/dashboard');
-        } else if (event === 'SIGNED_OUT') {
-          router.push('/auth/signin');
-        }
-      },
-    );
+    // Vérifier la session au chargement initial
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setSession(session);
+    });
 
     return () => {
-      authListener.subscription.unsubscribe();
+      subscription.unsubscribe();
     };
-  }, [router, setLoading]);
+  }, []);
 
   const signIn = async (email: string, password: string) => {
-    setLoading(true);
+    console.log('signIn', email, password);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    setLoading(false);
+    console.log('signIn', data, error);
+
+    if (data.user) {
+      setUser(data.user);
+      setSession(data.session);
+      // Ajoutez cette ligne pour forcer la mise à jour de la session
+      await supabase.auth.refreshSession();
+    }
+
     return { data, error };
   };
 
   const signOut = async () => {
-    setLoading(true);
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      setUser(null); // Ajouté pour mettre à jour l'état de l'utilisateur
+      setSession(null); // Ajouté pour mettre à jour l'état de la session
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -107,12 +104,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       skipBrowserRedirect?: boolean;
     },
   ) => {
-    setLoading(true);
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: window.location.origin + '/dashboard', // Assurez-vous que cette URL est correcte
           ...options,
         },
       });
@@ -120,7 +115,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       console.error('Error signing in with provider:', error);
     }
-    setLoading(false);
   };
 
   return (

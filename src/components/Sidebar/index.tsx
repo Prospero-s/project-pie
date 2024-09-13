@@ -5,17 +5,20 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
-import importImage from '/public/images/icon/Groupe_2.png';
+import { useTranslation } from '../../app/i18n/client';
 
 interface SidebarProps {
   sidebarOpen: boolean;
   setSidebarOpen: (arg: boolean) => void;
 }
 
-const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
-  const { t } = useTranslation('sidebar');
+const Sidebar = ({
+  sidebarOpen,
+  setSidebarOpen,
+  lng,
+}: SidebarProps & { lng: string }) => {
+  const { t } = useTranslation(lng, 'sidebar');
 
   const pathname = usePathname();
 
@@ -72,7 +75,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         <Image
           width={176}
           height={32}
-          src={importImage.src}
+          src={'/images/icon/Groupe_2.png'}
           alt="Logo"
           priority
         />
@@ -109,7 +112,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             <ul className="mb-6 flex flex-col gap-1.5">
               <li>
                 <Link
-                  href="/dashboard"
+                  href={`/${lng}/dashboard`}
                   className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
                     pathname.includes('dashboard') &&
                     'bg-graydark dark:bg-meta-4'
@@ -121,9 +124,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               </li>
               <li>
                 <Link
-                  href="/tables"
+                  href={`/${lng}/table-investement`}
                   className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                    pathname.includes('tables') && 'bg-graydark dark:bg-meta-4'
+                    pathname.includes('table-investement') &&
+                    'bg-graydark dark:bg-meta-4'
                   }`}
                 >
                   <FolderOutlined />

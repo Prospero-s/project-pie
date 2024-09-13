@@ -59,6 +59,7 @@
     "postcss.config.js",
     "tailwind.config.ts",
     "/src/js/us-aea-en.js",
-    "next.config.js"
+    "next.config.js",
+    "next-i18next.config.js"
   ]
 }

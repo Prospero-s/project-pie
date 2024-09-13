@@ -1,8 +1,8 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useTranslation } from 'react-i18next';
 
+import { useTranslation } from '@/app/i18n/client';
 import StartupDetails from '@/components/Entreprise/StartupDetails';
 
 const entreprises = [
@@ -89,8 +89,8 @@ const calculateShareCapital = (growthData: any) => {
   return totalFunding + totalRevenue;
 };
 
-const Entreprise = () => {
-  const { t } = useTranslation('company-details');
+const Entreprise = ({ lng }: { lng: string }) => {
+  const { t } = useTranslation(lng, 'company-details');
   const searchParams = useSearchParams();
   const startupId = searchParams.get('id');
 
@@ -103,7 +103,7 @@ const Entreprise = () => {
   const shareCapital = calculateShareCapital(enteprise.growthData);
   const startupWithCapital = { ...enteprise, shareCapital };
 
-  return <StartupDetails startup={startupWithCapital} />;
+  return <StartupDetails startup={startupWithCapital} lng={lng} />;
 };
 
 export default Entreprise;

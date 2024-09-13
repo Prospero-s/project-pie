@@ -3,9 +3,10 @@
 import 'leaflet/dist/leaflet.css';
 
 import L, { LatLngTuple } from 'leaflet';
-import { useTranslation } from 'react-i18next';
+import { useEffect, useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 
+import { useTranslation } from '@/app/i18n/client';
 import customMarkerIcon from '/public/images/icon/map-marker.svg';
 
 const CustomIcon = L.icon({
@@ -16,8 +17,18 @@ const CustomIcon = L.icon({
   shadowSize: [41, 41],
 });
 
-const MapOne = () => {
-  const { t } = useTranslation('dashboard');
+const MapOne = ({ lng }: { lng: string }) => {
+  const { t } = useTranslation(lng, 'dashboard');
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return null; // ou un loader, ou un message d'attente
+  }
+
   const positions: { name: string; position: LatLngTuple }[] = [
     { name: 'NeuroTech AI', position: [48.8566, 2.3522] },
     { name: 'EcoDrive Innovations', position: [51.5074, -0.1278] },
