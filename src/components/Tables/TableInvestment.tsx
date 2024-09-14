@@ -80,7 +80,7 @@ const TableInvestissement = ({ lng }: { lng: string }) => {
                 </td>
                 <td className="px-6 py-4">
                   <Link
-                    href={`/entreprises?id=${investment.id}`}
+                    href={`/user/entreprises?id=${investment.id}`}
                     className="text-blue-500 hover:text-blue-700"
                   >
                     Voir

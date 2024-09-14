@@ -2,13 +2,11 @@
 
 import dynamic from 'next/dynamic';
 
-import DefaultLayout from '@/components/common/Layouts/UserLayout';
+import { useTranslation } from '@/app/i18n/client';
 import CardDataStats from '@/components/Dashboard/CardDataStats';
 import ChartOne from '@/components/Dashboard/ChartOne';
 import ChartThree from '@/components/Dashboard/ChartThree';
 import ChartTwo from '@/components/Dashboard/ChartTwo';
-
-import { useTranslation } from '../../i18n/client';
 
 export default function ClientDashboard({ lng }: { lng: string }) {
   const MapOne = dynamic(() => import('@/components/Dashboard/MapOne'), {
@@ -17,7 +15,7 @@ export default function ClientDashboard({ lng }: { lng: string }) {
   const { t } = useTranslation(lng, 'dashboard');
 
   return (
-    <DefaultLayout lng={lng}>
+    <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
         <CardDataStats
           title={t('total_companies')}
@@ -139,6 +137,6 @@ export default function ClientDashboard({ lng }: { lng: string }) {
           <MapOne lng={lng} />
         </div>
       </div>
-    </DefaultLayout>
+    </>
   );
 }

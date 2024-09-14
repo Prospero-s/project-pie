@@ -8,8 +8,8 @@ export const metadata: Metadata = {
   description: 'This is Next.js Signin Page TailAdmin Dashboard Template',
 };
 
-const Settings = ({ params: { lng } }: { params: { lng: string } }) => {
-  return <ClientSettings lng={lng} />;
+const Settings = () => {
+  return <ClientSettings />;
 };
 
 export default Settings;

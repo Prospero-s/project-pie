@@ -1,7 +1,5 @@
 import '@/css/satoshi.css';
 import '@/css/style.css';
-import 'flatpickr/dist/flatpickr.min.css';
-import 'jsvectormap/dist/css/jsvectormap.css';
 
 import { dir } from 'i18next';
 

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 
 import { supabase } from '@/lib/supabaseClient';
 
-export default function AuthLayout({
+export default function AuthLayoutComponent({
   children,
 }: {
   children: React.ReactNode;
@@ -30,7 +30,7 @@ export default function AuthLayout({
         return;
       }
       if (data?.user) {
-        router.push('/dashboard');
+        router.push(`/user/dashboard`);
       } else {
         setLoading(false);
       }

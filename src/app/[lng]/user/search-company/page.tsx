@@ -1,8 +1,6 @@
 import { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 
-import UserLayout from '@/components/common/Layouts/UserLayout';
-
 const ClientSearchCompany = dynamic(() => import('./client'), { ssr: false });
 
 export const metadata: Metadata = {
@@ -10,12 +8,8 @@ export const metadata: Metadata = {
   description: 'This is Next.js Signin Page TailAdmin Dashboard Template',
 };
 
-const CompanyDetails = ({ lng }: { lng: string }) => {
-  return (
-    <UserLayout lng={lng}>
-      <ClientSearchCompany lng={lng} />
-    </UserLayout>
-  );
+const CompanyDetails = ({ params: { lng } }: { params: { lng: string } }) => {
+  return <ClientSearchCompany lng={lng} />;
 };
 
 export default CompanyDetails;

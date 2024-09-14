@@ -1,9 +1,14 @@
 import { ApexOptions } from 'apexcharts';
+import dynamic from 'next/dynamic';
 import React from 'react';
-import ReactApexChart from 'react-apexcharts';
 
 import { useTranslation } from '@/app/i18n/client';
 import Breadcrumb from '@/components/common/Breadcrumbs/Breadcrumb';
+
+const ReactApexChart = dynamic(() => import('react-apexcharts'), {
+  ssr: false,
+});
+
 interface GrowthData {
   funding: number[];
   revenue: number[];

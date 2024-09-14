@@ -9,7 +9,7 @@ import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/lib/supabaseClient';
 
-export default function UserLayout({
+export default function UserLayoutComponent({
   children,
   lng,
 }: {
@@ -17,7 +17,7 @@ export default function UserLayout({
   lng: string;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
@@ -33,7 +33,7 @@ export default function UserLayout({
       const { data, error } = await supabase.auth.getUser();
       if (error) {
         console.log("Erreur lors de la récupération de l'utilisateur:", error);
-        router.push('/signin');
+        router.push('/auth/signin');
         setLoading(false);
         return;
       }
@@ -46,7 +46,7 @@ export default function UserLayout({
     fetchUser();
   }, [isMounted, router]);
 
-  if (loading) {
+  if (!user) {
     return <></>;
   }
 
