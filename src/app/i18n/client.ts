@@ -1,7 +1,6 @@
 'use client';
 
 import i18next, { FlatNamespace, KeyPrefix } from 'i18next';
-// import LocizeBackend from 'i18next-locize-backend'
 import LanguageDetector from 'i18next-browser-languagedetector';
 import resourcesToBackend from 'i18next-resources-to-backend';
 import { useEffect, useState } from 'react';
