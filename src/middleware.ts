@@ -17,8 +17,17 @@ export async function middleware(request: NextRequest) {
     locales.find(locale => pathname.startsWith(`/${locale}`)) || 'fr'; // Langue par défaut: 'fr'
 
   // Exclure les pages de connexion de la redirection
-  if (pathname.startsWith(`/${locale}/signin`)) {
+  if (pathname.startsWith(`/${locale}/auth/signin`)) {
     return NextResponse.next();
+  }
+
+  console.log(pathname);
+
+  // Rediriger /fr/ vers /fr/home/
+  if (pathname === `/${locale}`) {
+    return NextResponse.redirect(
+      new URL(`/${locale}/auth/signin/`, request.url),
+    );
   }
 
   // Gérer la langue si elle est manquante dans l'URL

@@ -1,6 +1,4 @@
 import { User } from '@supabase/supabase-js';
-import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +10,7 @@ const Header = (props: {
   sidebarOpen: string | boolean | undefined;
   setSidebarOpen: (arg0: boolean) => void;
   user: User | null;
+  setUser: (arg0: User | null) => void;
 }) => {
   const { t } = useTranslation('search-company');
   const router = useRouter();
@@ -20,7 +19,7 @@ const Header = (props: {
   const handleSearchSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     if (siren) {
-      router.push(`/search-company?siren=${siren}`);
+      router.push(`/user/search-company/${siren}`);
     }
   };
 
@@ -79,15 +78,6 @@ const Header = (props: {
               </span>
             </span>
           </button>
-
-          <Link className="block flex-shrink-0 lg:hidden" href="/">
-            <Image
-              width={32}
-              height={32}
-              src={'/images/logo/logo-icon.svg'}
-              alt="Logo"
-            />
-          </Link>
         </div>
 
         <div className="hidden sm:block">
@@ -134,7 +124,7 @@ const Header = (props: {
           <ul className="flex items-center gap-2 2xsm:gap-4">
             <DropdownNotification />
           </ul>
-          <DropdownUser user={props.user} />
+          <DropdownUser user={props.user} setUser={props.setUser} />
         </div>
       </div>
     </header>

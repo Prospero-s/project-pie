@@ -1,6 +1,6 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 
 import { useTranslation } from '@/app/i18n/client';
 import StartupDetails from '@/components/Entreprise/StartupDetails';
@@ -91,17 +91,17 @@ const calculateShareCapital = (growthData: any) => {
 
 const Entreprise = ({ lng }: { lng: string }) => {
   const { t } = useTranslation(lng, 'company-details');
-  const searchParams = useSearchParams();
-  const startupId = searchParams.get('id');
+  const params = useParams();
+  const startupId = params.id;
 
-  const enteprise = entreprises.find(s => s.id === startupId);
+  const entreprise = entreprises.find(s => s.id === startupId);
 
-  if (!enteprise) {
+  if (!entreprise) {
     return <div>{t('startup_not_found')}</div>;
   }
 
-  const shareCapital = calculateShareCapital(enteprise.growthData);
-  const startupWithCapital = { ...enteprise, shareCapital };
+  const shareCapital = calculateShareCapital(entreprise.growthData);
+  const startupWithCapital = { ...entreprise, shareCapital };
 
   return <StartupDetails startup={startupWithCapital} lng={lng} />;
 };

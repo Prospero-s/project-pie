@@ -12,8 +12,6 @@
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.5.4",
-    "@supabase/auth-helpers-nextjs": "^0.10.0",
-    "@supabase/ssr": "^0.5.1",
     "@supabase/supabase-js": "^2.45.2",
     "@types/leaflet": "^1.9.12",
     "accept-language": "3.0.20",
@@ -23,13 +21,12 @@
     "chart.js": "^4.4.3",
     "flatpickr": "^4.6.13",
     "fund": "^1.0.0",
+    "gsap": "^3.12.5",
     "i18next": "23.14.0",
     "i18next-browser-languagedetector": "8.0.0",
     "i18next-http-backend": "^2.6.1",
     "i18next-resources-to-backend": "1.2.1",
-    "jsvectormap": "^1.5.3",
     "leaflet": "^1.9.4",
-    "lodash": "^4.17.21",
     "next": "14.2.8",
     "next-i18next": "^15.3.1",
     "next-intl": "^3.19.1",
@@ -39,8 +36,7 @@
     "react-cookie": "7.2.0",
     "react-dom": "18.3.1",
     "react-i18next": "15.0.1",
-    "react-leaflet": "^4.2.1",
-    "sharp": "^0.33.5"
+    "react-leaflet": "^4.2.1"
   },
   "devDependencies": {
     "@babel/eslint-parser": "7.25.1",

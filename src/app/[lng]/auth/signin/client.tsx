@@ -1,19 +1,20 @@
 'use client';
 
 import {
-  AppleOutlined,
   GoogleOutlined,
   MailOutlined,
   WindowsOutlined,
 } from '@ant-design/icons';
 import { Button, Input, Modal } from 'antd';
+import { gsap } from 'gsap';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { useTranslation } from '@/app/i18n/client';
 import { openNotificationWithIcon } from '@/components/Notification/NotifAlert';
+import { useUser } from '@/context/userContext';
 import { supabase } from '@/lib/supabaseClient';
 
 const ClientSignIn = ({ lng }: { lng: string }) => {
@@ -24,7 +25,18 @@ const ClientSignIn = ({ lng }: { lng: string }) => {
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
   const router = useRouter();
+  const { setUser } = useUser();
   const [loading, setLoading] = useState(false);
+
+  const formRef = useRef(null);
+
+  useEffect(() => {
+    gsap.fromTo(
+      formRef.current,
+      { opacity: 0, y: 50 },
+      { opacity: 1, y: 0, duration: 1, ease: 'power3.out' },
+    );
+  }, []);
 
   const isFormValid = () => {
     return email.trim() !== '' && password.trim() !== '';
@@ -54,6 +66,7 @@ const ClientSignIn = ({ lng }: { lng: string }) => {
           t('login_success'),
           t('login_success_message'),
         );
+        setUser(data.user);
         router.push(`/${lng}/user/dashboard`);
       }
     } catch (error) {
@@ -102,28 +115,6 @@ const ClientSignIn = ({ lng }: { lng: string }) => {
       });
     } catch (error) {
       console.error('Erreur de connexion avec Microsoft:', error);
-      openNotificationWithIcon(
-        'error',
-        t('login_error_title'),
-        t('login_error_message'),
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const signInWithApple = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await supabase.auth.signInWithOAuth({
-        provider: 'apple',
-        options: {
-          redirectTo: window.location.origin + '/dashboard', // Assurez-vous que cette URL est correcte
-        },
-      });
-    } catch (error) {
-      console.error('Erreur de connexion avec Apple:', error);
       openNotificationWithIcon(
         'error',
         t('login_error_title'),
@@ -193,114 +184,103 @@ const ClientSignIn = ({ lng }: { lng: string }) => {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-        <div className="flex flex-wrap items-center">
-          <div className="hidden w-full xl:block xl:w-1/2">
-            <div className="flex flex-col items-center justify-center h-full">
-              <Image
-                src="/images/icon/logo-dark.png"
-                alt="SignIn"
-                width={400}
-                height={400}
-                className="mb-4"
-              />
-              <h1 className="text-2xl font-bold text-center">
-                {t('login_subtitle')}
-              </h1>
+    <>
+      <div className="flex flex-col md:flex-row h-screen w-screen">
+        <div className="md:w-3/5 w-full h-1/2 md:h-full">
+          <Image
+            src="/images/illustration/illustration-login.webp"
+            width={1000}
+            height={1000}
+            alt="SignIn"
+            priority
+            className="w-full h-full"
+          />
+        </div>
+        <div className="md:w-2/5 w-full md:h-full flex items-center justify-center md:mb-0">
+          <div
+            className="w-full md:w-2/3 h-full p-4 md:p-8 md:h-auto"
+            ref={formRef}
+          >
+            <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2 text-center">
+              {t('login_title')}
+            </h2>
+            <form onSubmit={handleSignIn} className="space-y-4">
+              <div className="mb-5 space-y-2">
+                <label className="block font-medium text-black dark:text-white">
+                  {t('email')}
+                </label>
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder={t('enter_email')}
+                  className="w-full rounded-lg border border-stroke bg-transparent py-3 px-4 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  required
+                />
+              </div>
+              <div className="mb-5 space-y-2">
+                <label className="block font-medium text-black dark:text-white">
+                  {t('password')}
+                </label>
+                <Input.Password
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder={t('enter_password')}
+                  className="w-full rounded-lg border border-stroke bg-transparent py-3 px-4 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  required
+                />
+                <Button
+                  onClick={handleForgotPassword}
+                  type="link"
+                  className="text-sm text-primary block mt-2"
+                >
+                  {t('forgot_password_text')}
+                </Button>
+              </div>
+              <div className="mb-5 mt-6">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  disabled={!isFormValid() || loading}
+                  className={`w-full rounded-lg border h-12 flex items-center justify-center bg-primary p-4 text-white transition ${
+                    isFormValid()
+                      ? 'hover:bg-opacity-90'
+                      : 'opacity-50 cursor-not-allowed'
+                  }`}
+                >
+                  {t('login')}
+                </Button>
+              </div>
+            </form>
+            <div className="flex items-center justify-center mb-4 mt-4">
+              <span className="text-gray-500">{t('or_connect_with')}</span>
             </div>
-          </div>
-          <div className="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2">
-            <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
-              <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2 text-center">
-                {t('login_title')}
-              </h2>
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div className="mb-5 space-y-2">
-                  <label className="block font-medium text-black dark:text-white">
-                    {t('email')}
-                  </label>
-                  <Input
-                    type="email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    placeholder={t('enter_email')}
-                    className="w-full rounded-lg border border-stroke bg-transparent py-3 px-4 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    required
-                  />
-                </div>
-                <div className="mb-5 space-y-2">
-                  <label className="block font-medium text-black dark:text-white">
-                    {t('password')}
-                  </label>
-                  <Input.Password
-                    type="password"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    placeholder={t('enter_password')}
-                    className="w-full rounded-lg border border-stroke bg-transparent py-3 px-4 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    required
-                  />
-                  <Button
-                    onClick={handleForgotPassword}
-                    type="link"
-                    className="text-sm text-primary block mt-2"
-                  >
-                    {t('forgot_password_text')}
-                  </Button>
-                </div>
-                <div className="mb-5 mt-6">
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    disabled={!isFormValid() || loading}
-                    className={`w-full rounded-lg border h-12 flex items-center justify-center bg-primary p-4 text-white transition ${
-                      isFormValid()
-                        ? 'hover:bg-opacity-90'
-                        : 'opacity-50 cursor-not-allowed'
-                    }`}
-                  >
-                    {t('login')}
-                  </Button>
-                </div>
-              </form>
-              <div className="flex items-center justify-center mb-4 mt-4">
-                <span className="text-gray-500">{t('or_connect_with')}</span>
-              </div>
-              <div className="flex justify-between gap-4">
-                <Button
-                  icon={<GoogleOutlined />}
-                  disabled={loading}
-                  className="flex-1 h-12 flex items-center justify-center bg-rose-600 hover:!bg-white hover:!border-rose-600 hover:!text-rose-600 border-rose-600 text-white"
-                  onClick={signInWithGoogle}
-                >
-                  Google
-                </Button>
-                <Button
-                  icon={<WindowsOutlined />}
-                  disabled={loading}
-                  className="flex-1 h-12 flex items-center justify-center bg-blue-500 hover:!bg-white hover:!border-blue-500 hover:!text-blue-500 border-blue-500 text-white"
-                  onClick={signInWithMicrosoft}
-                >
-                  Microsoft
-                </Button>
-                <Button
-                  icon={<AppleOutlined />}
-                  disabled={loading}
-                  className="flex-1 h-12 flex items-center justify-center bg-black hover:!bg-white hover:!border-black hover:!text-black border-black text-white"
-                  onClick={signInWithApple}
-                >
-                  Apple
-                </Button>
-              </div>
-              <div className="mt-6 text-center">
-                <p>
-                  {t('no_account')}{' '}
-                  <Link href={`/${lng}/auth/signup`} className="text-primary">
-                    {t('create_account')}
-                  </Link>
-                </p>
-              </div>
+            <div className="flex justify-between gap-4">
+              <Button
+                icon={<GoogleOutlined />}
+                disabled={loading}
+                className="flex-1 h-12 flex items-center justify-center bg-rose-600 hover:!bg-white hover:!border-rose-600 hover:!text-rose-600 border-rose-600 text-white"
+                onClick={signInWithGoogle}
+              >
+                Google
+              </Button>
+              <Button
+                icon={<WindowsOutlined />}
+                disabled={loading}
+                className="flex-1 h-12 flex items-center justify-center bg-blue-500 hover:!bg-white hover:!border-blue-500 hover:!text-blue-500 border-blue-500 text-white"
+                onClick={signInWithMicrosoft}
+              >
+                Microsoft
+              </Button>
+            </div>
+            <div className="mt-6 text-center">
+              <p>
+                {t('no_account')}{' '}
+                <Link href={`/${lng}/auth/signup`} className="text-primary">
+                  {t('create_account')}
+                </Link>
+              </p>
             </div>
           </div>
         </div>
@@ -354,7 +334,7 @@ const ClientSignIn = ({ lng }: { lng: string }) => {
           <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
             <MailOutlined className="text-blue-600 text-2xl" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
             {t('forgot_password.title')}
           </h3>
           <Input
@@ -362,19 +342,19 @@ const ClientSignIn = ({ lng }: { lng: string }) => {
             value={forgotPasswordEmail}
             onChange={e => setForgotPasswordEmail(e.target.value)}
             placeholder={t('forgot_password.email')}
-            className="w-full mb-2"
+            className="w-full md:w-2/3 mb-4"
           />
           <Button
             type="primary"
             onClick={handleForgotPasswordSubmit}
-            className="w-full mb-2"
+            className="w-full md:w-2/3 mb-4"
             disabled={loading}
           >
             {t('forgot_password.submit')}
           </Button>
         </div>
       </Modal>
-    </div>
+    </>
   );
 };
 

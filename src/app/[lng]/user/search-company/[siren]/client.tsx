@@ -1,7 +1,7 @@
 'use client';
 
 import { Spin } from 'antd';
-import { useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
 
 import { useTranslation } from '@/app/i18n/client';
@@ -13,8 +13,8 @@ import useCompanyDetails from '@/hooks/useCompanyDetails';
 
 const ClientSearchCompany = ({ lng }: { lng: string }) => {
   const { t } = useTranslation(lng, 'search-company');
-  const searchParams = useSearchParams();
-  const siren = searchParams.get('siren') || '';
+  const params = useParams();
+  const siren = Array.isArray(params.siren) ? params.siren[0] : params.siren;
   const { company, loading, percent, error } = useCompanyDetails(siren);
 
   useEffect(() => {

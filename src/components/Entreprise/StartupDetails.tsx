@@ -1,13 +1,11 @@
+'use client';
+
 import { ApexOptions } from 'apexcharts';
-import dynamic from 'next/dynamic';
 import React from 'react';
+import ReactApexChart from 'react-apexcharts';
 
 import { useTranslation } from '@/app/i18n/client';
 import Breadcrumb from '@/components/common/Breadcrumbs/Breadcrumb';
-
-const ReactApexChart = dynamic(() => import('react-apexcharts'), {
-  ssr: false,
-});
 
 interface GrowthData {
   funding: number[];
@@ -104,18 +102,18 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({ startup, lng }) => {
     {
       name: 'Financement',
       type: 'area',
-      data: startup.growthData.funding,
+      data: startup.growthData.funding || [],
     },
     {
       name: 'Revenus',
       type: 'bar',
-      data: startup.growthData.revenue,
+      data: startup.growthData.revenue || [],
     },
   ];
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <Breadcrumb pageName={t('entreprises.startup_details')} />
+      <Breadcrumb pageName={t('startup_details')} />
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
           <div>

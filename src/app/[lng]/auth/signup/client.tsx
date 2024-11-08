@@ -1,10 +1,11 @@
 'use client';
 
-import { Input } from 'antd';
+import { Button, Input } from 'antd';
+import { gsap } from 'gsap';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { openNotificationWithIcon } from '@/components/Notification/NotifAlert';
 import { supabase } from '@/lib/supabaseClient';
@@ -22,6 +23,16 @@ const ClientSignUp = ({ lng }: { lng: string }) => {
   const [, setError] = useState('');
   const [, setSuccess] = useState(false);
   const router = useRouter();
+
+  const formRef = useRef(null);
+
+  useEffect(() => {
+    gsap.fromTo(
+      formRef.current,
+      { opacity: 0, y: 50 },
+      { opacity: 1, y: 0, duration: 1, ease: 'power3.out' },
+    );
+  }, []);
 
   const checkPasswordStrength = (pass: string) => {
     let strength = 0;
@@ -144,149 +155,143 @@ const ClientSignUp = ({ lng }: { lng: string }) => {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-        <div className="flex flex-wrap items-center">
-          <div className="hidden w-full xl:block xl:w-1/2">
-            <div className="flex flex-col items-center justify-center h-full">
-              <Image
-                src="/images/icon/logo-dark.png"
-                alt="SignUp"
-                width={400}
-                height={400}
-                className="mb-4"
-              />
-              <h1 className="text-2xl font-bold text-center">
-                {t('subtitle')}
-              </h1>
-            </div>
-          </div>
-          <div className="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2">
-            <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
-              <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2 text-center">
-                {t('title')}
-              </h2>
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-2">
-                  <label className="block font-medium text-black dark:text-white">
-                    {t('full_name')}
-                  </label>
-                  <div className="relative">
-                    <Input
-                      type="text"
-                      placeholder={t('enter_full_name')}
-                      value={fullName}
-                      onChange={e => setFullName(e.target.value)}
-                      className="w-full rounded-lg border border-stroke bg-transparent py-3 px-4 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    />
-                  </div>
+    <>
+      <div className="flex flex-col md:flex-row h-screen w-screen">
+        <div className="md:w-3/5 w-full h-1/2 md:h-full">
+          <Image
+            src="/images/illustration/illustration-login.webp"
+            width={1000}
+            height={1000}
+            alt="SignIn"
+            priority
+            className="w-full h-full"
+          />
+        </div>
+        <div className="md:w-2/5 w-full md:h-full flex items-center justify-center md:mb-0">
+          <div
+            className="w-full md:w-2/3 h-full p-4 md:p-8 md:h-auto"
+            ref={formRef}
+          >
+            <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2 text-center">
+              {t('title')}
+            </h2>
+            <form onSubmit={handleSignUp} className="space-y-4">
+              <div className="space-y-2">
+                <label className="block font-medium text-black dark:text-white">
+                  {t('full_name')}
+                </label>
+                <div className="relative">
+                  <Input
+                    type="text"
+                    placeholder={t('enter_full_name')}
+                    value={fullName}
+                    onChange={e => setFullName(e.target.value)}
+                    className="w-full rounded-lg border border-stroke bg-transparent py-3 px-4 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  />
                 </div>
+              </div>
 
-                <div className="space-y-2">
-                  <label className="block font-medium text-black dark:text-white">
-                    {t('email')}
-                  </label>
-                  <div className="relative">
-                    <Input
-                      type="email"
-                      placeholder={t('enter_email')}
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
-                      className="w-full rounded-lg border border-stroke bg-transparent py-3 px-4 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    />
-                  </div>
+              <div className="space-y-2">
+                <label className="block font-medium text-black dark:text-white">
+                  {t('email')}
+                </label>
+                <div className="relative">
+                  <Input
+                    type="email"
+                    placeholder={t('enter_email')}
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    className="w-full rounded-lg border border-stroke bg-transparent py-3 px-4 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  />
                 </div>
+              </div>
 
-                <div className="space-y-2">
-                  <label className="block font-medium text-black dark:text-white">
-                    {t('password')}
-                  </label>
-                  <div className="relative">
-                    <Input.Password
-                      type="password"
-                      placeholder={t('enter_password')}
-                      value={password}
-                      onChange={handlePasswordChange}
-                      className="w-full rounded-lg border border-stroke bg-transparent py-3 px-4 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    />
-                  </div>
-                  <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full transition-all duration-300 ${
-                        passwordStrength >= 75
-                          ? 'bg-green-500'
-                          : 'bg-yellow-500'
-                      }`}
-                      style={{ width: `${passwordStrength}%` }}
-                    ></div>
-                  </div>
-                  <p
-                    className={`text-sm ${
-                      passwordStrength < 75
-                        ? 'text-yellow-600'
-                        : 'text-green-600'
+              <div className="space-y-2">
+                <label className="block font-medium text-black dark:text-white">
+                  {t('password')}
+                </label>
+                <div className="relative">
+                  <Input.Password
+                    type="password"
+                    placeholder={t('enter_password')}
+                    value={password}
+                    onChange={handlePasswordChange}
+                    className="w-full rounded-lg border border-stroke bg-transparent py-3 px-4 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  />
+                </div>
+                <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-300 ${
+                      passwordStrength >= 75 ? 'bg-green-500' : 'bg-yellow-500'
                     }`}
-                  >
-                    {passwordStrength < 75
-                      ? t('password_requirements')
-                      : passwordStrength === 100
-                        ? t('password_strong')
-                        : t('password_good')}
+                    style={{ width: `${passwordStrength}%` }}
+                  ></div>
+                </div>
+                <p
+                  className={`text-sm ${
+                    passwordStrength < 75 ? 'text-yellow-600' : 'text-green-600'
+                  }`}
+                >
+                  {passwordStrength < 75
+                    ? t('password_requirements')
+                    : passwordStrength === 100
+                      ? t('password_strong')
+                      : t('password_good')}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block font-medium text-black dark:text-white">
+                  {t('confirm_password')}
+                </label>
+                <div className="relative">
+                  <Input.Password
+                    type="password"
+                    placeholder={t('reenter_password')}
+                    value={confirmPassword}
+                    onChange={handleConfirmPasswordChange}
+                    className={`w-full rounded-lg border ${
+                      !passwordMatch && confirmPassword
+                        ? 'border-rose-500'
+                        : 'border-stroke dark:border-form-strokedark'
+                    } bg-transparent py-3 px-4 text-black outline-none focus:border-primary focus-visible:shadow-none dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                  />
+                </div>
+                {!passwordMatch && confirmPassword && (
+                  <p className="text-sm text-rose-500">
+                    {t('password_mismatch')}
                   </p>
-                </div>
+                )}
+              </div>
 
-                <div className="space-y-2">
-                  <label className="block font-medium text-black dark:text-white">
-                    {t('confirm_password')}
-                  </label>
-                  <div className="relative">
-                    <Input.Password
-                      type="password"
-                      placeholder={t('reenter_password')}
-                      value={confirmPassword}
-                      onChange={handleConfirmPasswordChange}
-                      className={`w-full rounded-lg border ${
-                        !passwordMatch && confirmPassword
-                          ? 'border-rose-500'
-                          : 'border-stroke dark:border-form-strokedark'
-                      } bg-transparent py-3 px-4 text-black outline-none focus:border-primary focus-visible:shadow-none dark:bg-form-input dark:text-white dark:focus:border-primary`}
-                    />
-                  </div>
-                  {!passwordMatch && confirmPassword && (
-                    <p className="text-sm text-rose-500">
-                      {t('password_mismatch')}
-                    </p>
-                  )}
-                </div>
+              <div>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  disabled={!isFormValid()}
+                  className={`w-full rounded-lg border h-12 flex items-center justify-center bg-primary p-4 text-white transition ${
+                    isFormValid()
+                      ? 'hover:bg-opacity-90'
+                      : 'opacity-50 cursor-not-allowed'
+                  }`}
+                >
+                  {t('create_account')}
+                </Button>
+              </div>
 
-                <div>
-                  <button
-                    type="submit"
-                    disabled={!isFormValid()}
-                    className={`w-full rounded-lg border border-primary bg-primary p-4 text-white transition ${
-                      isFormValid()
-                        ? 'hover:bg-opacity-90'
-                        : 'opacity-50 cursor-not-allowed'
-                    }`}
-                  >
-                    {t('create_account')}
-                  </button>
-                </div>
-
-                <div className="mt-6 text-center">
-                  <p>
-                    {t('already_have_account')}{' '}
-                    <Link href={`/${lng}/auth/signin`} className="text-primary">
-                      {t('sign_in')}
-                    </Link>
-                  </p>
-                </div>
-              </form>
-            </div>
+              <div className="mt-6 text-center">
+                <p>
+                  {t('already_have_account')}{' '}
+                  <Link href={`/${lng}/auth/signin`} className="text-primary">
+                    {t('sign_in')}
+                  </Link>
+                </p>
+              </div>
+            </form>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

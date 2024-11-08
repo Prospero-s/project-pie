@@ -4,6 +4,7 @@ import '@/css/style.css';
 import { dir } from 'i18next';
 
 import DefaultLayout from '@/components/common/Layouts/DefaultLayout';
+import { UserProvider } from '@/context/userContext';
 
 import { useTranslation } from '../i18n';
 import { fallbackLng, languages } from '../i18n/settings';
@@ -42,7 +43,9 @@ export default function RootLayout({
     <html lang={lng} dir={dir(lng)}>
       <head />
       <body>
-        <DefaultLayout lng={lng}>{children}</DefaultLayout>
+        <UserProvider>
+          <DefaultLayout lng={lng}>{children}</DefaultLayout>
+        </UserProvider>
       </body>
     </html>
   );
