@@ -16,6 +16,12 @@ Ce projet combine **Symfony** pour la partie backend et **React** pour la partie
      cp /.env.example /.env
      ```
    - Ajuster les variables dans ces fichiers en fonction de votre configuration.
+   - Pour la connexion à Supabase completer les deux variables suivantes :
+      ```
+      SUPABASE_DB_USER=******
+      SUPABASE_DB_PASSWORD=******
+      DATABASE_URL=pgsql://${SUPABASE_DB_USER}:${SUPABASE_DB_PASSWORD}@aws-0-eu-west-3.pooler.supabase.com:6543/prospero
+      ```
 
 2. **Lancer les conteneurs Docker** :
    ```bash
