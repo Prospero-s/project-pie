@@ -31,6 +31,22 @@ services:
       - target: 443
         published: ${HTTP3_PORT:-443}
         protocol: udp
+  
+  vite:
+    image: node:16
+    container_name: vite_container
+    working_dir: /app
+    command: npm run dev  # Assurez-vous de démarrer Vite
+    volumes:
+      - ./app:/app  # Montera le répertoire de votre projet dans le conteneur
+    ports:
+      - "5173:5173"  # Expose le port de Vite
+    environment:
+      - VITE_SERVER_HOST=0.0.0.0  # Permet d'écouter toutes les connexions
+    depends_on:
+      - php  # Assure que Symfony démarre avant Vite
+    networks:
+      - symfony-vite-network
 
 # Mercure is installed as a Caddy module, prevent the Flex recipe from installing another service
 ###> symfony/mercure-bundle ###
@@ -41,3 +57,7 @@ volumes:
   caddy_config:
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###
+
+networks:
+  symfony-vite-network:
+    driver: bridge

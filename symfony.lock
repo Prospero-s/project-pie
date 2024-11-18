@@ -1,4 +1,13 @@
 {
+    "pentatrion/vite-bundle": {
+        "version": "7.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "6.5",
+            "ref": "3a6673f248f8fc1dd364dadfef4c5b381d1efab6"
+        }
+    },
     "symfony/console": {
         "version": "7.1",
         "recipe": {
@@ -64,6 +73,20 @@
             "config/routes.yaml"
         ]
     },
+    "symfony/stimulus-bundle": {
+        "version": "2.21",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "2.13",
+            "ref": "6acd9ff4f7fd5626d2962109bd4ebab351d43c43"
+        },
+        "files": [
+            "assets/bootstrap.js",
+            "assets/controllers.json",
+            "assets/controllers/hello_controller.js"
+        ]
+    },
     "symfony/twig-bundle": {
         "version": "7.1",
         "recipe": {
@@ -75,6 +98,18 @@
         "files": [
             "config/packages/twig.yaml",
             "templates/base.html.twig"
+        ]
+    },
+    "symfony/ux-react": {
+        "version": "2.21",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "2.9",
+            "ref": "e970076b31d602ae6e2106cf91a82c7e1f7ddff2"
+        },
+        "files": [
+            "assets/react/controllers/Hello.jsx"
         ]
     }
 }
