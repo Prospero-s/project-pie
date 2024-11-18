@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 const ClientDashboard = dynamic(() => import('./client'), { ssr: false });
 
 export const metadata: Metadata = {
-  title: 'Project PIE Dashboard',
+  title: 'Dashboard',
   description: 'This is Next.js with TailAdmin Dashboard Template',
 };
 

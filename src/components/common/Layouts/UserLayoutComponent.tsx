@@ -18,20 +18,15 @@ export default function UserLayoutComponent({
 
   return (
     <>
-      {/* <!-- ===== Page Wrapper Start ===== --> */}
       <div className="flex h-screen overflow-hidden">
-        {/* <!-- ===== Sidebar Start ===== --> */}
         <Sidebar
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
           lng={lng}
         />
-        {/* <!-- ===== Sidebar End ===== --> */}
 
-        {/* <!-- ===== Content Area Start ===== --> */}
         <div className="relative flex flex-1 flex-col overflow-y-auto">
-          {/* <!-- ===== Header Start ===== --> */}
-          <div className="flex-none overflow-hidden">
+          <div className="flex-none">
             <Header
               sidebarOpen={sidebarOpen}
               setSidebarOpen={setSidebarOpen}
@@ -40,19 +35,14 @@ export default function UserLayoutComponent({
               lng={lng}
             />
           </div>
-          {/* <!-- ===== Header End ===== --> */}
 
-          {/* <!-- ===== Main Content Start ===== --> */}
           <main className="flex-1 h-full overflow-y-auto">
-            <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10 overflow-y-auto">
-              <div className="overflow-y-auto">{children}</div>
+            <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
+              <div>{children}</div>
             </div>
           </main>
-          {/* <!-- ===== Main Content End ===== --> */}
         </div>
-        {/* <!-- ===== Content Area End ===== --> */}
       </div>
-      {/* <!-- ===== Page Wrapper End ===== --> */}
     </>
   );
 }
