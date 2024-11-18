@@ -1,4 +1,4 @@
-#syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1
 
 # Versions
 FROM dunglas/frankenphp:1-php8.3 AS frankenphp_upstream
@@ -6,7 +6,6 @@ FROM dunglas/frankenphp:1-php8.3 AS frankenphp_upstream
 # The different stages of this Dockerfile are meant to be built into separate images
 # https://docs.docker.com/develop/develop-images/multistage-build/#stop-at-a-specific-build-stage
 # https://docs.docker.com/compose/compose-file/#target
-
 
 # Base FrankenPHP image
 FROM frankenphp_upstream AS frankenphp_base
@@ -22,7 +21,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	file \
 	gettext \
 	git \
-	&& rm -rf /var/lib/apt/lists/*
+    curl && rm -rf /var/lib/apt/lists/*  # Corrected line
+
+    # Install Node.js and npm using apt-get (for Debian/Ubuntu-based images)
+    RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -  # Set up the Node.js repository
+    RUN apt-get install -y nodejs  # Install Node.js and npm
+    RUN node -v  # Verify Node.js version
+    RUN npm -v   # Verify npm version
 
 RUN set -eux; \
 	install-php-extensions \
@@ -30,8 +35,7 @@ RUN set -eux; \
 		apcu \
 		intl \
 		opcache \
-		zip \
-	;
+		zip;
 
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
 ENV COMPOSER_ALLOW_SUPERUSER=1
@@ -39,6 +43,9 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
 
 ###> recipes ###
+###> doctrine/doctrine-bundle ###
+RUN install-php-extensions pdo_pgsql
+###< doctrine/doctrine-bundle ###
 ###< recipes ###
 
 COPY --link frankenphp/conf.d/10-app.ini $PHP_INI_DIR/app.conf.d/
@@ -59,8 +66,7 @@ RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 RUN set -eux; \
 	install-php-extensions \
-		xdebug \
-	;
+		xdebug;
 
 COPY --link frankenphp/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
 

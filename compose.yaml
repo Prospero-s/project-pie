@@ -3,7 +3,7 @@ services:
     image: ${IMAGES_PREFIX:-}app-php
     restart: unless-stopped
     environment:
-      SERVER_NAME: ${SERVER_NAME:-localhost}, php:80
+      SERVER_NAME: ${SERVER_NAME:-localhost}, php:443
       MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
       MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
       # Run "composer require symfony/orm-pack" to install and configure Doctrine ORM
@@ -18,6 +18,7 @@ services:
     volumes:
       - caddy_data:/data
       - caddy_config:/config
+      - ./app:/app
     ports:
       # HTTP
       - target: 80
@@ -31,13 +32,56 @@ services:
       - target: 443
         published: ${HTTP3_PORT:-443}
         protocol: udp
+  
+  vite:
+    image: node:20
+    container_name: vite_container
+    working_dir: /app
+    command: npm run dev
+    volumes:
+      - .:/app  # Montera le répertoire de votre projet dans le conteneur
+    ports:
+      - "5173:5173"  # Expose le port de Vite
+    environment:
+      - VITE_SERVER_HOST=0.0.0.0  # Permet d'écouter toutes les connexions
+    depends_on:
+      - php  # Assure que Symfony démarre avant Vite
+    networks:
+      - symfony-vite-network
 
 # Mercure is installed as a Caddy module, prevent the Flex recipe from installing another service
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###
 
+###> doctrine/doctrine-bundle ###
+  database:
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      # You should definitely change the password in production
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
+      # - ./docker/db/data:/var/lib/postgresql/data:rw
+###< doctrine/doctrine-bundle ###
+
 volumes:
   caddy_data:
   caddy_config:
 ###> symfony/mercure-bundle ###
+
+###> doctrine/doctrine-bundle ###
+  database_data:
+###< doctrine/doctrine-bundle ###
 ###< symfony/mercure-bundle ###
+
+networks:
+  symfony-vite-network:
+    driver: bridge
