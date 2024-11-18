@@ -7,6 +7,7 @@ Ce projet combine **Symfony** pour la partie backend et **React** pour la partie
 - **Docker** installés sur votre machine.
 - **Makefile** installés sur votre machine.
 - **Git** pour cloner le projet.
+- **Make** pour cloner le projet.
 
 ## Installation
 
@@ -18,32 +19,100 @@ Ce projet combine **Symfony** pour la partie backend et **React** pour la partie
    - Ajuster les variables dans ces fichiers en fonction de votre configuration.
 
 2. **Lancer les conteneurs Docker** :
-   ```bash
-   make up
-   ```
+   - Build l'image :
+      ```bash
+      make build
+      ```
+   
+   - Monté les services :
+      ```bash
+      make up
+      ```
 
 3. **Installer les dépendances** :
+   - Entrée dans le shell du conteneur PHP :
+      ```bash
+      make shell
+      ```
+      
    - Backend (Symfony) :
      ```bash
      composer install
      ```
+
    - Frontend (React) :
      ```bash
      npm install
      ```
 
+4. **Installer les certificats** :
+   - Installer mkcert :
+      MacOS
+      ```bash
+     brew install mkcert
+     brew install nss # if you use Firefox
+     ```
+
+     Linux
+      ```bash
+     sudo apt install libnss3-tools
+         -or-
+      sudo yum install nss-tools
+         -or-
+      sudo pacman -S nss
+         -or-
+      sudo zypper install mozilla-nss-tools
+     ```
+
+      Sur Windows, utiliser Chocolatey
+      ```bash
+      choco install mkcert
+      ```
+
+      Ou Scoop
+      ```bash
+      scoop bucket add extras
+      scoop install mkcert
+      ```
+
+   - Générer et vérifier les certifications :
+      ```bash
+     mkcert -cert-file frankenphp/certs/tls.pem -key-file frankenphp/certs/tls.key "localhost"
+     ```
+
+   - Ajoutez le certificat racine de mkcert au système :
+      ```bash
+     mkcert -CAROOT
+     ```
+
+      Mac :
+      ```bash
+      sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "$(mkcert -CAROOT)/rootCA.pem"
+      ```
+      
+      Linux :
+      ```bash
+      sudo cp "$(mkcert -CAROOT)/rootCA.pem" /usr/local/share/ca-certificates/rootCA.crt
+      sudo update-ca-certificates
+      ```
+
+      Windows : Double-cliquez sur le certificat racine (rootCA.pem), puis cliquez sur Installer le certificat et sélectionnez Autorités de certification racines de confiance.
+
 4. **Accéder au projet** :
-   - http://localhost:8000
+   - http://localhost
 
 ## Structure du Projet
 
 ```
 .
-├── backend/                # Code Symfony
-│   ├── src/                # Code source backend
-│   ├── .env                # Fichier de configuration
+├── .env                    # Fichier de configuration
+├── Dockerfile              # Dockerfile pour le projet
+├── certs/                  # Les certificats HTTPS
+├── src/                    # Code Symfony
+│   ├── Controller/         # Code Controller Symfony
+│   ├── Entity                # Fichier de configuration
 │   └── Dockerfile          # Dockerfile pour PHP
-├── frontend/               # Code React
+├── Assets/                 # Code React
 │   ├── src/                # Code source frontend
 │   ├── .env                # Fichier de configuration
 │   └── Dockerfile          # Dockerfile pour Node.js
