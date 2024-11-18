@@ -1,0 +1,17 @@
+# config/packages/pentatrion_vite.yaml
+pentatrion_vite:
+    # Chemin où les fichiers compilés par Vite seront générés
+    build_directory: 'public/build'
+    
+    # Chemin vers le répertoire public (les fichiers accessibles depuis le navigateur)
+    public_directory: 'public'
+
+    # Permet d'utiliser des URLs absolues pour les assets
+    absolute_url: false
+
+    # Gestion des erreurs si un asset ou une entrée est manquant
+    throw_on_missing_asset: true
+    throw_on_missing_entry: true
+
+    # Activer le cache pour éviter de recompiler à chaque requête
+    cache: true

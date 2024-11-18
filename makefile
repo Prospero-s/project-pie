@@ -30,6 +30,9 @@ up:
 down:
 	$(DOCKER_COMPOSE) down
 
+delete containers:
+	$(DOCKER_COMPOSE) down --volumes
+
 restart: down up
 
 build:
