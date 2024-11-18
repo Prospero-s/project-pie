@@ -1,7 +1,6 @@
 'use client';
 
-import { Spin } from 'antd';
-import React, { Suspense, useState } from 'react';
+import React, { useState } from 'react';
 
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
@@ -30,20 +29,23 @@ export default function UserLayoutComponent({
         {/* <!-- ===== Sidebar End ===== --> */}
 
         {/* <!-- ===== Content Area Start ===== --> */}
-        <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+        <div className="relative flex flex-1 flex-col overflow-y-auto">
           {/* <!-- ===== Header Start ===== --> */}
-          <Header
-            sidebarOpen={sidebarOpen}
-            setSidebarOpen={setSidebarOpen}
-            user={user}
-            setUser={setUser}
-          />
+          <div className="flex-none overflow-hidden">
+            <Header
+              sidebarOpen={sidebarOpen}
+              setSidebarOpen={setSidebarOpen}
+              user={user}
+              setUser={setUser}
+              lng={lng}
+            />
+          </div>
           {/* <!-- ===== Header End ===== --> */}
 
           {/* <!-- ===== Main Content Start ===== --> */}
-          <main>
-            <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
-              <Suspense fallback={<Spin size="large" />}>{children}</Suspense>
+          <main className="flex-1 h-full overflow-y-auto">
+            <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10 overflow-y-auto">
+              <div className="overflow-y-auto">{children}</div>
             </div>
           </main>
           {/* <!-- ===== Main Content End ===== --> */}

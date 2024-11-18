@@ -11,6 +11,7 @@ const Header = (props: {
   setSidebarOpen: (arg0: boolean) => void;
   user: User | null;
   setUser: (arg0: User | null) => void;
+  lng: string;
 }) => {
   const { t } = useTranslation('search-company');
   const router = useRouter();
@@ -124,7 +125,11 @@ const Header = (props: {
           <ul className="flex items-center gap-2 2xsm:gap-4">
             <DropdownNotification />
           </ul>
-          <DropdownUser user={props.user} setUser={props.setUser} />
+          <DropdownUser
+            lng={props.lng}
+            user={props.user}
+            setUser={props.setUser}
+          />
         </div>
       </div>
     </header>

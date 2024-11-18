@@ -1,5 +1,9 @@
 {
   "profile": "Profile",
   "settings": "Settings",
-  "logout": "Logout"
+  "logout": "Logout",
+  "logoutSuccess": "Logout success",
+  "logoutSuccessMessage": "You are now logged out.",
+  "logoutError": "Logout error",
+  "logoutErrorMessage": "An error occurred while logging out."
 }

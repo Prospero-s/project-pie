@@ -6,12 +6,12 @@ import Breadcrumb from '@/components/common/Breadcrumbs/Breadcrumb';
 import TableInvestement from '@/components/Tables/TableInvestment';
 
 const ClientTableInvestement = ({ lng }: { lng: string }) => {
-  const { t } = useTranslation('investement');
+  const { t } = useTranslation('entreprises');
 
   return (
-    <div className="flex flex-col gap-10">
-      <Breadcrumb pageName={t('enteprises')} />
-      <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-4">
+      <Breadcrumb pageName={t('my_portfolio')} />
+      <div className="flex flex-col gap-4">
         <TableInvestement lng={lng} />
       </div>
     </div>

@@ -1,5 +1,9 @@
 {
   "profile": "Profil",
   "settings": "Paramètres",
-  "logout": "Déconnexion"
+  "logout": "Déconnexion",
+  "logoutSuccess": "Déconnexion réussie",
+  "logoutSuccessMessage": "Vous êtes maintenant déconnecté.",
+  "logoutError": "Erreur de déconnexion",
+  "logoutErrorMessage": "Une erreur est survenue lors de la déconnexion."
 }

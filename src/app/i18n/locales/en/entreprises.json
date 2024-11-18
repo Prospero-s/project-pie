@@ -1,7 +1,9 @@
 {
+  "my_portfolio": "My Portfolio",
   "startup_name": "Startup Name",
-  "investment_amount": "Investment Amount",
-  "investment_date": "Investment Date",
-  "investment_status": "Investment Status",
-  "actions": "Actions"
+  "sector": "Sector",
+  "description": "Description",
+  "funding_type": "Funding Type",
+  "amount_raised": "Amount Raised",
+  "view_details": "View Details"
 }

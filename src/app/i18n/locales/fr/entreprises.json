@@ -1,7 +1,9 @@
 {
+  "my_portfolio": "Mon Portefeuille",
   "startup_name": "Nom de la startup",
-  "investment_amount": "Montant de l'investissement",
-  "investment_date": "Date de l'investissement",
-  "investment_status": "Statut de l'investissement",
-  "actions": "Actions"
+  "sector": "Secteur d'activité",
+  "description": "Description",
+  "funding_type": "Type de levée",
+  "amount_raised": "Montant levé",
+  "view_details": "Voir les détails"
 }

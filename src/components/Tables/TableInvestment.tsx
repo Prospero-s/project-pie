@@ -1,95 +1,136 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 import { useTranslation } from '@/app/i18n/client';
-
-type Investment = {
-  id: string;
-  startupName: string;
-  investmentAmount: number;
-  investmentDate: string;
-  investmentStatus: 'Actif' | 'Sorti' | 'En attente';
-};
-
-const investmentsData: Investment[] = [
-  {
-    id: '1',
-    startupName: 'NeuroTech AI',
-    investmentAmount: 3000000,
-    investmentDate: '20 Fév, 2023',
-    investmentStatus: 'Actif',
-  },
-  {
-    id: '2',
-    startupName: 'EcoDrive Innovations',
-    investmentAmount: 1500000,
-    investmentDate: '15 Jan, 2024',
-    investmentStatus: 'En attente',
-  },
-  {
-    id: '3',
-    startupName: 'Quantum Solutions',
-    investmentAmount: 2500000,
-    investmentDate: '11 Mar, 2023',
-    investmentStatus: 'Sorti',
-  },
-];
+import startupsMock from '@/mocks/startupsMock';
+import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { Button, Skeleton, Table, Tooltip } from 'antd';
+import Image from 'next/image';
 
 const TableInvestissement = ({ lng }: { lng: string }) => {
   const { t } = useTranslation(lng, 'entreprises');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const columns = [
+    {
+      title: '',
+      dataIndex: 'logo',
+      key: 'logo',
+      width: 80,
+      render: (logo: string, record: any) =>
+        loading ? (
+          <Skeleton.Avatar active shape="circle" />
+        ) : (
+          <Image
+            src={logo}
+            alt={record.name}
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
+        ),
+    },
+    {
+      title: t('startup_name'),
+      dataIndex: 'name',
+      key: 'name',
+      render: (text: string) =>
+        loading ? <Skeleton.Input block active size="small" /> : text,
+    },
+    {
+      title: t('sector'),
+      dataIndex: 'sector',
+      key: 'sector',
+      render: (text: string) =>
+        loading ? <Skeleton.Input block active size="small" /> : text,
+    },
+    {
+      title: t('description'),
+      dataIndex: 'description',
+      key: 'description',
+      width: 400,
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (text: string) =>
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : (
+          <Tooltip placement="topLeft" title={text}>
+            {text}
+          </Tooltip>
+        ),
+    },
+    {
+      title: t('funding_type'),
+      dataIndex: 'fundingType',
+      key: 'fundingType',
+      render: (text: string) =>
+        loading ? <Skeleton.Input block active size="small" /> : text,
+    },
+    {
+      title: t('amount_raised'),
+      dataIndex: 'amountRaised',
+      key: 'amountRaised',
+      render: (amount: number) =>
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : (
+          `${amount.toLocaleString()} €`
+        ),
+    },
+    {
+      title: t('actions'),
+      key: 'actions',
+      width: 100,
+      render: (text: string, record: any) =>
+        loading ? (
+          <Skeleton.Button active size="small" />
+        ) : (
+          <div className="flex items-center gap-4">
+            <Link
+              href={`/user/table-investement/${record.id}`}
+              className="text-blue-500 hover:text-blue-700 text-lg"
+            >
+              <EyeOutlined />
+            </Link>
+            <DeleteOutlined className="!text-rose-500 hover:!text-rose-700 text-lg" />
+          </div>
+        ),
+    },
+  ];
+
+  const dataSource = startupsMock.map((startup, index) => ({
+    key: index,
+    ...startup,
+  }));
+
   return (
-    <div className="rounded-sm border border-gray-300 bg-white p-6 shadow-lg">
-      <div className="max-w-full overflow-x-auto">
-        <table className="w-full table-auto text-left">
-          <thead>
-            <tr className="bg-gray-100 text-gray-700">
-              <th className="px-6 py-4 font-semibold">{t('startup_name')}</th>
-              <th className="px-6 py-4 font-semibold">
-                {t('investment_amount')}
-              </th>
-              <th className="px-6 py-4 font-semibold">
-                {t('investment_date')}
-              </th>
-              <th className="px-6 py-4 font-semibold">
-                {t('investment_status')}
-              </th>
-              <th className="px-6 py-4 font-semibold">{t('actions')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {investmentsData.map((investment, index) => (
-              <tr key={index} className="border-b border-gray-200">
-                <td className="px-6 py-4">{investment.startupName}</td>
-                <td className="px-6 py-4">
-                  {investment.investmentAmount.toLocaleString()} €
-                </td>
-                <td className="px-6 py-4">{investment.investmentDate}</td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                      investment.investmentStatus === 'Actif'
-                        ? 'bg-green-200 text-green-700'
-                        : investment.investmentStatus === 'Sorti'
-                          ? 'bg-red-200 text-red-700'
-                          : 'bg-yellow-200 text-yellow-700'
-                    }`}
-                  >
-                    {investment.investmentStatus}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <Link
-                    href={`/user/table-investement/${investment.id}`}
-                    className="text-blue-500 hover:text-blue-700"
-                  >
-                    Voir
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="rounded-lg border border-slate-200 flex flex-col w-full">
+      <div className="overflow-x-auto">
+        <Table
+          columns={columns}
+          dataSource={loading ? Array(5).fill({}) : dataSource}
+          pagination={false}
+          rowClassName={(record, index) =>
+            index % 2 === 0 ? '!bg-white' : '!bg-slate-50'
+          }
+          size="small"
+        />
+      </div>
+      <div className="flex justify-between items-center p-4 bg-white rounded-b-lg w-full">
+        <div className="flex items-center gap-2">
+          <Button>Précedent</Button>
+          <Button>Suivant</Button>
+        </div>
+        <div className="flex items-center gap-2">Page 1 sur 10</div>
       </div>
     </div>
   );
