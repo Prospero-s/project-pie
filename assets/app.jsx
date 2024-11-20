@@ -6,32 +6,19 @@
  */
 
 // any CSS you import will output into a single css file (app.css in this case)
-import "./styles/app.css";
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { createRoot } from "react-dom/client";
+import ReactDOM from "react-dom/client";
+import "./styles/theme.scss";
 
-/* if you're using Bootstrap */
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import App from "./js/pages/Test.jsx";
 
-import TestPage from "./js/pages/Test";
-
-console.log("test")
-
-const Main = () => {
-  console.log("test")
-  return (
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
     <Router>
-      <Navigation />
       <Routes>
-        <Route path="/" element={<TestPage />} />
-        {/* Ajoutez d'autres routes pour vos pages ici */}
+        <Route path="/test" element={<App />} />
       </Routes>
     </Router>
-  );
-};
-
-const container = document.getElementById("root");
-const root = createRoot(container); // createRoot(container!) if you use TypeScript
-root.render(<Main />);
+  </React.StrictMode>
+);

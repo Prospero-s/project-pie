@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl && rm -rf /var/lib/apt/lists/*  # Corrected line
 
 # Install Node.js and npm using apt-get (for Debian/Ubuntu-based images)
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -  # Set up the Node.js repository
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -  # Set up the Node.js repository
 RUN apt-get install -y nodejs  # Install Node.js and npm
 RUN node -v  # Verify Node.js version
 RUN npm -v   # Verify npm version
@@ -42,6 +42,9 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
 
 ###> recipes ###
+###> doctrine/doctrine-bundle ###
+RUN install-php-extensions pdo_pgsql
+###< doctrine/doctrine-bundle ###
 ###< recipes ###
 
 COPY --link frankenphp/conf.d/10-app.ini $PHP_INI_DIR/app.conf.d/

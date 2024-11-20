@@ -8,21 +8,18 @@
     "devDependencies": {
         "@hotwired/stimulus": "^3.0.0",
         "@symfony/stimulus-bridge": "^3.2.0",
-        "@symfony/ux-react": "file:vendor/symfony/ux-react/assets",
-        "@vitejs/plugin-react": "^4.3.3",
-        "react": "^18.3.1",
-        "react-dom": "^18.3.1",
-        "vite": "^5.4.11",
-        "vite-plugin-symfony": "^7.0"
+        "autoprefixer": "^10.4.20",
+        "postcss": "^8.4.49",
+        "sass": "^1.81.0"
     },
     "dependencies": {
-        "vite": "4.0.0",
-        "rollup": "3.5.0",
-        "@vitejs/plugin-react": "3.0.0",
-        "autoprefixer": "^10.4.20",
+        "@vitejs/plugin-react": "^4.3.3",
         "bootstrap": "^5.3.3",
-        "postcss": "^8.4.49",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
         "react-router-dom": "^6.28.0",
-        "tailwindcss": "^3.4.15"
+        "tailwindcss": "^3.4.15",
+        "vite": "^5.4.11",
+        "vite-plugin-symfony": "^7.0.5"
     }
 }
