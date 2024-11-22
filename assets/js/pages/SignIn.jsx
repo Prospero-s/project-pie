@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '@/context/userContext';
-import { supabase } from '@/lib/supabaseClient';
-import { openNotificationWithIcon } from '@/components/common/Notification/NotifAlert';
 import SignInForm from '@/components/signin/SignInForm';
 import SignInButtons from '@/components/signin/SignInButtons';
 import VerificationModal from '@/components/signin/VerificationModal';
 import ForgotPasswordModal from '@/components/signin/ForgotPasswordModal';
 import gsap from 'gsap';
 import illustrationLogin from '../../img/illustration/illustration-login.webp';
+import { signInWithEmail, signInWithProvider, resendVerificationEmail, resetPassword } from '@/services/signin/authService';
+import { Button } from 'antd';
 
 const SignIn = ({ i18n }) => {
   const { t } = useTranslation('signin', { i18n });
@@ -26,6 +26,10 @@ const SignIn = ({ i18n }) => {
   const formRef = useRef(null);
 
   useEffect(() => {
+    i18n.changeLanguage(lng);
+  }, [lng, i18n]);
+
+  useEffect(() => {
     gsap.fromTo(
       formRef.current,
       { opacity: 0, y: 50 },
@@ -40,107 +44,29 @@ const SignIn = ({ i18n }) => {
   const handleSignIn = async (e) => {
     e.preventDefault();
     setLoading(true);
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
-      if (error) {
-        if (
-          error.status === 400 &&
-          error.message.includes('Email not confirmed')
-        ) {
-          setShowVerificationModal(true);
-        } else {
-          throw error;
-        }
-      } else if (data.user) {
-        openNotificationWithIcon(
-          'success',
-          t('login_success'),
-          t('login_success_message'),
-        );
-        setUser(data.user);
-        navigate(`/${lng}/user/dashboard`);
-      }
-    } catch (error) {
-      console.error('Erreur de connexion:', error);
-      openNotificationWithIcon(
-        'error',
-        t('login_error'),
-        t('login_error_message'),
-      );
-    } finally {
-      setLoading(false);
-    }
+    const result = await signInWithEmail(email, password, t, setUser, navigate, lng);
+    setShowVerificationModal(result.showVerificationModal);
+    setLoading(false);
   };
 
-  const signInWithGoogle = async (e) => {
+  const handleSignInWithGoogle = async (e) => {
     e.preventDefault();
     setLoading(true);
-    try {
-      await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin + `/${lng}/user/dashboard`,
-        },
-      });
-    } catch (error) {
-      console.error('Erreur de connexion avec Google:', error);
-      openNotificationWithIcon(
-        'error',
-        t('login_error_title'),
-        t('login_error_message'),
-      );
-    } finally {
-      setLoading(false);
-    }
+    await signInWithProvider('google', lng, t);
+    setLoading(false);
   };
 
-  const signInWithMicrosoft = async (e) => {
+  const handleSignInWithMicrosoft = async (e) => {
     e.preventDefault();
     setLoading(true);
-    try {
-      await supabase.auth.signInWithOAuth({
-        provider: 'azure',
-        options: {
-          redirectTo: window.location.origin + `/${lng}/user/dashboard`,
-        },
-      });
-    } catch (error) {
-      console.error('Erreur de connexion avec Microsoft:', error);
-      openNotificationWithIcon(
-        'error',
-        t('login_error_title'),
-        t('login_error_message'),
-      );
-    } finally {
-      setLoading(false);
-    }
+    await signInWithProvider('azure', lng, t);
+    setLoading(false);
   };
 
-  const resendVerificationEmail = async (e) => {
+  const handleResendVerificationEmail = async (e) => {
     e.preventDefault();
-    try {
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: email,
-      });
-      if (error) throw error;
-      openNotificationWithIcon(
-        'success',
-        t('verification_email_resent'),
-        t('check_inbox'),
-      );
-      setShowVerificationModal(false);
-    } catch (error) {
-      console.error("Erreur lors du renvoi de l'email de vérification:", error);
-      openNotificationWithIcon(
-        'error',
-        t('resend_error'),
-        t('resend_error_message'),
-      );
-    }
+    const success = await resendVerificationEmail(email, t);
+    if (success) setShowVerificationModal(false);
   };
 
   const handleForgotPassword = async (e) => {
@@ -150,49 +76,26 @@ const SignIn = ({ i18n }) => {
 
   const handleForgotPasswordSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(
-        forgotPasswordEmail,
-        {
-          redirectTo: window.location.origin + '/dashboard',
-        },
-      );
-      if (error) throw error;
-      openNotificationWithIcon(
-        'success',
-        t('forgot_password.email_sent'),
-        t('forgot_password.check_inbox'),
-      );
-      setShowForgotPasswordModal(false);
-    } catch (error) {
-      console.error(
-        'Erreur lors de la réinitialisation du mot de passe:',
-        error,
-      );
-      openNotificationWithIcon(
-        'error',
-        t('forgot_password.error'),
-        t('forgot_password.error_message'),
-      );
-    }
+    const success = await resetPassword(forgotPasswordEmail, t);
+    if (success) setShowForgotPasswordModal(false);
   };
 
   return (
     <>
-      <div className="flex flex-col md:flex-row h-screen w-screen">
-        <div className="md:w-3/5 w-full h-1/2 md:h-full">
+      <div className="flex flex-col xl:flex-row h-screen w-screen overflow-x-hidden">
+        <div className="w-full lg:w-3/5 h-1/2 lg:h-full flex-initial lg:flex-none">
           <img
             src={illustrationLogin}
             alt="SignIn"
-            className="w-full h-full"
+            className="w-full h-full object-cover"
           />
         </div>
-        <div className="md:w-2/5 w-full md:h-full flex items-center justify-center md:mb-0">
+        <div className="w-full lg:w-2/5 h-full flex items-center justify-center flex-1 lg:flex-none px-8 lg:px-0 py-10 lg:py-0">
           <div
-            className="w-full md:w-2/3 h-full p-4 md:p-8 md:h-auto"
+            className="w-full lg:w-2/3 p-4 lg:p-8"
             ref={formRef}
           >
-            <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2 text-center">
+            <h2 className="mb-9 text-2xl font-bold text-black dark:text-white lg:text-title-xl2 text-center">
               {t('login_title')}
             </h2>
             <SignInForm
@@ -211,16 +114,20 @@ const SignIn = ({ i18n }) => {
             </div>
             <SignInButtons
               t={t}
-              signInWithGoogle={signInWithGoogle}
-              signInWithMicrosoft={signInWithMicrosoft}
+              signInWithGoogle={handleSignInWithGoogle}
+              signInWithMicrosoft={handleSignInWithMicrosoft}
               loading={loading}
             />
             <div className="mt-6 text-center">
               <p>
                 {t('no_account')}{' '}
-                <a href={`/${lng}/auth/signup`} className="text-primary">
+                <Button
+                  type="link"
+                  href={`/${lng}/signup`}
+                  className="text-primary text-md !p-0"
+                >
                   {t('create_account')}
-                </a>
+                </Button>
               </p>
             </div>
           </div>
@@ -230,7 +137,7 @@ const SignIn = ({ i18n }) => {
         t={t}
         showVerificationModal={showVerificationModal}
         setShowVerificationModal={setShowVerificationModal}
-        resendVerificationEmail={resendVerificationEmail}
+        resendVerificationEmail={handleResendVerificationEmail}
         loading={loading}
       />
       <ForgotPasswordModal

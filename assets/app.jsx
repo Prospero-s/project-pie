@@ -12,20 +12,19 @@ import ReactDOM from "react-dom/client";
 import "./css/app.css";
 import { UserProvider } from "@/context/userContext";
 import SignIn from "@/pages/SignIn";
-import LanguageProvider from "@/provider/LanguageProvider";
+import SignUp from "@/pages/SignUp";
 import.meta.glob(["../img/**"]);
 import i18n from "./js/i18n";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <UserProvider>
-      <LanguageProvider i18n={i18n}>
       <Router>
         <Routes>
-        <Route path="/:lng/signin" element={<SignIn i18n={i18n} />} />
-          </Routes>
-        </Router>
-      </LanguageProvider>
+          <Route path="/:lng/signin" element={<SignIn i18n={i18n} />} />
+          <Route path="/:lng/signup" element={<SignUp i18n={i18n} />} />
+        </Routes>
+      </Router>
     </UserProvider>
   </React.StrictMode>
 );

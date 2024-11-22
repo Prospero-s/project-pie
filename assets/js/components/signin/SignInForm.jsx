@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'antd';
-import InputField from '@/components/common/InputField/InputField';
-import PasswordField from '@/components/common/PasswordField/PasswordField';
+import InputField from '@/components/common/field/InputField';
+import PasswordField from '@/components/common/field/PasswordField';
 
 const SignInForm = ({ t, email, setEmail, password, setPassword, handleSignIn, isFormValid, loading, handleForgotPassword }) => (
   <form onSubmit={handleSignIn} className="space-y-4">

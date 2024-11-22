@@ -10,7 +10,7 @@ const SignInButtons = ({ t, signInWithGoogle, signInWithMicrosoft, loading }) =>
       className="flex-1 h-12 flex items-center justify-center bg-rose-600 hover:!bg-white hover:!border-rose-600 hover:!text-rose-600 border-rose-600 text-white"
       onClick={signInWithGoogle}
     >
-      {t('google')}
+      Google
     </Button>
     <Button
       icon={<WindowsOutlined />}
@@ -18,7 +18,7 @@ const SignInButtons = ({ t, signInWithGoogle, signInWithMicrosoft, loading }) =>
       className="flex-1 h-12 flex items-center justify-center bg-blue-500 hover:!bg-white hover:!border-blue-500 hover:!text-blue-500 border-blue-500 text-white"
       onClick={signInWithMicrosoft}
     >
-      {t('microsoft')}
+      Microsoft
     </Button>
   </div>
 );
