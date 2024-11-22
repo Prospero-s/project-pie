@@ -9,16 +9,23 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ReactDOM from "react-dom/client";
-import "./styles/theme.scss";
-
-import App from "./js/pages/Test.jsx";
+import "./css/app.css";
+import { UserProvider } from "@/context/userContext";
+import SignIn from "@/pages/SignIn";
+import LanguageProvider from "@/provider/LanguageProvider";
+import.meta.glob(["../img/**"]);
+import i18n from "./js/i18n";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <Router>
-      <Routes>
-        <Route path="/test" element={<App />} />
-      </Routes>
-    </Router>
+    <UserProvider>
+      <LanguageProvider i18n={i18n}>
+      <Router>
+        <Routes>
+        <Route path="/:lng/signin" element={<SignIn i18n={i18n} />} />
+          </Routes>
+        </Router>
+      </LanguageProvider>
+    </UserProvider>
   </React.StrictMode>
 );
