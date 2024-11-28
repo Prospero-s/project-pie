@@ -8,6 +8,7 @@ Ce projet combine **Symfony** pour la partie backend et **React** pour la partie
 - **Makefile** installés sur votre machine.
 - **Git** pour cloner le projet.
 - **Make** pour cloner le projet.
+- **Visual Studio Code** avec l'extension **Remote - WSL**.
 
 ## Installation
 
@@ -98,7 +99,28 @@ Ce projet combine **Symfony** pour la partie backend et **React** pour la partie
 
       Windows : Double-cliquez sur le certificat racine (rootCA.pem), puis cliquez sur Installer le certificat et sélectionnez Autorités de certification racines de confiance.
 
-4. **Accéder au projet** :
+5. **Configurer WSL avec Visual Studio Code** :
+
+   - **Installer WSL** : Suivez les instructions officielles pour installer WSL sur votre machine Windows. Assurez-vous d'avoir une distribution Linux installée (comme Ubuntu a installer directement depuis le Microsoft Store).
+
+   - **Installer Visual Studio Code** : Téléchargez et installez Visual Studio Code si ce n'est pas déjà fait.
+
+   - **Installer l'extension Remote - WSL** : Ouvrez Visual Studio Code, allez dans l'onglet Extensions (ou utilisez le raccourci `Ctrl+Shift+X`), et recherchez "Remote - WSL". Installez l'extension.
+
+   - **Ouvrir le projet dans WSL** : Après avoir installé l'extension, vous pouvez ouvrir le projet dans VS Code en utilisant le raccourci `Ctrl+Shift+P`, puis en tapant `Connect to WSL in New Window` et choisir la distribution Linux que vous avez installée.
+
+   - **Copier le projet dans WSL** : Après avoir lancer le WSL sur VS Code, copiez le projet dans WSL soit via le terminal WSL soit via l'explorateur de fichier.
+
+   - **Configurer les paramètres** : Assurez-vous que votre projet est configuré pour utiliser les chemins et les outils disponibles dans WSL. Vous pouvez ajuster les paramètres de votre projet dans Visual Studio Code pour s'assurer qu'il utilise les bons interpréteurs et outils. Il se peut qu'il y ait des problèmes sur l'installation des node_modules à cause des permissions. Si c'est le cas, copier les node_modules de votre pc hors WSL et les coller dans le projet dans WSL. Ajouter une permission pour que le container puisse lire le dossier node_modules.
+      ```bash
+      sudo chmod -R 777 node_modules
+      ```	
+   - **Lancer le projet** :
+      ```bash
+      docker-compose up -d
+      ```
+
+6. **Accéder au projet** :
    - http://localhost
 
 ## Structure du Projet
