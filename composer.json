@@ -14,7 +14,9 @@
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^3.3",
         "easycorp/easyadmin-bundle": "^4.10",
+        "nelmio/cors-bundle": "^2.5",
         "pentatrion/vite-bundle": "^7.0",
+        "smalot/pdfparser": "^2.11",
         "symfony/console": "7.1.*",
         "symfony/dotenv": "7.1.*",
         "symfony/flex": "^2",
@@ -22,6 +24,7 @@
         "symfony/runtime": "7.1.*",
         "symfony/twig-bundle": "7.1.*",
         "symfony/yaml": "7.1.*",
+        "thiagoalessio/tesseract_ocr": "^2.13",
         "twig/twig": "^3.0"
     },
 

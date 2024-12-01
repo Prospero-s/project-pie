@@ -3,3 +3,9 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+    
+images:
+    path: /images/{filename}
+    controller: Symfony\Bundle\FrameworkBundle\Controller\AbstractController::file
+    defaults:
+        directory: '%kernel.project_dir%/var/uploads/images'
