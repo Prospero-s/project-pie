@@ -21,6 +21,7 @@ const VerificationModal = ({ t, showVerificationModal, setShowVerificationModal,
       </p>
       <Button
         type="primary"
+        htmlType="submit"
         disabled={loading}
         onClick={resendVerificationEmail}
         className="w-full mb-2"

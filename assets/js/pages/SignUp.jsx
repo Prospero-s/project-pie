@@ -55,41 +55,27 @@ const SignUp = ({ i18n }) => {
   };
 
   return (
-    <div className="flex flex-col xl:flex-row h-screen w-screen overflow-x-hidden">
-      <div className="w-full lg:w-3/5 h-1/2 lg:h-full flex-initial lg:flex-none">
-        <img
-          src={illustrationLogin}
-          alt="SignIn"
-          className="w-full h-full object-cover"
+    <div className="w-full p-2 sm:p-6" ref={formRef}>
+      <h2 className="mb-8 text-3xl font-bold text-black dark:text-white text-center">
+        {t('title')}
+      </h2>
+      <form onSubmit={handleSignUp} className="space-y-4">
+        <SignUpForm
+          t={t}
+          fullName={fullName}
+          setFullName={setFullName}
+          email={email}
+          setEmail={setEmail}
+          password={password}
+          setPassword={setPassword}
+          confirmPassword={confirmPassword}
+          setConfirmPassword={setConfirmPassword}
+          passwordMatch={passwordMatch}
+          handleConfirmPasswordChange={handleConfirmPasswordChange}
         />
-      </div>
-      <div className="w-full lg:w-2/5 h-full flex items-center justify-center flex-1 lg:flex-none px-8 lg:px-0 py-10 lg:py-0">
-        <div
-          className="w-full lg:w-2/3 p-4 lg:p-8"
-          ref={formRef}
-        >
-          <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2 text-center">
-            {t('title')}
-          </h2>
-          <form onSubmit={handleSignUp} className="space-y-4">
-            <SignUpForm
-              t={t}
-              fullName={fullName}
-              setFullName={setFullName}
-              email={email}
-              setEmail={setEmail}
-              password={password}
-              setPassword={setPassword}
-              confirmPassword={confirmPassword}
-              setConfirmPassword={setConfirmPassword}
-              passwordMatch={passwordMatch}
-              handleConfirmPasswordChange={handleConfirmPasswordChange}
-            />
-            <SignUpButton t={t} isFormValid={isFormValid} />
-            <SignUpLink t={t} lng={lng} />
-          </form>
-        </div>
-      </div>
+        <SignUpButton t={t} isFormValid={isFormValid} />
+        <SignUpLink t={t} lng={lng} />
+      </form>
     </div>
   );
 };

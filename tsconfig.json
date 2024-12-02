@@ -16,7 +16,8 @@
     "incremental": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": ["assets/js/*"]
+      "@/*": ["assets/js/*"],
+      "@img/*": ["assets/img/*"]
     }
   },
   "include": [
@@ -24,7 +25,9 @@
     "assets/**/*.tsx",
     "assets/**/*.js",
     "assets/**/*.jsx",
-    "env.d.ts"
-, "tailwind.config.js", "postcss.config.js"  ],
+    "env.d.ts",
+    "tailwind.config.js",
+    "postcss.config.js"
+  ],
   "exclude": ["node_modules", "dist", "build"]
 }

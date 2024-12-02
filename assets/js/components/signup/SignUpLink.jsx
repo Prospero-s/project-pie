@@ -6,7 +6,7 @@ const SignUpLink = ({ t, lng }) => (
     <p>
       {t('already_have_account')}{' '}
       <Button
-        href={`/${lng}/signin`}
+        href={`/${lng}/auth/signin`}
         className="text-primary text-md !p-0"
         type="link"
       >

@@ -7,7 +7,6 @@ import SignInButtons from '@/components/signin/SignInButtons';
 import VerificationModal from '@/components/signin/VerificationModal';
 import ForgotPasswordModal from '@/components/signin/ForgotPasswordModal';
 import gsap from 'gsap';
-import illustrationLogin from '../../img/illustration/illustration-login.webp';
 import { signInWithEmail, signInWithProvider, resendVerificationEmail, resetPassword } from '@/services/signin/authService';
 import { Button } from 'antd';
 
@@ -76,62 +75,46 @@ const SignIn = ({ i18n }) => {
 
   const handleForgotPasswordSubmit = async (e) => {
     e.preventDefault();
-    const success = await resetPassword(forgotPasswordEmail, t);
+    const success = await resetPassword(forgotPasswordEmail, lng, t);
     if (success) setShowForgotPasswordModal(false);
   };
 
   return (
-    <>
-      <div className="flex flex-col xl:flex-row h-screen w-screen overflow-x-hidden">
-        <div className="w-full lg:w-3/5 h-1/2 lg:h-full flex-initial lg:flex-none">
-          <img
-            src={illustrationLogin}
-            alt="SignIn"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="w-full lg:w-2/5 h-full flex items-center justify-center flex-1 lg:flex-none px-8 lg:px-0 py-10 lg:py-0">
-          <div
-            className="w-full lg:w-2/3 p-4 lg:p-8"
-            ref={formRef}
+    <div className="w-full p-2 sm:p-6" ref={formRef}>
+      <h2 className="mb-8 text-3xl font-bold text-black dark:text-white text-center">
+        {t('login_title')}
+      </h2>
+      <SignInForm
+        t={t}
+        email={email}
+        setEmail={setEmail}
+        password={password}
+        setPassword={setPassword}
+        handleSignIn={handleSignIn}
+        isFormValid={isFormValid}
+        loading={loading}
+        handleForgotPassword={handleForgotPassword}
+      />
+      <div className="flex items-center justify-center mb-4 mt-4">
+        <span className="text-gray-500">{t('or_connect_with')}</span>
+      </div>
+      <SignInButtons
+        t={t}
+        signInWithGoogle={handleSignInWithGoogle}
+        signInWithMicrosoft={handleSignInWithMicrosoft}
+        loading={loading}
+      />
+      <div className="mt-6 text-center">
+        <p>
+          {t('no_account')}{' '}
+          <Button
+            type="link"
+            href={`/${lng}/auth/signup`}
+            className="text-primary text-md !p-0"
           >
-            <h2 className="mb-9 text-2xl font-bold text-black dark:text-white lg:text-title-xl2 text-center">
-              {t('login_title')}
-            </h2>
-            <SignInForm
-              t={t}
-              email={email}
-              setEmail={setEmail}
-              password={password}
-              setPassword={setPassword}
-              handleSignIn={handleSignIn}
-              isFormValid={isFormValid}
-              loading={loading}
-              handleForgotPassword={handleForgotPassword}
-            />
-            <div className="flex items-center justify-center mb-4 mt-4">
-              <span className="text-gray-500">{t('or_connect_with')}</span>
-            </div>
-            <SignInButtons
-              t={t}
-              signInWithGoogle={handleSignInWithGoogle}
-              signInWithMicrosoft={handleSignInWithMicrosoft}
-              loading={loading}
-            />
-            <div className="mt-6 text-center">
-              <p>
-                {t('no_account')}{' '}
-                <Button
-                  type="link"
-                  href={`/${lng}/signup`}
-                  className="text-primary text-md !p-0"
-                >
-                  {t('create_account')}
-                </Button>
-              </p>
-            </div>
-          </div>
-        </div>
+            {t('create_account')}
+          </Button>
+        </p>
       </div>
       <VerificationModal
         t={t}
@@ -149,7 +132,7 @@ const SignIn = ({ i18n }) => {
         handleForgotPasswordSubmit={handleForgotPasswordSubmit}
         loading={loading}
       />
-    </>
+    </div>
   );
 };
 

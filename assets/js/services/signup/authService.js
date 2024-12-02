@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabaseClient';
-import { openNotificationWithIcon } from '@/components/common/Notification/NotifAlert';
+import { openNotificationWithIcon } from '@/components/common/notification/NotifAlert';
 
 export const signUpWithEmail = async (email, password, fullName, t, navigate, lng) => {
   try {

@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MainController extends AbstractController
 {
-    #[Route('/{lng}/signin', name: 'app_signin')]
+    #[Route('/{lng}/auth/signin', name: 'app_signin')]
     public function signin(): Response
     {
         return $this->render('main/index.html.twig', [
@@ -16,8 +16,16 @@ class MainController extends AbstractController
         ]);
     }
 
-    #[Route('/{lng}/signup', name: 'app_signup')]
+    #[Route('/{lng}/auth/signup', name: 'app_signup')]
     public function signup(): Response
+    {
+        return $this->render('main/index.html.twig', [
+            'controller_name' => 'MainController',
+        ]);
+    }
+
+    #[Route('/{lng}/auth/reset-password', name: 'app_reset_password')]
+    public function resetPassword(): Response
     {
         return $this->render('main/index.html.twig', [
             'controller_name' => 'MainController',

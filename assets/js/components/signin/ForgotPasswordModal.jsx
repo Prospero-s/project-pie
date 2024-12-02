@@ -25,6 +25,7 @@ const ForgotPasswordModal = ({ t, showForgotPasswordModal, setShowForgotPassword
       />
       <Button
         type="primary"
+        htmlType="submit"
         onClick={handleForgotPasswordSubmit}
         className="w-full md:w-2/3 mb-4"
         disabled={loading}

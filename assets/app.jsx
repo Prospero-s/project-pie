@@ -13,6 +13,8 @@ import "./css/app.css";
 import { UserProvider } from "@/context/userContext";
 import SignIn from "@/pages/SignIn";
 import SignUp from "@/pages/SignUp";
+import ResetPassword from "@/pages/ResetPassword";
+import AuthLayout from "@/components/common/layout/AuthLayout";
 import.meta.glob(["../img/**"]);
 import i18n from "./js/i18n";
 
@@ -21,8 +23,18 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <UserProvider>
       <Router>
         <Routes>
-          <Route path="/:lng/signin" element={<SignIn i18n={i18n} />} />
-          <Route path="/:lng/signup" element={<SignUp i18n={i18n} />} />
+          <Route
+            path="/:lng/auth/*"
+            element={
+              <AuthLayout>
+                <Routes>
+                  <Route path="signin" element={<SignIn i18n={i18n} />} />
+                  <Route path="signup" element={<SignUp i18n={i18n} />} />
+                  <Route path="reset-password" element={<ResetPassword i18n={i18n} />} />
+                </Routes>
+              </AuthLayout>
+            }
+          />
         </Routes>
       </Router>
     </UserProvider>

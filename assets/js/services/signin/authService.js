@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabaseClient';
-import { openNotificationWithIcon } from '@/components/common/Notification/NotifAlert';
+import { openNotificationWithIcon } from '@/components/common/notification/NotifAlert';
 
 export const signInWithEmail = async (email, password, t, setUser, navigate, lng) => {
   try {
@@ -53,10 +53,10 @@ export const resendVerificationEmail = async (email, t) => {
   }
 };
 
-export const resetPassword = async (email, t) => {
+export const resetPassword = async (email, lng, t) => {
   try {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/dashboard',
+      redirectTo: window.location.origin + `/${lng}/auth/reset-password`,
     });
     if (error) throw error;
     openNotificationWithIcon('success', t('forgot_password.email_sent'), t('forgot_password.check_inbox'));
