@@ -14,7 +14,10 @@ import { UserProvider } from "@/context/userContext";
 import SignIn from "@/pages/SignIn";
 import SignUp from "@/pages/SignUp";
 import ResetPassword from "@/pages/ResetPassword";
+import Dashboard from "@/pages/Dashboard";
 import AuthLayout from "@/components/common/layout/AuthLayout";
+import ProtectedRoute from "@/components/common/auth/ProtectedRoute";
+import AppLayout from "@/components/common/layout/AppLayout";
 import.meta.glob(["../img/**"]);
 import i18n from "./js/i18n";
 
@@ -26,13 +29,25 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route
             path="/:lng/auth/*"
             element={
-              <AuthLayout>
+              <AuthLayout i18n={i18n}>
                 <Routes>
                   <Route path="signin" element={<SignIn i18n={i18n} />} />
                   <Route path="signup" element={<SignUp i18n={i18n} />} />
                   <Route path="reset-password" element={<ResetPassword i18n={i18n} />} />
                 </Routes>
               </AuthLayout>
+            }
+          />
+          <Route
+            path="/:lng/*"
+            element={
+              <ProtectedRoute i18n={i18n}>
+                <AppLayout i18n={i18n}>
+                  <Routes>
+                    <Route path="dashboard" element={<Dashboard i18n={i18n} />} />
+                  </Routes>
+                </AppLayout>
+              </ProtectedRoute>
             }
           />
         </Routes>

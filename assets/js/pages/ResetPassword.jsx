@@ -8,7 +8,7 @@ import { openNotificationWithIcon } from '@/components/common/notification/Notif
 
 const ResetPasswordPage = ({ i18n }) => {
   const { t } = useTranslation('resetPassword', { i18n });
-  const { lng } = useParams();
+  const lng = useParams().lng;
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [accessToken, setAccessToken] = useState('');

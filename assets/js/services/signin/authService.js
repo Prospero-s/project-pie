@@ -14,27 +14,37 @@ export const signInWithEmail = async (email, password, t, setUser, navigate, lng
         throw error;
       }
     } else if (data.user) {
-      openNotificationWithIcon('success', t('login_success'), t('login_success_message'));
-      setUser(data.user);
-      navigate(`/${lng}/user/dashboard`);
+      const session = await supabase.auth.getSession();
+      if (session.data.session) {
+        openNotificationWithIcon('success', t('login_success'), t('login_success_message'));
+        setUser(data.user);
+        navigate(`/${lng}/dashboard`);
+      }
     }
   } catch (error) {
-    openNotificationWithIcon('error', t('login_error'), t('login_error_message'));
+    openNotificationWithIcon('error', t('login_error'), t('login_error_provider'));
   }
   return { showVerificationModal: false };
 };
 
-export const signInWithProvider = async (provider, lng, t) => {
+export const signInWithProvider = async (provider, lng, t, setUser, navigate) => {
   try {
-    await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: provider,
       options: {
-        redirectTo: window.location.origin + `/${lng}/user/dashboard`,
+        redirectTo: window.location.origin + `/${lng}/dashboard`,
       },
     });
+    if (data.user) {
+      const session = await supabase.auth.getSession();
+      if (session.data.session) {
+        openNotificationWithIcon('success', t('login_success'), t('login_success_message'));
+        setUser(data.user);
+        navigate(`/${lng}/dashboard`);
+      }
+    }
   } catch (error) {
-    console.error(`Erreur de connexion avec ${provider}:`, error);
-    openNotificationWithIcon('error', t('login_error_title'), t('login_error_message'));
+    openNotificationWithIcon('error', t('login_error'), t('login_error_provider'));
   }
 };
 

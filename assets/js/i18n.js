@@ -8,6 +8,8 @@ import frSignUp from './locales/fr/signup.json';
 import enSignUp from './locales/en/signup.json';
 import frResetPassword from './locales/fr/reset-password.json';
 import enResetPassword from './locales/en/reset-password.json';
+import frMenu from './locales/fr/menu.json';
+import enMenu from './locales/en/menu.json';
 
 i18n
   .use(initReactI18next)
@@ -17,11 +19,13 @@ i18n
         signin: frSignIn,
         signup: frSignUp,
         resetPassword: frResetPassword,
+        menu: frMenu,
       },
       en: {
         signin: enSignIn,
         signup: enSignUp,
         resetPassword: enResetPassword,
+        menu: enMenu,
       },
     },
     lng: ['fr', 'en'],

@@ -12,7 +12,7 @@ import { Button } from 'antd';
 
 const SignIn = ({ i18n }) => {
   const { t } = useTranslation('signin', { i18n });
-  const { lng } = useParams();
+  const lng = useParams().lng;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showVerificationModal, setShowVerificationModal] = useState(false);
@@ -81,7 +81,7 @@ const SignIn = ({ i18n }) => {
 
   return (
     <div className="w-full p-2 sm:p-6" ref={formRef}>
-      <h2 className="mb-8 text-3xl font-bold text-black dark:text-white text-center">
+      <h2 className="mb-8 text-2xl font-bold text-black text-center">
         {t('login_title')}
       </h2>
       <SignInForm
@@ -110,7 +110,7 @@ const SignIn = ({ i18n }) => {
           <Button
             type="link"
             href={`/${lng}/auth/signup`}
-            className="text-primary text-md !p-0"
+            className="text-primary text-base !p-0"
           >
             {t('create_account')}
           </Button>

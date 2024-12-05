@@ -3,14 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import gsap from 'gsap';
 import { signUpWithEmail } from '@/services/signup/authService';
-import illustrationLogin from '../../img/illustration/illustration-login.webp';
 import SignUpForm from '@/components/signup/SignUpForm';
 import SignUpButton from '@/components/signup/SignUpButton';
 import SignUpLink from '@/components/signup/SignUpLink';
 
 const SignUp = ({ i18n }) => {
   const { t } = useTranslation('signup', { i18n });
-  const { lng } = useParams();
+  const lng = useParams().lng;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -56,7 +55,7 @@ const SignUp = ({ i18n }) => {
 
   return (
     <div className="w-full p-2 sm:p-6" ref={formRef}>
-      <h2 className="mb-8 text-3xl font-bold text-black dark:text-white text-center">
+      <h2 className="mb-8 text-2xl font-bold text-black text-center">
         {t('title')}
       </h2>
       <form onSubmit={handleSignUp} className="space-y-4">

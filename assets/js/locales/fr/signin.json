@@ -10,6 +10,7 @@
   "login_success_message": "Vous êtes maintenant connecté.",
   "login_error": "Erreur de connexion",
   "login_error_message": "Email ou mot de passe incorrect.",
+  "login_error_provider": "Erreur de connexion avec le fournisseur",
   "no_account": "Vous n'avez pas de compte?",
   "create_account": "Créer un compte",
   "google": "Google",

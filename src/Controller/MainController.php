@@ -31,4 +31,12 @@ class MainController extends AbstractController
             'controller_name' => 'MainController',
         ]);
     }
+
+    #[Route('/{lng}/dashboard', name: 'app_dashboard')]
+    public function dashboard(): Response
+    {
+        return $this->render('main/index.html.twig', [
+            'controller_name' => 'MainController',
+        ]);
+    }
 }
