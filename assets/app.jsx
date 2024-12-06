@@ -15,6 +15,7 @@ import SignIn from "@/pages/SignIn";
 import SignUp from "@/pages/SignUp";
 import ResetPassword from "@/pages/ResetPassword";
 import Dashboard from "@/pages/Dashboard";
+import Investments from "@/pages/Investments";
 import AuthLayout from "@/components/common/layout/AuthLayout";
 import ProtectedRoute from "@/components/common/auth/ProtectedRoute";
 import AppLayout from "@/components/common/layout/AppLayout";
@@ -45,6 +46,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                 <AppLayout i18n={i18n}>
                   <Routes>
                     <Route path="dashboard" element={<Dashboard i18n={i18n} />} />
+                    <Route path="investments" element={<Investments i18n={i18n} />} />
                   </Routes>
                 </AppLayout>
               </ProtectedRoute>

@@ -39,4 +39,12 @@ class MainController extends AbstractController
             'controller_name' => 'MainController',
         ]);
     }
+
+    #[Route('/{lng}/investments', name: 'app_investments')]
+    public function investments(): Response
+    {
+        return $this->render('main/index.html.twig', [
+            'controller_name' => 'MainController',
+        ]);
+    }
 }

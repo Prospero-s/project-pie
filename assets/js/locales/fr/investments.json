@@ -1,0 +1,15 @@
+{
+  "my_portfolio": "Mon Portefeuille",
+  "entreprise_name": "Nom de l'entreprise",
+  "sector": "Secteur d'activité",
+  "description": "Description",
+  "funding_type": "Type de levée",
+  "amount_raised": "Montant levé",
+  "view_details": "Voir les détails",
+  "add_investment": "Ajouter un investissement",
+  "company_name": "Nom de l'entreprise",
+  "company_name_placeholder": "Entrez le nom de l'entreprise",
+  "sector_placeholder": "Entrez le secteur d'activité",
+  "add": "Ajouter",
+  "cancel": "Annuler"
+}

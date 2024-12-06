@@ -32,9 +32,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, i18n }) => {
       label: <Link to={`/${lng}/dashboard`}>{t('dashboard')}</Link>,
     },
     {
-      key: 'investements',
+      key: 'investments',
       icon: <FolderOutlined className="!text-2xl lg:text-xl" />,
-      label: <Link to={`/${lng}/investements`}>{t('portfolio')}</Link>,
+      label: <Link to={`/${lng}/investments`}>{t('portfolio')}</Link>,
     },
   ];
 
