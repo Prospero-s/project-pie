@@ -8,27 +8,26 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "downlevelIteration": true,
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
+    "baseUrl": "./",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["assets/js/*"],
+      "@img/*": ["assets/img/*"]
     }
   },
   "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "src/**/*.js"
+    "assets/**/*.ts",
+    "assets/**/*.tsx",
+    "assets/**/*.js",
+    "assets/**/*.jsx",
+    "env.d.ts",
+    "tailwind.config.js",
+    "postcss.config.js"
   ],
-  "exclude": ["node_modules", "prettier.config.js"]
+  "exclude": ["node_modules", "dist", "build"]
 }

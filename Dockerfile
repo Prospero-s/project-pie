@@ -15,27 +15,26 @@ WORKDIR /app
 VOLUME /app/var/
 
 # persistent / runtime deps
-# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
-	acl \
-	file \
-	gettext \
-	git \
+    acl \
+    file \
+    gettext \
+    git \
     curl && rm -rf /var/lib/apt/lists/*  # Corrected line
 
-    # Install Node.js and npm using apt-get (for Debian/Ubuntu-based images)
-    RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -  # Set up the Node.js repository
-    RUN apt-get install -y nodejs  # Install Node.js and npm
-    RUN node -v  # Verify Node.js version
-    RUN npm -v   # Verify npm version
+# Install Node.js and npm using apt-get (for Debian/Ubuntu-based images)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -  # Set up the Node.js repository
+RUN apt-get install -y nodejs  # Install Node.js and npm
+RUN node -v  # Verify Node.js version
+RUN npm -v   # Verify npm version
 
 RUN set -eux; \
-	install-php-extensions \
-		@composer \
-		apcu \
-		intl \
-		opcache \
-		zip;
+    install-php-extensions \
+        @composer \
+        apcu \
+        intl \
+        opcache \
+        zip;
 
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
 ENV COMPOSER_ALLOW_SUPERUSER=1
@@ -65,8 +64,8 @@ ENV APP_ENV=dev XDEBUG_MODE=off
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 RUN set -eux; \
-	install-php-extensions \
-		xdebug;
+    install-php-extensions \
+        xdebug;
 
 COPY --link frankenphp/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
 
@@ -86,15 +85,15 @@ COPY --link frankenphp/worker.Caddyfile /etc/caddy/worker.Caddyfile
 # prevent the reinstallation of vendors at every changes in the source code
 COPY --link composer.* symfony.* ./
 RUN set -eux; \
-	composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
+    composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
 
 # copy sources
 COPY --link . ./
 RUN rm -Rf frankenphp/
 
 RUN set -eux; \
-	mkdir -p var/cache var/log; \
-	composer dump-autoload --classmap-authoritative --no-dev; \
-	composer dump-env prod; \
-	composer run-script --no-dev post-install-cmd; \
-	chmod +x bin/console; sync;
+    mkdir -p var/cache var/log; \
+    composer dump-autoload --classmap-authoritative --no-dev; \
+    composer dump-env prod; \
+    composer run-script --no-dev post-install-cmd; \
+    chmod +x bin/console; sync;
