@@ -23,5 +23,11 @@ module.exports = {
         parser: 'typescript',
       },
     },
+    {
+      files: '*.jsx',
+      options: {
+        parser: 'babel',
+      },
+    },
   ],
 };

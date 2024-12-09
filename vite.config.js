@@ -11,9 +11,13 @@ export default defineConfig({
     // react(),
     symfonyPlugin(),
   ],
+  css: {
+    postcss: "./postcss.config.cjs",
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "assets/js"),
+      "@img": path.resolve(__dirname, "assets/img"),
     },
   },
   server: {

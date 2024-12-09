@@ -1,30 +1,22 @@
 {
-    "name": "symfony/skeleton",
     "type": "project",
     "license": "proprietary",
-    "description": "A minimal Symfony project recommended to create bare bones applications",
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "doctrine/dbal": "^3",
-        "doctrine/doctrine-bundle": "^2.13",
         "doctrine/doctrine-migrations-bundle": "^3.3",
-        "doctrine/orm": "^3.3",
         "easycorp/easyadmin-bundle": "^4.10",
         "pentatrion/vite-bundle": "^7.0",
-        "symfony/console": "7.1.*",
-        "symfony/dotenv": "7.1.*",
+        "symfony/console": "7.0.*",
+        "symfony/dotenv": "7.0.*",
         "symfony/flex": "^2",
-        "symfony/framework-bundle": "7.1.*",
-        "symfony/runtime": "7.1.*",
-        "symfony/twig-bundle": "7.1.*",
-        "symfony/yaml": "7.1.*",
-        "twig/twig": "^3.0"
+        "symfony/framework-bundle": "7.0.*",
+        "symfony/runtime": "7.0.*",
+        "symfony/yaml": "7.0.*"
     },
-
     "config": {
         "allow-plugins": {
             "php-http/discovery": true,
@@ -71,13 +63,13 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "7.1.*"
+            "require": "7.0.*"
         }
     },
     "require-dev": {
-        "symfony/debug-bundle": "7.1.*",
-        "symfony/maker-bundle": "^1.61",
-        "symfony/stopwatch": "7.1.*",
-        "symfony/web-profiler-bundle": "7.1.*"
+        "symfony/debug-bundle": "7.0.*",
+        "symfony/maker-bundle": "^1.58",
+        "symfony/stopwatch": "7.0.*",
+        "symfony/web-profiler-bundle": "7.0.*"
     }
 }
