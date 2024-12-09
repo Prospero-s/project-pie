@@ -12,24 +12,24 @@ function PdfUploader() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file) {
-        alert('Veuillez sélectionner un fichier.');
-        return;
+      alert('Veuillez sélectionner un fichier.');
+      return;
     }
+
     const formData = new FormData();
     formData.append('pdf', file);
 
     try {
-        const response = await axios.post('https://localhost/api/pdf', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
-        setData(response.data);
+      const response = await axios.post('https://localhost/api/pdf', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setData(response.data);
     } catch (error) {
-        console.error('Error uploading PDF:', error);
+      console.error('Error uploading PDF:', error);
     }
-};
-
+  };
 
   return (
     <div>
@@ -47,13 +47,19 @@ function PdfUploader() {
           <h2>Images</h2>
           <div>
             {data.images.map((image, index) => (
-              <img key={index} src={`http://localhost:443/images/${image}`} alt={`Page ${index + 1}`} />
+              <img
+                key={index}
+                src={`https://localhost/uploads/images/${image.split('/').pop()}`}
+                alt={`Page ${index + 1}`}
+                width={1200}
+                height={650}
+              />
             ))}
           </div>
         </div>
       )}
     </div>
   );
-};
+}
 
 export default PdfUploader;
