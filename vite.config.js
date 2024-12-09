@@ -21,20 +21,16 @@ export default defineConfig({
     },
   },
   server: {
-    // // Dehors container
-    // hmr: false,
-    // // Dedans container
     watch: {
       usePolling: true,
     },
-    // https: true,
     https: {
       key: './frankenphp/certs/tls.key',
       cert: './frankenphp/certs/tls.pem',
     },
     host: "0.0.0.0",
-    port: 5173, // Choisir un port différent pour éviter les conflits
-    strictPort: true, // Si le port est déjà occupé, échouer
+    port: 5173,
+    strictPort: true,
     hmr: {
       host: 'localhost'
     }

@@ -19,6 +19,12 @@ services:
       - caddy_data:/data
       - caddy_config:/config
       - ./app:/app
+    healthcheck:
+      test: ["CMD", "php-fpm", "-t"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     ports:
       # HTTP
       - target: 80
@@ -37,15 +43,22 @@ services:
     image: node:20
     container_name: vite_container
     working_dir: /app
-    command: npm run dev
+    command: >
+      sh -c "
+        mkdir -p /app/node_modules &&
+        chown -R node:node /app/node_modules &&
+        su node -c 'npm install && npm run dev'
+      "
     volumes:
-      - .:/app  # Montera le répertoire de votre projet dans le conteneur
+      - .:/app
+      - node_modules:/app/node_modules
     ports:
-      - "5173:5173"  # Expose le port de Vite
+      - "5173:5173"
     environment:
-      - VITE_SERVER_HOST=0.0.0.0  # Permet d'écouter toutes les connexions
+      - VITE_SERVER_HOST=0.0.0.0
+      - NODE_ENV=development
     depends_on:
-      - php  # Assure que Symfony démarre avant Vite
+      - php
     networks:
       - symfony-vite-network
 
@@ -75,12 +88,8 @@ services:
 volumes:
   caddy_data:
   caddy_config:
-###> symfony/mercure-bundle ###
-
-###> doctrine/doctrine-bundle ###
   database_data:
-###< doctrine/doctrine-bundle ###
-###< symfony/mercure-bundle ###
+  node_modules:
 
 networks:
   symfony-vite-network:

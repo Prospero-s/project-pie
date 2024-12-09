@@ -3,40 +3,43 @@
 # Versions
 FROM dunglas/frankenphp:1-php8.3 AS frankenphp_upstream
 
-# The different stages of this Dockerfile are meant to be built into separate images
-# https://docs.docker.com/develop/develop-images/multistage-build/#stop-at-a-specific-build-stage
-# https://docs.docker.com/compose/compose-file/#target
-
 # Base FrankenPHP image
 FROM frankenphp_upstream AS frankenphp_base
 
 WORKDIR /app
 
-VOLUME /app/var/
+# Éviter les avertissements interactifs
+ENV DEBIAN_FRONTEND=noninteractive
 
-# persistent / runtime deps
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    acl \
-    file \
-    gettext \
-    git \
-    curl && rm -rf /var/lib/apt/lists/*  # Corrected line
+# Configurer shell pour pipefail
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# Install Node.js and npm using apt-get (for Debian/Ubuntu-based images)
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -  # Set up the Node.js repository
-RUN apt-get install -y nodejs  # Install Node.js and npm
-RUN node -v  # Verify Node.js version
-RUN npm -v   # Verify npm version
+# Installer les dépendances en une seule commande RUN
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        nodejs=18.* \
+        npm=9.* \
+        acl=2.* \
+        file=1:* \
+        gettext=0.* \
+        git=1:* \
+    ; \
+    rm -rf /var/lib/apt/lists/*; \
+    # Vérifier les versions
+    node -v; \
+    npm -v
 
+# Installer les extensions PHP
 RUN set -eux; \
     install-php-extensions \
         @composer \
         apcu \
         intl \
         opcache \
-        zip;
+        zip
 
-# https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
+# Configuration de Composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
