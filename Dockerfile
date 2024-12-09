@@ -14,19 +14,24 @@ WORKDIR /app
 
 VOLUME /app/var/
 
-# persistent / runtime deps
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
     acl \
     file \
     gettext \
     git \
-    curl && rm -rf /var/lib/apt/lists/*  # Corrected line
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js and npm using apt-get (for Debian/Ubuntu-based images)
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -  # Set up the Node.js repository
-RUN apt-get install -y nodejs  # Install Node.js and npm
-RUN node -v  # Verify Node.js version
-RUN npm -v   # Verify npm version
+# hadolint ignore=DL3008
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/* \
+    && node -v \
+    && npm -v
 
 RUN set -eux; \
     install-php-extensions \
