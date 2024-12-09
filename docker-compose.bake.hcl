@@ -1,5 +1,5 @@
 group "default" {
-  targets = ["app-php", "vite"]
+  targets = ["app-php"]
 }
 
 target "app-php" {
@@ -7,10 +7,4 @@ target "app-php" {
   dockerfile = "Dockerfile"
   target = "frankenphp_dev"
   tags = ["app-php:latest"]
-}
-
-target "vite" {
-  context = "."
-  dockerfile = "Dockerfile.node"
-  tags = ["vite:latest"]
 }
