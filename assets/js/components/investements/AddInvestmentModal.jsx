@@ -11,7 +11,6 @@ const AddInvestmentModal = ({ i18n }) => {
   const handleCancel = () => setIsModalVisible(false);
   
   const handleOk = () => {
-    console.log('Startup ajoutée');
     setIsModalVisible(false);
   };
 
