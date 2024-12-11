@@ -32,6 +32,12 @@ services:
       - target: 443
         published: ${HTTP3_PORT:-443}
         protocol: udp
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
   
   vite:
     image: node:20
