@@ -18,6 +18,12 @@ Ce projet combine **Symfony** pour la partie backend et **React** pour la partie
      cp /.env.example /.env
      ```
    - Ajuster les variables dans ces fichiers en fonction de votre configuration.
+   - Pour la connexion à Supabase completer les deux variables suivantes :
+      ```
+      SUPABASE_DB_USER=******
+      SUPABASE_DB_PASSWORD=******
+      DATABASE_URL=pgsql://${SUPABASE_DB_USER}:${SUPABASE_DB_PASSWORD}@aws-0-eu-west-3.pooler.supabase.com:6543/prospero
+      ```
 
 2. **Lancer les conteneurs Docker** :
    - Build l'image :
@@ -97,7 +103,28 @@ Ce projet combine **Symfony** pour la partie backend et **React** pour la partie
       sudo update-ca-certificates
       ```
 
-      Windows : Double-cliquez sur le certificat racine (rootCA.pem), puis cliquez sur Installer le certificat et sélectionnez Autorités de certification racines de confiance.
+   - Windows : Double-cliquez sur le certificat racine (rootCA.pem), puis cliquez sur Installer le certificat et sélectionnez     Autorités de certification racines de confiance.
+
+   - Sinon, Windows : Étapes pour installer un certificat racine (.pem) sur Windows :
+      Double-cliquez sur le fichier .pem : Lorsque vous double-cliquez sur un fichier .pem, il devrait vous demander quel programme l'ouvrir. Si vous ne voyez pas "Certificate Manager" ou "CertMgr.msc" dans la liste, vous pouvez essayer d'ouvrir le fichier directement avec Gestionnaire de certificats Windows.
+
+      Si ce n'est pas le cas, vous pouvez également essayer de lancer le gestionnaire de certificats via la commande certmgr.msc.
+
+      Lancer le gestionnaire de certificats Windows :
+
+      Appuyez sur Win + R pour ouvrir la fenêtre "Exécuter".
+      Tapez certmgr.msc et appuyez sur Entrée. Cela ouvrira le gestionnaire de certificats.
+      Importer le certificat :
+
+      Dans le gestionnaire de certificats, sous le menu à gauche, développez le dossier Autorités de certification racines de confiance.
+      Cliquez avec le bouton droit sur Certificats sous Autorités de certification racines de confiance, puis sélectionnez Toutes les tâches > Importer...
+      Sélectionnez le certificat à importer :
+
+      La fenêtre "Assistant Importation de certificat" s'ouvrira.
+      Cliquez sur Parcourir..., puis sélectionnez votre fichier .pem.
+      Cliquez sur Suivant et choisissez Placer tous les certificats dans le magasin suivant.
+      Sélectionnez Autorités de certification racines de confiance et cliquez sur Suivant.
+      Cliquez sur Terminer pour importer le certificat.
 
 5. **Configurer WSL avec Visual Studio Code** :
 
