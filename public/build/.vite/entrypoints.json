@@ -10,10 +10,10 @@
   "legacy": false,
   "metadatas": {},
   "version": [
-    "7.0.5",
+    "7.1.0",
     7,
-    0,
-    5
+    1,
+    0
   ],
   "viteServer": "https://localhost:5173"
 }
