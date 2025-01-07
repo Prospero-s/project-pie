@@ -4,7 +4,11 @@ import illustrationLogin from '@img/illustration/illustration-login.webp';
 import { useUser } from '@/context/userContext';
 
 const AuthLayout = ({ children, i18n }) => {
-  const { user } = useUser();
+  const { user, loading } = useUser();
+
+  if (loading) {
+    return null;
+  }
 
   if (user) {
     return <Navigate to={`/${i18n.language}/dashboard`} replace />;

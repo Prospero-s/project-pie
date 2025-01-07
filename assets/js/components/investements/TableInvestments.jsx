@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Skeleton, Table, Tooltip } from 'antd';
-import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EyeOutlined, FileAddOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import startupsMock from '@/mocks/investements/startupsMock';
@@ -16,56 +16,29 @@ const TableInvestments = ({ i18n }) => {
 
   const columns = [
     {
-      title: '',
-      dataIndex: 'logo',
-      key: 'logo',
-      width: 80,
-      render: (logo, record) =>
-        loading ? (
-          <Skeleton.Avatar active shape="circle" />
-        ) : (
-          <img
-            src={record.logo}
-            alt={record.name}
-            className="w-10 h-10 rounded-full"
-          />
-        ),
-    },
-    {
-      title: t('entreprise_name'),
+      title: t('entreprise'),
       dataIndex: 'name',
       key: 'name',
-      render: (text) =>
-        loading ? <Skeleton.Input block active size="small" /> : text,
+      render: (text, record) =>
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : (
+          <div className="flex items-center gap-4">
+            <Link to={`/investements/${record.id}`} className="flex items-center gap-4">
+              <img
+                src={record.logo}
+                alt={record.name}
+                className="w-10 h-10 rounded-full"
+              />
+              <span>{text}</span>
+            </Link>
+          </div>
+        ),
     },
     {
       title: t('sector'),
       dataIndex: 'sector',
       key: 'sector',
-      render: (text) =>
-        loading ? <Skeleton.Input block active size="small" /> : text,
-    },
-    {
-      title: t('description'),
-      dataIndex: 'description',
-      key: 'description',
-      width: 400,
-      ellipsis: {
-        showTitle: false,
-      },
-      render: (text) =>
-        loading ? (
-          <Skeleton.Input block active size="small" />
-        ) : (
-          <Tooltip placement="topLeft" title={text}>
-            {text}
-          </Tooltip>
-        ),
-    },
-    {
-      title: t('funding_type'),
-      dataIndex: 'fundingType',
-      key: 'fundingType',
       render: (text) =>
         loading ? <Skeleton.Input block active size="small" /> : text,
     },
@@ -81,6 +54,24 @@ const TableInvestments = ({ i18n }) => {
         ),
     },
     {
+      title: t('funding_type'),
+      dataIndex: 'fundingType',
+      key: 'fundingType',
+      render: (text) =>
+        loading ? <Skeleton.Input block active size="small" /> : text,
+    },
+    {
+      title: t('last_update'),
+      dataIndex: 'lastUpdate',
+      key: 'lastUpdate',
+      render: (date) =>
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : (
+          new Date(date).toLocaleDateString()
+        ),
+    },
+    {
       title: t('actions'),
       key: 'actions',
       width: 100,
@@ -89,12 +80,10 @@ const TableInvestments = ({ i18n }) => {
           <Skeleton.Button active size="small" />
         ) : (
           <div className="flex items-center gap-4">
-            <Link
-              to={`/investements/${record.id}`}
-              className="text-blue-500 hover:text-blue-700 text-lg"
-            >
-              <EyeOutlined />
-            </Link>
+            <FileAddOutlined
+              className="!text-blue-500 hover:!text-blue-700 text-lg cursor-pointer"
+              onClick={() => handleAdd(record.id)}
+            />
             <DeleteOutlined 
               className="!text-rose-500 hover:!text-rose-700 text-lg cursor-pointer" 
               onClick={() => handleDelete(record.id)}
@@ -106,6 +95,10 @@ const TableInvestments = ({ i18n }) => {
 
   const handleDelete = (id) => {
     console.log('Suppression de la startup avec l\'ID:', id);
+  };
+
+  const handleAdd = (id) => {
+    console.log('Ajout de la startup avec l\'ID:', id);
   };
 
   const dataSource = startupsMock.map((startup, index) => ({

@@ -7,7 +7,7 @@ import SignInButtons from '@/components/signin/SignInButtons';
 import VerificationModal from '@/components/signin/VerificationModal';
 import ForgotPasswordModal from '@/components/signin/ForgotPasswordModal';
 import gsap from 'gsap';
-import { signInWithEmail, signInWithProvider, resendVerificationEmail, resetPassword } from '@/services/signin/authService';
+import { signInWithEmail, signInWithProvider, resendVerificationEmail, resetPassword, confirmSignUp, confirmResetPassword } from '@/services/auth/awsAuthService';
 import { Button } from 'antd';
 
 const SignIn = ({ i18n }) => {
@@ -18,6 +18,7 @@ const SignIn = ({ i18n }) => {
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
   const navigate = useNavigate();
   const { setUser } = useUser();
   const [loading, setLoading] = useState(false);
@@ -51,21 +52,21 @@ const SignIn = ({ i18n }) => {
   const handleSignInWithGoogle = async (e) => {
     e.preventDefault();
     setLoading(true);
-    await signInWithProvider('google', lng, t);
+    await signInWithProvider('Google', lng, t);
     setLoading(false);
   };
 
   const handleSignInWithMicrosoft = async (e) => {
     e.preventDefault();
     setLoading(true);
-    await signInWithProvider('azure', lng, t);
+    await signInWithProvider('Microsoft', lng, t);
     setLoading(false);
   };
 
-  const handleResendVerificationEmail = async (e) => {
-    e.preventDefault();
-    const success = await resendVerificationEmail(email, t);
-    if (success) setShowVerificationModal(false);
+  const handleResendVerificationEmail = async () => {
+    setLoading(true);
+    await resendVerificationEmail(email, t);
+    setLoading(false);
   };
 
   const handleForgotPassword = async (e) => {
@@ -73,10 +74,26 @@ const SignIn = ({ i18n }) => {
     setShowForgotPasswordModal(true);
   };
 
-  const handleForgotPasswordSubmit = async (e) => {
-    e.preventDefault();
-    const success = await resetPassword(forgotPasswordEmail, lng, t);
-    if (success) setShowForgotPasswordModal(false);
+  const handleForgotPasswordSubmit = async (email) => {
+    return await resetPassword(email, t);
+  };
+
+  const handleConfirmCode = async () => {
+    setLoading(true);
+    const success = await confirmSignUp(email, verificationCode, t, navigate, lng);
+    if (success) {
+      await signInWithEmail(email, password, t, setUser, navigate, lng);
+      setShowVerificationModal(false);
+    }
+    setLoading(false);
+  };
+
+  const handleConfirmPasswordReset = async (code, newPassword) => {
+    return await confirmResetPassword(forgotPasswordEmail, code, newPassword, t);
+  };
+
+  const handleMicrosoftSignIn = () => {
+    signInWithProvider('Microsoft', lng, t);
   };
 
   return (
@@ -100,8 +117,8 @@ const SignIn = ({ i18n }) => {
       </div>
       <SignInButtons
         t={t}
-        signInWithGoogle={handleSignInWithGoogle}
-        signInWithMicrosoft={handleSignInWithMicrosoft}
+        signInWithGoogle={() => signInWithProvider('Google', lng, t)}
+        signInWithMicrosoft={handleMicrosoftSignIn}
         loading={loading}
       />
       <div className="mt-6 text-center">
@@ -121,6 +138,9 @@ const SignIn = ({ i18n }) => {
         showVerificationModal={showVerificationModal}
         setShowVerificationModal={setShowVerificationModal}
         resendVerificationEmail={handleResendVerificationEmail}
+        verificationCode={verificationCode}
+        setVerificationCode={setVerificationCode}
+        handleConfirmCode={handleConfirmCode}
         loading={loading}
       />
       <ForgotPasswordModal
@@ -130,6 +150,7 @@ const SignIn = ({ i18n }) => {
         forgotPasswordEmail={forgotPasswordEmail}
         setForgotPasswordEmail={setForgotPasswordEmail}
         handleForgotPasswordSubmit={handleForgotPasswordSubmit}
+        handleConfirmPasswordReset={handleConfirmPasswordReset}
         loading={loading}
       />
     </div>

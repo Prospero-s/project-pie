@@ -54,7 +54,7 @@ const DropdownNotification = ({ i18n }) => {
       arrow
     >
       <Badge count={5} className="cursor-pointer">
-        <BellOutlined className="text-3xl lg:text-4xl hover:text-primary transition-colors duration-300" />
+        <BellOutlined className="text-2xl lg:text-3xl hover:text-primary transition-colors duration-300" />
       </Badge>
     </Dropdown>
   );

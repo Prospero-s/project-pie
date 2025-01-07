@@ -1,6 +1,6 @@
 {
   "my_portfolio": "My Portfolio",
-  "entreprise_name": "Entreprise Name",
+  "entreprise": "Entreprise",
   "sector": "Sector",
   "description": "Description",
   "funding_type": "Funding Type",
@@ -11,5 +11,6 @@
   "company_name_placeholder": "Enter the company name",
   "sector_placeholder": "Enter the sector",
   "add": "Add",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "last_update": "Last Update"
 }

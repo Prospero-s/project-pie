@@ -35,6 +35,23 @@
     "email_sent": "Email Sent",
     "check_inbox": "Please check your inbox for the reset link.",
     "error": "Error",
-    "error_message": "An error occurred while sending the reset link. Please try again later."
-  } 
+    "error_message": "An error occurred while sending the reset link. Please try again later.",
+    "verification_code": "Verification Code",
+    "enter_code": "Enter the verification code received by email",
+    "new_password": "New Password",
+    "enter_new_password": "Enter your new password",
+    "confirm_password": "Confirm Password",
+    "reenter_password": "Reenter your new password",
+    "reset_password": "Reset Password",
+    "passwords_dont_match": "Passwords don't match",
+    "success": "Password Reset",
+    "success_message": "Your password has been reset successfully",
+    "invalid_code": "Invalid verification code"
+  },
+  "verification_code": "Verification Code",
+  "verify": "Verify",
+  "verification_successful": "Verification Successful",
+  "account_verified": "Your account has been verified successfully",
+  "verification_error": "Verification Error",
+  "verification_error_message": "An error occurred during verification"
 }

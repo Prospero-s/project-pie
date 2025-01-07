@@ -1,38 +1,19 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { Avatar, Dropdown, Menu } from 'antd';
 import { 
   LogoutOutlined, 
   SettingOutlined, 
   UserOutlined 
 } from '@ant-design/icons';
-import { supabase } from '@/lib/supabaseClient';
-import { openNotificationWithIcon } from '@/components/common/notification/NotifAlert';
+import { signOut } from '@/services/auth/awsAuthService';
 
-const DropdownUser = ({ i18n, user, setUser }) => {
+const DropdownUser = ({ i18n, user }) => {
   const { t } = useTranslation('menu', { i18n });
-  const navigate = useNavigate();
   const lng = i18n.language;
 
   const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      openNotificationWithIcon(
-        'success',
-        t('logoutSuccess'),
-        t('logoutSuccessMessage')
-      );
-      setUser(null);
-      navigate(`/${lng}/auth/signin`);
-    } catch (error) {
-      console.error('Error signing out:', error);
-      openNotificationWithIcon(
-        'error',
-        t('logoutError'),
-        t('logoutErrorMessage')
-      );
-    }
+    await signOut(t, lng);
   };
 
   const items = [
