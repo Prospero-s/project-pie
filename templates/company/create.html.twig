@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer une Startup{% endblock %}
+
+{% block body %}
+<h1>Créer une Startup</h1>
+
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button type="submit" class="btn btn-primary">Rechercher</button>
+{{ form_end(form) }}
+
+{% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+{% if data %}
+    <h2>Informations sur l'entreprise</h2>
+    <ul>
+        <li><strong>Nom :</strong> {{ data.nom }}</li>
+        <li><strong>Secteur :</strong> {{ data.secteur }}</li>
+        <li><strong>Forme juridique :</strong> {{ data.forme_juridique }}</li>
+        <li><strong>Adresse :</strong> {{ data.adresse }}</li>
+    </ul>
+{% endif %}
+{% endblock %}
