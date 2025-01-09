@@ -8,8 +8,7 @@ const startupsMock = [
     name: 'NeuroTech AI',
     logo: logoNeurotech,
     sector: 'Intelligence Artificielle',
-    description:
-      "Développe des solutions d'IA pour améliorer la santé mentale.",
+    lastUpdate: '2024-03-15',
     fundingType: 'Série A',
     amountRaised: 3000000,
   },
@@ -18,8 +17,7 @@ const startupsMock = [
     name: 'EcoDrive Innovations',
     logo: logoEcodrive,
     sector: 'Technologie Durable',
-    description:
-      "Invente des solutions pour réduire l'empreinte carbone des véhicules.",
+    lastUpdate: '2024-03-14',
     fundingType: 'Série B',
     amountRaised: 1500000,
   },
@@ -28,8 +26,7 @@ const startupsMock = [
     name: 'Quantum Solutions',
     logo: logoQuantum,
     sector: 'Informatique Quantique',
-    description:
-      'Fournit des solutions de calcul quantique pour les entreprises.',
+    lastUpdate: '2024-03-13',
     fundingType: 'Série C',
     amountRaised: 2500000,
   },
@@ -38,8 +35,7 @@ const startupsMock = [
     name: 'NeuroTech AI',
     logo: logoNeurotech,
     sector: 'Intelligence Artificielle',
-    description:
-      "Développe des solutions d'IA pour améliorer la santé mentale.",
+    lastUpdate: '2024-03-15',
     fundingType: 'Série A',
     amountRaised: 3000000,
   },
@@ -48,8 +44,7 @@ const startupsMock = [
     name: 'EcoDrive Innovations',
     logo: logoEcodrive,
     sector: 'Technologie Durable',
-    description:
-      "Invente des solutions pour réduire l'empreinte carbone des véhicules.",
+    lastUpdate: '2024-03-14',
     fundingType: 'Série B',
     amountRaised: 1500000,
   },
@@ -58,8 +53,7 @@ const startupsMock = [
     name: 'Quantum Solutions',
     logo: logoQuantum,
     sector: 'Informatique Quantique',
-    description:
-      'Fournit des solutions de calcul quantique pour les entreprises.',
+    lastUpdate: '2024-03-13',
     fundingType: 'Série C',
     amountRaised: 2500000,
   },
@@ -68,8 +62,7 @@ const startupsMock = [
     name: 'NeuroTech AI',
     logo: logoNeurotech,
     sector: 'Intelligence Artificielle',
-    description:
-      "Développe des solutions d'IA pour améliorer la santé mentale.",
+    lastUpdate: '2024-03-15',
     fundingType: 'Série A',
     amountRaised: 3000000,
   },
@@ -78,8 +71,7 @@ const startupsMock = [
     name: 'EcoDrive Innovations',
     logo: logoEcodrive,
     sector: 'Technologie Durable',
-    description:
-      "Invente des solutions pour réduire l'empreinte carbone des véhicules.",
+    lastUpdate: '2024-03-14',
     fundingType: 'Série B',
     amountRaised: 1500000,
   },
@@ -88,8 +80,7 @@ const startupsMock = [
     name: 'Quantum Solutions',
     logo: logoQuantum,
     sector: 'Informatique Quantique',
-    description:
-      'Fournit des solutions de calcul quantique pour les entreprises.',
+    lastUpdate: '2024-03-13',
     fundingType: 'Série C',
     amountRaised: 2500000,
   },
@@ -98,8 +89,7 @@ const startupsMock = [
     name: 'NeuroTech AI',
     logo: logoNeurotech,
     sector: 'Intelligence Artificielle',
-    description:
-      "Développe des solutions d'IA pour améliorer la santé mentale.",
+    lastUpdate: '2024-03-15',
     fundingType: 'Série A',
     amountRaised: 3000000,
   },

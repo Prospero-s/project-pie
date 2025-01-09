@@ -30,5 +30,15 @@
   "account_created_message": "Vous pouvez maintenant vous connecter à votre compte.",
   "email_already_registered": "Cet email est déjà enregistré.",
   "verification_email_sent": "Un email de vérification a été envoyé à votre adresse. Veuillez vérifier votre boîte de réception et suivre les instructions pour activer votre compte.",
-  "registration_successful": "Inscription réussie"
+  "registration_successful": "Inscription réussie",
+  "verify_email": "Vérifier votre email",
+  "enter_verification_code": "Veuillez entrer le code de vérification envoyé à votre email",
+  "verification_code": "Code de vérification",
+  "verify": "Vérifier",
+  "cancel": "Annuler",
+  "verification_successful": "Vérification réussie",
+  "account_verified": "Votre compte a été vérifié avec succès",
+  "verification_error": "Erreur de vérification",
+  "invalid_code": "Code de vérification invalide",
+  "verification_error_message": "Une erreur s'est produite lors de la vérification"
 }

@@ -6,8 +6,6 @@ import frSignIn from './locales/fr/signin.json';
 import enSignIn from './locales/en/signin.json';
 import frSignUp from './locales/fr/signup.json';
 import enSignUp from './locales/en/signup.json';
-import frResetPassword from './locales/fr/reset-password.json';
-import enResetPassword from './locales/en/reset-password.json';
 import frMenu from './locales/fr/menu.json';
 import enMenu from './locales/en/menu.json';
 import frInvestments from './locales/fr/investments.json';
@@ -20,23 +18,26 @@ i18n
       fr: {
         signin: frSignIn,
         signup: frSignUp,
-        resetPassword: frResetPassword,
         menu: frMenu,
         investments: frInvestments,
       },
       en: {
         signin: enSignIn,
         signup: enSignUp,
-        resetPassword: enResetPassword,
         menu: enMenu,
         investments: enInvestments,
       },
     },
-    lng: ['fr', 'en'],
+    lng: 'fr',
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false,
     },
+    react: {
+      useSuspense: false,
+      bindI18n: 'languageChanged loaded',
+    },
+    initImmediate: true
   });
 
 export default i18n;

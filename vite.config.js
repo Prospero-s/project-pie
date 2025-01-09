@@ -18,6 +18,8 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "assets/js"),
       "@img": path.resolve(__dirname, "assets/img"),
+      buffer: 'buffer',
+      process: 'process/browser',
     },
   },
   server: {
@@ -45,5 +47,16 @@ export default defineConfig({
         app: "./assets/app.jsx",
       },
     },
+  },
+  define: {
+    global: 'window',
+    'process.env': process.env
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: 'globalThis'
+      }
+    }
   },
 });

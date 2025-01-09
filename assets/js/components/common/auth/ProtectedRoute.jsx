@@ -1,13 +1,21 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation, useParams } from 'react-router-dom';
 import { useUser } from '@/context/userContext';
 
 const ProtectedRoute = ({ children, i18n }) => {
-  const { user } = useUser();
-  const lng = i18n.language;
+  const { user, loading } = useUser();
+  const location = useLocation();
+  const { lng } = useParams();
+
+  if (loading) {
+    return (
+      <>
+      </>
+    );
+  }
 
   if (!user) {
-    return <Navigate to={`/${lng}/auth/signin`} replace />;
+    return <Navigate to={`/${i18n.language}/auth/signin`} state={{ from: location }} replace />;
   }
 
   return children;

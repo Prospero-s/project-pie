@@ -1,42 +1,87 @@
-import { User } from '@supabase/supabase-js';
 import { createContext, ReactNode, useContext, useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { Auth, Hub } from 'aws-amplify';
+
+interface UserMetadata {
+  full_name: string;
+  avatar_url: string;
+  email_verified: boolean;
+}
+
+interface AppMetadata {
+  roles: string[];
+}
+
+interface FormattedUser {
+  id: string;
+  email: string;
+  user_metadata: UserMetadata;
+  app_metadata: AppMetadata;
+}
 
 interface UserContextType {
-  user: User | null;
-  setUser: (user: User | null) => void;
+  user: FormattedUser | null;
+  setUser: (user: FormattedUser | null) => void;
+  loading: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<FormattedUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Vérifier la session au chargement
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    // Écouter les changements d'authentification
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  if (loading) {
-    return null;
-  }
-
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser, loading }}>
+      <UserAuthListener setUser={setUser} setLoading={setLoading} />
       {children}
     </UserContext.Provider>
   );
+};
+
+// Nouveau composant pour gérer l'authentification
+const UserAuthListener = ({ setUser, setLoading }: { setUser: (user: FormattedUser | null) => void, setLoading: (loading: boolean) => void }) => {
+  useEffect(() => {
+    checkUser();
+    const listener = Hub.listen('auth', ({ payload: { event, data } }) => {
+      switch (event) {
+        case 'signIn':
+          checkUser();
+          break;
+        case 'signOut':
+          setUser(null);
+          break;
+      }
+    });
+
+    return () => listener();
+  }, []);
+
+  async function checkUser() {
+    try {
+      const cognitoUser = await Auth.currentAuthenticatedUser();
+      if (cognitoUser) {
+        const { idToken, accessToken } = cognitoUser.signInUserSession;
+        const userData = {
+          id: cognitoUser.username,
+          email: idToken.payload.email,
+          user_metadata: {
+            full_name: idToken.payload.name || '',
+            avatar_url: idToken.payload.picture || '',
+            email_verified: idToken.payload.email_verified === true,
+          },
+          app_metadata: {
+            roles: accessToken.payload['cognito:groups'] || []
+          }
+        };
+        setUser(userData);
+      }
+    } catch (error) {
+      setUser(null);
+    }
+    setLoading(false);
+  }
+
+  return null;
 };
 
 export const useUser = () => {

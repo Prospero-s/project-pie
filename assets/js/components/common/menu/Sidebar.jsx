@@ -4,7 +4,7 @@ import { Layout, Menu, Divider } from 'antd';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import logoProspero from '@img/logo/logo-prospero.svg';
+import logoProspero from '@img/logo/logo-prospero-white.svg';
 
 const { Sider } = Layout;
 
