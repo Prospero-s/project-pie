@@ -21,6 +21,9 @@ help:
 	@echo "  cache-clear       - Vider le cache Symfony"
 	@echo "  migrations        - Exécuter les migrations de base de données"
 	@echo "  test              - Exécuter les tests PHPUnit"
+	@echo "  test-db-local     - Vérifier la connexion à la base de données locale"
+	@echo "  test-db-aws       - Vérifier la connexion à la base de données AWS"
+	@echo "  test-all-db       - Vérifier les deux bases de données"
 
 # Cibles
 
@@ -55,3 +58,13 @@ migrations:
 
 test:
 	$(DOCKER_COMPOSE) exec $(PHP_CONTAINER) ./vendor/bin/phpunit
+
+test-db-local:
+	$(SYMFONY) doctrine:schema:validate
+	$(SYMFONY) doctrine:migrations:status
+
+test-db-aws:
+	DATABASE_URL="$$DATABASE_URL_AWS" $(SYMFONY) doctrine:schema:validate
+	DATABASE_URL="$$DATABASE_URL_AWS" $(SYMFONY) doctrine:migrations:status
+
+test-all-db: test-db-local test-db-aws
