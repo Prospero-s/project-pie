@@ -5,10 +5,20 @@
             "Group": "Servers",
             "Host": "postgres",
             "Port": 5432,
-            "MaintenanceDB": "prospero",
+            "MaintenanceDB": "postgres",
             "Username": "postgres",
             "Password": "mypgdbpass",
             "SSLMode": "prefer"
+        },
+        "2": {
+            "Name": "Prospero Test AWS",
+            "Group": "Servers",
+            "Host": "prospero-test.c5o8wacsecor.eu-west-3.rds.amazonaws.com",
+            "Port": 5432,
+            "MaintenanceDB": "postgres",
+            "Username": "postgres",
+            "Password": "c7vEGe79F6b2Zt",
+            "SSLMode": "require"
         }
     }
 }
