@@ -3,7 +3,11 @@ DOCKER_COMPOSE = docker-compose
 SYMFONY = docker-compose exec php bin/console
 COMPOSER = docker-compose exec php composer
 NPM = docker-compose exec node npm
-PHP_CONTAINER = php # Nom du conteneur PHP dans docker-compose.yml
+PHP_CONTAINER = php
+
+# Inclure les variables d'environnement
+include .env
+export
 
 # Aide
 .PHONY: help
@@ -68,3 +72,28 @@ test-db-aws:
 	DATABASE_URL="$$DATABASE_URL_AWS" $(SYMFONY) doctrine:migrations:status
 
 test-all-db: test-db-local test-db-aws
+
+# Commandes pour les migrations
+migrations-diff:
+	$(SYMFONY) doctrine:migrations:diff
+
+migrations-local:
+	$(SYMFONY) doctrine:migrations:migrate --no-interaction --env=dev
+
+migrations-status-local:
+	$(SYMFONY) doctrine:migrations:status --env=dev
+
+migrations-test-aws:
+	$(eval DATABASE_URL=$(DATABASE_URL_AWS))
+	$(DOCKER_COMPOSE) exec -e DATABASE_URL=$(DATABASE_URL) php bin/console doctrine:migrations:migrate --no-interaction --env=prod
+
+migrations-status-test-aws:
+	$(eval DATABASE_URL=$(DATABASE_URL_AWS))
+	$(DOCKER_COMPOSE) exec -e DATABASE_URL=$(DATABASE_URL) php bin/console doctrine:migrations:status --env=prod --verbose
+
+migrations-rollback-local:
+	$(SYMFONY) doctrine:migrations:migrate prev --env=dev
+
+migrations-rollback-test-aws:
+	$(eval DATABASE_URL=$(DATABASE_URL_AWS))
+	$(DOCKER_COMPOSE) exec -e DATABASE_URL=$(DATABASE_URL) php bin/console doctrine:migrations:migrate prev --env=prod

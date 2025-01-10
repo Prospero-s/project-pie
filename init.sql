@@ -1,1 +1,1 @@
-DROP DATABASE IF EXISTS postgres;
+-- Ne rien mettre ici, on garde la base postgres par défaut
