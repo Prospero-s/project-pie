@@ -1,0 +1,19 @@
+{
+  "base": "/build/",
+  "entryPoints": {
+    "app": {
+      "js": [
+        "https://localhost:5173/build/assets/app.jsx"
+      ]
+    }
+  },
+  "legacy": false,
+  "metadatas": {},
+  "version": [
+    "7.1.0",
+    7,
+    1,
+    0
+  ],
+  "viteServer": "https://localhost:5173"
+}

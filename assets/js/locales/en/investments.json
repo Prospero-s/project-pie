@@ -1,0 +1,16 @@
+{
+  "my_portfolio": "My Portfolio",
+  "entreprise": "Entreprise",
+  "sector": "Sector",
+  "description": "Description",
+  "funding_type": "Funding Type",
+  "amount_raised": "Amount Raised",
+  "view_details": "View Details",
+  "add_investment": "Add Investment",
+  "company_name": "Company Name",
+  "company_name_placeholder": "Enter the company name",
+  "sector_placeholder": "Enter the sector",
+  "add": "Add",
+  "cancel": "Cancel",
+  "last_update": "Last Update"
+}

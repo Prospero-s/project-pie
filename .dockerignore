@@ -1,3 +1,7 @@
+!frankenphp/
+!frankenphp/conf.d/
+!frankenphp/Caddyfile
+!frankenphp/docker-entrypoint.sh
 **/*.log
 **/*.md
 **/*.php~
