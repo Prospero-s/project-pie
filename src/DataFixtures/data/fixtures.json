@@ -1,0 +1,1454 @@
+{
+    "enterprises": [
+        {
+            "denomination": "Air Liquide SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Industrie des gaz industriels",
+            "name": "Air Liquide",
+            "siret": "31234567800012",
+            "siren": "312345678",
+            "code_naf": "2011Z",
+            "activities": "Production et distribution de gaz industriels",
+            "capital": 2505133888,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75007,
+                "city": "Paris",
+                "track_type": "quai",
+                "route": "d'Orsay",
+                "lane_number": "75"
+            },
+            "recipient": {
+                "firstname": "François",
+                "lastname": "Jackow",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "L'Oréal SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Cosmétiques",
+            "name": "L'Oréal",
+            "siret": "63204931000015",
+            "siren": "632049310",
+            "code_naf": "2042Z",
+            "activities": "Fabrication de parfums et de produits pour la toilette",
+            "capital": 107082474,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92100,
+                "city": "Clichy",
+                "track_type": "rue",
+                "route": "Martre",
+                "lane_number": "41"
+            },
+            "recipient": {
+                "firstname": "Nicolas",
+                "lastname": "Hieronimus",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Dassault Aviation SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Aéronautique",
+            "name": "Dassault Aviation",
+            "siret": "71202078100741",
+            "siren": "712020781",
+            "code_naf": "3030Z",
+            "activities": "Construction aéronautique et spatiale",
+            "capital": 66789624,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92210,
+                "city": "Saint-Cloud",
+                "track_type": "avenue",
+                "route": "Marcel Dassault",
+                "lane_number": "9"
+            },
+            "recipient": {
+                "firstname": "Éric",
+                "lastname": "Trappier",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Capgemini SE",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SE",
+            "main_activity": "Services informatiques",
+            "name": "Capgemini",
+            "siret": "33063245100082",
+            "siren": "330632451",
+            "code_naf": "6202A",
+            "activities": "Conseil en systèmes et logiciels informatiques",
+            "capital": 1379132567,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75017,
+                "city": "Paris",
+                "track_type": "place",
+                "route": "de l'Étoile",
+                "lane_number": "11"
+            },
+            "recipient": {
+                "firstname": "Aiman",
+                "lastname": "Ezzat",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Decathlon SE",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SE",
+            "main_activity": "Commerce de détail d'articles de sport",
+            "name": "Decathlon",
+            "siret": "30635957500082",
+            "siren": "306359575",
+            "code_naf": "4764Z",
+            "activities": "Commerce de détail d'articles de sport en magasin spécialisé",
+            "capital": 10450000,
+            "min_capital": 1000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 59650,
+                "city": "Villeneuve-d'Ascq",
+                "track_type": "boulevard",
+                "route": "de Mons",
+                "lane_number": "4"
+            },
+            "recipient": {
+                "firstname": "Fabien",
+                "lastname": "Derville",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Ubisoft Entertainment SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Édition de jeux électroniques",
+            "name": "Ubisoft",
+            "siret": "33569950400053",
+            "siren": "335699504",
+            "code_naf": "5821Z",
+            "activities": "Édition de jeux électroniques",
+            "capital": 9625551,
+            "min_capital": 1000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 93400,
+                "city": "Montreuil",
+                "track_type": "rue",
+                "route": "Saint-Antoine",
+                "lane_number": "2"
+            },
+            "recipient": {
+                "firstname": "Yves",
+                "lastname": "Guillemot",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Deezer SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Services de streaming musical",
+            "name": "Deezer",
+            "siret": "51149195100027",
+            "siren": "511491951",
+            "code_naf": "6201Z",
+            "activities": "Programmation informatique",
+            "capital": 245346979,
+            "min_capital": 1000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75009,
+                "city": "Paris",
+                "track_type": "rue",
+                "route": "d'Athènes",
+                "lane_number": "24"
+            },
+            "recipient": {
+                "firstname": "Jeronimo",
+                "lastname": "Folgueira",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "OVH Groupe SAS",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SAS",
+            "main_activity": "Hébergement et services cloud",
+            "name": "OVHcloud",
+            "siret": "53748304700036",
+            "siren": "537483047",
+            "code_naf": "6311Z",
+            "activities": "Traitement de données, hébergement et activités connexes",
+            "capital": 170778796,
+            "min_capital": 1000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 59100,
+                "city": "Roubaix",
+                "track_type": "rue",
+                "route": "Kellermann",
+                "lane_number": "2"
+            },
+            "recipient": {
+                "firstname": "Michel",
+                "lastname": "Paulin",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Doctolib SAS",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SAS",
+            "main_activity": "Services de santé numériques",
+            "name": "Doctolib",
+            "siret": "79451843300014",
+            "siren": "794518433",
+            "code_naf": "6201Z",
+            "activities": "Programmation informatique",
+            "capital": 1941,
+            "min_capital": 1000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75008,
+                "city": "Paris",
+                "track_type": "rue",
+                "route": "de Londres",
+                "lane_number": "54"
+            },
+            "recipient": {
+                "firstname": "Stanislas",
+                "lastname": "Niox-Chateau",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Blablacar",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SAS",
+            "main_activity": "Covoiturage",
+            "name": "Blablacar",
+            "siret": "49106123400048",
+            "siren": "491061234",
+            "code_naf": "6312Z",
+            "activities": "Portails Internet",
+            "capital": 151577,
+            "min_capital": 1000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75010,
+                "city": "Paris",
+                "track_type": "rue",
+                "route": "Ménars",
+                "lane_number": "84"
+            },
+            "recipient": {
+                "firstname": "Nicolas",
+                "lastname": "Brusson",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Vinci SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Construction et concessions",
+            "name": "Vinci",
+            "siret": "55204944500113",
+            "siren": "552049445",
+            "code_naf": "7010Z",
+            "activities": "Activités des sièges sociaux",
+            "capital": 1493677621,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92800,
+                "city": "Rueil-Malmaison",
+                "track_type": "cours",
+                "route": "Ferdinand de Lesseps",
+                "lane_number": "1"
+            },
+            "recipient": {
+                "firstname": "Xavier",
+                "lastname": "Huillard",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Carrefour SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Grande distribution",
+            "name": "Carrefour",
+            "siret": "65280089100014",
+            "siren": "652800891",
+            "code_naf": "4711F",
+            "activities": "Hypermarchés",
+            "capital": 1940000000,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 91300,
+                "city": "Massy",
+                "track_type": "avenue",
+                "route": "de Paris",
+                "lane_number": "93"
+            },
+            "recipient": {
+                "firstname": "Alexandre",
+                "lastname": "Bompard",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Thales SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Électronique de défense",
+            "name": "Thales",
+            "siret": "55206147700012",
+            "siren": "552061477",
+            "code_naf": "7010Z",
+            "activities": "Activités des sièges sociaux",
+            "capital": 640000000,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92400,
+                "city": "Courbevoie",
+                "track_type": "avenue",
+                "route": "de la Grande Armée",
+                "lane_number": "31"
+            },
+            "recipient": {
+                "firstname": "Patrice",
+                "lastname": "Caine",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Safran SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Aéronautique et défense",
+            "name": "Safran",
+            "siret": "56280109400019",
+            "siren": "562801094",
+            "code_naf": "3030Z",
+            "activities": "Construction aéronautique et spatiale",
+            "capital": 85448488,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75015,
+                "city": "Paris",
+                "track_type": "boulevard",
+                "route": "du Général Martial Valin",
+                "lane_number": "2"
+            },
+            "recipient": {
+                "firstname": "Olivier",
+                "lastname": "Andriès",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Michelin SCA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SCA",
+            "main_activity": "Pneumatiques",
+            "name": "Michelin",
+            "siret": "85580201400018",
+            "siren": "855802014",
+            "code_naf": "2211Z",
+            "activities": "Fabrication de pneumatiques",
+            "capital": 357060900,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 63000,
+                "city": "Clermont-Ferrand",
+                "track_type": "place",
+                "route": "des Carmes-Déchaux",
+                "lane_number": "23"
+            },
+            "recipient": {
+                "firstname": "Florent",
+                "lastname": "Menegaux",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Sanofi SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Industrie pharmaceutique",
+            "name": "Sanofi",
+            "siret": "39530917100012",
+            "siren": "395309171",
+            "code_naf": "2120Z",
+            "activities": "Fabrication de préparations pharmaceutiques",
+            "capital": 2527121390,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75008,
+                "city": "Paris",
+                "track_type": "avenue",
+                "route": "de la Grande Armée",
+                "lane_number": "54"
+            },
+            "recipient": {
+                "firstname": "Paul",
+                "lastname": "Hudson",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Alstom SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Transport ferroviaire",
+            "name": "Alstom",
+            "siret": "38963450100117",
+            "siren": "389634501",
+            "code_naf": "3020Z",
+            "activities": "Construction de matériel ferroviaire roulant",
+            "capital": 2616486292,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 93400,
+                "city": "Saint-Ouen",
+                "track_type": "boulevard",
+                "route": "Victor Hugo",
+                "lane_number": "48"
+            },
+            "recipient": {
+                "firstname": "Henri",
+                "lastname": "Poupart-Lafarge",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Legrand SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Équipements électriques",
+            "name": "Legrand",
+            "siret": "42157934200012",
+            "siren": "421579342",
+            "code_naf": "2733Z",
+            "activities": "Fabrication de matériel d'installation électrique",
+            "capital": 1069790984,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 87000,
+                "city": "Limoges",
+                "track_type": "rue",
+                "route": "d'Oradour-sur-Glane",
+                "lane_number": "128"
+            },
+            "recipient": {
+                "firstname": "Benoît",
+                "lastname": "Coquart",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Sodexo SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Services aux entreprises",
+            "name": "Sodexo",
+            "siret": "30199749700012",
+            "siren": "301997497",
+            "code_naf": "5629B",
+            "activities": "Autres services de restauration",
+            "capital": 589819548,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92120,
+                "city": "Issy-les-Moulineaux",
+                "track_type": "rue",
+                "route": "Newton",
+                "lane_number": "255"
+            },
+            "recipient": {
+                "firstname": "Sophie",
+                "lastname": "Bellon",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Edenred SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Services aux entreprises",
+            "name": "Edenred",
+            "siret": "49375591200024",
+            "siren": "493755912",
+            "code_naf": "7010Z",
+            "activities": "Services de paiement",
+            "capital": 499176118,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92240,
+                "city": "Malakoff",
+                "track_type": "boulevard",
+                "route": "Gabriel Péri",
+                "lane_number": "14"
+            },
+            "recipient": {
+                "firstname": "Bertrand",
+                "lastname": "Dumazy",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Arkema SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Chimie",
+            "name": "Arkema",
+            "siret": "44561898400027",
+            "siren": "445618984",
+            "code_naf": "2016Z",
+            "activities": "Fabrication de matières plastiques de base",
+            "capital": 742860410,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92700,
+                "city": "Colombes",
+                "track_type": "rue",
+                "route": "du Président Wilson",
+                "lane_number": "420"
+            },
+            "recipient": {
+                "firstname": "Thierry",
+                "lastname": "Le Hénaff",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Valeo SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Équipements automobiles",
+            "name": "Valeo",
+            "siret": "55203545400014",
+            "siren": "552035454",
+            "code_naf": "2931Z",
+            "activities": "Fabrication d'équipements électriques pour automobile",
+            "capital": 242576816,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75017,
+                "city": "Paris",
+                "track_type": "rue",
+                "route": "Bayen",
+                "lane_number": "43"
+            },
+            "recipient": {
+                "firstname": "Christophe",
+                "lastname": "Périllat",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Atos SE",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SE",
+            "main_activity": "Services informatiques",
+            "name": "Atos",
+            "siret": "32384848400014",
+            "siren": "323848484",
+            "code_naf": "6202A",
+            "activities": "Conseil en systèmes et logiciels informatiques",
+            "capital": 110730332,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92400,
+                "city": "Bezons",
+                "track_type": "rue",
+                "route": "des Frères Lumière",
+                "lane_number": "80"
+            },
+            "recipient": {
+                "firstname": "Bertrand",
+                "lastname": "Meunier",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Publicis Groupe SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Publicité et communication",
+            "name": "Publicis",
+            "siret": "54207049700030",
+            "siren": "542070497",
+            "code_naf": "7311Z",
+            "activities": "Activités des agences de publicité",
+            "capital": 101384963,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75008,
+                "city": "Paris",
+                "track_type": "avenue",
+                "route": "des Champs-Élysées",
+                "lane_number": "133"
+            },
+            "recipient": {
+                "firstname": "Arthur",
+                "lastname": "Sadoun",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Worldline SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Services de paiement",
+            "name": "Worldline",
+            "siret": "37890129100040",
+            "siren": "378901291",
+            "code_naf": "6311Z",
+            "activities": "Traitement de données et paiements électroniques",
+            "capital": 190892216,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92400,
+                "city": "Puteaux",
+                "track_type": "place",
+                "route": "des Degrés",
+                "lane_number": "1"
+            },
+            "recipient": {
+                "firstname": "Gilles",
+                "lastname": "Grapinet",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Bureau Veritas SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Certification et contrôle",
+            "name": "Bureau Veritas",
+            "siret": "77523163100011",
+            "siren": "775231631",
+            "code_naf": "7120B",
+            "activities": "Analyses, essais et inspections techniques",
+            "capital": 54283854,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92200,
+                "city": "Neuilly-sur-Seine",
+                "track_type": "cours",
+                "route": "du Triangle",
+                "lane_number": "40"
+            },
+            "recipient": {
+                "firstname": "Hinda",
+                "lastname": "Gharbi",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "TotalEnergies SE",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SE",
+            "main_activity": "Énergie et pétrole",
+            "name": "TotalEnergies",
+            "siret": "54205901400028",
+            "siren": "542059014",
+            "code_naf": "1920Z",
+            "activities": "Raffinage du pétrole",
+            "capital": 6641697357,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92400,
+                "city": "Courbevoie",
+                "track_type": "place",
+                "route": "Jean Millier",
+                "lane_number": "2"
+            },
+            "recipient": {
+                "firstname": "Patrick",
+                "lastname": "Pouyanné",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Danone SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Agroalimentaire",
+            "name": "Danone",
+            "siret": "55203096600416",
+            "siren": "552030966",
+            "code_naf": "1051C",
+            "activities": "Fabrication de produits laitiers",
+            "capital": 171920622,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75009,
+                "city": "Paris",
+                "track_type": "rue",
+                "route": "de la Boétie",
+                "lane_number": "17"
+            },
+            "recipient": {
+                "firstname": "Antoine",
+                "lastname": "de Saint-Affrique",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Bouygues SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Construction et télécommunications",
+            "name": "Bouygues",
+            "siret": "57201505400019",
+            "siren": "572015054",
+            "code_naf": "7010Z",
+            "activities": "Activités des sièges sociaux",
+            "capital": 382504795,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75008,
+                "city": "Paris",
+                "track_type": "avenue",
+                "route": "Hoche",
+                "lane_number": "32"
+            },
+            "recipient": {
+                "firstname": "Martin",
+                "lastname": "Bouygues",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Schneider Electric SE",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SE",
+            "main_activity": "Équipements électriques",
+            "name": "Schneider Electric",
+            "siret": "54279072100018",
+            "siren": "542790721",
+            "code_naf": "2712Z",
+            "activities": "Fabrication de matériel de distribution électrique",
+            "capital": 2276133768,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92500,
+                "city": "Rueil-Malmaison",
+                "track_type": "rue",
+                "route": "Joseph Monier",
+                "lane_number": "35"
+            },
+            "recipient": {
+                "firstname": "Jean-Pascal",
+                "lastname": "Tricoire",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Orange SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Télécommunications",
+            "name": "Orange",
+            "siret": "38012986600725",
+            "siren": "380129866",
+            "code_naf": "6110Z",
+            "activities": "Télécommunications filaires",
+            "capital": 10640226396,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92130,
+                "city": "Issy-les-Moulineaux",
+                "track_type": "avenue",
+                "route": "du Général de Gaulle",
+                "lane_number": "111"
+            },
+            "recipient": {
+                "firstname": "Christel",
+                "lastname": "Heydemann",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Engie SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Énergie",
+            "name": "Engie",
+            "siret": "54210765100197",
+            "siren": "542107651",
+            "code_naf": "3523Z",
+            "activities": "Commerce de combustibles gazeux",
+            "capital": 2435285011,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92400,
+                "city": "Courbevoie",
+                "track_type": "place",
+                "route": "Samuel de Champlain",
+                "lane_number": "1"
+            },
+            "recipient": {
+                "firstname": "Catherine",
+                "lastname": "MacGregor",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Hermès International SCA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SCA",
+            "main_activity": "Luxe et maroquinerie",
+            "name": "Hermès",
+            "siret": "57207262600011",
+            "siren": "572072626",
+            "code_naf": "1512Z",
+            "activities": "Fabrication d'articles de maroquinerie",
+            "capital": 53840400,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75008,
+                "city": "Paris",
+                "track_type": "rue",
+                "route": "du Faubourg Saint-Honoré",
+                "lane_number": "24"
+            },
+            "recipient": {
+                "firstname": "Axel",
+                "lastname": "Dumas",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Kering SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Luxe",
+            "name": "Kering",
+            "siret": "55208858500885",
+            "siren": "552088585",
+            "code_naf": "7010Z",
+            "activities": "Activités des sièges sociaux",
+            "capital": 498771664,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75008,
+                "city": "Paris",
+                "track_type": "rue",
+                "route": "de la Paix",
+                "lane_number": "40"
+            },
+            "recipient": {
+                "firstname": "François-Henri",
+                "lastname": "Pinault",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "LVMH SE",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SE",
+            "main_activity": "Luxe",
+            "name": "LVMH",
+            "siret": "77572217100602",
+            "siren": "775722171",
+            "code_naf": "7010Z",
+            "activities": "Activités des sièges sociaux",
+            "capital": 151981299,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75008,
+                "city": "Paris",
+                "track_type": "avenue",
+                "route": "Montaigne",
+                "lane_number": "22"
+            },
+            "recipient": {
+                "firstname": "Bernard",
+                "lastname": "Arnault",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Accor SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Hôtellerie",
+            "name": "Accor",
+            "siret": "60205422200089",
+            "siren": "602054222",
+            "code_naf": "5510Z",
+            "activities": "Hôtels et hébergement similaire",
+            "capital": 785568804,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92130,
+                "city": "Issy-les-Moulineaux",
+                "track_type": "rue",
+                "route": "Henri Farman",
+                "lane_number": "82"
+            },
+            "recipient": {
+                "firstname": "Sébastien",
+                "lastname": "Bazin",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Veolia Environnement SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Services à l'environnement",
+            "name": "Veolia",
+            "siret": "40321003100281",
+            "siren": "403210031",
+            "code_naf": "3811Z",
+            "activities": "Collecte des déchets non dangereux",
+            "capital": 3498626330,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75008,
+                "city": "Paris",
+                "track_type": "avenue",
+                "route": "de la Motte-Picquet",
+                "lane_number": "30"
+            },
+            "recipient": {
+                "firstname": "Estelle",
+                "lastname": "Brachlianoff",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Saint-Gobain SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Matériaux de construction",
+            "name": "Saint-Gobain",
+            "siret": "54205012600016",
+            "siren": "542050126",
+            "code_naf": "2311Z",
+            "activities": "Fabrication de verre plat",
+            "capital": 2063077070,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92400,
+                "city": "Courbevoie",
+                "track_type": "place",
+                "route": "de l'Iris",
+                "lane_number": "12"
+            },
+            "recipient": {
+                "firstname": "Benoit",
+                "lastname": "Bazin",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Renault SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Automobile",
+            "name": "Renault",
+            "siret": "78097020200018",
+            "siren": "780970202",
+            "code_naf": "2910Z",
+            "activities": "Construction de véhicules automobiles",
+            "capital": 1126701902,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92100,
+                "city": "Boulogne-Billancourt",
+                "track_type": "quai",
+                "route": "Le Gallo",
+                "lane_number": "13"
+            },
+            "recipient": {
+                "firstname": "Luca",
+                "lastname": "de Meo",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Pernod Ricard SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Vins et spiritueux",
+            "name": "Pernod Ricard",
+            "siret": "58297229600013",
+            "siren": "582972296",
+            "code_naf": "1101Z",
+            "activities": "Production de boissons alcooliques distillées",
+            "capital": 399818400,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75116,
+                "city": "Paris",
+                "track_type": "place",
+                "route": "des États-Unis",
+                "lane_number": "5"
+            },
+            "recipient": {
+                "firstname": "Alexandre",
+                "lastname": "Ricard",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Essilor Luxottica SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Optique",
+            "name": "EssilorLuxottica",
+            "siret": "71204106300015",
+            "siren": "712041063",
+            "code_naf": "3250A",
+            "activities": "Fabrication de matériel médico-chirurgical et dentaire",
+            "capital": 79020762,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 94220,
+                "city": "Charenton-le-Pont",
+                "track_type": "rue",
+                "route": "du Maréchal de Lattre de Tassigny",
+                "lane_number": "147"
+            },
+            "recipient": {
+                "firstname": "Francesco",
+                "lastname": "Milleri",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Crédit Agricole SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Banque et assurance",
+            "name": "Crédit Agricole",
+            "siret": "78456962100012",
+            "siren": "784569621",
+            "code_naf": "6419Z",
+            "activities": "Autres intermédiations monétaires",
+            "capital": 9340726773,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92120,
+                "city": "Montrouge",
+                "track_type": "place",
+                "route": "des États-Unis",
+                "lane_number": "12"
+            },
+            "recipient": {
+                "firstname": "Philippe",
+                "lastname": "Brassac",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "BNP Paribas SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Banque",
+            "name": "BNP Paribas",
+            "siret": "66204244900014",
+            "siren": "662042449",
+            "code_naf": "6419Z",
+            "activities": "Autres intermédiations monétaires",
+            "capital": 2468663292,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75009,
+                "city": "Paris",
+                "track_type": "boulevard",
+                "route": "des Italiens",
+                "lane_number": "16"
+            },
+            "recipient": {
+                "firstname": "Jean-Laurent",
+                "lastname": "Bonnafé",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Société Générale SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Banque",
+            "name": "Société Générale",
+            "siret": "55212022200013",
+            "siren": "552120222",
+            "code_naf": "6419Z",
+            "activities": "Autres intermédiations monétaires",
+            "capital": 1062354722,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75009,
+                "city": "Paris",
+                "track_type": "boulevard",
+                "route": "Haussmann",
+                "lane_number": "29"
+            },
+            "recipient": {
+                "firstname": "Slawomir",
+                "lastname": "Krupa",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "AXA SA",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SA",
+            "main_activity": "Assurance",
+            "name": "AXA",
+            "siret": "57212054100017",
+            "siren": "572120541",
+            "code_naf": "6512Z",
+            "activities": "Autres assurances",
+            "capital": 5533991507,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75008,
+                "city": "Paris",
+                "track_type": "avenue",
+                "route": "Matignon",
+                "lane_number": "25"
+            },
+            "recipient": {
+                "firstname": "Thomas",
+                "lastname": "Buberl",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Stellantis N.V.",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "NV",
+            "main_activity": "Automobile",
+            "name": "Stellantis",
+            "siret": "79050019100082",
+            "siren": "790500191",
+            "code_naf": "2910Z",
+            "activities": "Construction de véhicules automobiles",
+            "capital": 4846637499,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 78300,
+                "city": "Poissy",
+                "track_type": "boulevard",
+                "route": "de l'Europe",
+                "lane_number": "2"
+            },
+            "recipient": {
+                "firstname": "Carlos",
+                "lastname": "Tavares",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Airbus SE",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SE",
+            "main_activity": "Aéronautique et défense",
+            "name": "Airbus",
+            "siret": "38347481500011",
+            "siren": "383474815",
+            "code_naf": "3030Z",
+            "activities": "Construction aéronautique et spatiale",
+            "capital": 785333784,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 31700,
+                "city": "Blagnac",
+                "track_type": "rond-point",
+                "route": "Maurice Bellonte",
+                "lane_number": "1"
+            },
+            "recipient": {
+                "firstname": "Guillaume",
+                "lastname": "Faury",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Teleperformance SE",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SE",
+            "main_activity": "Services aux entreprises",
+            "name": "Teleperformance",
+            "siret": "30188775900459",
+            "siren": "301887759",
+            "code_naf": "8220Z",
+            "activities": "Activités de centres d'appels",
+            "capital": 147802105,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75008,
+                "city": "Paris",
+                "track_type": "rue",
+                "route": "de Prony",
+                "lane_number": "21"
+            },
+            "recipient": {
+                "firstname": "Daniel",
+                "lastname": "Julien",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Eurofins Scientific SE",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SE",
+            "main_activity": "Services bio-analytiques",
+            "name": "Eurofins Scientific",
+            "siret": "35013841900032",
+            "siren": "350138419",
+            "code_naf": "7120B",
+            "activities": "Analyses, essais et inspections techniques",
+            "capital": 1947653690,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 75001,
+                "city": "Paris",
+                "track_type": "rue",
+                "route": "du Louvre",
+                "lane_number": "23"
+            },
+            "recipient": {
+                "firstname": "Gilles",
+                "lastname": "Martin",
+                "parts": 100
+            }
+        },
+        {
+            "denomination": "Bolloré SE",
+            "remote_society": false,
+            "established_in_france": true,
+            "legal_form": "SE",
+            "main_activity": "Transport et logistique",
+            "name": "Bolloré",
+            "siret": "05580901400902",
+            "siren": "055809014",
+            "code_naf": "7010Z",
+            "activities": "Activités des sièges sociaux",
+            "capital": 471135819,
+            "min_capital": 2000000,
+            "currency": "EUR",
+            "address": {
+                "head_office": true,
+                "country": "France",
+                "postal_code": 92800,
+                "city": "Puteaux",
+                "track_type": "quai",
+                "route": "de Dion Bouton",
+                "lane_number": "31"
+            },
+            "recipient": {
+                "firstname": "Cyrille",
+                "lastname": "Bolloré",
+                "parts": 100
+            }
+        }
+    ]
+}

@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Entreprises{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Liste des Entreprises</h1>
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Dénomination</th>
+                <th>SIREN</th>
+                <th>Forme Juridique</th>
+                <th>Code APE</th>
+                <th>Secteur</th>
+                <th>Ville</th>
+                <th>Représentant</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for enterprise in enterprises %}
+            <tr>
+                <td>{{ enterprise.denomination }}</td>
+                <td>{{ enterprise.siren }}</td>
+                <td>{{ enterprise.formeJuridique }}</td>
+                <td>{{ enterprise.codeApe }}</td>
+                <td>{{ enterprise.sector }}</td>
+                <td>
+                    {% if enterprise.address %}
+                        {{ enterprise.address.commune }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if enterprise.representants is not empty %}
+                        {% for representative in enterprise.representants %}
+                            {{ representative.nom }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7" class="text-center">Aucune entreprise trouvée</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} 

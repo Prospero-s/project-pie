@@ -12,7 +12,8 @@ class Representative
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Enterprise::class, inversedBy: 'representatives')]
+    #[ORM\ManyToOne(targetEntity: Enterprise::class, inversedBy: 'representants')]
+    #[ORM\JoinColumn(nullable: false)]
     private Enterprise $enterprise;
 
     #[ORM\Column(length: 255)]

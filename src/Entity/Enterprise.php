@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -46,10 +48,15 @@ class Enterprise
     private ?Address $address = null;
 
     #[ORM\OneToMany(mappedBy: 'enterprise', targetEntity: Representative::class)]
-    private Representative $representants;
+    private Collection $representants;
 
     #[ORM\OneToOne(mappedBy: 'enterprise', cascade: ['persist', 'remove'])]
     private ?Investment $investment = null;
+
+    public function __construct()
+    {
+        $this->representants = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -163,36 +170,52 @@ class Enterprise
         return $this;
     }
 
-    public function getAddress(): ?CompanyAddress
+    public function getAddress(): ?Address
     {
         return $this->address;
     }
 
-    public function setAddress(?CompanyAddress $address): self
+    public function setAddress(?Address $address): self
     {
         $this->address = $address;
         return $this;
     }
 
-    public function getInvestment(): ?CompanyInvestment
+    public function getInvestment(): ?Investment
     {
         return $this->investment;
     }
 
-    public function setInvestment(?CompanyInvestment $investment): self
+    public function setInvestment(?Investment $investment): self
     {
         $this->investment = $investment;
         return $this;
     }
 
-    public function getRepresentants(): array
+    public function getRepresentants(): Collection
     {
         return $this->representants;
     }
 
-    public function setRepresentants(array $representants): self
+    public function addRepresentant(Representative $representant): self
     {
-        $this->representants = $representants;
+        if (!$this->representants->contains($representant)) {
+            $this->representants->add($representant);
+            $representant->setEnterprise($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRepresentant(Representative $representant): self
+    {
+        if ($this->representants->removeElement($representant)) {
+            // set the owning side to null (unless already changed)
+            if ($representant->getEnterprise() === $this) {
+                $representant->setEnterprise(null);
+            }
+        }
+
         return $this;
     }
 
