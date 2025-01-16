@@ -1,0 +1,120 @@
+{
+  "my_portfolio": "Mon Portefeuille",
+  "common": {
+    "add": "Ajouter",
+    "cancel": "Annuler",
+    "next": "Suivant",
+    "finish": "Terminer",
+    "previous": "Précédent",
+    "loading": "Chargement...",
+    "page": "Page",
+    "of": "sur",
+    "search": "Rechercher",
+    "back": "Retour",
+    "confirm": "Confirmer"
+  },
+  "creation": {
+    "title": "Création d'entreprise",
+    "select_type": "Choisir le type de création",
+    "automatic_creation": "Création automatique",
+    "automatic_description": "Récupérer automatiquement les informations via le SIREN",
+    "manual_creation": "Création manuelle",
+    "manual_description": "Saisir manuellement les informations de l'entreprise"
+  },
+  "enterprise_details": {
+    "title": "Détails de l'entreprise",
+    "confirmation_title": "Confirmation des détails de l'entreprise",
+    "siren": "Numéro SIREN",
+    "siren_placeholder": "Entrez le numéro SIREN (9 chiffres)",
+    "siren_required": "Veuillez saisir le SIREN",
+    "siren_invalid": "Le SIREN doit contenir exactement 9 chiffres",
+    "error": "Erreur lors de la récupération des données",
+    "enterprise": {
+      "name": "Nom de l'entreprise",
+      "name_placeholder": "Entrez le nom de l'entreprise",
+      "name_required": "Veuillez saisir le nom de l'entreprise",
+      "sector": "Secteur d'activité",
+      "sector_placeholder": "Entrez le secteur d'activité",
+      "sector_required": "Veuillez saisir le secteur d'activité",
+      "description": "Description",
+      "details": {
+        "title": "Détails de l'entreprise",
+        "last_update": "Dernière mise à jour",
+        "legal_form": "Forme juridique",
+        "siren": "SIREN",
+        "siret": "SIRET",
+        "headquarters": "(siège)",
+        "address": {
+          "title": "Adresse du siège social",
+          "street_number": "N°",
+          "street_type": "Type de voie",
+          "street": "Voie",
+          "postal_code": "Code postal",
+          "city": "Ville",
+          "country": "Pays"
+        },
+        "capital": {
+          "amount": "Capital social",
+          "currency": "Devise",
+          "not_available": "Capital social non renseigné"
+        },
+        "ape": {
+          "code": "Code APE",
+          "activity": "Activité principale"
+        },
+        "representatives": {
+          "title": "Représentants",
+          "name": "Nom",
+          "role": "Qualité"
+        }
+      }
+    },
+    "loading": {
+      "title": "Récupération des informations en cours...",
+      "description": "Nous recherchons les détails de l'entreprise auprès des registres officiels",
+      "map": "Chargement de la carte..."
+    },
+    "error_siren": {
+      "title": "Erreur",
+      "message": "Impossible de récupérer les informations de l'entreprise. Votre Siren est peut-être incorrect. Veuillez réessayer ultérieurement."
+    },
+    "sectors": {
+      "technology": "Technologie",
+      "healthcare": "Santé",
+      "finance": "Finance",
+      "retail": "Commerce",
+      "manufacturing": "Industrie",
+      "energy": "Énergie",
+      "education": "Éducation",
+      "other": "Autre"
+    },
+    "sector_required": "Veuillez sélectionner un secteur d'activité",
+    "select_sector": "Sélectionnez un secteur d'activité"
+  },
+  "funding": {
+    "title": "Détails de la levée",
+    "type": "Type de levée",
+    "select_type": "Sélectionner le type de levée",
+    "type_required": "Veuillez sélectionner le type de levée",
+    "amount": "Montant levé",
+    "amount_required": "Veuillez saisir le montant levé",
+    "currency": "Devise",
+    "currency_required": "Veuillez sélectionner la devise",
+    "types": {
+      "seed": "Amorçage (Seed)",
+      "serieA": "Série A",
+      "serieB": "Série B",
+      "serieC": "Série C",
+      "growth": "Croissance (Growth)",
+      "ipo": "Introduction en bourse (IPO)",
+      "debt": "Dette",
+      "grant": "Subvention",
+      "other": "Autre"
+    }
+  },
+  "actions": {
+    "title": "Actions",
+    "view_details": "Voir les détails",
+    "add_investment": "Ajouter un investissement"
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "my_portfolio": "My Portfolio",
+  "common": {
+    "add": "Add",
+    "cancel": "Cancel",
+    "next": "Next",
+    "finish": "Finish",
+    "previous": "Previous",
+    "loading": "Loading...",
+    "page": "Page",
+    "of": "of",
+    "search": "Search",
+    "back": "Back",
+    "confirm": "Confirm"
+  },
+  "creation": {
+    "title": "Enterprise Creation",
+    "select_type": "Choose creation type",
+    "automatic_creation": "Automatic creation",
+    "automatic_description": "Automatically retrieve information via SIREN",
+    "manual_creation": "Manual creation",
+    "manual_description": "Manually enter enterprise information"
+  },
+  "enterprise_details": {
+    "title": "Enterprise Details",
+    "confirmation_title": "Enterprise Details Confirmation",
+    "siren": "SIREN number",
+    "siren_placeholder": "Enter SIREN number (9 digits)",
+    "siren_required": "Please enter SIREN",
+    "siren_invalid": "SIREN must contain exactly 9 digits",
+    "error": "Error retrieving data",
+    "enterprise": {
+      "name": "Enterprise name",
+      "name_placeholder": "Enter enterprise name",
+      "name_required": "Please enter enterprise name",
+      "sector": "Business sector",
+      "sector_placeholder": "Enter business sector",
+      "sector_required": "Please enter business sector",
+      "description": "Description",
+      "details": {
+        "title": "Enterprise Details",
+        "last_update": "Last update",
+        "legal_form": "Legal form",
+        "siren": "SIREN",
+        "siret": "SIRET",
+        "headquarters": "(headquarters)",
+        "address": {
+          "title": "Registered office address",
+          "street_number": "No.",
+          "street_type": "Street type",
+          "street": "Street",
+          "postal_code": "Postal code",
+          "city": "City",
+          "country": "Country"
+        },
+        "capital": {
+          "amount": "Share capital",
+          "currency": "Currency",
+          "not_available": "Share capital not provided"
+        },
+        "ape": {
+          "code": "APE Code",
+          "activity": "Main activity"
+        },
+        "representatives": {
+          "title": "Representatives",
+          "name": "Name",
+          "role": "Role"
+        }
+      }
+    },
+    "loading": {
+      "title": "Retrieving enterprise details...",
+      "description": "We are retrieving the enterprise details from official registers"
+    },
+    "error_siren": {
+      "title": "Error",
+      "message": "Unable to retrieve enterprise details. Your Siren may be incorrect. Please try again later."
+    },
+    "sectors": {
+      "technology": "Technology",
+      "healthcare": "Healthcare",
+      "finance": "Finance",
+      "retail": "Retail",
+      "manufacturing": "Manufacturing",
+      "energy": "Energy",
+      "education": "Education",
+      "other": "Other"
+    },
+    "sector_required": "Please select an activity sector",
+    "select_sector": "Select an activity sector"
+  },
+  "funding": {
+    "title": "Funding Details",
+    "type": "Funding Type",
+    "select_type": "Select funding type",
+    "type_required": "Please select funding type",
+    "amount": "Amount raised",
+    "amount_required": "Please enter amount raised",
+    "currency": "Currency",
+    "currency_required": "Please select currency",
+    "types": {
+      "seed": "Seed",
+      "serieA": "Series A",
+      "serieB": "Series B",
+      "serieC": "Series C",
+      "growth": "Growth",
+      "ipo": "Initial Public Offering (IPO)",
+      "debt": "Debt",
+      "grant": "Grant",
+      "other": "Other"
+    }
+  },
+  "actions": {
+    "title": "Actions",
+    "view_details": "View details",
+    "add_investment": "Add investment"
+  }
+}

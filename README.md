@@ -1,114 +1,174 @@
-# TailAdmin Next.js - Free Next.js Tailwind Admin Dashboard Template
+# Projet : Prospero
 
-TailAdmin is a free and open-source admin dashboard template built on **Next.js and Tailwind CSS** providing developers with everything they need to create a feature-rich and data-driven: back-end, dashboard, or admin panel solution for any sort of web project.
+Ce projet combine **Symfony** pour la partie backend et **React** pour la partie frontend, le tout orchestré à l'aide de **Docker**.
 
-[![tailwind nextjs admin template](https://github.com/TailAdmin/free-nextjs-admin-dashboard/blob/main/tailadmin-nextjs.jpg)](https://nextjs-demo.tailadmin.com/)
+## Prérequis
 
-With TailAdmin Next.js, you get access to all the necessary dashboard UI components, elements, and pages required to build a high-quality and complete dashboard or admin panel. Whether you're building a dashboard or admin panel for a complex web application or a simple website. 
-
-TailAdmin utilizes the powerful features of **Next.js 14** and common features of Next.js such as server-side rendering (SSR), static site generation (SSG), and seamless API route integration. Combined with the advancements of **React 18** and the robustness of **TypeScript**, TailAdmin is the perfect solution to help get your project up and running quickly.
-
-### [✨ Visit Website](https://tailadmin.com/)
-### [🚀 PRO Demo](https://nextjs-demo.tailadmin.com/)
-### [🚀 FREE Demo](https://nextjs-free-demo.tailadmin.com/)
-
-### TailAdmin Next.js PRO vs TailAdmin Next.js FREE Comparison 📊
-
-#### [TailAdmin Next.js PRO](https://nextjs-demo.tailadmin.com/)
-- 5 Unique Dashboards: Analytics, Ecommerce, Marketing, and CRM (More will be added)
-- 150+ Dashboard UI Components
-- 200+ Total UI Elements
-- 45+ HTML Files
-- All Essential Elements and Files
-- Full Figma Design Source - As Shown on Demo
-___
-
-#### [TailAdmin Next.js FREE](https://free-nextjs-demo.tailadmin.com/)
-- 1 Unique Dashboard
-- 30+ Dashboard UI Components
-- 50+ Total UI Elements 
-- 10+ HTML Files
-- TypeScript Support
-- Basic UI Kit Elements and Files
-- Figma Design Source - Free Sample
-___
-
-### [⬇️ Download Now](https://tailadmin.com/download)
-
-### [⚡ Get PRO Version](https://tailadmin.com/pricing)
-
-### [📄 Documentation/Installation](https://tailadmin.com/docs)
-
-### [🖌️ TailAdmin Figma Free Sample](https://www.figma.com/community/file/1214477970819985778)
-
-### [👉 TailAdmin HTML Version](https://github.com/TailAdmin/tailadmin-free-tailwind-dashboard-template)
-
+- **Docker** installés sur votre machine.
+- **Makefile** installés sur votre machine.
+- **Git** pour cloner le projet.
+- **Make** pour cloner le projet.
+- **Visual Studio Code** avec l'extension **Remote - WSL**.
 
 ## Installation
-Here are the steps you need to follow to install the dependencies.
 
-1. Download and extract the template from Next.js Templates.
+1. **Configurer les fichiers environnement** :
+   - Copier les fichiers `.env` nécessaires :
+     ```bash
+     cp /.env.example /.env
+     ```
+   - Ajuster les variables dans ces fichiers en fonction de votre configuration.
+   - Pour la connexion à Supabase completer les deux variables suivantes :
+      ```
+      SUPABASE_DB_USER=******
+      SUPABASE_DB_PASSWORD=******
+      DATABASE_URL=pgsql://${SUPABASE_DB_USER}:${SUPABASE_DB_PASSWORD}@aws-0-eu-west-3.pooler.supabase.com:6543/prospero
+      ```
 
-2. After that **cd** into the template directory then run this command to install all the dependencies
+2. **Lancer les conteneurs Docker** :
+   - Build l'image :
+      ```bash
+      make build
+      ```
+   
+   - Monté les services :
+      ```bash
+      make up
+      ```
+
+3. **Installer les dépendances** :
+   - Entrée dans le shell du conteneur PHP :
+      ```bash
+      make shell
+      ```
+      
+   - Backend (Symfony) :
+     ```bash
+     composer install
+     ```
+
+   - Frontend (React) :
+     ```bash
+     npm install
+     ```
+
+4. **Installer les certificats** :
+   - Installer mkcert :
+      MacOS
+      ```bash
+     brew install mkcert
+     brew install nss # if you use Firefox
+     ```
+
+     Linux
+      ```bash
+     sudo apt install libnss3-tools
+         -or-
+      sudo yum install nss-tools
+         -or-
+      sudo pacman -S nss
+         -or-
+      sudo zypper install mozilla-nss-tools
+     ```
+
+      Sur Windows, utiliser Chocolatey
+      ```bash
+      choco install mkcert
+      ```
+
+      Ou Scoop
+      ```bash
+      scoop bucket add extras
+      scoop install mkcert
+      ```
+
+   - Générer et vérifier les certifications :
+      ```bash
+     mkcert -cert-file frankenphp/certs/tls.pem -key-file frankenphp/certs/tls.key "localhost"
+     ```
+
+   - Ajoutez le certificat racine de mkcert au système :
+      ```bash
+     mkcert -CAROOT
+     ```
+
+      Mac :
+      ```bash
+      sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "$(mkcert -CAROOT)/rootCA.pem"
+      ```
+      
+      Linux :
+      ```bash
+      sudo cp "$(mkcert -CAROOT)/rootCA.pem" /usr/local/share/ca-certificates/rootCA.crt
+      sudo update-ca-certificates
+      ```
+
+   - Windows : Double-cliquez sur le certificat racine (rootCA.pem), puis cliquez sur Installer le certificat et sélectionnez     Autorités de certification racines de confiance.
+
+   - Sinon, Windows : Étapes pour installer un certificat racine (.pem) sur Windows :
+      Double-cliquez sur le fichier .pem : Lorsque vous double-cliquez sur un fichier .pem, il devrait vous demander quel programme l'ouvrir. Si vous ne voyez pas "Certificate Manager" ou "CertMgr.msc" dans la liste, vous pouvez essayer d'ouvrir le fichier directement avec Gestionnaire de certificats Windows.
+
+      Si ce n'est pas le cas, vous pouvez également essayer de lancer le gestionnaire de certificats via la commande certmgr.msc.
+
+      Lancer le gestionnaire de certificats Windows :
+
+      Appuyez sur Win + R pour ouvrir la fenêtre "Exécuter".
+      Tapez certmgr.msc et appuyez sur Entrée. Cela ouvrira le gestionnaire de certificats.
+      Importer le certificat :
+
+      Dans le gestionnaire de certificats, sous le menu à gauche, développez le dossier Autorités de certification racines de confiance.
+      Cliquez avec le bouton droit sur Certificats sous Autorités de certification racines de confiance, puis sélectionnez Toutes les tâches > Importer...
+      Sélectionnez le certificat à importer :
+
+      La fenêtre "Assistant Importation de certificat" s'ouvrira.
+      Cliquez sur Parcourir..., puis sélectionnez votre fichier .pem.
+      Cliquez sur Suivant et choisissez Placer tous les certificats dans le magasin suivant.
+      Sélectionnez Autorités de certification racines de confiance et cliquez sur Suivant.
+      Cliquez sur Terminer pour importer le certificat.
+
+5. **Configurer WSL avec Visual Studio Code** :
+
+   - **Installer WSL** : Suivez les instructions officielles pour installer WSL sur votre machine Windows. Assurez-vous d'avoir une distribution Linux installée (comme Ubuntu a installer directement depuis le Microsoft Store).
+
+   - **Installer Visual Studio Code** : Téléchargez et installez Visual Studio Code si ce n'est pas déjà fait.
+
+   - **Installer l'extension Remote - WSL** : Ouvrez Visual Studio Code, allez dans l'onglet Extensions (ou utilisez le raccourci `Ctrl+Shift+X`), et recherchez "Remote - WSL". Installez l'extension.
+
+   - **Ouvrir le projet dans WSL** : Après avoir installé l'extension, vous pouvez ouvrir le projet dans VS Code en utilisant le raccourci `Ctrl+Shift+P`, puis en tapant `Connect to WSL in New Window` et choisir la distribution Linux que vous avez installée.
+
+   - **Copier le projet dans WSL** : Après avoir lancer le WSL sur VS Code, copiez le projet dans WSL soit via le terminal WSL soit via l'explorateur de fichier.
+
+   - **Configurer les paramètres** : Assurez-vous que votre projet est configuré pour utiliser les chemins et les outils disponibles dans WSL. Vous pouvez ajuster les paramètres de votre projet dans Visual Studio Code pour s'assurer qu'il utilise les bons interpréteurs et outils. Il se peut qu'il y ait des problèmes sur l'installation des node_modules à cause des permissions. Si c'est le cas, copier les node_modules de votre pc hors WSL et les coller dans le projet dans WSL. Ajouter une permission pour que le container puisse lire le dossier node_modules.
+      ```bash
+      sudo chmod -R 777 node_modules
+      ```	
+   - **Lancer le projet** :
+      ```bash
+      docker-compose up -d
+      ```
+
+6. **Accéder au projet** :
+   - http://localhost
+
+## Structure du Projet
 
 ```
-npm install
-```
-or
-
-```
-yarn install
-```
-
-3. Now run this command to start the developement server
-
-```
-npm run dev
-```
-
-or 
-
-```
-yarn dev
+.
+├── .env                    # Fichier de configuration
+├── Dockerfile              # Dockerfile pour le projet
+├── certs/                  # Les certificats HTTPS
+├── src/                    # Code Symfony
+│   ├── Controller/         # Code Controller Symfony
+│   ├── Entity                # Fichier de configuration
+│   └── Dockerfile          # Dockerfile pour PHP
+├── Assets/                 # Code React
+│   ├── src/                # Code source frontend
+│   ├── .env                # Fichier de configuration
+│   └── Dockerfile          # Dockerfile pour Node.js
+├── docker-compose.yml      # Configuration Docker Compose
+└── README.md               # Ce fichier
 ```
 
+## Licence
 
-## Free Admin Dashboard Template for Next.js Built-with Tailwind CSS, React 18 and TypeScript
-TailAdmin Next.js is a free dashboard template, which uses Tailwind CSS, is a great starting point for dashboard UI. This template uses the Next.js JavaScript framework and the easy-to-use Tailwind CSS framework. The Tailwind CSS and Next.js Dashboard Template comes with ready-made components like navigation menus, charts, tables, and forms. These components can be easily adjusted and added to any Next.js web application.
-
-TailAdmin for Next.js provides all essential Next.js + Tailwind CSS UI components that can be copied and pasted directly into your dashboard projects. The range of components includes charts, graphs, navbars, tabs, buttons, cards, tables, profiles, forms, modals, app pages, calendars, web app example templates, and more, all coded for Next.js React and styled using Tailwind CSS.
-
-If you're on the hunt for a top-quality Next.js-Tailwind Dashboard, Admin Panel Template, or UI Kit, TailAdmin is the perfect choice for you!
-
-### 📄 License
-TailAdmin Next.js Free is 100% free and open-source; feel free to use it with your personal and commercial projects.
-
-### 💜 Support
-If you like the template, please star this repository to inspire the team to create more stuff like this and reach more users like you!
-
-
-## Update Logs
-
-### Version 1.3.1 - [Feb 12, 2024]
-
-#### Issues
-
-- **Issues 02:** Fix Misspelling issue [Default Layout/Layouts].
-
-#### Enhancements
-- **Enhancement 01:** Update style.css
-
-### Version 1.3.0 - [Feb 05, 2024]
-
-#### Enhancements
-
-- **Enhancement 01:** Update Next.js into version 14
-- **Enhancement 02:** Integrate flatpickr in [Date Picker/Form Elements]
-- **Enhancement 03:** Change color after select an option [Select Element/Form Elements].
-- **Enhancement 04:** Make it functional [Multiselect Dropdown/Form Elements].
-- **Enhancement 05:** Make best value editable [Pricing Table One/Pricing Table].
-- **Enhancement 06:** Add Default Layout Component and make App/Layout more clean and use it in every pages.
-
-### Version 0.1.0 - Initial Release - [Aug 3, 2023]
-
-- Initial release of TailAdmin Next.
+Ce projet est sous licence [MIT](LICENSE).

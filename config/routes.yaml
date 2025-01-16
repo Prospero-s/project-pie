@@ -1,0 +1,11 @@
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+    type: attribute
+
+main:
+    path: /{_locale}/signin
+    controller: App\Controller\MainController::signin
+    requirements:
+        _locale: en|fr
