@@ -30,7 +30,7 @@ export default defineConfig({
       usePolling: true,
     },
     // https: true,
-    https: {
+    https: process.env.NODE_ENV === 'production' ? false : {
       key: './frankenphp/certs/tls.key',
       cert: './frankenphp/certs/tls.pem',
     },
@@ -38,7 +38,8 @@ export default defineConfig({
     port: 5173, // Choisir un port différent pour éviter les conflits
     strictPort: true, // Si le port est déjà occupé, échouer
     hmr: {
-      host: 'localhost'
+      host: process.env.NODE_ENV === 'production' ? 'ec2-54-234-153-106.compute-1.amazonaws.com' : 'localhost',
+      protocol: process.env.NODE_ENV === 'production' ? 'wss' : 'ws'
     }
   },
   build: {

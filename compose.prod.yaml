@@ -4,7 +4,47 @@ services:
     build:
       context: .
       target: frankenphp_prod
+    restart: unless-stopped
     environment:
-      APP_SECRET: ${APP_SECRET}
-      MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET}
-      MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET}
+      - NODE_ENV=production
+      - SERVER_NAME=ec2-54-234-153-106.compute-1.amazonaws.com
+      - APP_ENV=prod
+      - APP_DEBUG=0
+      - MERCURE_PUBLISHER_JWT_KEY=${MERCURE_PUBLISHER_JWT_KEY}
+      - MERCURE_PUBLISHER_JWT_ALG=${MERCURE_PUBLISHER_JWT_ALG}
+      - MERCURE_SUBSCRIBER_JWT_KEY=${MERCURE_SUBSCRIBER_JWT_KEY}
+      - MERCURE_SUBSCRIBER_JWT_ALG=${MERCURE_SUBSCRIBER_JWT_ALG}
+      - PHP_PM_MAX_CHILDREN=50
+      - PHP_PM_START_SERVERS=5
+      - PHP_PM_MIN_SPARE_SERVERS=5
+      - PHP_PM_MAX_SPARE_SERVERS=35
+      - OPCACHE_MEMORY_CONSUMPTION=256
+    env_file:
+      - .env
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+      - ./frankenphp/certs:/etc/caddy/certs:ro
+      - ./public:/app/public:ro
+      - ./config:/app/config:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+
+volumes:
+  caddy_data:
+  caddy_config:

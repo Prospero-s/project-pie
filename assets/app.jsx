@@ -63,7 +63,7 @@ Amplify.configure({
       providers: ['Google', 'Microsoft']
     },
     cookieStorage: {
-      domain: 'localhost',
+      domain: process.env.NODE_ENV === 'production' ? 'ec2-54-234-153-106.compute-1.amazonaws.com' : 'localhost',
       path: '/',
       expires: 365,
       secure: true

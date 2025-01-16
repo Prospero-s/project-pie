@@ -1,3 +1,10 @@
+{
+	auto_https disable_redirects
+	servers {
+		protocol http
+	}
+}
+
 worker {
 	file ./public/index.php
 	env APP_RUNTIME Runtime\FrankenPhpSymfony\Runtime
