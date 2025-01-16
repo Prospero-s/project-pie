@@ -25,6 +25,9 @@ import AllCompanies from "@/pages/AllCompanies";
 import AuthCallback from "@/pages/AuthCallback";
 import GroupSelection from "@/pages/GroupSelection";
 import CompanyDetails from "@/pages/CompanyDetails";
+import TextractResults from "@/pages/TextractResults";
+import EditDocument from "@/pages/EditDocument";
+import Documents from "@/pages/Documents";
 
 import AuthLayout from "@/components/common/layout/AuthLayout";
 import ProtectedRoute from "@/components/common/auth/ProtectedRoute";
@@ -121,6 +124,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         <Route path="investments" element={<Investments i18n={i18n} />} />
                         <Route path="companies" element={<AllCompanies i18n={i18n} />} />
                         <Route path="company/details/:id" element={<CompanyDetails i18n={i18n} />} />
+                        <Route path="textract-results" element={<TextractResults i18n={i18n}/>} />
+                        <Route path="/documents/edit/:id" element={<EditDocument i18n={i18n}/>} />
+                        <Route path="documents" element={<Documents i18n={i18n} />} />
                       </Routes>
                     </AppLayout>
                   </ProtectedRoute>

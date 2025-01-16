@@ -2,6 +2,7 @@
 
 # Base FrankenPHP image
 FROM dunglas/frankenphp:1-php8.3 AS frankenphp_base
+FROM dunglas/frankenphp:1-php8.3 AS frankenphp_base
 
 WORKDIR /app
 
@@ -10,6 +11,7 @@ VOLUME /app/var/
 # Set SHELL to include pipefail
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
+# Installation des dépendances système
 # Installation des dépendances système
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -37,7 +39,7 @@ RUN install-php-extensions \
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
-
+RUN mkdir -p /var/www/html/public/uploads && chown -R www-data:www-data /var/www/html/public/uploads
 # Dev FrankenPHP image
 FROM frankenphp_base AS frankenphp_dev
 
@@ -45,6 +47,13 @@ ENV APP_ENV=dev XDEBUG_MODE=off
 
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
+COPY frankenphp/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
+COPY frankenphp/Caddyfile /etc/caddy/Caddyfile
+COPY frankenphp/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+RUN chmod +x /usr/local/bin/docker-entrypoint
+
+ENTRYPOINT ["docker-entrypoint"]
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile", "--watch"]
 COPY frankenphp/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
 COPY frankenphp/Caddyfile /etc/caddy/Caddyfile
 COPY frankenphp/docker-entrypoint.sh /usr/local/bin/docker-entrypoint

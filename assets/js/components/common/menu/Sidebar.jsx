@@ -42,6 +42,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, i18n }) => {
       icon: <FileSearchOutlined className="!text-2xl lg:text-xl" />,
       label: <Link to={`/${lng}/companies`}>{t('companies')}</Link>,
     },
+    {
+      key: 'Documents',
+      icon: <FileSearchOutlined className="!text-2xl lg:text-xl" />,
+      label: <Link to={`/${lng}/documents`}>{t('documents')}</Link>,
+    },
   ];
 
   return (

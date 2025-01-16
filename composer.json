@@ -9,6 +9,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "amphp/http-client": "^4.2.1",
+        "aws/aws-sdk-php": "^3.336",
         "doctrine/dbal": "^3",
         "doctrine/doctrine-bundle": "^2.13",
         "doctrine/doctrine-migrations-bundle": "^3.3",
@@ -25,6 +26,7 @@
         "symfony/monolog-bundle": "^3.10",
         "symfony/runtime": "7.1.*",
         "symfony/twig-bundle": "7.1.*",
+        "symfony/ux-twig-component": "*",
         "symfony/yaml": "7.1.*",
         "twig/twig": "^3.0"
     },
@@ -80,7 +82,7 @@
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.0",
         "symfony/debug-bundle": "7.1.*",
-        "symfony/maker-bundle": "^1.61",
+        "symfony/maker-bundle": "^1.62",
         "symfony/stopwatch": "7.1.*",
         "symfony/web-profiler-bundle": "7.1.*"
     }

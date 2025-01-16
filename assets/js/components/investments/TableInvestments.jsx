@@ -7,6 +7,9 @@ import AddCompanyModal from './AddCompanyModal';
 import InvestmentActions from './table/InvestmentActions';
 import EmptyInvestmentState from './table/EmptyInvestmentState';
 import NoResultsState from './table/NoResultsState';
+import UploadPopup from "@/components/common/upload/UploadPopup"; 
+
+
 
 const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
   const { t } = useTranslation('investments', { i18n });
@@ -23,6 +26,14 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
     sector: [],
     fundingType: []
   });
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [isPopupVisible, setPopupVisible] = useState(false);
+  const handleOpenPopup = (company) => {
+    setSelectedCompany(company);
+    setPopupVisible(true);
+  };  
+  const handleClosePopup = () => setPopupVisible(false);
+  
 
   useEffect(() => {
     loadInvestments({
@@ -240,14 +251,27 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
       title: t('actions.title'),
       key: 'actions',
       width: 100,
-      render: (text, record) => (
-        <InvestmentActions
-          loading={loading}
-          onAdd={handleAdd}
-          onDelete={handleDelete}
-          recordId={record.id}
-        />
-      ),
+      render: (text, record) =>
+        loading ? (
+          <Skeleton.Button active size="small" />
+        ) : (
+          <div>
+            <InvestmentActions
+              loading={loading}
+              onAdd={handleAdd}
+              onDelete={handleDelete}
+              recordId={record.id}
+            />
+            <FileAddOutlined
+              className="!text-blue-500 hover:!text-blue-700 text-lg cursor-pointer"
+              onClick={() => handleOpenPopup(record)}
+            />
+            <DeleteOutlined 
+              className="!text-rose-500 hover:!text-rose-700 text-lg cursor-pointer" 
+              onClick={() => handleDelete(record.id)}
+            />
+          </div>
+        ),
     },
   ];
 
@@ -282,6 +306,13 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
         onAdd={handleAdd}
         t={t}
       />
+      {isPopupVisible && (
+        <UploadPopup
+          visible={isPopupVisible}
+          onClose={handleClosePopup}
+          company={selectedCompany} // On passe l'entreprise sélectionnée
+        />
+      )}
       <div className="rounded-lg border border-slate-200 flex flex-col w-full">
         {investments.length === 0 && !Object.values(activeFilters).some(filter => filter.length > 0) ? (
           <EmptyInvestmentState t={t} onAddClick={() => setIsModalOpen(true)} />

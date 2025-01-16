@@ -32,6 +32,7 @@ final class Version20250121112150 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
+        $this->addSql('CREATE SCHEMA public');
         $this->addSql('ALTER INDEX uniq_fe44e340979b1ad6 RENAME TO uniq_fe44e340a97d1ac3');
         $this->addSql('ALTER INDEX idx_2507390e979b1ad6 RENAME TO idx_2507390ea97d1ac3');
         $this->addSql('ALTER TABLE company RENAME COLUMN business_structures TO forme_juridique');

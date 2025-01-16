@@ -52,3 +52,11 @@ next-env.d.ts
 /node_modules/
 /public/build/
 ###< pentatrion/vite-bundle ###
+
+###> php-cs-fixer/shim ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< php-cs-fixer/shim ###
+/public/uploads
+config/secrets/dev/dev.decrypt.private.php
+config/secrets/dev/dev.encrypt.public.php

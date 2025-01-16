@@ -20,6 +20,7 @@ services:
       - caddy_data:/data
       - caddy_config:/config
       - ./app:/app
+            - ./public/uploads:/var/www/html/public/uploads  # Monte le dossier d'uploads
     ports:
       # HTTP
       - target: 80
