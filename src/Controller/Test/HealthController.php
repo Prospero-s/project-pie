@@ -1,7 +1,6 @@
 <?php
-// src/Controller/HealthController.php
 
-namespace App\Controller;
+namespace App\Controller\Test;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;

@@ -4,8 +4,9 @@ import { DeleteOutlined, EyeOutlined, FileAddOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import startupsMock from '@/mocks/investements/startupsMock';
+import AddEnterpriseModal from './AddEnterpriseModal';
 
-const TableInvestments = ({ i18n }) => {
+const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
   const { t } = useTranslation('investments', { i18n });
   const [loading, setLoading] = useState(true);
 
@@ -16,7 +17,7 @@ const TableInvestments = ({ i18n }) => {
 
   const columns = [
     {
-      title: t('entreprise'),
+      title: t('enterprise_details.enterprise.name'),
       dataIndex: 'name',
       key: 'name',
       render: (text, record) =>
@@ -36,14 +37,14 @@ const TableInvestments = ({ i18n }) => {
         ),
     },
     {
-      title: t('sector'),
+      title: t('enterprise_details.enterprise.sector'),
       dataIndex: 'sector',
       key: 'sector',
       render: (text) =>
         loading ? <Skeleton.Input block active size="small" /> : text,
     },
     {
-      title: t('amount_raised'),
+      title: t('funding.amount'),
       dataIndex: 'amountRaised',
       key: 'amountRaised',
       render: (amount) =>
@@ -54,14 +55,14 @@ const TableInvestments = ({ i18n }) => {
         ),
     },
     {
-      title: t('funding_type'),
+      title: t('funding.type'),
       dataIndex: 'fundingType',
       key: 'fundingType',
       render: (text) =>
         loading ? <Skeleton.Input block active size="small" /> : text,
     },
     {
-      title: t('last_update'),
+      title: t('enterprise_details.enterprise.details.last_update'),
       dataIndex: 'lastUpdate',
       key: 'lastUpdate',
       render: (date) =>
@@ -72,7 +73,7 @@ const TableInvestments = ({ i18n }) => {
         ),
     },
     {
-      title: t('actions'),
+      title: t('actions.title'),
       key: 'actions',
       width: 100,
       render: (text, record) =>
@@ -97,8 +98,8 @@ const TableInvestments = ({ i18n }) => {
     console.log('Suppression de la startup avec l\'ID:', id);
   };
 
-  const handleAdd = (id) => {
-    console.log('Ajout de la startup avec l\'ID:', id);
+  const handleAdd = async () => {
+    setIsModalOpen(true);
   };
 
   const dataSource = startupsMock.map((startup, index) => ({
@@ -107,24 +108,32 @@ const TableInvestments = ({ i18n }) => {
   }));
 
   return (
-    <div className="rounded-lg border border-slate-200 flex flex-col w-full">
-      <div className="overflow-x-auto">
-        <Table
-          columns={columns}
-          dataSource={loading ? Array(5).fill({}) : dataSource}
-          pagination={false}
-          rowClassName={(record, index) =>
-            index % 2 === 0 ? '!bg-white' : '!bg-slate-50'
-          }
-          size="small"
-        />
+    <>
+      <AddEnterpriseModal 
+        visible={isModalOpen} 
+        onCancel={() => setIsModalOpen(false)} 
+        onAdd={handleAdd}
+        t={t}
+      />
+      <div className="rounded-lg border border-slate-200 flex flex-col w-full">
+        <div className="overflow-x-auto">
+          <Table
+            columns={columns}
+            dataSource={loading ? Array(5).fill({}) : dataSource}
+            pagination={false}
+            rowClassName={(record, index) =>
+              index % 2 === 0 ? '!bg-white' : '!bg-slate-50'
+            }
+            size="small"
+          />
+        </div>
+        <TablePagination t={t} />
       </div>
-      <TablePagination />
-    </div>
+    </>
   );
 };
 
-const TablePagination = () => {
+const TablePagination = ({ t }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = 10;
 
@@ -143,20 +152,20 @@ const TablePagination = () => {
           onClick={handlePrevious}
           disabled={currentPage === 1}
         >
-          Précédent
+          {t('common.previous')}
         </Button>
         <Button 
           onClick={handleNext}
           disabled={currentPage === totalPages}
         >
-          Suivant
+          {t('common.next')}
         </Button>
       </div>
       <div className="flex items-center gap-2">
-        Page {currentPage} sur {totalPages}
+        {t('common.page')} {currentPage} {t('common.of')} {totalPages}
       </div>
     </div>
-  );
+  );  
 };
 
 export default TableInvestments;

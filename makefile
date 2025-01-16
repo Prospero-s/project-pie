@@ -74,8 +74,10 @@ test-db-aws:
 test-all-db: test-db-local test-db-aws
 
 # Commandes pour les migrations
+
 migrations-diff:
-	$(SYMFONY) doctrine:migrations:diff
+	$(SYMFONY) doctrine:migrations:diff --formatted
+	sed -i '/CREATE SCHEMA public/d' migrations/Version*.php
 
 migrations-local:
 	$(SYMFONY) doctrine:migrations:migrate --no-interaction --env=dev
@@ -97,3 +99,6 @@ migrations-rollback-local:
 migrations-rollback-test-aws:
 	$(eval DATABASE_URL=$(DATABASE_URL_AWS))
 	$(DOCKER_COMPOSE) exec -e DATABASE_URL=$(DATABASE_URL) php bin/console doctrine:migrations:migrate prev --env=prod
+
+logs-php:
+	$(DOCKER_COMPOSE) exec $(PHP_CONTAINER) tail -f var/log/dev.log

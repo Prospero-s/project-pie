@@ -6,15 +6,16 @@
 parameters:
     app.locales: ['en', 'fr']
     app.default_locale: 'en'
+    app.api_base_url: 'https://localhost'  # Valeur par défaut pour le dev
+    api_username: '%env(API_USERNAME)%'
+    api_password: '%env(API_PASSWORD)%'
 
 services:
-    # default configuration for services in *this* file
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        autowire: true
+        autoconfigure: true
+        public: false
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
         exclude:
@@ -22,5 +23,46 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # Configuration du client HTTP
+    Symfony\Contracts\HttpClient\HttpClientInterface:
+        factory: ['Symfony\Component\HttpClient\HttpClient', 'create']
+        arguments:
+            $defaultOptions:
+                timeout: 30
+                verify_peer: false
+                verify_host: false
+
+    # Configuration du client API
+    App\Service\Enterprise\Api\EnterpriseApiClient:
+        arguments:
+            $httpClient: '@Symfony\Contracts\HttpClient\HttpClientInterface'
+            $apiUsername: '%api_username%'
+            $apiPassword: '%api_password%'
+
+    # Configuration des scrapers avec tag commun et priorité
+    App\Service\Enterprise\Scraper\InpiEnterpriseScraper:
+        arguments:
+            $client: '@Symfony\Contracts\HttpClient\HttpClientInterface'
+        tags:
+            - { name: 'enterprise.scraper', priority: 100 }
+
+    App\Service\Enterprise\Scraper\PappersEnterpriseScraper:
+        arguments:
+            $client: '@Symfony\Contracts\HttpClient\HttpClientInterface'
+        tags:
+            - { name: 'enterprise.scraper', priority: 50 }
+
+    App\Service\Enterprise\Scraper\SocieteEnterpriseScraper:
+        arguments:
+            $client: '@Symfony\Contracts\HttpClient\HttpClientInterface'
+        tags:
+            - { name: 'enterprise.scraper', priority: 25 }
+
+    # Configuration de l'agrégateur de données
+    App\Service\Enterprise\EnterpriseDataAggregator:
+        arguments:
+            $scrapers: !tagged_iterator enterprise.scraper
+
+    # Alias des interfaces vers leurs implémentations
+    App\Service\Enterprise\EnterpriseServiceInterface: '@App\Service\Enterprise\EnterpriseService'
+    App\Service\Enterprise\Api\EnterpriseApiClientInterface: '@App\Service\Enterprise\Api\EnterpriseApiClient'
