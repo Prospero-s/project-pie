@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -203,7 +204,6 @@ class Enterprise
             $this->representants->add($representant);
             $representant->setEnterprise($this);
         }
-
         return $this;
     }
 
@@ -215,7 +215,6 @@ class Enterprise
                 $representant->setEnterprise(null);
             }
         }
-
         return $this;
     }
 
