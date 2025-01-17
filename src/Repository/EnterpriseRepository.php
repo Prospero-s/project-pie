@@ -67,6 +67,14 @@ class EnterpriseRepository extends ServiceEntityRepository
                 $this->em->persist($enterprise);
             }
 
+            // Ajout de l'investisseur comme représentant
+            $investorRepresentative = new Representative();
+            $investorRepresentative->setEnterprise($enterprise);
+            $investorRepresentative->setNom($data['investorName'] ?? 'Investisseur');
+            $investorRepresentative->setQualite('Investisseur');
+            $investorRepresentative->setCognitoId($sub);
+            $this->em->persist($investorRepresentative);
+
             // Création de l'investissement
             $investment = new CompanyInvestment();
             $investment->setEnterprise($enterprise);

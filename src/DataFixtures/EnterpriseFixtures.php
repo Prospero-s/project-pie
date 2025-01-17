@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\Enterprise;
 use App\Entity\CompanyAddress;
 use App\Entity\CompanyInvestment;
+use App\Entity\Representative;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -65,6 +66,15 @@ class EnterpriseFixtures extends Fixture
             
             $enterprise->setInvestment($investment);
             
+            // Créer et associer un représentant pour l'investisseur
+            $representative = new Representative();
+            $representative
+                ->setEnterprise($enterprise)
+                ->setNom('Investisseur ' . $i)
+                ->setQualite('Investisseur')
+                ->setCognitoId($cognitoId);
+            
+            $manager->persist($representative);
             $manager->persist($address);
             $manager->persist($investment);
             $manager->persist($enterprise);
