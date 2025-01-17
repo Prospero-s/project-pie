@@ -7,8 +7,8 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Representative;
-use App\Entity\Address;
-use App\Entity\Investment;
+use App\Entity\CompanyAddress;
+use App\Entity\CompanyInvestment;
 
 class EnterpriseRepository extends ServiceEntityRepository
 {
@@ -52,7 +52,7 @@ class EnterpriseRepository extends ServiceEntityRepository
 
                 // Création de l'adresse
                 if (!empty($data['adresse'])) {
-                    $address = new Address();
+                    $address = new CompanyAddress();
                     $address->setEnterprise($enterprise);
                     $address->setNumVoie($data['adresse']['numVoie'] ?? null);
                     $address->setTypeVoie($data['adresse']['typeVoie'] ?? null);
@@ -68,7 +68,7 @@ class EnterpriseRepository extends ServiceEntityRepository
             }
 
             // Création de l'investissement
-            $investment = new Investment();
+            $investment = new CompanyInvestment();
             $investment->setEnterprise($enterprise);
             $investment->setCognitoId($sub);
             $investment->setFundingType($data['fundingType']);

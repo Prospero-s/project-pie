@@ -4,7 +4,6 @@ namespace App\Controller\Api;
 
 use App\Service\Enterprise\EnterpriseServiceInterface;
 use App\Repository\EnterpriseRepository;
-use App\Repository\EnterpriseInvestmentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
