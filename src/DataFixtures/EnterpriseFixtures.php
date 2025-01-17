@@ -19,10 +19,14 @@ class EnterpriseFixtures extends Fixture
     
     public function load(ObjectManager $manager): void
     {
+        // Créer un investisseur qui investira dans plusieurs entreprises
+        $multiInvestorId = 'MULTI_INVESTOR_USER';
+        
         // Générer 20 entreprises
         for ($i = 0; $i < 20; $i++) {
             $enterprise = new Enterprise();
-            $cognitoId = 'FIXTURE_USER_' . $i;
+            // Pour les entreprises 0, 5 et 10, utiliser le même investisseur
+            $cognitoId = ($i == 0 || $i == 5 || $i == 10) ? $multiInvestorId : 'FIXTURE_USER_' . $i;
             
             // Générer un SIREN valide (9 chiffres)
             $siren = str_pad(mt_rand(1, 999999999), 9, '0', STR_PAD_LEFT);
@@ -70,7 +74,7 @@ class EnterpriseFixtures extends Fixture
             $representative = new Representative();
             $representative
                 ->setEnterprise($enterprise)
-                ->setNom('Investisseur ' . $i)
+                ->setNom($cognitoId === $multiInvestorId ? 'Multi Investisseur' : 'Investisseur ' . $i)
                 ->setQualite('Investisseur')
                 ->setCognitoId($cognitoId);
             

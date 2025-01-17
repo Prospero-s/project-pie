@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250114170754 extends AbstractMigration
+final class Version20250117153811 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,11 +20,11 @@ final class Version20250114170754 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE SEQUENCE address_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE company_address_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE company_investment_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE enterprise_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
-        $this->addSql('CREATE SEQUENCE investment_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE representative_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
-        $this->addSql('CREATE TABLE address (
+        $this->addSql('CREATE TABLE company_address (
           id INT NOT NULL,
           enterprise_id INT NOT NULL,
           num_voie VARCHAR(10) DEFAULT NULL,
@@ -35,7 +35,18 @@ final class Version20250114170754 extends AbstractMigration
           pays VARCHAR(50) NOT NULL,
           PRIMARY KEY(id)
         )');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_D4E6F81A97D1AC3 ON address (enterprise_id)');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_2D1C7556A97D1AC3 ON company_address (enterprise_id)');
+        $this->addSql('CREATE TABLE company_investment (
+          id INT NOT NULL,
+          enterprise_id INT NOT NULL,
+          cognito_id VARCHAR(255) NOT NULL,
+          funding_type VARCHAR(50) NOT NULL,
+          amount BIGINT NOT NULL,
+          currency VARCHAR(3) NOT NULL,
+          invested_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
+          PRIMARY KEY(id)
+        )');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_FE44E340A97D1AC3 ON company_investment (enterprise_id)');
         $this->addSql('CREATE TABLE enterprise (
           id INT NOT NULL,
           cognito_id TEXT NOT NULL,
@@ -51,33 +62,23 @@ final class Version20250114170754 extends AbstractMigration
           PRIMARY KEY(id)
         )');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_B1B36A03DB8BBA08 ON enterprise (siren)');
-        $this->addSql('CREATE TABLE investment (
-          id INT NOT NULL,
-          enterprise_id INT NOT NULL,
-          cognito_id VARCHAR(255) NOT NULL,
-          funding_type VARCHAR(50) NOT NULL,
-          amount BIGINT NOT NULL,
-          currency VARCHAR(3) NOT NULL,
-          invested_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
-          PRIMARY KEY(id)
-        )');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_43CA0AD6A97D1AC3 ON investment (enterprise_id)');
         $this->addSql('CREATE TABLE representative (
           id INT NOT NULL,
           enterprise_id INT DEFAULT NULL,
           nom VARCHAR(255) NOT NULL,
           qualite VARCHAR(255) NOT NULL,
+          cognito_id VARCHAR(255) DEFAULT NULL,
           PRIMARY KEY(id)
         )');
         $this->addSql('CREATE INDEX IDX_2507390EA97D1AC3 ON representative (enterprise_id)');
         $this->addSql('ALTER TABLE
-          address
+          company_address
         ADD
-          CONSTRAINT FK_D4E6F81A97D1AC3 FOREIGN KEY (enterprise_id) REFERENCES enterprise (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+          CONSTRAINT FK_2D1C7556A97D1AC3 FOREIGN KEY (enterprise_id) REFERENCES enterprise (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE
-          investment
+          company_investment
         ADD
-          CONSTRAINT FK_43CA0AD6A97D1AC3 FOREIGN KEY (enterprise_id) REFERENCES enterprise (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+          CONSTRAINT FK_FE44E340A97D1AC3 FOREIGN KEY (enterprise_id) REFERENCES enterprise (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE
           representative
         ADD
@@ -87,16 +88,16 @@ final class Version20250114170754 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('DROP SEQUENCE address_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE company_address_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE company_investment_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE enterprise_id_seq CASCADE');
-        $this->addSql('DROP SEQUENCE investment_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE representative_id_seq CASCADE');
-        $this->addSql('ALTER TABLE address DROP CONSTRAINT FK_D4E6F81A97D1AC3');
-        $this->addSql('ALTER TABLE investment DROP CONSTRAINT FK_43CA0AD6A97D1AC3');
+        $this->addSql('ALTER TABLE company_address DROP CONSTRAINT FK_2D1C7556A97D1AC3');
+        $this->addSql('ALTER TABLE company_investment DROP CONSTRAINT FK_FE44E340A97D1AC3');
         $this->addSql('ALTER TABLE representative DROP CONSTRAINT FK_2507390EA97D1AC3');
-        $this->addSql('DROP TABLE address');
+        $this->addSql('DROP TABLE company_address');
+        $this->addSql('DROP TABLE company_investment');
         $this->addSql('DROP TABLE enterprise');
-        $this->addSql('DROP TABLE investment');
         $this->addSql('DROP TABLE representative');
     }
 }
