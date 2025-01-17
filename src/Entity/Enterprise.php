@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
 class Enterprise
@@ -43,13 +45,18 @@ class Enterprise
     private \DateTime $deletedAt;
 
     #[ORM\OneToOne(mappedBy: 'enterprise', cascade: ['persist', 'remove'])]
-    private ?Address $address = null;
+    private ?CompanyAddress $address = null;
 
     #[ORM\OneToMany(mappedBy: 'enterprise', targetEntity: Representative::class)]
-    private Representative $representants;
+    private Collection $representatives;
 
     #[ORM\OneToOne(mappedBy: 'enterprise', cascade: ['persist', 'remove'])]
-    private ?Investment $investment = null;
+    private ?CompanyInvestment $investment = null;
+
+    public function __construct()
+    {
+        $this->representatives = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -185,14 +192,27 @@ class Enterprise
         return $this;
     }
 
-    public function getRepresentants(): array
+    public function getRepresentatives(): Collection
     {
-        return $this->representants;
+        return $this->representatives;
     }
 
-    public function setRepresentants(array $representants): self
+    public function addRepresentative(Representative $representative): self
     {
-        $this->representants = $representants;
+        if (!$this->representatives->contains($representative)) {
+            $this->representatives->add($representative);
+            $representative->setEnterprise($this);
+        }
+        return $this;
+    }
+
+    public function removeRepresentative(Representative $representative): self
+    {
+        if ($this->representatives->removeElement($representative)) {
+            if ($representative->getEnterprise() === $this) {
+                $representative->setEnterprise(null);
+            }
+        }
         return $this;
     }
 
