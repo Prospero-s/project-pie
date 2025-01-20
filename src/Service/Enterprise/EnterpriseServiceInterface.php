@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Service\Enterprise;
+namespace App\Service\Company;
 
-interface EnterpriseServiceInterface
+interface CompanyServiceInterface
 {
     /**
      * Récupère les données d'une entreprise par son SIREN
      */
-    public function getEnterpriseData(string $siren, bool $forceScraping = false): array;
+    public function getCompanyData(string $siren, bool $forceScraping = false): array;
 } 

@@ -12,8 +12,8 @@ class Representative
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Enterprise::class, inversedBy: 'representatives')]
-    private Enterprise $enterprise;
+    #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'representatives')]
+    private Company $company;
 
     #[ORM\Column(length: 255)]
     private string $nom;
@@ -29,14 +29,14 @@ class Representative
         return $this->id;
     }
 
-    public function getEnterprise(): Enterprise
+    public function getCompany(): Company
     {
-        return $this->enterprise;
+        return $this->company;
     }
 
-    public function setEnterprise(Enterprise $enterprise): self
+    public function setCompany(Company $company): self
     {
-        $this->enterprise = $enterprise;
+        $this->company = $company;
         return $this;
     }
 

@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Service\Enterprise\Data;
+namespace App\Service\Company\Data;
 
-use App\Service\Enterprise\Scraper\EnterpriseScraperInterface;
+use App\Service\Company\Scraper\CompanyScraperInterface;
 use Psr\Log\LoggerInterface;
 
-class EnterpriseDataAggregator implements EnterpriseDataAggregatorInterface
+class CompanyDataAggregator implements CompanyDataAggregatorInterface
 {
     /**
-     * @param iterable<EnterpriseScraperInterface> $scrapers
+     * @param iterable<CompanyScraperInterface> $scrapers
      */
     public function __construct(
         private readonly iterable $scrapers,

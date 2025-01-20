@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Service\Enterprise\Scraper;
+namespace App\Service\Company\Scraper;
 
-interface EnterpriseScraperInterface
+interface CompanyScraperInterface
 {
     /**
      * Vérifie si le scraper supporte une source donnée

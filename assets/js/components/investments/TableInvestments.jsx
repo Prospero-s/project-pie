@@ -4,7 +4,7 @@ import { DeleteOutlined, EyeOutlined, FileAddOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import startupsMock from '@/mocks/investements/startupsMock';
-import AddEnterpriseModal from './AddEnterpriseModal';
+import AddCompanyModal from './AddCompanyModal';
 
 const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
   const { t } = useTranslation('investments', { i18n });
@@ -17,7 +17,7 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
 
   const columns = [
     {
-      title: t('enterprise_details.enterprise.name'),
+      title: t('company_details.company.name'),
       dataIndex: 'name',
       key: 'name',
       render: (text, record) =>
@@ -37,7 +37,7 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
         ),
     },
     {
-      title: t('enterprise_details.enterprise.sector'),
+      title: t('company_details.company.sector'),
       dataIndex: 'sector',
       key: 'sector',
       render: (text) =>
@@ -62,7 +62,7 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
         loading ? <Skeleton.Input block active size="small" /> : text,
     },
     {
-      title: t('enterprise_details.enterprise.details.last_update'),
+      title: t('company_details.company.details.last_update'),
       dataIndex: 'lastUpdate',
       key: 'lastUpdate',
       render: (date) =>
@@ -109,7 +109,7 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
 
   return (
     <>
-      <AddEnterpriseModal 
+      <AddCompanyModal 
         visible={isModalOpen} 
         onCancel={() => setIsModalOpen(false)} 
         onAdd={handleAdd}

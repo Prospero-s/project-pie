@@ -21,7 +21,7 @@
     "manual_creation": "Création manuelle",
     "manual_description": "Saisir manuellement les informations de l'entreprise"
   },
-  "enterprise_details": {
+  "company_details": {
     "title": "Détails de l'entreprise",
     "confirmation_title": "Confirmation des détails de l'entreprise",
     "siren": "Numéro SIREN",
@@ -29,7 +29,7 @@
     "siren_required": "Veuillez saisir le SIREN",
     "siren_invalid": "Le SIREN doit contenir exactement 9 chiffres",
     "error": "Erreur lors de la récupération des données",
-    "enterprise": {
+    "company": {
       "name": "Nom de l'entreprise",
       "name_placeholder": "Entrez le nom de l'entreprise",
       "name_required": "Veuillez saisir le nom de l'entreprise",

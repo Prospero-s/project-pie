@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Service\Enterprise\Api;
+namespace App\Service\Company\Api;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Psr\Log\LoggerInterface;
 
-class EnterpriseApiClient implements EnterpriseApiClientInterface
+class CompanyApiClient implements CompanyApiClientInterface
 {
     public function __construct(
         private readonly HttpClientInterface $httpClient,
@@ -14,7 +14,7 @@ class EnterpriseApiClient implements EnterpriseApiClientInterface
         private readonly string $apiPassword
     ) {}
 
-    public function fetchEnterpriseData(string $siren): array
+    public function fetchCompanyData(string $siren): array
     {
         $token = $this->getAuthToken();
         $apiUrl = "https://registre-national-entreprises.inpi.fr/api/companies/{$siren}";

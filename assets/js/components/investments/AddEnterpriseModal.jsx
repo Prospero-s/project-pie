@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { Modal, Steps } from 'antd';
 import SelectCreationType from './steps/SelectCreationType';
-import ManualEnterpriseForm from './steps/ManualEnterpriseForm';
-import AutomaticEnterpriseForm from './steps/AutomaticEnterpriseForm';
+import ManualCompanyForm from './steps/ManualCompanyForm';
+import AutomaticCompanyForm from './steps/AutomaticCompanyForm';
 import FundingDetailsForm from './steps/FundingDetailsForm';
-import { saveEnterprise } from '@/services/enterprise/enterpriseService';
+import { saveCompany } from '@/services/company/companyService';
 
-const AddEnterpriseModal = ({ visible, onCancel, onAdd, t }) => {
+const AddCompanyModal = ({ visible, onCancel, onAdd, t }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [creationType, setCreationType] = useState(null);
-  const [enterpriseData, setEnterpriseData] = useState(null);
+  const [companyData, setCompanyData] = useState(null);
 
   const resetState = () => {
     setCurrentStep(0);
     setCreationType(null);
-    setEnterpriseData(null);
+    setCompanyData(null);
   };
 
   const handleCancel = () => {
@@ -24,9 +24,9 @@ const AddEnterpriseModal = ({ visible, onCancel, onAdd, t }) => {
 
   const handleFinish = async (fundingData) => {
     try {
-      // Combine enterprise and funding data
+      // Combine company and funding data
       const completeData = {
-        ...enterpriseData,
+        ...companyData,
         fundingType: fundingData.fundingType,
         amountRaised: fundingData.amountRaised,
         currency: fundingData.currency || 'EUR'
@@ -35,10 +35,10 @@ const AddEnterpriseModal = ({ visible, onCancel, onAdd, t }) => {
       console.log('completeData', completeData);
 
       // Save to database
-      const savedEnterprise = await saveEnterprise(completeData);
+      const savedCompany = await saveCompany(completeData);
       
       // Call the original onAdd callback
-      onAdd({ ...enterpriseData, ...fundingData });
+      onAdd({ ...companyData, ...fundingData });
       
       // Close modal
       handleCancel();
@@ -58,19 +58,19 @@ const AddEnterpriseModal = ({ visible, onCancel, onAdd, t }) => {
       />
     },
     {
-      title: t('enterprise_details.title'),
+      title: t('company_details.title'),
       content: creationType === 'automatic' ? (
-        <AutomaticEnterpriseForm
+        <AutomaticCompanyForm
           onNext={(data) => {
-            setEnterpriseData(data);
+            setCompanyData(data);
             setCurrentStep(2);
           }}
           t={t}
         />
       ) : (
-        <ManualEnterpriseForm
+        <ManualCompanyForm
           onNext={(data) => {
-            setEnterpriseData(data);
+            setCompanyData(data);
             setCurrentStep(2);
           }}
           t={t}
@@ -80,7 +80,7 @@ const AddEnterpriseModal = ({ visible, onCancel, onAdd, t }) => {
     {
       title: t('funding.title'),
       content: <FundingDetailsForm
-        enterpriseData={enterpriseData}
+        companyData={companyData}
         onFinish={handleFinish}
         t={t}
       />
@@ -107,4 +107,4 @@ const AddEnterpriseModal = ({ visible, onCancel, onAdd, t }) => {
   );
 };
 
-export default AddEnterpriseModal; 
+export default AddCompanyModal; 

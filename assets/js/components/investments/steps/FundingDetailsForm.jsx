@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, InputNumber, Select, Button } from 'antd';
 
-const FundingDetailsForm = ({ enterpriseData, onFinish, t }) => {
+const FundingDetailsForm = ({ companyData, onFinish, t }) => {
   const [form] = Form.useForm();
 
   const currencies = [
@@ -25,7 +25,7 @@ const FundingDetailsForm = ({ enterpriseData, onFinish, t }) => {
       layout="vertical"
       onFinish={onFinish}
       initialValues={{
-        currency: enterpriseData?.devise || 'EUR'
+        currency: companyData?.devise || 'EUR'
       }}
     >
       <Form.Item

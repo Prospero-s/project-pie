@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Service\Enterprise\Scraper;
+namespace App\Service\Company\Scraper;
 
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Psr\Log\LoggerInterface;
 
-class PappersEnterpriseScraper implements EnterpriseScraperInterface
+class PappersCompanyScraper implements CompanyScraperInterface
 {
     private HttpClientInterface $client;
     private LoggerInterface $logger;
@@ -91,7 +91,7 @@ class PappersEnterpriseScraper implements EnterpriseScraperInterface
 
             return [
                 'numVoie' => '',  // À extraire si disponible
-                'typeVoie' => '', // À extraire si disponible
+                'streetTypes' => '', // À extraire si disponible
                 'voie' => $adresseText,
                 'codePostal' => $cpvilleMatches[1] ?? '',
                 'commune' => $cpvilleMatches[2] ?? '',

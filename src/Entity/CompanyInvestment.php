@@ -14,7 +14,7 @@ class CompanyInvestment
 
     #[ORM\OneToOne(inversedBy: 'investment')]
     #[ORM\JoinColumn(nullable: false)]
-    private Enterprise $enterprise;
+    private Company $company;
 
     #[ORM\Column(length: 255)]
     private string $cognitoId;
@@ -41,14 +41,14 @@ class CompanyInvestment
         return $this->id;
     }
 
-    public function getEnterprise(): Enterprise
+    public function getCompany(): Company
     {
-        return $this->enterprise;
+        return $this->company;
     }
 
-    public function setEnterprise(Enterprise $enterprise): self
+    public function setCompany(Company $company): self
     {
-        $this->enterprise = $enterprise;
+        $this->company = $company;
         return $this;
     }
 

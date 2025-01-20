@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Service\Enterprise\Data;
+namespace App\Service\Company\Data;
 
-interface EnterpriseDataAggregatorInterface
+interface CompanyDataAggregatorInterface
 {
     /**
      * Agrège les données d'une entreprise à partir de différentes sources

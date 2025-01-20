@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Service\Enterprise;
+namespace App\Service\Company;
 
-use App\Service\Enterprise\Scraper\EnterpriseScraperInterface;
+use App\Service\Company\Scraper\CompanyScraperInterface;
 use Psr\Log\LoggerInterface;
 
-class EnterpriseDataAggregator
+class CompanyDataAggregator
 {
     private array $scrapers;
     private LoggerInterface $logger;
@@ -23,7 +23,7 @@ class EnterpriseDataAggregator
         $this->logger = $logger;
     }
 
-    public function getEnterpriseData(string $siren, bool $forceScraping = false): array
+    public function getCompanyData(string $siren, bool $forceScraping = false): array
     {
         $errors = [];
         $data = [];

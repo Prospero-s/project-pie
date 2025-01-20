@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Service\Enterprise\Scraper;
+namespace App\Service\Company\Scraper;
 
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Psr\Log\LoggerInterface;
 
-class InpiEnterpriseScraper implements EnterpriseScraperInterface
+class InpiCompanyScraper implements CompanyScraperInterface
 {
     private array $cache = [];
     private const CACHE_TTL = 3600; // 1 heure
@@ -217,7 +217,7 @@ class InpiEnterpriseScraper implements EnterpriseScraperInterface
             ];
 
             $numVoie = null;
-            $typeVoie = null;
+            $streetTypes = null;
             $voie = [];
             $codePostal = null;
             $commune = null;
@@ -248,7 +248,7 @@ class InpiEnterpriseScraper implements EnterpriseScraperInterface
                 if (!$voieFound) {
                     $partUpper = strtoupper(rtrim($part, '.'));
                     if (isset($typesVoie[$partUpper])) {
-                        $typeVoie = $typesVoie[$partUpper];
+                        $streetTypes = $typesVoie[$partUpper];
                         $voieFound = true;
                         continue;
                     }
@@ -270,7 +270,7 @@ class InpiEnterpriseScraper implements EnterpriseScraperInterface
                 'commune' => $commune,
                 'codePostal' => $codePostal,
                 'voie' => $voieStr,
-                'typeVoie' => $typeVoie,
+                'streetTypes' => $streetTypes,
                 'numVoie' => $numVoie,
             ];
         }

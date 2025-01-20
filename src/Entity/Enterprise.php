@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
-class Enterprise
+class Company
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -44,13 +44,13 @@ class Enterprise
     #[ORM\Column(type: 'datetime')]
     private \DateTime $deletedAt;
 
-    #[ORM\OneToOne(mappedBy: 'enterprise', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'company', cascade: ['persist', 'remove'])]
     private ?CompanyAddress $address = null;
 
-    #[ORM\OneToMany(mappedBy: 'enterprise', targetEntity: Representative::class)]
+    #[ORM\OneToMany(mappedBy: 'company', targetEntity: Representative::class)]
     private Collection $representatives;
 
-    #[ORM\OneToOne(mappedBy: 'enterprise', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'company', cascade: ['persist', 'remove'])]
     private ?CompanyInvestment $investment = null;
 
     public function __construct()
@@ -201,7 +201,7 @@ class Enterprise
     {
         if (!$this->representatives->contains($representative)) {
             $this->representatives->add($representative);
-            $representative->setEnterprise($this);
+            $representative->setCompany($this);
         }
         return $this;
     }
@@ -209,8 +209,8 @@ class Enterprise
     public function removeRepresentative(Representative $representative): self
     {
         if ($this->representatives->removeElement($representative)) {
-            if ($representative->getEnterprise() === $this) {
-                $representative->setEnterprise(null);
+            if ($representative->getCompany() === $this) {
+                $representative->setCompany(null);
             }
         }
         return $this;

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-const EnterpriseMap = ({ address }) => {
+const CompanyMap = ({ address }) => {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const [loading, setLoading] = useState(true);
@@ -38,7 +38,7 @@ const EnterpriseMap = ({ address }) => {
         // Construction de l'adresse complète
         const addressParts = [];
         if (address.numVoie) addressParts.push(address.numVoie);
-        if (address.typeVoie) addressParts.push(address.typeVoie);
+        if (address.streetTypes) addressParts.push(address.streetTypes);
         if (address.voie) addressParts.push(address.voie);
         addressParts.push(address.codePostal);
         addressParts.push(address.commune);
@@ -53,7 +53,7 @@ const EnterpriseMap = ({ address }) => {
 
         // Si pas de résultat, essayer avec une version simplifiée
         if (!data || data.length === 0) {
-          query = `${address.typeVoie} ${address.voie} ${address.commune} ${address.codePostal} France`;
+          query = `${address.streetTypes} ${address.voie} ${address.commune} ${address.codePostal} France`;
           response = await fetch(
             `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=fr&limit=1`
           );
@@ -221,7 +221,7 @@ const EnterpriseMap = ({ address }) => {
               </div>
               <div class="popup-body">
                 <div class="popup-address">
-                  ${address.numVoie ? `${address.numVoie} ` : ''}${address.typeVoie || ''} ${address.voie || ''}
+                  ${address.numVoie ? `${address.numVoie} ` : ''}${address.streetTypes || ''} ${address.voie || ''}
                 </div>
                 <div class="popup-city">
                   ${address.codePostal || ''} ${address.commune || ''}
@@ -274,4 +274,4 @@ const EnterpriseMap = ({ address }) => {
   );
 };
 
-export default EnterpriseMap; 
+export default CompanyMap; 

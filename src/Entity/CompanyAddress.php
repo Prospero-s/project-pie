@@ -14,13 +14,13 @@ class CompanyAddress
 
     #[ORM\OneToOne(inversedBy: 'address')]
     #[ORM\JoinColumn(nullable: false)]
-    private Enterprise $enterprise;
+    private Company $company;
 
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $numVoie = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    private ?string $typeVoie = null;
+    private ?string $streetTypes = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $voie = null;
@@ -39,14 +39,14 @@ class CompanyAddress
         return $this->id;
     }
 
-    public function getEnterprise(): Enterprise
+    public function getCompany(): Company
     {
-        return $this->enterprise;
+        return $this->company;
     }
 
-    public function setEnterprise(Enterprise $enterprise): self
+    public function setCompany(Company $company): self
     {
-        $this->enterprise = $enterprise;
+        $this->company = $company;
         return $this;
     }
 
@@ -61,14 +61,14 @@ class CompanyAddress
         return $this;
     }
 
-    public function getTypeVoie(): ?string
+    public function getStreetTypes(): ?string
     {
-        return $this->typeVoie;
+        return $this->streetTypes;
     }
 
-    public function setTypeVoie(?string $typeVoie): self
+    public function setStreetTypes(?string $streetTypes): self
     {
-        $this->typeVoie = $typeVoie;
+        $this->streetTypes = $streetTypes;
         return $this;
     }
 
@@ -120,7 +120,7 @@ class CompanyAddress
     {
         $parts = array_filter([
             $this->numVoie,
-            $this->typeVoie,
+            $this->streetTypes,
             $this->voie,
             $this->codePostal,
             $this->commune,

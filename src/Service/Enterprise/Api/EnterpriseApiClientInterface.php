@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Service\Enterprise\Api;
+namespace App\Service\Company\Api;
 
-interface EnterpriseApiClientInterface
+interface CompanyApiClientInterface
 {
     /**
      * Récupère les données d'une entreprise via l'API
      */
-    public function fetchEnterpriseData(string $siren): array;
+    public function fetchCompanyData(string $siren): array;
 
     /**
      * Récupère un token d'authentification
