@@ -1,5 +1,5 @@
 import React from 'react';
-import { DashboardOutlined, FolderOutlined } from '@ant-design/icons';
+import { DashboardOutlined, FolderOutlined, FileSearchOutlined } from '@ant-design/icons';
 import { Layout, Menu, Divider } from 'antd';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -36,10 +36,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, i18n }) => {
       icon: <FolderOutlined className="!text-2xl lg:text-xl" />,
       label: <Link to={`/${lng}/investments`}>{t('portfolio')}</Link>,
     },
+    {
+      key: 'companies',
+      icon: <FileSearchOutlined className="!text-2xl lg:text-xl" />,
+      label: <Link to={`/${lng}/companies`}>{t('companies')}</Link>,
+    },
   ];
 
   return (
-    <Sider collapsible={!isMobile} collapsed={isMobile || sidebarOpen} onCollapse={setSidebarOpen}>
+    <Sider width={240} collapsible={!isMobile} collapsed={isMobile || sidebarOpen} onCollapse={setSidebarOpen}>
       <div className="flex items-center justify-center p-4 h-24">
         <img src={logoProspero} alt="Logo" className="h-12 w-auto" />
         {!sidebarOpen && !isMobile && (
