@@ -32,7 +32,7 @@ const CompanyDetails = ({ company, loading = false }) => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div className="flex-grow">
             <Title level={3} className="!mb-2 text-dark">{company.denomination}</Title>
-            <Text className="text-lg text-navy">{company.formeJuridique}</Text>
+            <Text className="text-lg text-navy">{company.businessStructures}</Text>
           </div>
           <div className="flex items-center space-x-2 text-sm bg-gray-50 px-3 py-1.5 rounded-full">
             <ClockCircleOutlined className="text-blue-primary" />

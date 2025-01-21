@@ -34,7 +34,7 @@ class CompanyRepository extends ServiceEntityRepository
                 $company->setCognitoId($sub);
                 $company->setSiren($data['siren']);
                 $company->setDenomination($data['denomination']);
-                $company->setFormeJuridique($data['formeJuridique'] ?? null);
+                $company->setBusinessStructures($data['businessStructures'] ?? null);
                 $company->setCodeApe($data['codeApe'] ?? null);
                 $company->setSiret($data['siret'] ?? null);
                 $company->setUpdatedAt($data['updatedAt'] ?? new \DateTime("9999-12-31 23:59:59"));

@@ -9,7 +9,7 @@ class CompanyDataAggregator
 {
     private array $scrapers;
     private LoggerInterface $logger;
-    private array $requiredFields = ['denomination', 'siren', 'formeJuridique'];
+    private array $requiredFields = ['denomination', 'siren', 'businessStructures'];
 
     public function __construct(iterable $scrapers, LoggerInterface $logger)
     {

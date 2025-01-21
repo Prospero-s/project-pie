@@ -35,7 +35,7 @@ class SocieteCompanyScraper implements CompanyScraperInterface
             $data = [
                 'siren' => $siren,
                 'denomination' => $this->extractDenomination($crawler),
-                'formeJuridique' => $this->extractFormeJuridique($crawler),
+                'businessStructures' => $this->extractBusinessStructures($crawler),
                 'adresse' => $this->extractAdresse($crawler),
                 'siret' => $this->extractSiret($crawler),
                 'capital' => $this->extractCapital($crawler),
@@ -63,7 +63,7 @@ class SocieteCompanyScraper implements CompanyScraperInterface
         }
     }
 
-    private function extractFormeJuridique(Crawler $crawler): string
+    private function extractBusinessStructures(Crawler $crawler): string
     {
         try {
             return trim($crawler->filter('.company-subtitle')->text());

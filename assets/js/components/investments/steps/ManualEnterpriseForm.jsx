@@ -20,7 +20,7 @@ const ManualCompanyForm = ({ onNext, t }) => {
       denomination: values.denomination.trim(),
       siren: values.siren.replace(/\s/g, ''),
       sector: values.sector,
-      formeJuridique: null,
+      businessStructures: null,
       representants: [],
       adresse: null,
       codeApe: null,

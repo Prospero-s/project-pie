@@ -6,7 +6,7 @@ const mapApiDataToCompany = (apiData) => {
     denomination: apiData.denomination,
     siren: apiData.siren,
     siret: apiData.siret,
-    formeJuridique: apiData.formeJuridique,
+    businessStructures: apiData.businessStructures,
     adresse: {
       pays: apiData.adresse?.pays || 'FRANCE',
       codePostal: apiData.adresse?.codePostal,
@@ -57,7 +57,7 @@ export const fetchCompanyDetails = async (siren, t) => {
     const companyData = mapApiDataToCompany(apiData);
     
     // Vérification des données requises
-    const requiredFields = ['denomination', 'siren', 'formeJuridique'];
+    const requiredFields = ['denomination', 'siren', 'businessStructures'];
     const missingFields = requiredFields.filter(field => !companyData[field]);
     
     if (missingFields.length > 0) {
@@ -95,7 +95,7 @@ export const saveCompany = async (companyData) => {
       body: JSON.stringify({
         siren: companyData.siren,
         denomination: companyData.denomination,
-        formeJuridique: companyData.formeJuridique,
+        businessStructures: companyData.businessStructures,
         codeApe: companyData.codeApe,
         siret: companyData.siret,
         adresse: companyData.adresse,

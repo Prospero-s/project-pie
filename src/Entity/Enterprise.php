@@ -24,7 +24,7 @@ class Company
     private string $denomination;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $formeJuridique = null;
+    private ?string $businessStructures = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $codeApe = null;
@@ -85,14 +85,14 @@ class Company
         return $this;
     }
 
-    public function getFormeJuridique(): ?string
+    public function getBusinessStructures(): ?string
     {
-        return $this->formeJuridique;
+        return $this->businessStructures;
     }
 
-    public function setFormeJuridique(?string $formeJuridique): self
+    public function setBusinessStructures(?string $businessStructures): self
     {
-        $this->formeJuridique = $formeJuridique;
+        $this->businessStructures = $businessStructures;
         return $this;
     }
 

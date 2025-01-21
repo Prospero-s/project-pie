@@ -11,7 +11,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class CompanyFixtures extends Fixture
 {
-    private array $formeJuridique = ['SARL', 'SAS', 'SA', 'EURL', 'SASU'];
+    private array $businessStructures = ['SARL', 'SAS', 'SA', 'EURL', 'SASU'];
     private array $sectors = ['Technology', 'Healthcare', 'Finance', 'Manufacturing', 'Retail', 'Energy', 'Real Estate'];
     private array $codeApe = ['6201Z', '7022Z', '6420Z', '4791A', '3511Z'];
     private array $streetTypes = ['rue', 'avenue', 'boulevard', 'place', 'impasse'];
@@ -37,7 +37,7 @@ class CompanyFixtures extends Fixture
                 ->setSiren($siren)
                 ->setSiret($siret)
                 ->setDenomination($this->generateCompanyName())
-                ->setFormeJuridique($this->formeJuridique[array_rand($this->formeJuridique)])
+                ->setBusinessStructures($this->businessStructures[array_rand($this->businessStructures)])
                 ->setCodeApe($this->codeApe[array_rand($this->codeApe)])
                 ->setSector($this->sectors[array_rand($this->sectors)])
                 ->setCognitoId($cognitoId)

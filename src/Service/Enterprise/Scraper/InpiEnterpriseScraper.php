@@ -96,7 +96,7 @@ class InpiCompanyScraper implements CompanyScraperInterface
             'siren' => $siren,
             'siret' => null,
             'denomination' => '',
-            'formeJuridique' => '',
+            'businessStructures' => '',
             'codeApe' => '',
             'updatedAt' => '',
             'adresse' => [],
@@ -109,7 +109,7 @@ class InpiCompanyScraper implements CompanyScraperInterface
         
         // Extraire les données en parallèle si possible
         $data['denomination'] = $this->extractDenomination($blocDetails);
-        $data['formeJuridique'] = $this->extractFormeJuridique($blocDetails);
+        $data['businessStructures'] = $this->extractBusinessStructures($blocDetails);
         $data['adresse'] = $this->extractAdresse($blocDetails);
         $data['representants'] = $this->extractRepresentants($crawler);
 
@@ -163,13 +163,13 @@ class InpiCompanyScraper implements CompanyScraperInterface
         return trim($denomination);
     }
 
-    private function extractFormeJuridique(Crawler $blocDetails): string
+    private function extractBusinessStructures(Crawler $blocDetails): string
     {
-        $formeJuridique = $blocDetails->reduce(function (Crawler $node) {
+        $businessStructures = $blocDetails->reduce(function (Crawler $node) {
             return str_contains($node->text(), 'Forme juridique');
         })->filter('.highlight-text')->text('');
 
-        return trim($formeJuridique);
+        return trim($businessStructures);
     }
 
     private function extractAdresse(Crawler $blocDetails): array
