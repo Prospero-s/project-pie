@@ -50,7 +50,7 @@ class CompanyFixtures extends Fixture
             $address
                 ->setStreetNumber((string)mt_rand(1, 150))
                 ->setStreetTypes($this->streetTypes[array_rand($this->streetTypes)])
-                ->setVoie($this->generateVoie())
+                ->setVoie($this->generateStreetType())
                 ->setCodePostal($this->generatePostalCode())
                 ->setCommune($this->generateCity())
                 ->setPays('FRANCE')
@@ -95,7 +95,7 @@ class CompanyFixtures extends Fixture
         return $prefixes[array_rand($prefixes)] . ' ' . $suffixes[array_rand($suffixes)];
     }
 
-    private function generateVoie(): string
+    private function generateStreetType(): string
     {
         $names = ['de la Paix', 'des Champs-Élysées', 'Saint-Germain', 
                  'du Commerce', 'de l\'Innovation', 'de l\'Industrie',
