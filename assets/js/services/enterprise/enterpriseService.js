@@ -11,7 +11,7 @@ const mapApiDataToCompany = (apiData) => {
       pays: apiData.adresse?.pays || 'FRANCE',
       codePostal: apiData.adresse?.codePostal,
       commune: apiData.adresse?.commune,
-      typeVoie: apiData.adresse?.typeVoie,
+      streetTypes: apiData.adresse?.streetTypes,
       voie: apiData.adresse?.voie,
       streetNumber: apiData.adresse?.streetNumber
     },

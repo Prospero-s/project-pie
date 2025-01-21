@@ -55,7 +55,7 @@ class CompanyRepository extends ServiceEntityRepository
                     $address = new CompanyAddress();
                     $address->setCompany($company);
                     $address->setStreetNumber($data['adresse']['streetNumber'] ?? null);
-                    $address->setTypeVoie($data['adresse']['typeVoie'] ?? null);
+                    $address->setStreetTypes($data['adresse']['streetTypes'] ?? null);
                     $address->setVoie($data['adresse']['voie'] ?? null);
                     $address->setCodePostal($data['adresse']['codePostal'] ?? null);
                     $address->setCommune($data['adresse']['commune'] ?? null);

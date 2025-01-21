@@ -14,7 +14,7 @@ class CompanyFixtures extends Fixture
     private array $formeJuridique = ['SARL', 'SAS', 'SA', 'EURL', 'SASU'];
     private array $sectors = ['Technology', 'Healthcare', 'Finance', 'Manufacturing', 'Retail', 'Energy', 'Real Estate'];
     private array $codeApe = ['6201Z', '7022Z', '6420Z', '4791A', '3511Z'];
-    private array $typeVoie = ['rue', 'avenue', 'boulevard', 'place', 'impasse'];
+    private array $streetTypes = ['rue', 'avenue', 'boulevard', 'place', 'impasse'];
     private array $fundingTypes = ['Equity', 'Debt', 'Convertible', 'Seed', 'Series A', 'Series B'];
     
     public function load(ObjectManager $manager): void
@@ -49,7 +49,7 @@ class CompanyFixtures extends Fixture
             $address = new CompanyAddress();
             $address
                 ->setStreetNumber((string)mt_rand(1, 150))
-                ->setTypeVoie($this->typeVoie[array_rand($this->typeVoie)])
+                ->setStreetTypes($this->streetTypes[array_rand($this->streetTypes)])
                 ->setVoie($this->generateVoie())
                 ->setCodePostal($this->generatePostalCode())
                 ->setCommune($this->generateCity())
