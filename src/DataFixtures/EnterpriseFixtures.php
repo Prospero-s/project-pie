@@ -48,7 +48,7 @@ class EnterpriseFixtures extends Fixture
             // Créer et associer une adresse
             $address = new CompanyAddress();
             $address
-                ->setNumVoie((string)mt_rand(1, 150))
+                ->setStreetNumber((string)mt_rand(1, 150))
                 ->setTypeVoie($this->typeVoie[array_rand($this->typeVoie)])
                 ->setVoie($this->generateVoie())
                 ->setCodePostal($this->generatePostalCode())

@@ -54,7 +54,7 @@ class EnterpriseRepository extends ServiceEntityRepository
                 if (!empty($data['adresse'])) {
                     $address = new CompanyAddress();
                     $address->setEnterprise($enterprise);
-                    $address->setNumVoie($data['adresse']['numVoie'] ?? null);
+                    $address->setStreetNumber($data['adresse']['streetNumber'] ?? null);
                     $address->setTypeVoie($data['adresse']['typeVoie'] ?? null);
                     $address->setVoie($data['adresse']['voie'] ?? null);
                     $address->setCodePostal($data['adresse']['codePostal'] ?? null);

@@ -90,7 +90,7 @@ class PappersCompanyScraper implements CompanyScraperInterface
             preg_match('/(\d{5})\s+(.+)$/', $adresseText, $cpvilleMatches);
 
             return [
-                'numVoie' => '',  // À extraire si disponible
+                'streetNumber' => '',  // À extraire si disponible
                 'streetTypes' => '', // À extraire si disponible
                 'voie' => $adresseText,
                 'codePostal' => $cpvilleMatches[1] ?? '',

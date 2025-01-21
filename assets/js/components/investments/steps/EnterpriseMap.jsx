@@ -37,7 +37,7 @@ const CompanyMap = ({ address }) => {
 
         // Construction de l'adresse complète
         const addressParts = [];
-        if (address.numVoie) addressParts.push(address.numVoie);
+        if (address.streetNumber) addressParts.push(address.streetNumber);
         if (address.streetTypes) addressParts.push(address.streetTypes);
         if (address.voie) addressParts.push(address.voie);
         addressParts.push(address.codePostal);
@@ -221,7 +221,7 @@ const CompanyMap = ({ address }) => {
               </div>
               <div class="popup-body">
                 <div class="popup-address">
-                  ${address.numVoie ? `${address.numVoie} ` : ''}${address.streetTypes || ''} ${address.voie || ''}
+                  ${address.streetNumber ? `${address.streetNumber} ` : ''}${address.streetTypes || ''} ${address.voie || ''}
                 </div>
                 <div class="popup-city">
                   ${address.codePostal || ''} ${address.commune || ''}

@@ -216,7 +216,7 @@ class InpiCompanyScraper implements CompanyScraperInterface
                 'PL.' => 'PLACE'
             ];
 
-            $numVoie = null;
+            $streetNumber = null;
             $streetTypes = null;
             $voie = [];
             $codePostal = null;
@@ -239,8 +239,8 @@ class InpiCompanyScraper implements CompanyScraperInterface
                 }
 
                 // Vérifier si c'est un numéro de rue (1-4 chiffres)
-                if (!$numVoie && preg_match('/^(\d{1,4})$/', $part)) {
-                    $numVoie = $part;
+                if (!$streetNumber && preg_match('/^(\d{1,4})$/', $part)) {
+                    $streetNumber = $part;
                     continue;
                 }
 
@@ -271,7 +271,7 @@ class InpiCompanyScraper implements CompanyScraperInterface
                 'codePostal' => $codePostal,
                 'voie' => $voieStr,
                 'streetTypes' => $streetTypes,
-                'numVoie' => $numVoie,
+                'streetNumber' => $streetNumber,
             ];
         }
 

@@ -13,7 +13,7 @@ const mapApiDataToEnterprise = (apiData) => {
       commune: apiData.adresse?.commune,
       typeVoie: apiData.adresse?.typeVoie,
       voie: apiData.adresse?.voie,
-      numVoie: apiData.adresse?.numVoie
+      streetNumber: apiData.adresse?.streetNumber
     },
     codeApe: apiData.codeApe,
     representants: Array.isArray(apiData.representants) ? apiData.representants.map(rep => ({

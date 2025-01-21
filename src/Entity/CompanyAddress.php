@@ -17,7 +17,7 @@ class CompanyAddress
     private Company $company;
 
     #[ORM\Column(length: 10, nullable: true)]
-    private ?string $numVoie = null;
+    private ?string $streetNumber = null;
 
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $streetTypes = null;
@@ -50,14 +50,14 @@ class CompanyAddress
         return $this;
     }
 
-    public function getNumVoie(): ?string
+    public function getStreetNumber(): ?string
     {
-        return $this->numVoie;
+        return $this->streetNumber;
     }
 
-    public function setNumVoie(?string $numVoie): self
+    public function setStreetNumber(?string $streetNumber): self
     {
-        $this->numVoie = $numVoie;
+        $this->streetNumber = $streetNumber;
         return $this;
     }
 
@@ -119,7 +119,7 @@ class CompanyAddress
     public function getFullAddress(): string
     {
         $parts = array_filter([
-            $this->numVoie,
+            $this->streetNumber,
             $this->streetTypes,
             $this->voie,
             $this->codePostal,
