@@ -21,6 +21,7 @@ import SignIn from "@/pages/SignIn";
 import SignUp from "@/pages/SignUp";
 import Dashboard from "@/pages/Dashboard";
 import Investments from "@/pages/Investments";
+import AllCompanies from "@/pages/AllCompanies";
 import AuthCallback from "@/pages/AuthCallback";
 import AuthLayout from "@/components/common/layout/AuthLayout";
 import ProtectedRoute from "@/components/common/auth/ProtectedRoute";
@@ -97,6 +98,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                       <Routes>
                         <Route path="dashboard" element={<Dashboard i18n={i18n} />} />
                         <Route path="investments" element={<Investments i18n={i18n} />} />
+                        <Route path="companies" element={<AllCompanies i18n={i18n} />} />
                       </Routes>
                     </AppLayout>
                   </ProtectedRoute>

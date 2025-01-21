@@ -1,5 +1,6 @@
 import { openNotificationWithIcon } from '@/components/common/notification/NotifAlert';
 import { Auth } from 'aws-amplify';
+import axios from 'axios';
 
 const mapApiDataToCompany = (apiData) => {
   return {
@@ -133,6 +134,32 @@ export const saveCompany = async (companyData) => {
       'Erreur',
       error.message || 'Une erreur est survenue lors de la sauvegarde de l\'entreprise'
     );
+    throw error;
+  }
+}; 
+
+export const getAllCompanies = async (page, pageSize) => {
+  try {
+    const cognitoId = await Auth.currentSession()
+      .then(session => session.getIdToken().getJwtToken())
+      .catch(() => null);
+
+    if (!cognitoId) {
+      throw new Error('Utilisateur non authentifié');
+    }
+
+    const response = await axios.get('/api/getAllCompanies', {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Cognito-Id': cognitoId
+      },
+    });
+
+    const result = await response.data;
+
+    return result;
+  } catch (error) {
+    console.error('Erreur lors de la récupération:', error);
     throw error;
   }
 }; 

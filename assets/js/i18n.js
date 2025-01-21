@@ -10,6 +10,8 @@ import frMenu from './locales/fr/menu.json';
 import enMenu from './locales/en/menu.json';
 import frInvestments from './locales/fr/investments.json';
 import enInvestments from './locales/en/investments.json';
+import frAllCompanies from './locales/fr/allCompanies.json';
+import enAllCompanies from './locales/en/allCompanies.json';
 
 i18n
   .use(initReactI18next)
@@ -20,12 +22,14 @@ i18n
         signup: frSignUp,
         menu: frMenu,
         investments: frInvestments,
+        allCompanies: frAllCompanies,
       },
       en: {
         signin: enSignIn,
         signup: enSignUp,
         menu: enMenu,
         investments: enInvestments,
+        allCompanies: enAllCompanies,
       },
     },
     lng: 'fr',

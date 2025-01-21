@@ -83,4 +83,40 @@ class CompanyController extends AbstractController
             ], 400);
         }
     }
+
+    #[Route('/getAllCompanies', name: 'app_get_all_companies', methods: ['GET'])]
+    public function getAllCompanies(Request $request): JsonResponse
+    {
+        try {
+            $cognitoId = $request->headers->get('X-Cognito-Id');
+            if (!$cognitoId) {
+                throw new \Exception('Utilisateur non authentifié');
+            }
+
+            $companies = $this->companyRepository->findAll();
+
+            $data = [];
+            foreach ($companies as $company) {
+                $data[] = [
+                    'id' => $company->getId(),
+                    'name' => $company->getDenomination(),
+                    'sector' => $company->getSector(),
+                    'created_at' => $company->getCreatedAt()->format('Y-m-d'),
+                ];
+            }
+
+            return new JsonResponse($data);
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur critique dans getAllCompanies', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'class' => get_class($e)
+            ]);
+
+            return new JsonResponse([
+                'error' => $e->getMessage(),
+                'details' => 'Une erreur est survenue lors de la récupération des données'
+            ], 400);
+        }
+    }
 } 

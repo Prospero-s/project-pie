@@ -1,0 +1,32 @@
+{
+  "list_companies": "Companies",
+  "common": {
+    "add": "Add",
+    "cancel": "Cancel",
+    "next": "Next",
+    "finish": "Finish",
+    "previous": "Previous",
+    "loading": "Loading...",
+    "page": "Page",
+    "of": "of",
+    "search": "Search",
+    "back": "Back",
+    "confirm": "Confirm"
+  },
+  "company": {
+    "name": "Company name",
+    "sector": "Business sector",
+    "siren": "SIREN",
+    "siret": "SIRET",
+    "created_at": "Created at"
+  },
+  "loading": {
+      "title": "Retrieving company details...",
+      "description": "We are retrieving the company details from official registers"
+  },
+  "actions": {
+    "title": "Actions",
+    "view_details": "View details",
+    "add_investment": "Add investment"
+  }
+}
