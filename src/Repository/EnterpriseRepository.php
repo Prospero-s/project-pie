@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\Enterprise;
+use App\Entity\Company;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
@@ -10,15 +10,15 @@ use App\Entity\Representative;
 use App\Entity\CompanyAddress;
 use App\Entity\CompanyInvestment;
 
-class EnterpriseRepository extends ServiceEntityRepository
+class CompanyRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry, EntityManagerInterface $em)
     {
-        parent::__construct($registry, Enterprise::class);
+        parent::__construct($registry, Company::class);
         $this->em = $em;
     }
 
-    public function saveEnterprise(string $cognitoId, array $data): array
+    public function saveCompany(string $cognitoId, array $data): array
     {
         try {
             // Extraire le sub du token JWT
@@ -27,24 +27,24 @@ class EnterpriseRepository extends ServiceEntityRepository
             $sub = $payload['sub'] ?? throw new \Exception('Token invalide : sub manquant');
 
             // Recherche ou création de l'entreprise
-            $enterprise = $this->em->getRepository(Enterprise::class)->findOneBy(['siren' => $data['siren']]);
+            $company = $this->em->getRepository(Company::class)->findOneBy(['siren' => $data['siren']]);
             
-            if (!$enterprise) {
-                $enterprise = new Enterprise();
-                $enterprise->setCognitoId($sub);
-                $enterprise->setSiren($data['siren']);
-                $enterprise->setDenomination($data['denomination']);
-                $enterprise->setFormeJuridique($data['formeJuridique'] ?? null);
-                $enterprise->setCodeApe($data['codeApe'] ?? null);
-                $enterprise->setSiret($data['siret'] ?? null);
-                $enterprise->setUpdatedAt($data['updatedAt'] ?? new \DateTime("9999-12-31 23:59:59"));
-                $enterprise->setCreatedAt(new \DateTime());
-                $enterprise->setDeletedAt(new \DateTime("9999-12-31 23:59:59"));
-                $enterprise->setSector($data['sector'] ?? null);
+            if (!$company) {
+                $company = new Company();
+                $company->setCognitoId($sub);
+                $company->setSiren($data['siren']);
+                $company->setDenomination($data['denomination']);
+                $company->setFormeJuridique($data['formeJuridique'] ?? null);
+                $company->setCodeApe($data['codeApe'] ?? null);
+                $company->setSiret($data['siret'] ?? null);
+                $company->setUpdatedAt($data['updatedAt'] ?? new \DateTime("9999-12-31 23:59:59"));
+                $company->setCreatedAt(new \DateTime());
+                $company->setDeletedAt(new \DateTime("9999-12-31 23:59:59"));
+                $company->setSector($data['sector'] ?? null);
                 //Création des représentants
                 foreach ($data['representants'] as $representant) {
                     $representantEntity = new Representative();
-                    $representantEntity->setEnterprise($enterprise);
+                    $representantEntity->setCompany($company);
                     $representantEntity->setNom($representant['nom']);
                     $representantEntity->setQualite($representant['qualite'] ?? null);
                     $this->em->persist($representantEntity);
@@ -53,7 +53,7 @@ class EnterpriseRepository extends ServiceEntityRepository
                 // Création de l'adresse
                 if (!empty($data['adresse'])) {
                     $address = new CompanyAddress();
-                    $address->setEnterprise($enterprise);
+                    $address->setCompany($company);
                     $address->setStreetNumber($data['adresse']['streetNumber'] ?? null);
                     $address->setTypeVoie($data['adresse']['typeVoie'] ?? null);
                     $address->setVoie($data['adresse']['voie'] ?? null);
@@ -64,12 +64,12 @@ class EnterpriseRepository extends ServiceEntityRepository
                     $this->em->persist($address);
                 }
 
-                $this->em->persist($enterprise);
+                $this->em->persist($company);
             }
 
             // Ajout de l'investisseur comme représentant
             $investorRepresentative = new Representative();
-            $investorRepresentative->setEnterprise($enterprise);
+            $investorRepresentative->setCompany($company);
             $investorRepresentative->setNom($data['investorName'] ?? 'Investisseur');
             $investorRepresentative->setQualite('Investisseur');
             $investorRepresentative->setCognitoId($sub);
@@ -77,7 +77,7 @@ class EnterpriseRepository extends ServiceEntityRepository
 
             // Création de l'investissement
             $investment = new CompanyInvestment();
-            $investment->setEnterprise($enterprise);
+            $investment->setCompany($company);
             $investment->setCognitoId($sub);
             $investment->setFundingType($data['fundingType']);
             $investment->setAmount($data['amountRaised']);
@@ -88,10 +88,10 @@ class EnterpriseRepository extends ServiceEntityRepository
 
             return [
                 'success' => true,
-                'enterprise' => [
-                    'id' => $enterprise->getId(),
-                    'siren' => $enterprise->getSiren(),
-                    'denomination' => $enterprise->getDenomination()
+                'company' => [
+                    'id' => $company->getId(),
+                    'siren' => $company->getSiren(),
+                    'denomination' => $company->getDenomination()
                 ],
                 'investment' => [
                     'id' => $investment->getId(),

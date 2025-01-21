@@ -2,8 +2,8 @@
 
 namespace App\Controller\Api;
 
-use App\Service\Enterprise\EnterpriseServiceInterface;
-use App\Repository\EnterpriseRepository;
+use App\Service\Company\CompanyServiceInterface;
+use App\Repository\CompanyRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,18 +11,18 @@ use Symfony\Component\Routing\Annotation\Route;
 use Psr\Log\LoggerInterface;
 
 #[Route('/api', name: 'api_')]
-class EnterpriseController extends AbstractController
+class CompanyController extends AbstractController
 {
     public function __construct(
-        private readonly EnterpriseServiceInterface $enterpriseService,
-        private readonly EnterpriseRepository $enterpriseRepository,
+        private readonly CompanyServiceInterface $companyService,
+        private readonly CompanyRepository $companyRepository,
         private readonly LoggerInterface $logger
     ) {}
 
-    #[Route('/enterprise/{siren}', name: 'get_enterprise', methods: ['GET'])]
-    public function getEnterpriseDetails(string $siren, Request $request): JsonResponse
+    #[Route('/company/{siren}', name: 'get_company', methods: ['GET'])]
+    public function getCompanyDetails(string $siren, Request $request): JsonResponse
     {
-        $this->logger->info('Début de la requête getEnterpriseDetails', [
+        $this->logger->info('Début de la requête getCompanyDetails', [
             'siren' => $siren,
             'ip' => $request->getClientIp(),
             'mode' => $request->query->get('mode')
@@ -32,12 +32,12 @@ class EnterpriseController extends AbstractController
             $mode = $request->query->get('mode');
             $forceScraping = $mode === 'scraping';
             
-            $enterpriseData = $this->enterpriseService->getEnterpriseData($siren, $forceScraping);
+            $companyData = $this->companyService->getCompanyData($siren, $forceScraping);
             
-            return new JsonResponse($enterpriseData);
+            return new JsonResponse($companyData);
 
         } catch (\Exception $e) {
-            $this->logger->error('Erreur critique dans getEnterpriseDetails', [
+            $this->logger->error('Erreur critique dans getCompanyDetails', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'siren' => $siren,
@@ -51,8 +51,8 @@ class EnterpriseController extends AbstractController
         }
     }
 
-    #[Route('/enterprise/save', name: 'app_api_enterprise_save', methods: ['POST'])]
-    public function saveEnterprise(Request $request): JsonResponse
+    #[Route('/company/save', name: 'app_api_company_save', methods: ['POST'])]
+    public function saveCompany(Request $request): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true);
@@ -67,12 +67,12 @@ class EnterpriseController extends AbstractController
                 throw new \Exception('Utilisateur non authentifié');
             }
 
-            $result = $this->enterpriseRepository->saveEnterprise($cognitoId, $data);
+            $result = $this->companyRepository->saveCompany($cognitoId, $data);
             
             return new JsonResponse($result);
 
         } catch (\Exception $e) {
-            $this->logger->error('Erreur critique dans saveEnterprise', [
+            $this->logger->error('Erreur critique dans saveCompany', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);

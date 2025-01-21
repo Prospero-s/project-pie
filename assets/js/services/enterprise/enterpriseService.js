@@ -1,7 +1,7 @@
 import { openNotificationWithIcon } from '@/components/common/notification/NotifAlert';
 import { Auth } from 'aws-amplify';
 
-const mapApiDataToEnterprise = (apiData) => {
+const mapApiDataToCompany = (apiData) => {
   return {
     denomination: apiData.denomination,
     siren: apiData.siren,
@@ -24,17 +24,17 @@ const mapApiDataToEnterprise = (apiData) => {
   };
 };
 
-export const fetchEnterpriseDetails = async (siren, t) => {
+export const fetchCompanyDetails = async (siren, t) => {
   try {
     // Première tentative avec l'API principale
-    let response = await fetch(`/api/enterprise/${siren}`);
+    let response = await fetch(`/api/company/${siren}`);
     let apiData;
     
     // Vérifier d'abord le statut de la réponse
     if (!response.ok) {
       console.warn(`Erreur API (${response.status}), tentative avec le scraping...`);
       // Si l'API échoue, on force le mode scraping
-      response = await fetch(`/api/enterprise/${siren}?mode=scraping`);
+      response = await fetch(`/api/company/${siren}?mode=scraping`);
       
       if (!response.ok) {
         throw new Error(`Erreur lors de la récupération des données (${response.status})`);
@@ -54,29 +54,29 @@ export const fetchEnterpriseDetails = async (siren, t) => {
     }
 
     // Transformation des données
-    const enterpriseData = mapApiDataToEnterprise(apiData);
+    const companyData = mapApiDataToCompany(apiData);
     
     // Vérification des données requises
     const requiredFields = ['denomination', 'siren', 'formeJuridique'];
-    const missingFields = requiredFields.filter(field => !enterpriseData[field]);
+    const missingFields = requiredFields.filter(field => !companyData[field]);
     
     if (missingFields.length > 0) {
       throw new Error();
     }
 
-    return enterpriseData;
+    return companyData;
   } catch (error) {
     console.error('Erreur lors de la récupération des données:', error);
     openNotificationWithIcon(
       'error',
-      t('enterprise_details.error_siren.title'),
-      t('enterprise_details.error_siren.message')
+      t('company_details.error_siren.title'),
+      t('company_details.error_siren.message')
     );
     return null;
   }
 };
 
-export const saveEnterprise = async (enterpriseData) => {
+export const saveCompany = async (companyData) => {
   try {
     const cognitoId = await Auth.currentSession()
       .then(session => session.getIdToken().getJwtToken())
@@ -86,25 +86,25 @@ export const saveEnterprise = async (enterpriseData) => {
       throw new Error('Utilisateur non authentifié');
     }
 
-    const response = await fetch('/api/enterprise/save', {
+    const response = await fetch('/api/company/save', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-Cognito-Id': cognitoId
       },
       body: JSON.stringify({
-        siren: enterpriseData.siren,
-        denomination: enterpriseData.denomination,
-        formeJuridique: enterpriseData.formeJuridique,
-        codeApe: enterpriseData.codeApe,
-        siret: enterpriseData.siret,
-        adresse: enterpriseData.adresse,
-        representants: enterpriseData.representants,
-        fundingType: enterpriseData.fundingType,
-        amountRaised: enterpriseData.amountRaised,
-        currency: enterpriseData.currency || 'EUR',
-        updatedAt: enterpriseData.updatedAt || new Date().toISOString(),
-        sector: enterpriseData.sector
+        siren: companyData.siren,
+        denomination: companyData.denomination,
+        formeJuridique: companyData.formeJuridique,
+        codeApe: companyData.codeApe,
+        siret: companyData.siret,
+        adresse: companyData.adresse,
+        representants: companyData.representants,
+        fundingType: companyData.fundingType,
+        amountRaised: companyData.amountRaised,
+        currency: companyData.currency || 'EUR',
+        updatedAt: companyData.updatedAt || new Date().toISOString(),
+        sector: companyData.sector
       })
     });
 

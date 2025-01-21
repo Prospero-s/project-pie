@@ -2,14 +2,14 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Enterprise;
+use App\Entity\Company;
 use App\Entity\CompanyAddress;
 use App\Entity\CompanyInvestment;
 use App\Entity\Representative;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
-class EnterpriseFixtures extends Fixture
+class CompanyFixtures extends Fixture
 {
     private array $formeJuridique = ['SARL', 'SAS', 'SA', 'EURL', 'SASU'];
     private array $sectors = ['Technology', 'Healthcare', 'Finance', 'Manufacturing', 'Retail', 'Energy', 'Real Estate'];
@@ -24,7 +24,7 @@ class EnterpriseFixtures extends Fixture
         
         // Générer 20 entreprises
         for ($i = 0; $i < 20; $i++) {
-            $enterprise = new Enterprise();
+            $company = new Company();
             // Pour les entreprises 0, 5 et 10, utiliser le même investisseur
             $cognitoId = ($i == 0 || $i == 5 || $i == 10) ? $multiInvestorId : 'FIXTURE_USER_' . $i;
             
@@ -33,7 +33,7 @@ class EnterpriseFixtures extends Fixture
             // Générer un SIRET valide (SIREN + 5 chiffres)
             $siret = $siren . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
             
-            $enterprise
+            $company
                 ->setSiren($siren)
                 ->setSiret($siret)
                 ->setDenomination($this->generateCompanyName())
@@ -54,26 +54,26 @@ class EnterpriseFixtures extends Fixture
                 ->setCodePostal($this->generatePostalCode())
                 ->setCommune($this->generateCity())
                 ->setPays('FRANCE')
-                ->setEnterprise($enterprise);
+                ->setCompany($company);
             
-            $enterprise->setAddress($address);
+            $company->setAddress($address);
             
             // Créer et associer un investissement
             $investment = new CompanyInvestment();
             $investment
-                ->setEnterprise($enterprise)
+                ->setCompany($company)
                 ->setAmount(mt_rand(10000, 1000000))
                 ->setCognitoId($cognitoId)
                 ->setFundingType($this->fundingTypes[array_rand($this->fundingTypes)])
                 ->setCurrency('EUR')
                 ->setInvestedAt(new \DateTime());
             
-            $enterprise->setInvestment($investment);
+            $company->setInvestment($investment);
             
             // Créer et associer un représentant pour l'investisseur
             $representative = new Representative();
             $representative
-                ->setEnterprise($enterprise)
+                ->setCompany($company)
                 ->setNom($cognitoId === $multiInvestorId ? 'Multi Investisseur' : 'Investisseur ' . $i)
                 ->setQualite('Investisseur')
                 ->setCognitoId($cognitoId);
@@ -81,7 +81,7 @@ class EnterpriseFixtures extends Fixture
             $manager->persist($representative);
             $manager->persist($address);
             $manager->persist($investment);
-            $manager->persist($enterprise);
+            $manager->persist($company);
         }
 
         $manager->flush();
