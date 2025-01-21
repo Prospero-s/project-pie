@@ -1,23 +1,42 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Skeleton, Table, Tooltip } from 'antd';
-import { DeleteOutlined, EyeOutlined, FileAddOutlined } from '@ant-design/icons';
+import { Button, Skeleton, Table } from 'antd';
+import { DeleteOutlined, FileAddOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import startupsMock from '@/mocks/investements/startupsMock';
-import AddCompanyModal from './AddCompanyModal';
+import { getAllCompanies } from '@/services/company/companyService';
 
-const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
-  const { t } = useTranslation('investments', { i18n });
+const TableCompanies = ({ i18n }) => {
+  const { t } = useTranslation('allCompanies', { i18n });
   const [loading, setLoading] = useState(true);
+  const [companies, setCompanies] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [pageSize] = useState(10);
+
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 500);
+
+    const fetchCompanies = async () => {
+      try {
+        const data = await getAllCompanies(); // Appel API
+        setCompanies(data); // Définir les données
+      } catch (error) {
+        console.error('Erreur lors de la récupération des entreprises :', error);
+      } finally {
+        setLoading(false); // Terminer le chargement, succès ou erreur
+      }
+    };
+
+    fetchCompanies();
+
     return () => clearTimeout(timer);
   }, []);
 
   const columns = [
     {
-      title: t('company_details.company.name'),
+      title: t('company.name'),
       dataIndex: 'name',
       key: 'name',
       render: (text, record) =>
@@ -27,8 +46,8 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
           <div className="flex items-center gap-4">
             <Link to={`/investements/${record.id}`} className="flex items-center gap-4">
               <img
-                src={record.logo}
-                alt={record.name}
+                src={record.logo ?? "https://www.adaptivewfs.com/wp-content/uploads/2020/07/logo-placeholder-image.png"}
+                alt={record.name ?? "company-default-logo"}
                 className="w-10 h-10 rounded-full"
               />
               <span>{text}</span>
@@ -37,34 +56,16 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
         ),
     },
     {
-      title: t('company_details.company.sector'),
+      title: t('company.sector'),
       dataIndex: 'sector',
       key: 'sector',
       render: (text) =>
         loading ? <Skeleton.Input block active size="small" /> : text,
     },
     {
-      title: t('funding.amount'),
-      dataIndex: 'amountRaised',
-      key: 'amountRaised',
-      render: (amount) =>
-        loading ? (
-          <Skeleton.Input block active size="small" />
-        ) : (
-          `${amount.toLocaleString()} €`
-        ),
-    },
-    {
-      title: t('funding.type'),
-      dataIndex: 'fundingType',
-      key: 'fundingType',
-      render: (text) =>
-        loading ? <Skeleton.Input block active size="small" /> : text,
-    },
-    {
-      title: t('company_details.company.details.last_update'),
-      dataIndex: 'lastUpdate',
-      key: 'lastUpdate',
+      title: t('company.created_at'),
+      dataIndex: 'created_at',
+      key: 'created_at',
       render: (date) =>
         loading ? (
           <Skeleton.Input block active size="small" />
@@ -109,18 +110,17 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
 
   return (
     <>
-      <AddCompanyModal 
-        visible={isModalOpen} 
-        onCancel={() => setIsModalOpen(false)} 
-        onAdd={handleAdd}
-        t={t}
-      />
       <div className="rounded-lg border border-slate-200 flex flex-col w-full">
         <div className="overflow-x-auto">
           <Table
             columns={columns}
-            dataSource={loading ? Array(5).fill({}) : dataSource}
-            pagination={false}
+            dataSource={loading ? Array(5).fill({}) : companies}
+            pagination={{
+              current: currentPage,
+              total: totalItems,
+              pageSize: pageSize,
+              onChange: (page) => setCurrentPage(page), // Met à jour la page courante
+            }}
             rowClassName={(record, index) =>
               index % 2 === 0 ? '!bg-white' : '!bg-slate-50'
             }
@@ -168,4 +168,4 @@ const TablePagination = ({ t }) => {
   );  
 };
 
-export default TableInvestments;
+export default TableCompanies;

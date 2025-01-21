@@ -1,0 +1,32 @@
+{
+  "list_companies": "Les entreprises",
+  "common": {
+    "add": "Ajouter",
+    "cancel": "Annuler",
+    "next": "Suivant",
+    "finish": "Terminer",
+    "previous": "Précédent",
+    "loading": "Chargement...",
+    "page": "Page",
+    "of": "sur",
+    "search": "Rechercher",
+    "back": "Retour",
+    "confirm": "Confirmer"
+  },
+  "company": {
+    "name": "Nom de l'entreprise",
+    "sector": "Secteur d'activité",
+    "siren": "SIREN",
+    "siret": "SIRET",
+    "created_at": "Date de création"
+  },
+  "loading": {
+      "title": "Récupération des informations en cours...",
+      "description": "Nous recherchons les détails de l'entreprise auprès des registres officiels"
+  },
+  "actions": {
+    "title": "Actions",
+    "view_details": "Voir les détails",
+    "add_investment": "Ajouter un investissement"
+  }
+}

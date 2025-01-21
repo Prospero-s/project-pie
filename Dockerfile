@@ -7,6 +7,9 @@ WORKDIR /app
 
 VOLUME /app/var/
 
+# Set SHELL to include pipefail
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 # Installation des dépendances système
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -14,7 +17,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     file \
     gettext \
     git \
+    curl \
+    gnupg \
     libpq-dev \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Installation des extensions PHP
@@ -59,12 +66,14 @@ COPY frankenphp/Caddyfile /etc/caddy/Caddyfile
 COPY frankenphp/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 RUN chmod +x /usr/local/bin/docker-entrypoint
 
+# Optimisation de l'image
 RUN set -eux; \
     mkdir -p var/cache var/log; \
     composer install --prefer-dist --no-dev --no-scripts --no-progress; \
     composer dump-autoload --classmap-authoritative --no-dev; \
     composer dump-env prod; \
-    chmod +x bin/console; sync
+    chmod +x bin/console; \
+    sync
 
 ENTRYPOINT ["docker-entrypoint"]
-CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"] 
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]

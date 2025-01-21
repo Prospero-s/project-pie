@@ -33,36 +33,36 @@ services:
                 verify_host: false
 
     # Configuration du client API
-    App\Service\Enterprise\Api\EnterpriseApiClient:
+    App\Service\Company\Api\CompanyApiClient:
         arguments:
             $httpClient: '@Symfony\Contracts\HttpClient\HttpClientInterface'
             $apiUsername: '%api_username%'
             $apiPassword: '%api_password%'
 
     # Configuration des scrapers avec tag commun et priorité
-    App\Service\Enterprise\Scraper\InpiEnterpriseScraper:
+    App\Service\Company\Scraper\InpiCompanyScraper:
         arguments:
             $client: '@Symfony\Contracts\HttpClient\HttpClientInterface'
         tags:
-            - { name: 'enterprise.scraper', priority: 100 }
+            - { name: 'company.scraper', priority: 100 }
 
-    App\Service\Enterprise\Scraper\PappersEnterpriseScraper:
+    App\Service\Company\Scraper\PappersCompanyScraper:
         arguments:
             $client: '@Symfony\Contracts\HttpClient\HttpClientInterface'
         tags:
-            - { name: 'enterprise.scraper', priority: 50 }
+            - { name: 'company.scraper', priority: 50 }
 
-    App\Service\Enterprise\Scraper\SocieteEnterpriseScraper:
+    App\Service\Company\Scraper\SocieteCompanyScraper:
         arguments:
             $client: '@Symfony\Contracts\HttpClient\HttpClientInterface'
         tags:
-            - { name: 'enterprise.scraper', priority: 25 }
+            - { name: 'company.scraper', priority: 25 }
 
     # Configuration de l'agrégateur de données
-    App\Service\Enterprise\EnterpriseDataAggregator:
+    App\Service\Company\CompanyDataAggregator:
         arguments:
-            $scrapers: !tagged_iterator enterprise.scraper
+            $scrapers: !tagged_iterator company.scraper
 
     # Alias des interfaces vers leurs implémentations
-    App\Service\Enterprise\EnterpriseServiceInterface: '@App\Service\Enterprise\EnterpriseService'
-    App\Service\Enterprise\Api\EnterpriseApiClientInterface: '@App\Service\Enterprise\Api\EnterpriseApiClient'
+    App\Service\Company\CompanyServiceInterface: '@App\Service\Company\CompanyService'
+    App\Service\Company\Api\CompanyApiClientInterface: '@App\Service\Company\Api\CompanyApiClient'

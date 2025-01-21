@@ -14,31 +14,31 @@
     "confirm": "Confirm"
   },
   "creation": {
-    "title": "Enterprise Creation",
+    "title": "Company Creation",
     "select_type": "Choose creation type",
     "automatic_creation": "Automatic creation",
     "automatic_description": "Automatically retrieve information via SIREN",
     "manual_creation": "Manual creation",
-    "manual_description": "Manually enter enterprise information"
+    "manual_description": "Manually enter company information"
   },
-  "enterprise_details": {
-    "title": "Enterprise Details",
-    "confirmation_title": "Enterprise Details Confirmation",
+  "company_details": {
+    "title": "Company Details",
+    "confirmation_title": "Company Details Confirmation",
     "siren": "SIREN number",
     "siren_placeholder": "Enter SIREN number (9 digits)",
     "siren_required": "Please enter SIREN",
     "siren_invalid": "SIREN must contain exactly 9 digits",
     "error": "Error retrieving data",
-    "enterprise": {
-      "name": "Enterprise name",
-      "name_placeholder": "Enter enterprise name",
-      "name_required": "Please enter enterprise name",
+    "company": {
+      "name": "Company name",
+      "name_placeholder": "Enter company name",
+      "name_required": "Please enter company name",
       "sector": "Business sector",
       "sector_placeholder": "Enter business sector",
       "sector_required": "Please enter business sector",
       "description": "Description",
       "details": {
-        "title": "Enterprise Details",
+        "title": "Company Details",
         "last_update": "Last update",
         "legal_form": "Legal form",
         "siren": "SIREN",
@@ -70,12 +70,12 @@
       }
     },
     "loading": {
-      "title": "Retrieving enterprise details...",
-      "description": "We are retrieving the enterprise details from official registers"
+      "title": "Retrieving company details...",
+      "description": "We are retrieving the company details from official registers"
     },
     "error_siren": {
       "title": "Error",
-      "message": "Unable to retrieve enterprise details. Your Siren may be incorrect. Please try again later."
+      "message": "Unable to retrieve company details. Your Siren may be incorrect. Please try again later."
     },
     "sectors": {
       "technology": "Technology",

@@ -12,8 +12,8 @@ class Representative
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Enterprise::class, inversedBy: 'representatives')]
-    private Enterprise $enterprise;
+    #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'representatives')]
+    private Company $company;
 
     #[ORM\Column(length: 255)]
     private string $nom;
@@ -21,19 +21,22 @@ class Representative
     #[ORM\Column(length: 255)]
     private string $qualite;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $cognitoId = null;
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getEnterprise(): Enterprise
+    public function getCompany(): Company
     {
-        return $this->enterprise;
+        return $this->company;
     }
 
-    public function setEnterprise(Enterprise $enterprise): self
+    public function setCompany(Company $company): self
     {
-        $this->enterprise = $enterprise;
+        $this->company = $company;
         return $this;
     }
 
@@ -56,6 +59,17 @@ class Representative
     public function setQualite(string $qualite): self
     {
         $this->qualite = $qualite;
+        return $this;
+    }
+
+    public function getCognitoId(): ?string
+    {
+        return $this->cognitoId;
+    }
+
+    public function setCognitoId(?string $cognitoId): self
+    {
+        $this->cognitoId = $cognitoId;
         return $this;
     }
 }

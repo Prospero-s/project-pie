@@ -75,6 +75,9 @@ test-all-db: test-db-local test-db-aws
 
 # Commandes pour les migrations
 
+load-dev-fixtures: ;\
+	$(SYMFONY) doctrine:f:load -n
+
 migrations-diff:
 	$(SYMFONY) doctrine:migrations:diff --formatted
 	sed -i '/CREATE SCHEMA public/d' migrations/Version*.php

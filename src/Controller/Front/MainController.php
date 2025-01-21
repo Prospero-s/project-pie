@@ -53,6 +53,17 @@ class MainController extends AbstractController
         ]);
     }
 
+    #[Route('/{lng}/companies', name: 'app_all_companies', requirements: ['lng' => 'fr|en'])]
+    public function allCompanies(Request $request, string $lng): Response
+    {
+        $request->getSession()->set('_locale', $lng);
+        
+        return $this->render('main/index.html.twig', [
+            'controller_name' => 'MainController',
+            'locale' => $lng
+        ]);
+    }
+
     #[Route('/',name: 'app_redirect')]
     public function redirectToLocale(Request $request): Response
     {
