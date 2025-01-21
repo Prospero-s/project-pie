@@ -1,4 +1,5 @@
 {
+    "name": "prospero-app",
     "type": "module",
     "private": true,
     "scripts": {
