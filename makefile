@@ -24,6 +24,7 @@ help:
 	@echo "  install           - Installer les dépendances avec Composer"
 	@echo "  cache-clear       - Vider le cache Symfony"
 	@echo "  migrations        - Exécuter les migrations de base de données"
+	@echo "  load-migrations   - Charger les migrations de base de données"
 	@echo "  test              - Exécuter les tests PHPUnit"
 	@echo "  test-db-local     - Vérifier la connexion à la base de données locale"
 	@echo "  test-db-aws       - Vérifier la connexion à la base de données AWS"
@@ -58,6 +59,9 @@ cache-clear:
 	$(SYMFONY) cache:clear
 
 migrations:
+	$(SYMFONY) doctrine:migrations:migrate --no-interaction
+
+load-migrations:
 	$(SYMFONY) doctrine:migrations:migrate --no-interaction
 
 test:

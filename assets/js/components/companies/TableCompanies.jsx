@@ -13,19 +13,22 @@ const TableCompanies = ({ i18n }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [pageSize] = useState(10);
-
+  const [uniqueSectors, setUniqueSectors] = useState([]);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 500);
 
     const fetchCompanies = async () => {
       try {
-        const data = await getAllCompanies(); // Appel API
-        setCompanies(data); // Définir les données
+        const data = await getAllCompanies();
+        setCompanies(data);
+        // Extraire les secteurs uniques des données
+        const sectors = [...new Set(data.map(company => company.sector))].filter(Boolean).sort();
+        setUniqueSectors(sectors);
       } catch (error) {
         console.error('Erreur lors de la récupération des entreprises :', error);
       } finally {
-        setLoading(false); // Terminer le chargement, succès ou erreur
+        setLoading(false);
       }
     };
 
@@ -39,6 +42,8 @@ const TableCompanies = ({ i18n }) => {
       title: t('company.name'),
       dataIndex: 'name',
       key: 'name',
+      sorter: (a, b) => a.name.localeCompare(b.name),
+      sortDirections: ['ascend', 'descend'],
       render: (text, record) =>
         loading ? (
           <Skeleton.Input block active size="small" />
@@ -59,6 +64,12 @@ const TableCompanies = ({ i18n }) => {
       title: t('company.sector'),
       dataIndex: 'sector',
       key: 'sector',
+      filters: uniqueSectors.map(sector => ({ text: sector, value: sector })),
+      onFilter: (value, record) => record.sector === value,
+      filterMode: 'menu',
+      filterSearch: true,
+      sorter: (a, b) => a.sector.localeCompare(b.sector),
+      sortDirections: ['ascend', 'descend'],
       render: (text) =>
         loading ? <Skeleton.Input block active size="small" /> : text,
     },
@@ -66,6 +77,8 @@ const TableCompanies = ({ i18n }) => {
       title: t('company.created_at'),
       dataIndex: 'created_at',
       key: 'created_at',
+      sorter: (a, b) => new Date(a.created_at) - new Date(b.created_at),
+      sortDirections: ['ascend', 'descend'],
       render: (date) =>
         loading ? (
           <Skeleton.Input block active size="small" />

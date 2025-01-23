@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Skeleton, Table, Tooltip } from 'antd';
+import { Button, Skeleton, Table, Tooltip, Select } from 'antd';
 import { DeleteOutlined, EyeOutlined, FileAddOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -15,11 +15,22 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
     return () => clearTimeout(timer);
   }, []);
 
+  const fundingTypes = [
+    'Seed',
+    'Série A',
+    'Série B',
+    'Série C',
+    'Série D',
+    'IPO'
+  ];
+
   const columns = [
     {
       title: t('company_details.company.name'),
       dataIndex: 'name',
       key: 'name',
+      sorter: (a, b) => a.name.localeCompare(b.name),
+      sortDirections: ['ascend', 'descend'],
       render: (text, record) =>
         loading ? (
           <Skeleton.Input block active size="small" />
@@ -40,6 +51,8 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
       title: t('company_details.company.sector'),
       dataIndex: 'sector',
       key: 'sector',
+      sorter: (a, b) => a.sector.localeCompare(b.sector),
+      sortDirections: ['ascend', 'descend'],
       render: (text) =>
         loading ? <Skeleton.Input block active size="small" /> : text,
     },
@@ -47,6 +60,8 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
       title: t('funding.amount'),
       dataIndex: 'amountRaised',
       key: 'amountRaised',
+      sorter: (a, b) => a.amountRaised - b.amountRaised,
+      sortDirections: ['ascend', 'descend'],
       render: (amount) =>
         loading ? (
           <Skeleton.Input block active size="small" />
@@ -58,6 +73,13 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
       title: t('funding.type'),
       dataIndex: 'fundingType',
       key: 'fundingType',
+      filters: fundingTypes.map(type => ({ text: type, value: type })),
+      onFilter: (value, record) => {
+        const normalizeStr = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        return normalizeStr(record.fundingType) === normalizeStr(value);
+      },
+      filterMode: 'menu',
+      filterSearch: true,
       render: (text) =>
         loading ? <Skeleton.Input block active size="small" /> : text,
     },
@@ -65,6 +87,8 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
       title: t('company_details.company.details.last_update'),
       dataIndex: 'lastUpdate',
       key: 'lastUpdate',
+      sorter: (a, b) => new Date(a.lastUpdate) - new Date(b.lastUpdate),
+      sortDirections: ['ascend', 'descend'],
       render: (date) =>
         loading ? (
           <Skeleton.Input block active size="small" />
