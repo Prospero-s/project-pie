@@ -3,7 +3,7 @@
   "entryPoints": {
     "app": {
       "js": [
-        "https://localhost:5173/build/assets/app.jsx"
+        "http://localhost:5173/build/assets/app.jsx"
       ]
     }
   },
@@ -15,5 +15,5 @@
     1,
     0
   ],
-  "viteServer": "https://localhost:5173"
+  "viteServer": "http://localhost:5173"
 }

@@ -1,10 +1,11 @@
-import React from 'react';
-import { DashboardOutlined, FolderOutlined, FileSearchOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { DashboardOutlined, FolderOutlined, FileSearchOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Layout, Menu, Divider } from 'antd';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import logoProspero from '@img/logo/logo-prospero-white.svg';
+import logoProspero from '@img/logo/logo-prospero-blue.svg';
+import logoIconProspero from '@img/logo/logo-icon-prospero-blue.svg';
 
 const { Sider } = Layout;
 
@@ -12,12 +13,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, i18n }) => {
   const { t } = useTranslation('menu', { i18n });
   const { pathname } = useLocation();
   const lng = i18n.language;
-  const [isMobile, setIsMobile] = React.useState(window.innerWidth < 640);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
+  // const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
 
   const activePath = pathname.split('/').pop();
 
-
-  React.useEffect(() => {
+  useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 640);
     };
@@ -44,18 +45,33 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, i18n }) => {
   ];
 
   return (
-    <Sider width={240} collapsible={!isMobile} collapsed={isMobile || sidebarOpen} onCollapse={setSidebarOpen}>
-      <div className="flex items-center justify-center p-4 h-24">
-        <img src={logoProspero} alt="Logo" className="h-12 w-auto" />
-        {!sidebarOpen && !isMobile && (
-          <span className="ml-3 text-white text-xl font-semibold">Prospero</span>
-        )}
+    <Sider
+      className="!bg-gray_100"
+      width={240}
+      collapsible={!isMobile}
+      collapsed={isMobile || !sidebarOpen}
+      onCollapse={(collapsed) => setSidebarOpen(!collapsed)}
+      trigger={null}
+    >
+      <div className="flex items-center justify-between h-16 px-4">
+        <img 
+          src={sidebarOpen ? logoProspero : logoIconProspero} 
+          alt="Logo" 
+          className="h-6 w-auto transition-all duration-300" 
+        />
+        <button
+          className="p-2 ml-2 bg-gray_200 text-black rounded-md hover:bg-blue-500 hover:text-white transition-all duration-300"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          {sidebarOpen ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+        </button>
       </div>
-      <Divider className="my-0 bg-gray-600" />
-      <Menu 
-        theme="dark" 
-        mode="inline" 
-        selectedKeys={[activePath]} 
+      <Divider className="my-0" />
+      <Menu
+        theme="light"
+        className="bg-gray_100 p-2"
+        mode="inline"
+        selectedKeys={[activePath]}
         items={menuItems}
       />
     </Sider>

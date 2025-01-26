@@ -10,7 +10,12 @@ const Dashboard = ({ i18n }) => {
     i18n.changeLanguage(lng);
   }, [lng, i18n]);
   
-  return <div>dashboard</div>;
+  return (
+    <div>
+      <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Welcome back</h2>
+      <p class="mt-4 text-gray-500">Track, manage and forecast your investments and manage your companies.</p>
+    </div>
+  );
 }
 
 export default Dashboard;
