@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/*		---- Colors ---- 	*/
+
+:root {
+  --gray-100-color: #FBFBFB;
+  --white-color: #FFFFFF;
+  --gray-900-color: #181D27;
+  --gray-600-color: #535862;
+  --success-500-color: #12B76A;
+  --success-700-color: #027A48;
+  --error-700-color: #B42318;
+}
+
+/*		---- Fonts ---- 	*/
+
+@font-face {
+  font-family: "Inter";
+  src: url("./fonts/Inter-VariableFont.ttf");
+}
+
 .ant-menu-item-selected {
-  background-color: rgba(255, 255, 255, 0.1) !important;
+  background-color: #f1f1f1 !important;
 }
