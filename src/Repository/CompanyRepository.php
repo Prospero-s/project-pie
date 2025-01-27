@@ -103,4 +103,100 @@ class CompanyRepository extends ServiceEntityRepository
             throw $e;
         }
     }
+
+    public function findByFilters(array $filters): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->leftJoin('c.investment', 'i')
+            ->where('c.deletedAt > :now')
+            ->setParameter('now', new \DateTime());
+
+        if (!empty($filters['sector'])) {
+            $qb->andWhere('c.sector = :sector')
+               ->setParameter('sector', $filters['sector']);
+        }
+
+        if (!empty($filters['fundingType'])) {
+            $qb->andWhere('i.fundingType = :fundingType')
+               ->setParameter('fundingType', $filters['fundingType']);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findByFiltersWithPagination(array $filters, int $page = 1, int $limit = 10, string $sortField = 'updatedAt', string $sortOrder = 'desc'): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->select('c', 'i')
+            ->leftJoin('c.investment', 'i')
+            ->where('c.deletedAt > :now')
+            ->setParameter('now', new \DateTime());
+
+        // Application des filtres multiples
+        if (!empty($filters['sector'])) {
+            if (is_array($filters['sector'])) {
+                $qb->andWhere('c.sector IN (:sectors)')
+                   ->setParameter('sectors', $filters['sector']);
+            } else {
+                $qb->andWhere('c.sector = :sector')
+                   ->setParameter('sector', $filters['sector']);
+            }
+        }
+
+        if (!empty($filters['fundingType'])) {
+            if (is_array($filters['fundingType'])) {
+                $qb->andWhere('i.fundingType IN (:fundingTypes)')
+                   ->setParameter('fundingTypes', $filters['fundingType']);
+            } else {
+                $qb->andWhere('i.fundingType = :fundingType')
+                   ->setParameter('fundingType', $filters['fundingType']);
+            }
+        }
+
+        // Gestion du tri
+        switch ($sortField) {
+            case 'amount':
+                $qb->orderBy('i.amount', $sortOrder);
+                break;
+            case 'updatedAt':
+                $qb->orderBy('c.updatedAt', $sortOrder);
+                break;
+            case 'denomination':
+                $qb->orderBy('c.denomination', $sortOrder);
+                break;
+            default:
+                $qb->orderBy('c.updatedAt', 'DESC');
+        }
+
+        // Calcul du total avant pagination
+        $countQb = clone $qb;
+        $total = count($countQb->getQuery()->getResult());
+
+        // Pagination
+        $qb->setFirstResult(($page - 1) * $limit)
+           ->setMaxResults($limit);
+
+        $results = $qb->getQuery()->getResult();
+
+        // Formatage des données
+        $formattedResults = array_map(function($company) {
+            return [
+                'id' => $company->getId(),
+                'denomination' => $company->getDenomination(),
+                'sector' => $company->getSector(),
+                'updatedAt' => $company->getUpdatedAt()->format('Y-m-d H:i:s'),
+                'investment' => $company->getInvestment() ? [
+                    'amount' => $company->getInvestment()->getAmount(),
+                    'fundingType' => $company->getInvestment()->getFundingType(),
+                ] : null,
+            ];
+        }, $results);
+
+        return [
+            'data' => $formattedResults,
+            'total' => $total,
+            'page' => $page,
+            'limit' => $limit
+        ];
+    }
 } 
