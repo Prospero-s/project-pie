@@ -137,48 +137,12 @@ const TableCompanies = ({ i18n }) => {
             rowClassName={(record, index) =>
               index % 2 === 0 ? '!bg-white' : '!bg-slate-50'
             }
-            size="small"
+            size="middle"
           />
         </div>
-        <TablePagination t={t} />
       </div>
     </>
   );
-};
-
-const TablePagination = ({ t }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 10;
-
-  const handlePrevious = () => {
-    setCurrentPage((prev) => Math.max(1, prev - 1));
-  };
-
-  const handleNext = () => {
-    setCurrentPage((prev) => Math.min(totalPages, prev + 1));
-  };
-
-  return (
-    <div className="flex justify-between items-center p-4 bg-white rounded-b-lg w-full">
-      <div className="flex items-center gap-2">
-        <Button 
-          onClick={handlePrevious}
-          disabled={currentPage === 1}
-        >
-          {t('common.previous')}
-        </Button>
-        <Button 
-          onClick={handleNext}
-          disabled={currentPage === totalPages}
-        >
-          {t('common.next')}
-        </Button>
-      </div>
-      <div className="flex items-center gap-2">
-        {t('common.page')} {currentPage} {t('common.of')} {totalPages}
-      </div>
-    </div>
-  );  
 };
 
 export default TableCompanies;
