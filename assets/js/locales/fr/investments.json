@@ -125,5 +125,8 @@
   "no_results": {
     "title": "Aucun résultat",
     "description": "Aucune startup ne correspond à vos filtres. Veuillez réessayer avec des filtres différents."
-  }
+  },
+  "investor": "Investisseur",
+  "investorRequired": "Veuillez sélectionner un investisseur",
+  "selectInvestor": "Sélectionner un investisseur"
 }

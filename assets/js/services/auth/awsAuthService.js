@@ -29,9 +29,11 @@ export const signInWithEmail = async (email, password, t, setUser, navigate, lng
   try {
     const cognitoUser = await Auth.signIn(email, password);
     
+    const userId = cognitoUser.idToken.payload.sub;
+
     // Formatage des données utilisateur
     const userData = {
-      id: cognitoUser.username,
+      id: userId,
       email: cognitoUser.attributes.email,
       user_metadata: {
         full_name: cognitoUser.attributes.name || '',

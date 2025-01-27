@@ -1,0 +1,38 @@
+{
+    "create-group-title": "Create a new group",
+    "group-name-placeholder": "Group name",
+    "invite-email": "Invite members",
+    "add-member": "Add member",
+    "remove-member": "Remove",
+    "invite-email-placeholder": "email@example.com",
+    "pending-invitations": "Pending invitations",
+    "invited-by": "Invited by",
+    "no-invitations": "No pending invitations",
+    "accept": "Accept",
+    "join-existing": "Join an existing group",
+    "create-new": "Create a new group",
+    "create": "Create",
+    "name": "Name",
+    "name-required": "Group name is required",
+    "notifications": {
+        "loading": "Loading...",
+        "error": {
+            "title": "Error",
+            "auth_headers": "Authentication error. Please sign in again.",
+            "load_invitations": "Error loading invitations. Please try again."
+        },
+        "create_success": {
+            "title": "Group created",
+            "description": "The group has been created successfully"
+        },
+        "create_error": {
+            "title": "Error",
+            "description": "An error occurred while creating the group"
+        }
+    },
+    "error": {
+        "invalid-email": "Invalid email address",
+        "invitation-exists": "An invitation has already been sent to this user"
+    },
+    "refresh": "Refresh"
+}

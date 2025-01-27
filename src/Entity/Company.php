@@ -14,9 +14,6 @@ class Company
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'text')]
-    private string $cognitoId;
-
     #[ORM\Column(length: 9, unique: true)]
     private string $siren;
 
@@ -50,12 +47,13 @@ class Company
     #[ORM\OneToMany(mappedBy: 'company', targetEntity: Representative::class)]
     private Collection $representatives;
 
-    #[ORM\OneToOne(mappedBy: 'company', cascade: ['persist', 'remove'])]
-    private ?CompanyInvestment $investment = null;
+    #[ORM\OneToMany(mappedBy: 'company', targetEntity: CompanyInvestment::class)]
+    private Collection $investments;
 
     public function __construct()
     {
         $this->representatives = new ArrayCollection();
+        $this->investments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -181,14 +179,27 @@ class Company
         return $this;
     }
 
-    public function getInvestment(): ?CompanyInvestment
+    public function getInvestments(): Collection
     {
-        return $this->investment;
+        return $this->investments;
     }
 
-    public function setInvestment(?CompanyInvestment $investment): self
+    public function addInvestment(CompanyInvestment $investment): self
     {
-        $this->investment = $investment;
+        if (!$this->investments->contains($investment)) {
+            $this->investments->add($investment);
+            $investment->setCompany($this);
+        }
+        return $this;
+    }
+
+    public function removeInvestment(CompanyInvestment $investment): self
+    {
+        if ($this->investments->removeElement($investment)) {
+            if ($investment->getCompany() === $this) {
+                $investment->setCompany(null);
+            }
+        }
         return $this;
     }
 
@@ -213,17 +224,6 @@ class Company
                 $representative->setCompany(null);
             }
         }
-        return $this;
-    }
-
-    public function getCognitoId(): string
-    {
-        return $this->cognitoId;
-    }
-
-    public function setCognitoId(string $cognitoId): self
-    {
-        $this->cognitoId = $cognitoId;
         return $this;
     }
 

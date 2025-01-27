@@ -24,27 +24,20 @@ const AddCompanyModal = ({ visible, onCancel, onAdd, t }) => {
 
   const handleFinish = async (fundingData) => {
     try {
-      // Combine company and funding data
       const completeData = {
         ...companyData,
         fundingType: fundingData.fundingType,
         amountRaised: fundingData.amountRaised,
-        currency: fundingData.currency || 'EUR'
+        currency: fundingData.currency || 'EUR',
+        investorId: fundingData.investorId
       };
 
       console.log('completeData', completeData);
-
-      // Save to database
       const savedCompany = await saveCompany(completeData);
-      
-      // Call the original onAdd callback
       onAdd({ ...companyData, ...fundingData });
-      
-      // Close modal
       handleCancel();
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
-      // L'erreur sera déjà gérée par le service via les notifications
     }
   };
 

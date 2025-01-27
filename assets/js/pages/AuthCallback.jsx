@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Auth, Hub } from 'aws-amplify';
 import { useUser } from '@/context/userContext';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -43,7 +44,48 @@ const AuthCallback = () => {
           try {
             const user = await Auth.currentAuthenticatedUser();
             console.log('Utilisateur authentifié:', user);
-            await handleSignIn(user);
+            
+            // Récupérer les tokens de session
+            const session = await Auth.currentSession();
+            const { idToken, accessToken } = session;
+            
+            // Utiliser le sub comme ID Cognito
+            const userId = idToken.payload.sub;
+            
+            const formattedUser = {
+              id: userId,
+              email: idToken.payload.email,
+              user_metadata: {
+                full_name: idToken.payload.name || '',
+                avatar_url: idToken.payload.picture || '',
+                email_verified: idToken.payload.email_verified === true,
+              },
+              app_metadata: {
+                roles: accessToken.payload['cognito:groups'] || []
+              }
+            };
+
+            // Configurer axios avec les headers
+            axios.defaults.headers.common['x-cognito-id'] = userId;
+            axios.defaults.headers.common['x-cognito-email'] = formattedUser.email;
+            axios.defaults.headers.common['Authorization'] = `Bearer ${idToken.getJwtToken()}`;
+
+            setUser(formattedUser);
+
+            // Vérifier si l'utilisateur appartient à un groupe
+            try {
+              const response = await axios.get('/api/user-groups');
+              const hasGroup = response.data.groups && response.data.groups.length > 0;
+
+              if (hasGroup) {
+                navigate(`/${i18n.language}/dashboard`, { replace: true });
+              } else {
+                navigate(`/${i18n.language}/group-selection`, { replace: true });
+              }
+            } catch (error) {
+              console.error('Erreur lors de la vérification des groupes:', error);
+              navigate(`/${i18n.language}/group-selection`, { replace: true });
+            }
           } catch (error) {
             console.error('Erreur lors de la récupération de l\'utilisateur:', error);
             redirectToSignIn();
@@ -60,30 +102,6 @@ const AuthCallback = () => {
 
     handleCallback();
   }, []);
-
-  const handleSignIn = async (userData) => {
-    try {
-      const cognitoUser = await Auth.currentAuthenticatedUser();
-      const formattedUser = {
-        id: cognitoUser.username,
-        email: cognitoUser.attributes.email,
-        user_metadata: {
-          full_name: cognitoUser.attributes.name || '',
-          avatar_url: cognitoUser.attributes.picture || '',
-          email_verified: cognitoUser.attributes.email_verified === true,
-        },
-        app_metadata: {
-          roles: cognitoUser.signInUserSession.accessToken.payload['cognito:groups'] || []
-        }
-      };
-
-      setUser(formattedUser);
-      navigate(`/${i18n.language}/dashboard`, { replace: true });
-    } catch (error) {
-      console.error('Erreur lors du traitement de l\'utilisateur:', error);
-      redirectToSignIn();
-    }
-  };
 
   const redirectToSignIn = () => {
     navigate(`/${i18n.language}/auth/signin`, { replace: true });

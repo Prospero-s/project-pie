@@ -67,7 +67,7 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
     }
 
     if (sorter.field) {
-      if (Array.isArray(sorter.field) && sorter.field[0] === 'investment' && sorter.field[1] === 'amount') {
+      if (Array.isArray(sorter.field) && sorter.field[0] === 'investment' && sorter.field[1] === 'totalAmount') {
         params.sortField = 'amount';
       } else {
         params.sortField = Array.isArray(sorter.field) ? sorter.field.join('.') : sorter.field;
@@ -152,17 +152,17 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
     },
     {
       title: t('funding.amount'),
-      dataIndex: ['investment', 'amount'],
+      dataIndex: ['investment', 'totalAmount'],
       key: 'amount',
       sorter: true,
       sortOrder: sortedInfo.columnKey === 'amount' ? sortedInfo.order : null,
       render: (_, record) => loading ? 
         <Skeleton.Input block active size="small" /> :
-        (record.investment?.amount ? `${Number(record.investment.amount).toLocaleString()} €` : '-')
+        (record.investment?.totalAmount ? `${Number(record.investment.totalAmount).toLocaleString()} €` : '-')
     },
     {
       title: t('funding.type'),
-      dataIndex: 'investment',
+      dataIndex: ['investment', 'lastFundingType'],
       key: 'fundingType',
       filters: [
         { text: t('funding.types.seed'), value: 'seed' },
@@ -173,10 +173,10 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
         { text: t('funding.types.ipo'), value: 'ipo' },
       ],
       filteredValue: activeFilters.fundingType,
-      render: (investment) => loading ? (
+      render: (_, record) => loading ? (
         <Skeleton.Input block active size="small" />
       ) : (
-        investment?.fundingType ? t(`funding.types.${investment.fundingType}`) : '-'
+        record.investment?.lastFundingType ? t(`funding.types.${record.investment.lastFundingType}`) : '-'
       ),
     },
     {
