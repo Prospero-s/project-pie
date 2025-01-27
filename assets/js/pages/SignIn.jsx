@@ -97,10 +97,13 @@ const SignIn = ({ i18n }) => {
   };
 
   return (
-    <div className="w-full p-2 sm:p-6" ref={formRef}>
-      <h2 className="mb-8 text-2xl font-bold text-black text-center">
-        {t('login_title')}
+    <div className="w-full" ref={formRef}>
+      <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+        Se connecter
       </h2>
+      <p className="text-gray-600 text-sm mb-6">
+        Bienvenue ! Veuillez entrer vos informations.
+      </p>
       <SignInForm
         t={t}
         email={email}
@@ -112,24 +115,35 @@ const SignIn = ({ i18n }) => {
         loading={loading}
         handleForgotPassword={handleForgotPassword}
       />
-      <div className="flex items-center justify-center mb-4 mt-4">
-        <span className="text-gray-500">{t('or_connect_with')}</span>
+      <div className="mt-6">
+        <Button
+          onClick={() => signInWithProvider('Google', lng, t)}
+          disabled={loading}
+          className="w-full h-10 flex items-center justify-center gap-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors text-sm"
+        >
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+          Continuer avec Google
+        </Button>
       </div>
-      <SignInButtons
-        t={t}
-        signInWithGoogle={() => signInWithProvider('Google', lng, t)}
-        signInWithMicrosoft={handleMicrosoftSignIn}
-        loading={loading}
-      />
+      <div className="mt-2">
+        <Button
+          onClick={() => signInWithProvider('Microsoft', lng, t)}
+          disabled={loading}
+          className="w-full h-10 flex items-center justify-center gap-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors text-sm"
+        >
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/microsoft.svg" alt="Microsoft" className="w-5 h-5" />
+          Continuer avec Microsoft
+        </Button>
+      </div>
       <div className="mt-6 text-center">
-        <p>
-          {t('no_account')}{' '}
+        <p className="text-sm text-gray-600">
+          Vous n'avez pas de compte ?{' '}
           <Button
             type="link"
             href={`/${lng}/auth/signup`}
-            className="text-primary text-base !p-0"
+            className="text-primary hover:text-primary/80 font-medium !p-0"
           >
-            {t('create_account')}
+            Créer un compte
           </Button>
         </p>
       </div>
