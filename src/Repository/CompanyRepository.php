@@ -37,9 +37,7 @@ class CompanyRepository extends ServiceEntityRepository
                 $company->setBusinessStructures($data['businessStructures'] ?? null);
                 $company->setCodeApe($data['codeApe'] ?? null);
                 $company->setSiret($data['siret'] ?? null);
-                $company->setUpdatedAt($data['updatedAt'] ?? new \DateTime("9999-12-31 23:59:59"));
-                $company->setCreatedAt(new \DateTime());
-                $company->setDeletedAt(new \DateTime("9999-12-31 23:59:59"));
+                $company->setUpdatedAt(new \DateTime());
                 $company->setSector($data['sector'] ?? null);
                 //Création des représentants
                 foreach ($data['representants'] as $representant) {
@@ -108,8 +106,7 @@ class CompanyRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('c')
             ->leftJoin('c.investment', 'i')
-            ->where('c.deletedAt > :now')
-            ->setParameter('now', new \DateTime());
+            ->where('c.deletedAt is NULL');
 
         if (!empty($filters['sector'])) {
             $qb->andWhere('c.sector = :sector')
@@ -129,8 +126,7 @@ class CompanyRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('c')
             ->select('c', 'i')
             ->leftJoin('c.investment', 'i')
-            ->where('c.deletedAt > :now')
-            ->setParameter('now', new \DateTime());
+            ->where('c.deletedAt is NULL');
 
         // Application des filtres multiples
         if (!empty($filters['sector'])) {
