@@ -12,6 +12,8 @@ import frInvestments from './locales/fr/investments.json';
 import enInvestments from './locales/en/investments.json';
 import frAllCompanies from './locales/fr/allCompanies.json';
 import enAllCompanies from './locales/en/allCompanies.json';
+import enGlobal from './locales/en/global.json';
+import frGlobal from './locales/fr/global.json';
 
 i18n
   .use(initReactI18next)
@@ -23,6 +25,7 @@ i18n
         menu: frMenu,
         investments: frInvestments,
         allCompanies: frAllCompanies,
+        global: frGlobal,
       },
       en: {
         signin: enSignIn,
@@ -30,6 +33,7 @@ i18n
         menu: enMenu,
         investments: enInvestments,
         allCompanies: enAllCompanies,
+        global: enGlobal,
       },
     },
     lng: 'fr',
