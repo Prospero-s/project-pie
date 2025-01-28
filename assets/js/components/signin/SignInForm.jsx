@@ -6,7 +6,7 @@ import PasswordField from '@/components/common/field/PasswordField';
 const SignInForm = ({ t, email, setEmail, password, setPassword, handleSignIn, isFormValid, loading, handleForgotPassword }) => (
   <form onSubmit={handleSignIn} className="space-y-4">
     <div className="space-y-1.5">
-      <label className="block text-sm font-medium text-gray-700">Email</label>
+      <label className="block text-sm font-medium text-gray-700">{t('email')}</label>
       <InputField
         value={email}
         onChange={e => setEmail(e.target.value)}
@@ -15,7 +15,7 @@ const SignInForm = ({ t, email, setEmail, password, setPassword, handleSignIn, i
       />
     </div>
     <div className="space-y-1.5">
-      <label className="block text-sm font-medium text-gray-700">Mot de passe</label>
+      <label className="block text-sm font-medium text-gray-700">{t('password')}</label>
       <PasswordField
         value={password}
         onChange={e => setPassword(e.target.value)}
@@ -24,13 +24,13 @@ const SignInForm = ({ t, email, setEmail, password, setPassword, handleSignIn, i
       />
     </div>
     <div className="flex items-center justify-between">
-      <Checkbox className="text-sm text-gray-600">Se souvenir de moi pour 30 jours</Checkbox>
+      <Checkbox className="text-sm text-gray-600">{t('remember_me')}</Checkbox>
       <Button
         onClick={handleForgotPassword}
         type="link"
         className="text-sm text-primary hover:text-primary/80 p-0"
       >
-        Mot de passe oublié
+        {t('forgot_password_text')}
       </Button>
     </div>
     <Button
@@ -41,7 +41,7 @@ const SignInForm = ({ t, email, setEmail, password, setPassword, handleSignIn, i
         isFormValid() ? 'hover:bg-opacity-90' : 'opacity-50 cursor-not-allowed'
       }`}
     >
-      Se connecter
+      {t('login')}
     </Button>
   </form>
 );

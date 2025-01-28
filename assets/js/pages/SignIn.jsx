@@ -98,12 +98,14 @@ const SignIn = ({ i18n }) => {
 
   return (
     <div className="w-full" ref={formRef}>
-      <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-        Se connecter
-      </h2>
-      <p className="text-gray-600 text-sm mb-6">
-        Bienvenue ! Veuillez entrer vos informations.
-      </p>
+      <div className='mb-8'>
+        <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+          {t('login_title')}
+        </h2>
+        <h4 className="text-gray-600 text-md mb-6">
+          {t('login_subtitle')}
+        </h4>
+      </div>
       <SignInForm
         t={t}
         email={email}
@@ -122,7 +124,7 @@ const SignIn = ({ i18n }) => {
           className="w-full h-10 flex items-center justify-center gap-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors text-sm"
         >
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
-          Continuer avec Google
+          {t('continue_with_google')}
         </Button>
       </div>
       <div className="mt-2">
@@ -132,18 +134,18 @@ const SignIn = ({ i18n }) => {
           className="w-full h-10 flex items-center justify-center gap-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors text-sm"
         >
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/microsoft.svg" alt="Microsoft" className="w-5 h-5" />
-          Continuer avec Microsoft
+          {t('continue_with_microsoft')}
         </Button>
       </div>
       <div className="mt-6 text-center">
         <p className="text-sm text-gray-600">
-          Vous n'avez pas de compte ?{' '}
+          {t('no_account')}{' '}
           <Button
             type="link"
             href={`/${lng}/auth/signup`}
             className="text-primary hover:text-primary/80 font-medium !p-0"
           >
-            Créer un compte
+            {t('create_account')}
           </Button>
         </p>
       </div>

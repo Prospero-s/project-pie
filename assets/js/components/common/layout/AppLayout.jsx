@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Spin } from 'antd';
 
-import Sidebar from '../menu/Sidebar';
-import AppHeader from '../menu/Header';
+import Sidebar from '@/components/common/menu/Sidebar';
+import AppHeader from '@/components/common/menu/Header';
 import { useUser } from '@/context/userContext';
 import { useParams } from 'react-router-dom';
 import { LoadingOutlined } from '@ant-design/icons';
 import logoProspero from '@img/logo/logo-icon-prospero-blue.svg';
+import FooterLayout from '@/components/common/layout/Footer';
 
-const { Content, Footer } = Layout;
+const { Content } = Layout;
 
 export default function AppLayout({ i18n, children }) {
   const { user, setUser } = useUser();
@@ -45,9 +46,7 @@ export default function AppLayout({ i18n, children }) {
               {children}
             </div>
           </Content>
-          <Footer style={{ textAlign: 'center' }}>
-            © 2024 - {new Date().getFullYear()} | Tous droits réservés par Prospero - Projet PIE
-          </Footer>
+          <FooterLayout i18n={i18n} isDashboard={true} />
         </Layout>
       </Layout>
     </>

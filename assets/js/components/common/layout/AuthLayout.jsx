@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import illustrationLogin from '@img/illustration/illustration-login.webp';
 import logoProspero from '@img/logo/logo-icon-prospero-blue.svg';
 import { useUser } from '@/context/userContext';
+import FooterLayout from '@/components/common/layout/Footer';
 
 const AuthLayout = ({ children, i18n }) => {
   const { user, loading } = useUser();
@@ -29,9 +30,7 @@ const AuthLayout = ({ children, i18n }) => {
             {children}
           </div>
         </div>
-        <div className="px-8 py-6 lg:px-12">
-          <span className="text-sm text-gray-500">© Prospero 2025</span>
-        </div>
+        <FooterLayout i18n={i18n} isDashboard={false} />
       </div>
       <div className="hidden lg:block lg:w-1/2 relative bg-gray-50">
         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[90%] aspect-[16/10] rounded-lg rounded-r-none shadow-xl overflow-hidden border-4 border-r-0 border-black">
