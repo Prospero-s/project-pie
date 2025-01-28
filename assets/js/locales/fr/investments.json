@@ -11,7 +11,8 @@
     "of": "sur",
     "search": "Rechercher",
     "back": "Retour",
-    "confirm": "Confirmer"
+    "confirm": "Confirmer",
+    "reset_filters": "Réinitialiser les filtres"
   },
   "creation": {
     "title": "Création d'entreprise",
@@ -116,5 +117,13 @@
     "title": "Actions",
     "view_details": "Voir les détails",
     "add_investment": "Ajouter un investissement"
+  },
+  "no_investments": {
+    "title": "Aucun investissement",
+    "description": "Vous n'avez pas encore d'investissement. Commencez par en ajouter un !"
+  },
+  "no_results": {
+    "title": "Aucun résultat",
+    "description": "Aucune startup ne correspond à vos filtres. Veuillez réessayer avec des filtres différents."
   }
 }

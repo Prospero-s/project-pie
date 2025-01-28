@@ -96,8 +96,11 @@ const AddCompanyModal = ({ visible, onCancel, onAdd, t }) => {
       width={1200}
       centered
       className="!max-w-[100vw]"
+      style={{
+        top: 20,
+      }}
     >
-      <div className="flex flex-col">
+      <div className="flex flex-col mt-8">
         <Steps current={currentStep} items={steps} className="mb-8" />
         <div className="flex-grow">
           {steps[currentStep].content}

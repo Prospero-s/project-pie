@@ -1,100 +1,199 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Skeleton, Table, Tooltip, Select } from 'antd';
-import { DeleteOutlined, EyeOutlined, FileAddOutlined } from '@ant-design/icons';
+import { Button, Skeleton, Table, Tooltip, Select, message } from 'antd';
+import { DeleteOutlined, EyeOutlined, FileAddOutlined, InboxOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import startupsMock from '@/mocks/investements/startupsMock';
+import { fetchInvestments } from '@/services/investment/investmentService';
 import AddCompanyModal from './AddCompanyModal';
 
 const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
   const { t } = useTranslation('investments', { i18n });
   const [loading, setLoading] = useState(true);
+  const [investments, setInvestments] = useState([]);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0
+  });
+  const [sortedInfo, setSortedInfo] = useState({});
+  const [activeFilters, setActiveFilters] = useState({
+    sector: [],
+    fundingType: []
+  });
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 500);
-    return () => clearTimeout(timer);
+    loadInvestments({
+      page: 1,
+      limit: 10,
+      sortField: 'updatedAt',
+      sortOrder: 'desc'
+    });
   }, []);
 
-  const fundingTypes = [
-    'Seed',
-    'Série A',
-    'Série B',
-    'Série C',
-    'Série D',
-    'IPO'
-  ];
+  const loadInvestments = async (params = {}) => {
+    try {
+      setLoading(true);
+      const response = await fetchInvestments(params);
+      setInvestments(response.data);
+      setPagination({
+        current: response.page,
+        pageSize: response.limit,
+        total: response.total
+      });
+      if (params.sortField) {
+        setSortedInfo({
+          columnKey: params.sortField.includes('.') ? params.sortField.split('.')[1] : params.sortField,
+          order: params.sortOrder === 'asc' ? 'ascend' : 'descend'
+        });
+      }
+    } catch (error) {
+      message.error(t('common.error_loading'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTableChange = (pagination, filters, sorter) => {
+    const params = {
+      page: pagination.current,
+      limit: pagination.pageSize,
+    };
+
+    if (filters.sector?.length > 0) {
+      params.sector = filters.sector;
+    }
+    if (filters.fundingType?.length > 0) {
+      params.fundingType = filters.fundingType;
+    }
+
+    if (sorter.field) {
+      if (Array.isArray(sorter.field) && sorter.field[0] === 'investment' && sorter.field[1] === 'amount') {
+        params.sortField = 'amount';
+      } else {
+        params.sortField = Array.isArray(sorter.field) ? sorter.field.join('.') : sorter.field;
+      }
+      params.sortOrder = sorter.order === 'ascend' ? 'asc' : 'desc';
+    }
+
+    setActiveFilters({
+      sector: filters.sector || [],
+      fundingType: filters.fundingType || []
+    });
+
+    setSortedInfo({
+      columnKey: Array.isArray(sorter.field) ? sorter.field[1] : sorter.field,
+      order: sorter.order
+    });
+
+    loadInvestments(params);
+  };
+
+  const handleReset = () => {
+    setActiveFilters({
+      sector: [],
+      fundingType: []
+    });
+    setSortedInfo({
+      columnKey: null,
+      order: null
+    });
+    setPagination({
+      ...pagination,
+      current: 1
+    });
+    
+    // Recharger les données avec les paramètres par défaut
+    loadInvestments({
+      page: 1,
+      limit: pagination.pageSize,
+      sortField: 'updatedAt',
+      sortOrder: 'desc'
+    });
+  };
 
   const columns = [
     {
       title: t('company_details.company.name'),
-      dataIndex: 'name',
-      key: 'name',
-      sorter: (a, b) => a.name.localeCompare(b.name),
-      sortDirections: ['ascend', 'descend'],
-      render: (text, record) =>
-        loading ? (
-          <Skeleton.Input block active size="small" />
-        ) : (
+      dataIndex: 'denomination',
+      key: 'denomination',
+      sorter: true,
+      sortOrder: sortedInfo.columnKey === 'denomination' ? sortedInfo.order : null,
+      render: (text, record) => (
+        loading ? <Skeleton.Input block active size="small" /> :
+        <Link to={`/investements/${record.id}`}>
           <div className="flex items-center gap-4">
-            <Link to={`/investements/${record.id}`} className="flex items-center gap-4">
-              <img
-                src={record.logo}
-                alt={record.name}
-                className="w-10 h-10 rounded-full"
-              />
-              <span>{text}</span>
-            </Link>
+            <img
+              src={record?.company?.logo ?? "https://www.adaptivewfs.com/wp-content/uploads/2020/07/logo-placeholder-image.png"}
+              alt={record?.company?.name ?? "company-default-logo"}
+              className="w-10 h-10 rounded-full"
+            />
+            <span>{text || '-'}</span>
           </div>
-        ),
+        </Link>
+      )
     },
     {
       title: t('company_details.company.sector'),
       dataIndex: 'sector',
       key: 'sector',
-      sorter: (a, b) => a.sector.localeCompare(b.sector),
-      sortDirections: ['ascend', 'descend'],
-      render: (text) =>
-        loading ? <Skeleton.Input block active size="small" /> : text,
+      filters: [
+        { text: t('company_details.sectors.technology'), value: 'technology' },
+        { text: t('company_details.sectors.healthcare'), value: 'healthcare' },
+        { text: t('company_details.sectors.finance'), value: 'finance' },
+        { text: t('company_details.sectors.retail'), value: 'retail' },
+        { text: t('company_details.sectors.manufacturing'), value: 'manufacturing' },
+        { text: t('company_details.sectors.energy'), value: 'energy' },
+        { text: t('company_details.sectors.education'), value: 'education' },
+      ],
+      filteredValue: activeFilters.sector,
+      render: (sector) => loading ? 
+        <Skeleton.Input block active size="small" /> :
+        (sector ? t(`company_details.sectors.${sector}`) : '-')
     },
     {
       title: t('funding.amount'),
-      dataIndex: 'amountRaised',
-      key: 'amountRaised',
-      sorter: (a, b) => a.amountRaised - b.amountRaised,
-      sortDirections: ['ascend', 'descend'],
-      render: (amount) =>
-        loading ? (
-          <Skeleton.Input block active size="small" />
-        ) : (
-          `${amount.toLocaleString()} €`
-        ),
+      dataIndex: ['investment', 'amount'],
+      key: 'amount',
+      sorter: true,
+      sortOrder: sortedInfo.columnKey === 'amount' ? sortedInfo.order : null,
+      render: (_, record) => loading ? 
+        <Skeleton.Input block active size="small" /> :
+        (record.investment?.amount ? `${Number(record.investment.amount).toLocaleString()} €` : '-')
     },
     {
       title: t('funding.type'),
-      dataIndex: 'fundingType',
+      dataIndex: 'investment',
       key: 'fundingType',
-      filters: fundingTypes.map(type => ({ text: type, value: type })),
-      onFilter: (value, record) => {
-        const normalizeStr = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-        return normalizeStr(record.fundingType) === normalizeStr(value);
-      },
-      filterMode: 'menu',
-      filterSearch: true,
-      render: (text) =>
-        loading ? <Skeleton.Input block active size="small" /> : text,
+      filters: [
+        { text: t('funding.types.seed'), value: 'seed' },
+        { text: t('funding.types.serieA'), value: 'serieA' },
+        { text: t('funding.types.serieB'), value: 'serieB' },
+        { text: t('funding.types.serieC'), value: 'serieC' },
+        { text: t('funding.types.growth'), value: 'growth' },
+        { text: t('funding.types.ipo'), value: 'ipo' },
+      ],
+      filteredValue: activeFilters.fundingType,
+      render: (investment) => loading ? (
+        <Skeleton.Input block active size="small" />
+      ) : (
+        investment?.fundingType ? t(`funding.types.${investment.fundingType}`) : '-'
+      ),
     },
     {
       title: t('company_details.company.details.last_update'),
-      dataIndex: 'lastUpdate',
-      key: 'lastUpdate',
-      sorter: (a, b) => new Date(a.lastUpdate) - new Date(b.lastUpdate),
-      sortDirections: ['ascend', 'descend'],
-      render: (date) =>
-        loading ? (
-          <Skeleton.Input block active size="small" />
-        ) : (
-          new Date(date).toLocaleDateString()
-        ),
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
+      sorter: true,
+      sortOrder: sortedInfo.columnKey === 'updatedAt' ? sortedInfo.order : null,
+      render: (date) => loading ? (
+        <Skeleton.Input block active size="small" />
+      ) : (
+        date ? new Date(date).toLocaleDateString('fr-FR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        }) : '-'
+      ),
     },
     {
       title: t('actions.title'),
@@ -122,14 +221,19 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
     console.log('Suppression de la startup avec l\'ID:', id);
   };
 
-  const handleAdd = async () => {
-    setIsModalOpen(true);
+  const handleAdd = async (newInvestment) => {
+    // Fermer la modal
+    setIsModalOpen(false);
+    
+    // Recharger les données avec les paramètres actuels
+    await loadInvestments({
+      page: pagination.current,
+      limit: pagination.pageSize,
+      sortField: sortedInfo.columnKey || 'updatedAt',
+      sortOrder: sortedInfo.order ? (sortedInfo.order === 'ascend' ? 'asc' : 'desc') : 'desc',
+      ...activeFilters
+    });
   };
-
-  const dataSource = startupsMock.map((startup, index) => ({
-    key: index,
-    ...startup,
-  }));
 
   return (
     <>
@@ -140,56 +244,65 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
         t={t}
       />
       <div className="rounded-lg border border-slate-200 flex flex-col w-full">
-        <div className="overflow-x-auto">
-          <Table
-            columns={columns}
-            dataSource={loading ? Array(5).fill({}) : dataSource}
-            pagination={false}
-            rowClassName={(record, index) =>
-              index % 2 === 0 ? '!bg-white' : '!bg-slate-50'
-            }
-            size="small"
-          />
-        </div>
-        <TablePagination t={t} />
+        {loading ? (
+          <div className="flex items-center justify-center p-8">
+            <div className="text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-4"></div>
+              <p className="text-gray-600">{t('common.loading')}</p>
+            </div>
+          </div>
+        ) : investments.length === 0 && !Object.values(activeFilters).some(filter => filter.length > 0) ? (
+          <div className="flex flex-col items-center justify-center p-8 text-center">
+            <div className="bg-gray-50 rounded-full p-4 mb-4">
+              <InboxOutlined className="text-4xl text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              {t('no_investments.title')}
+            </h3>
+            <p className="text-gray-600 mb-4">
+              {t('no_investments.description')}
+            </p>
+            <Button type="primary" onClick={() => setIsModalOpen(true)}>
+              {t('common.add')}
+            </Button>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <Table
+              columns={columns}
+              size="middle"
+              dataSource={investments}
+              loading={loading}
+              onChange={handleTableChange}
+              pagination={pagination}
+              sortDirections={['ascend', 'descend']}
+              rowClassName={(record, index) =>
+                index % 2 === 0 ? '!bg-white hover:!bg-blue-50' : '!bg-slate-50 hover:!bg-blue-50'
+              }
+              locale={{
+                emptyText: (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <div className="bg-gray-50 rounded-full p-4 mb-4">
+                      <InboxOutlined className="text-4xl text-blue-500" />
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      {t('no_results.title')}
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      {t('no_results.description')}
+                    </p>
+                    <Button onClick={handleReset} type="primary">
+                      {t('common.reset_filters')}
+                    </Button>
+                  </div>
+                )
+              }}
+            />
+          </div>
+        )}
       </div>
     </>
   );
-};
-
-const TablePagination = ({ t }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 10;
-
-  const handlePrevious = () => {
-    setCurrentPage((prev) => Math.max(1, prev - 1));
-  };
-
-  const handleNext = () => {
-    setCurrentPage((prev) => Math.min(totalPages, prev + 1));
-  };
-
-  return (
-    <div className="flex justify-between items-center p-4 bg-white rounded-b-lg w-full">
-      <div className="flex items-center gap-2">
-        <Button 
-          onClick={handlePrevious}
-          disabled={currentPage === 1}
-        >
-          {t('common.previous')}
-        </Button>
-        <Button 
-          onClick={handleNext}
-          disabled={currentPage === totalPages}
-        >
-          {t('common.next')}
-        </Button>
-      </div>
-      <div className="flex items-center gap-2">
-        {t('common.page')} {currentPage} {t('common.of')} {totalPages}
-      </div>
-    </div>
-  );  
 };
 
 export default TableInvestments;
