@@ -116,170 +116,119 @@ class CompanyRepository extends ServiceEntityRepository
 
     public function findByFiltersWithPagination(array $filters, string $cognitoId, int $page = 1, int $limit = 10, string $sortField = 'updatedAt', string $sortOrder = 'desc'): array
     {
-        $qb = $this->createQueryBuilder('c')
-            ->select(
-                'c as company',
-                '(SELECT SUM(inv_sum.amount) 
-                  FROM App\Entity\CompanyInvestment inv_sum 
-                  JOIN inv_sum.user usr_sum 
-                  JOIN usr_sum.userGroup grp_sum 
-                  WHERE inv_sum.company = c.id 
-                  AND grp_sum.id = (
-                      SELECT g_sum.id 
-                      FROM App\Entity\User u_sum 
-                      JOIN u_sum.userGroup g_sum 
-                      WHERE u_sum.cognitoId = :cognitoId
-                  )
-                ) as group_total_amount',
-                '(SELECT inv_last.fundingType 
-                  FROM App\Entity\CompanyInvestment inv_last 
-                  JOIN inv_last.user usr_last 
-                  JOIN usr_last.userGroup grp_last 
-                  WHERE inv_last.company = c.id 
-                  AND grp_last.id = (
-                      SELECT g_last.id 
-                      FROM App\Entity\User u_last 
-                      JOIN u_last.userGroup g_last 
-                      WHERE u_last.cognitoId = :cognitoId
-                  )
-                  AND inv_last.investedAt = (
-                      SELECT MAX(inv_max.investedAt)
-                      FROM App\Entity\CompanyInvestment inv_max
-                      JOIN inv_max.user usr_max
-                      JOIN usr_max.userGroup grp_max
-                      WHERE inv_max.company = c.id
-                      AND grp_max.id = grp_last.id
-                  )
-                ) as last_funding_type'
-            )
-            ->leftJoin('c.investments', 'i_main')
-            ->leftJoin('i_main.user', 'main_user')
-            ->leftJoin('main_user.userGroup', 'main_group')
-            ->where('c.deletedAt > :now')
-            ->andWhere('main_user IN (
-                SELECT DISTINCT u_filter
-                FROM App\Entity\User u_filter
-                LEFT JOIN u_filter.userGroup g_filter
-                WHERE u_filter.cognitoId = :cognitoId
-                OR g_filter.id IN (
-                    SELECT g_sub.id
-                    FROM App\Entity\UserGroup g_sub
-                    JOIN g_sub.users u_sub
-                    WHERE u_sub.cognitoId = :cognitoId
+        try {
+            $qb = $this->createQueryBuilder('c')
+                ->select(
+                    'c as company',
+                    '(SELECT COALESCE(SUM(inv_sum.amount), 0) 
+                      FROM App\Entity\CompanyInvestment inv_sum 
+                      JOIN inv_sum.user usr_sum 
+                      JOIN usr_sum.userGroup grp_sum 
+                      WHERE inv_sum.company = c.id 
+                      AND grp_sum.id = (
+                          SELECT DISTINCT g_sum.id 
+                          FROM App\Entity\User u_sum 
+                          JOIN u_sum.userGroup g_sum 
+                          WHERE u_sum.cognitoId = :cognitoId
+                      )
+                    ) as group_total_amount',
+                    '(SELECT MAX(inv_last.fundingType) 
+                      FROM App\Entity\CompanyInvestment inv_last 
+                      JOIN inv_last.user usr_last 
+                      JOIN usr_last.userGroup grp_last 
+                      WHERE inv_last.company = c.id 
+                      AND grp_last.id = (
+                          SELECT DISTINCT g_last.id 
+                          FROM App\Entity\User u_last 
+                          JOIN u_last.userGroup g_last 
+                          WHERE u_last.cognitoId = :cognitoId
+                      )
+                    ) as last_funding_type'
                 )
-            )')
-            ->setParameter('now', new \DateTime())
-            ->setParameter('cognitoId', $cognitoId)
-            ->groupBy('c.id');
+                ->join('c.investments', 'i_main')
+                ->join('i_main.user', 'main_user')
+                ->join('main_user.userGroup', 'main_group')
+                ->where('main_group.id = (
+                    SELECT DISTINCT g.id 
+                    FROM App\Entity\User u 
+                    JOIN u.userGroup g 
+                    WHERE u.cognitoId = :cognitoId
+                )')
+                ->setParameter('cognitoId', $cognitoId)
+                ->groupBy('c.id');
 
-        // Application des filtres multiples
-        if (!empty($filters['sector'])) {
-            if (is_array($filters['sector'])) {
+            // Application des filtres
+            if (!empty($filters['sector'])) {
                 $qb->andWhere('c.sector IN (:sectors)')
                    ->setParameter('sectors', $filters['sector']);
-            } else {
-                $qb->andWhere('c.sector = :sector')
-                   ->setParameter('sector', $filters['sector']);
             }
-        }
 
-        if (!empty($filters['fundingType'])) {
-            if (is_array($filters['fundingType'])) {
-                $fundingTypeConditions = [];
-                foreach ($filters['fundingType'] as $key => $type) {
-                    $paramName = 'fundingType_' . $key;
-                    $fundingTypeConditions[] = "(SELECT inv_ft{$key}.fundingType 
-                        FROM App\Entity\CompanyInvestment inv_ft{$key} 
-                        JOIN inv_ft{$key}.user usr_ft{$key} 
-                        JOIN usr_ft{$key}.userGroup grp_ft{$key} 
-                        WHERE inv_ft{$key}.company = c.id 
-                        AND grp_ft{$key}.id = (
-                            SELECT g_ft{$key}.id 
-                            FROM App\Entity\User u_ft{$key} 
-                            JOIN u_ft{$key}.userGroup g_ft{$key} 
-                            WHERE u_ft{$key}.cognitoId = :cognitoId
-                        )
-                        AND inv_ft{$key}.investedAt = (
-                            SELECT MAX(inv_ftmax{$key}.investedAt)
-                            FROM App\Entity\CompanyInvestment inv_ftmax{$key}
-                            JOIN inv_ftmax{$key}.user usr_ftmax{$key}
-                            JOIN usr_ftmax{$key}.userGroup grp_ftmax{$key}
-                            WHERE inv_ftmax{$key}.company = c.id
-                            AND grp_ftmax{$key}.id = grp_ft{$key}.id
-                        )
-                    ) = :{$paramName}";
-                    $qb->setParameter($paramName, $type);
-                }
-                $qb->andWhere('(' . implode(' OR ', $fundingTypeConditions) . ')');
-            } else {
-                $qb->andWhere('(SELECT inv_single.fundingType 
-                    FROM App\Entity\CompanyInvestment inv_single 
-                    JOIN inv_single.user usr_single 
-                    JOIN usr_single.userGroup grp_single 
-                    WHERE inv_single.company = c.id 
-                    AND grp_single.id = (
-                        SELECT g_single.id 
-                        FROM App\Entity\User u_single 
-                        JOIN u_single.userGroup g_single 
-                        WHERE u_single.cognitoId = :cognitoId
-                    )
-                    AND inv_single.investedAt = (
-                        SELECT MAX(inv_smax.investedAt)
-                        FROM App\Entity\CompanyInvestment inv_smax
-                        JOIN inv_smax.user usr_smax
-                        JOIN usr_smax.userGroup grp_smax
-                        WHERE inv_smax.company = c.id
-                        AND grp_smax.id = grp_single.id
-                    )
-                ) = :fundingType')
-                ->setParameter('fundingType', $filters['fundingType']);
+            if (!empty($filters['fundingType'])) {
+                $qb->andWhere('i_main.fundingType IN (:fundingTypes)')
+                   ->setParameter('fundingTypes', $filters['fundingType']);
             }
-        }
 
-        // Gestion du tri
-        switch ($sortField) {
-            case 'amount':
-                $qb->orderBy('group_total_amount', $sortOrder);
-                break;
-            case 'updatedAt':
-                $qb->orderBy('c.updatedAt', $sortOrder);
-                break;
-            case 'denomination':
-                $qb->orderBy('c.denomination', $sortOrder);
-                break;
-            default:
-                $qb->orderBy('c.updatedAt', 'DESC');
-        }
+            // Gestion du tri
+            switch ($sortField) {
+                case 'amount':
+                    $qb->orderBy('group_total_amount', $sortOrder);
+                    break;
+                case 'updatedAt':
+                    $qb->orderBy('c.updatedAt', $sortOrder);
+                    break;
+                case 'denomination':
+                    $qb->orderBy('c.denomination', $sortOrder);
+                    break;
+                default:
+                    $qb->orderBy('c.updatedAt', 'DESC');
+            }
 
-        // Calcul du total avant pagination
-        $countQb = clone $qb;
-        $total = count($countQb->getQuery()->getResult());
+            // Debug de la requête SQL
+            $query = $qb->getQuery();
+            $sql = $query->getSQL();
+            $params = $query->getParameters();
+            
+            // Log pour debug
+            error_log("SQL Query: " . $sql);
+            error_log("Parameters: " . json_encode($params->map(function($param) {
+                return $param->getValue();
+            })));
 
-        // Pagination
-        $qb->setFirstResult(($page - 1) * $limit)
-           ->setMaxResults($limit);
+            // Calcul du total
+            $countQb = clone $qb;
+            $total = count($countQb->getQuery()->getResult());
 
-        $results = $qb->getQuery()->getResult();
+            // Pagination
+            $qb->setFirstResult(($page - 1) * $limit)
+               ->setMaxResults($limit);
 
-        // Formatage des données modifié
-        $formattedResults = array_map(function($result) {
+            $results = $qb->getQuery()->getResult();
+
+            // Formatage des résultats
+            $formattedResults = array_map(function($result) {
+                return [
+                    'id' => $result['company']->getId(),
+                    'denomination' => $result['company']->getDenomination(),
+                    'sector' => $result['company']->getSector(),
+                    'updatedAt' => $result['company']->getUpdatedAt() ? 
+                        $result['company']->getUpdatedAt()->format('Y-m-d H:i:s') : null,
+                    'investment' => [
+                        'totalAmount' => (int)$result['group_total_amount'],
+                        'lastFundingType' => $result['last_funding_type']
+                    ]
+                ];
+            }, $results);
+
             return [
-                'id' => $result['company']->getId(),
-                'denomination' => $result['company']->getDenomination(),
-                'sector' => $result['company']->getSector(),
-                'updatedAt' => $result['company']->getUpdatedAt()->format('Y-m-d H:i:s'),
-                'investment' => [
-                    'totalAmount' => (int)$result['group_total_amount'] ?? 0,
-                    'lastFundingType' => $result['last_funding_type']
-                ]
+                'data' => $formattedResults,
+                'total' => $total,
+                'page' => $page,
+                'limit' => $limit
             ];
-        }, $results);
-
-        return [
-            'data' => $formattedResults,
-            'total' => $total,
-            'page' => $page,
-            'limit' => $limit
-        ];
+        } catch (\Exception $e) {
+            error_log("Error in findByFiltersWithPagination: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
+            throw $e;
+        }
     }
 } 

@@ -1,6 +1,7 @@
 {
   "my_portfolio": "Mon Portefeuille",
   "common": {
+    "error_invalid_data": "Impossible de récupérer les données",
     "add": "Ajouter",
     "cancel": "Annuler",
     "next": "Suivant",

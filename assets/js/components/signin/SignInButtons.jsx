@@ -3,22 +3,22 @@ import { Button } from 'antd';
 import { GoogleOutlined, WindowsOutlined } from '@ant-design/icons';
 
 const SignInButtons = ({ t, signInWithGoogle, signInWithMicrosoft, loading }) => (
-  <div className="flex flex-col sm:flex-row justify-between gap-4">
+  <div className="space-y-2">
     <Button
-      icon={<GoogleOutlined />}
-      disabled={loading}
-      className="h-14 text-base flex-1 flex items-center justify-center bg-rose-600 hover:!bg-white hover:!border-rose-600 hover:!text-rose-600 border-rose-600 text-white"
       onClick={signInWithGoogle}
+      disabled={loading}
+      icon={<GoogleOutlined className="text-lg" />}
+      className="w-full h-10 flex items-center justify-center gap-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors text-sm font-medium"
     >
-      Google
+      {t('continue_with_google')}
     </Button>
     <Button
-      icon={<WindowsOutlined />}
-      disabled={loading}
-      className="h-14 text-base flex-1 flex items-center justify-center bg-blue-500 hover:!bg-white hover:!border-blue-500 hover:!text-blue-500 border-blue-500 text-white"
       onClick={signInWithMicrosoft}
+      disabled={loading}
+      icon={<WindowsOutlined className="text-lg" />}
+      className="w-full h-10 flex items-center justify-center gap-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors text-sm font-medium"
     >
-      Microsoft
+      {t('continue_with_microsoft')}
     </Button>
   </div>
 );

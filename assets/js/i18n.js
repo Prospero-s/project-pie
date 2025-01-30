@@ -14,6 +14,10 @@ import frAllCompanies from './locales/fr/allCompanies.json';
 import enAllCompanies from './locales/en/allCompanies.json';
 import frGroups from './locales/fr/groups.json';
 import enGroups from './locales/en/groups.json';
+import enGlobal from './locales/en/global.json';
+import frGlobal from './locales/fr/global.json';
+import enDashboard from './locales/en/dashboard.json';
+import frDashboard from './locales/fr/dashboard.json';
 
 i18n
   .use(initReactI18next)
@@ -26,6 +30,8 @@ i18n
         investments: frInvestments,
         allCompanies: frAllCompanies,
         groups: frGroups,
+        global: frGlobal,
+        dashboard: frDashboard
       },
       en: {
         signin: enSignIn,
@@ -34,6 +40,8 @@ i18n
         investments: enInvestments,
         allCompanies: enAllCompanies,
         groups: enGroups,
+        global: enGlobal,
+        dashboard: enDashboard
       },
     },
     lng: 'fr',

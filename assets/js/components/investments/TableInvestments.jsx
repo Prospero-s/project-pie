@@ -34,12 +34,20 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
     try {
       setLoading(true);
       const response = await fetchInvestments(params);
+      
+      if (!response.data || !Array.isArray(response.data)) {
+        console.error('Format de données invalide:', response);
+        message.error(t('common.error_invalid_data'));
+        return;
+      }
+
       setInvestments(response.data);
       setPagination({
         current: response.page,
         pageSize: response.limit,
         total: response.total
       });
+      
       if (params.sortField) {
         setSortedInfo({
           columnKey: params.sortField.includes('.') ? params.sortField.split('.')[1] : params.sortField,
@@ -47,6 +55,7 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
         });
       }
     } catch (error) {
+      console.error('Erreur de chargement:', error);
       message.error(t('common.error_loading'));
     } finally {
       setLoading(false);

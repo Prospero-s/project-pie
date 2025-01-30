@@ -20,29 +20,20 @@ class InvestmentController extends AbstractController
                 throw new \Exception('Utilisateur non authentifié');
             }
 
-            // Initialiser $filters comme un tableau vide
-            $filters = [];
-            
-            // Récupérer les paramètres de filtrage
-            if ($request->query->get('sector')) {
-                $filters['sector'] = explode(',', $request->query->get('sector'));
-            }
-            if ($request->query->get('fundingType')) {
-                $filters['fundingType'] = explode(',', $request->query->get('fundingType'));
-            }
-
-            // Récupérer les paramètres de pagination
+            // Récupérer les paramètres de pagination et tri
             $page = $request->query->getInt('page', 1);
             $limit = $request->query->getInt('limit', 10);
             $sortField = $request->query->get('sortField', 'updatedAt');
             $sortOrder = $request->query->get('sortOrder', 'desc');
-            
-            // Validation du sortOrder
-            $sortOrder = in_array($sortOrder, ['asc', 'desc']) ? $sortOrder : 'desc';
-            
-            // Validation du sortField
-            $allowedFields = ['denomination', 'sector', 'amount', 'fundingType', 'updatedAt'];
-            $sortField = in_array($sortField, $allowedFields) ? $sortField : 'updatedAt';
+
+            // Récupérer les filtres
+            $filters = [];
+            if ($request->query->has('sector')) {
+                $filters['sector'] = explode(',', $request->query->get('sector'));
+            }
+            if ($request->query->has('fundingType')) {
+                $filters['fundingType'] = explode(',', $request->query->get('fundingType'));
+            }
 
             $result = $companyRepository->findByFiltersWithPagination(
                 $filters,
@@ -56,7 +47,8 @@ class InvestmentController extends AbstractController
             return new JsonResponse($result);
         } catch (\Exception $e) {
             return new JsonResponse([
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'details' => 'Une erreur est survenue lors de la récupération des investissements'
             ], 400);
         }
     }

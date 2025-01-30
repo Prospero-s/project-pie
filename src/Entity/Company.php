@@ -32,14 +32,14 @@ class Company
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $sector = null;
 
-    #[ORM\Column(type: 'datetime')]
-    private \DateTime $updatedAt;
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTime $updatedAt = null;
 
-    #[ORM\Column(type: 'datetime')]
-    private \DateTime $createdAt;
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $createdAt;
     
-    #[ORM\Column(type: 'datetime')]
-    private \DateTime $deletedAt;
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $deletedAt = null;
 
     #[ORM\OneToOne(mappedBy: 'company', cascade: ['persist', 'remove'])]
     private ?CompanyAddress $address = null;
@@ -53,7 +53,8 @@ class Company
     public function __construct()
     {
         $this->representatives = new ArrayCollection();
-        $this->investments = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
+        $this->deletedAt = null;
     }
 
     public function getId(): ?int
@@ -121,48 +122,29 @@ class Company
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTime|string|null $updatedAt): self
+    public function setUpdatedAt(\DateTime $updatedAt): self
     {
-        if ($updatedAt === null || $updatedAt === '') {
-            // Définir la date par défaut à 9999-12-31 23:59:59
-            $this->updatedAt = new \DateTime('9999-12-31 23:59:59');
-        } elseif (is_string($updatedAt)) {
-            try {
-                // Convertit le format dd/mm/yyyy en yyyy-mm-dd 00:00:00
-                $date = \DateTime::createFromFormat('d/m/Y H:i:s', $updatedAt . ' 00:00:00');
-                if ($date === false) {
-                    // Si le format n'est pas bon, on met la date par défaut
-                    $this->updatedAt = new \DateTime('9999-12-31 23:59:59');
-                } else {
-                    $this->updatedAt = $date;
-                }
-            } catch (\Exception $e) {
-                // En cas d'erreur, on met la date par défaut
-                $this->updatedAt = new \DateTime('9999-12-31 23:59:59');
-            }
-        } else {
-            $this->updatedAt = $updatedAt;
-        }
+        $this->updatedAt = $updatedAt;
         return $this;
     }
 
-    public function getCreatedAt(): \DateTime
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTime $createdAt): self
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
         return $this;
     }
 
-    public function getDeletedAt(): \DateTime
+    public function getDeletedAt(): \DateTimeImmutable
     {
         return $this->deletedAt;
     }
 
-    public function setDeletedAt(\DateTime $deletedAt): self
+    public function setDeletedAt(?\DateTimeImmutable $deletedAt): self
     {
         $this->deletedAt = $deletedAt;
         return $this;

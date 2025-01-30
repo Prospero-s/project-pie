@@ -1,6 +1,7 @@
 {
   "my_portfolio": "My Portfolio",
   "common": {
+    "error_invalid_data": "Unable to retrieve data",
     "add": "Add",
     "cancel": "Cancel",
     "next": "Next",
