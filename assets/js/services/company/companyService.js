@@ -105,7 +105,6 @@ export const saveCompany = async (companyData) => {
         fundingType: companyData.fundingType,
         amountRaised: companyData.amountRaised,
         currency: companyData.currency || 'EUR',
-        updatedAt: companyData.updatedAt || new Date().toISOString(),
         sector: companyData.sector,
         investorId: companyData.investorId
       })

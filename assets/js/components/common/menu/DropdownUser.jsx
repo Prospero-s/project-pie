@@ -7,13 +7,15 @@ import {
   UserOutlined 
 } from '@ant-design/icons';
 import { signOut } from '@/services/auth/awsAuthService';
+import { useNavigate } from 'react-router-dom';
 
 const DropdownUser = ({ i18n, user }) => {
   const { t } = useTranslation('menu', { i18n });
   const lng = i18n.language;
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await signOut(t, lng);
+    await signOut(t, lng, navigate);
   };
 
   const items = [

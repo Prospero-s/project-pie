@@ -12,7 +12,9 @@
     "of": "of",
     "search": "Search",
     "back": "Back",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "reset_filters": "Reset filters",
+    "reset": "Reset"
   },
   "creation": {
     "title": "Company Creation",
@@ -112,9 +114,22 @@
       "other": "Other"
     }
   },
+  "no_investments": {
+    "title": "No investments",
+    "description": "You have no investments yet. Start by adding one!"
+  },
+  "no_results": {
+    "title": "No results",
+    "description": "No startups match your filters. Please try again with different filters."
+  },
   "actions": {
     "title": "Actions",
     "view_details": "View details",
     "add_investment": "Add investment"
+  },
+  "select_investor": {
+    "investor": "Investor",
+    "investor-required": "Please select an investor",
+    "select-investor": "Select an investor"
   }
 }

@@ -54,9 +54,7 @@ class CompanyRepository extends ServiceEntityRepository
                 $company->setBusinessStructures($data['businessStructures'] ?? null);
                 $company->setCodeApe($data['codeApe'] ?? null);
                 $company->setSiret($data['siret'] ?? null);
-                $company->setUpdatedAt($data['updatedAt'] ?? new \DateTime("9999-12-31 23:59:59"));
-                $company->setCreatedAt(new \DateTime());
-                $company->setDeletedAt(new \DateTime("9999-12-31 23:59:59"));
+                $company->setUpdatedAt(new \DateTime());
                 $company->setSector($data['sector'] ?? null);
 
                 //Création des représentants
@@ -132,18 +130,18 @@ class CompanyRepository extends ServiceEntityRepository
                           WHERE u_sum.cognitoId = :cognitoId
                       )
                     ) as group_total_amount',
-                    '(SELECT MAX(inv_last.fundingType) 
-                      FROM App\Entity\CompanyInvestment inv_last 
-                      JOIN inv_last.user usr_last 
-                      JOIN usr_last.userGroup grp_last 
-                      WHERE inv_last.company = c.id 
-                      AND grp_last.id = (
-                          SELECT DISTINCT g_last.id 
-                          FROM App\Entity\User u_last 
-                          JOIN u_last.userGroup g_last 
-                          WHERE u_last.cognitoId = :cognitoId
+                    '(SELECT MAX(inv_date.investedAt)
+                      FROM App\Entity\CompanyInvestment inv_date
+                      JOIN inv_date.user usr_date
+                      JOIN usr_date.userGroup grp_date
+                      WHERE inv_date.company = c.id
+                      AND grp_date.id = (
+                          SELECT DISTINCT g_date.id
+                          FROM App\Entity\User u_date
+                          JOIN u_date.userGroup g_date
+                          WHERE u_date.cognitoId = :cognitoId
                       )
-                    ) as last_funding_type'
+                    ) as last_investment_date'
                 )
                 ->join('c.investments', 'i_main')
                 ->join('i_main.user', 'main_user')
@@ -174,13 +172,13 @@ class CompanyRepository extends ServiceEntityRepository
                     $qb->orderBy('group_total_amount', $sortOrder);
                     break;
                 case 'updatedAt':
-                    $qb->orderBy('c.updatedAt', $sortOrder);
+                    $qb->orderBy('last_investment_date', $sortOrder);
                     break;
                 case 'denomination':
                     $qb->orderBy('c.denomination', $sortOrder);
                     break;
                 default:
-                    $qb->orderBy('c.updatedAt', 'DESC');
+                    $qb->orderBy('last_investment_date', 'DESC');
             }
 
             // Debug de la requête SQL
@@ -204,17 +202,37 @@ class CompanyRepository extends ServiceEntityRepository
 
             $results = $qb->getQuery()->getResult();
 
-            // Formatage des résultats
-            $formattedResults = array_map(function($result) {
+            // Après avoir obtenu les résultats, nous allons chercher les types de financement séparément
+            $formattedResults = array_map(function($result) use ($cognitoId) {
+                $company = $result['company'];
+                
+                // Requête séparée pour obtenir les types de financement
+                $fundingTypes = $this->createQueryBuilder('c2')
+                    ->select('DISTINCT i.fundingType')
+                    ->join('c2.investments', 'i')
+                    ->join('i.user', 'u')
+                    ->join('u.userGroup', 'g')
+                    ->where('c2.id = :companyId')
+                    ->andWhere('g.id = (
+                        SELECT DISTINCT g2.id 
+                        FROM App\Entity\User u2 
+                        JOIN u2.userGroup g2 
+                        WHERE u2.cognitoId = :cognitoId
+                    )')
+                    ->setParameter('companyId', $company->getId())
+                    ->setParameter('cognitoId', $cognitoId)
+                    ->getQuery()
+                    ->getScalarResult();
+
                 return [
-                    'id' => $result['company']->getId(),
-                    'denomination' => $result['company']->getDenomination(),
-                    'sector' => $result['company']->getSector(),
-                    'updatedAt' => $result['company']->getUpdatedAt() ? 
-                        $result['company']->getUpdatedAt()->format('Y-m-d H:i:s') : null,
+                    'id' => $company->getId(),
+                    'denomination' => $company->getDenomination(),
+                    'sector' => $company->getSector(),
+                    'updatedAt' => $result['last_investment_date'] ? 
+                        (new \DateTime($result['last_investment_date']))->format('Y-m-d H:i:s') : null,
                     'investment' => [
                         'totalAmount' => (int)$result['group_total_amount'],
-                        'lastFundingType' => $result['last_funding_type']
+                        'fundingTypes' => array_column($fundingTypes, 'fundingType')
                     ]
                 ];
             }, $results);

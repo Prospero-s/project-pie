@@ -3,14 +3,17 @@
 namespace App\Repository;
 
 use App\Entity\GroupInvitation;
+use App\Entity\UserGroup;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-
+use Doctrine\ORM\EntityManagerInterface;
 class GroupInvitationRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $em)
     {
         parent::__construct($registry, GroupInvitation::class);
+        $this->em = $em;
     }
 
     public function findValidInvitationsByEmail(string $email): array
@@ -43,5 +46,48 @@ class GroupInvitationRepository extends ServiceEntityRepository
             ->setParameter('now', new \DateTime())
             ->getQuery()
             ->execute();
+    }
+
+    public function findExistingInvitation(string $email, UserGroup $group): ?GroupInvitation
+    {
+        return $this->createQueryBuilder('i')
+            ->where('i.email = :email')
+            ->andWhere('i.group = :group')
+            ->setParameter('email', $email)
+            ->setParameter('group', $group)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function createInvitation(UserGroup $group, string $email, User $invitedBy): GroupInvitation
+    {
+        $invitation = new GroupInvitation();
+        $invitation->setGroup($group);
+        $invitation->setEmail($email);
+        $invitation->setInvitedBy($invitedBy);
+        
+        $this->em->persist($invitation);
+        
+        return $invitation;
+    }
+
+    public function acceptInvitation(GroupInvitation $invitation, User $user): void
+    {
+        $group = $invitation->getGroup();
+        $group->addUser($user);
+        
+        $this->em->remove($invitation);
+    }
+
+    public function createInvitationFromRequest(UserGroup $group, string $email, User $invitedBy): GroupInvitation
+    {
+        $invitation = new GroupInvitation();
+        $invitation->setGroup($group);
+        $invitation->setEmail($email);
+        $invitation->setInvitedBy($invitedBy);
+
+        $this->em->persist($invitation);
+        
+        return $invitation;
     }
 } 

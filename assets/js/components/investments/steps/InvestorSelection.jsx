@@ -27,12 +27,12 @@ const InvestorSelection = ({ value, onChange, t }) => {
     return (
         <Form.Item
             name="investorId"
-            label={t('investor')}
-            rules={[{ required: true, message: t('investorRequired') }]}
+            label={t('select_investor.investor')}
+            rules={[{ required: true, message: t('select_investor.investor-required') }]}
         >
             <Select
                 loading={loading}
-                placeholder={t('selectInvestor')}
+                placeholder={t('select_investor.select-investor')}
                 className="w-full"
                 notFoundContent={loading ? <Spin size="small" /> : null}
             >

@@ -57,21 +57,13 @@ class GroupInvitationController extends AbstractController
             }
 
             // Vérifier si une invitation existe déjà
-            $existingInvitation = $this->invitationRepository->findOneBy([
-                'email' => $data['email'],
-                'group' => $group
-            ]);
+            $existingInvitation = $this->invitationRepository->findExistingInvitation($data['email'], $group);
 
             if ($existingInvitation) {
                 return $this->json(['error' => 'invitation-exists'], Response::HTTP_BAD_REQUEST);
             }
 
-            $invitation = new GroupInvitation();
-            $invitation->setGroup($group);
-            $invitation->setEmail($data['email']);
-            $invitation->setInvitedBy($user);
-
-            $this->entityManager->persist($invitation);
+            $invitation = $this->invitationRepository->createInvitationFromRequest($group, $data['email'], $user);
             $this->entityManager->flush();
 
             return $this->json([
@@ -106,19 +98,16 @@ class GroupInvitationController extends AbstractController
             return $this->json(['error' => 'Invalid email'], Response::HTTP_FORBIDDEN);
         }
 
-        $group = $invitation->getGroup();
-        $group->addUser($user);
-
-        $this->entityManager->remove($invitation);
+        $this->invitationRepository->acceptInvitation($invitation, $user);
         $this->entityManager->flush();
 
         return $this->json([
             'group' => [
-                'id' => $group->getId(),
-                'name' => $group->getName(),
+                'id' => $invitation->getGroup()->getId(),
+                'name' => $invitation->getGroup()->getName(),
                 'owner' => [
-                    'id' => $group->getOwner()->getId(),
-                    'email' => $group->getOwner()->getEmail()
+                    'id' => $invitation->getGroup()->getOwner()->getId(),
+                    'email' => $invitation->getGroup()->getOwner()->getEmail()
                 ]
             ]
         ]);

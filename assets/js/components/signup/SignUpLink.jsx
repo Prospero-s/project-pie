@@ -1,12 +1,16 @@
 import React from 'react';
 import { Button } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
-const SignUpLink = ({ t, lng }) => (
-  <div className="mt-6 text-center">
-    <p>
-      {t('already_have_account')}{' '}
+const SignUpLink = ({ t, lng }) => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="mt-6 text-center">
+      <p>
+        {t('already_have_account')}{' '}
       <Button
-        href={`/${lng}/auth/signin`}
+        onClick={() => navigate(`/${lng}/auth/signin`)}
         className="text-primary text-base !p-0"
         type="link"
       >
@@ -14,6 +18,7 @@ const SignUpLink = ({ t, lng }) => (
       </Button>
     </p>
   </div>
-);
+  );
+};
 
 export default SignUpLink;

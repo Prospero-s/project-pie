@@ -93,13 +93,7 @@ class UserGroupController extends AbstractController
             
             $this->entityManager->beginTransaction();
             try {
-                $group = new UserGroup();
-                $group->setName($data['name']);
-                $group->setOwner($owner);
-                $group->setCreatedAt(new \DateTime());
-                $group->addUser($owner);
-                
-                $this->entityManager->persist($group);
+                $group = $this->userGroupRepository->createGroup($data['name'], $owner);
                 
                 // Gérer les invitations
                 if (!empty($data['invitations'])) {
@@ -108,21 +102,12 @@ class UserGroupController extends AbstractController
                             throw new \Exception('invalid-email');
                         }
                         
-                        $existingInvitation = $this->invitationRepository->findOneBy([
-                            'email' => $invitationData['email'],
-                            'group' => $group
-                        ]);
-                        
+                        $existingInvitation = $this->invitationRepository->findExistingInvitation($invitationData['email'], $group);
                         if ($existingInvitation) {
                             throw new \Exception('invitation-exists');
                         }
                         
-                        $invitation = new GroupInvitation();
-                        $invitation->setGroup($group);
-                        $invitation->setEmail($invitationData['email']);
-                        $invitation->setInvitedBy($owner);
-                        
-                        $this->entityManager->persist($invitation);
+                        $this->invitationRepository->createInvitation($group, $invitationData['email'], $owner);
                     }
                 }
                 
@@ -150,7 +135,7 @@ class UserGroupController extends AbstractController
     }
 
     #[Route('/{id}/members', methods: ['POST'])]
-    public function addMember(UserGroup $group, Request $request): JsonResponse
+    public function addMember(int $id, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $cognitoId = $request->headers->get('x-cognito-id');
@@ -162,6 +147,11 @@ class UserGroupController extends AbstractController
         }
         
         try {
+            $group = $this->userGroupRepository->findGroupWithMembers($id);
+            if (!$group) {
+                return $this->json(['error' => 'Group not found'], Response::HTTP_NOT_FOUND);
+            }
+
             $currentUser = $this->userRepository->findByCognitoId($cognitoId);
             if (!$currentUser || $group->getOwner()->getId() !== $currentUser->getId()) {
                 return $this->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
@@ -172,7 +162,7 @@ class UserGroupController extends AbstractController
                 return $this->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
             }
 
-            $group->addUser($newMember);
+            $this->userGroupRepository->addMemberToGroup($group, $newMember);
             $this->entityManager->flush();
 
             return $this->json([
@@ -235,7 +225,7 @@ class UserGroupController extends AbstractController
     }
 
     #[Route('/{id}', methods: ['GET'])]
-    public function show(UserGroup $group, Request $request): JsonResponse
+    public function show(int $id, Request $request): JsonResponse
     {
         $cognitoId = $request->headers->get('x-cognito-id');
         $email = $request->headers->get('x-cognito-email');
@@ -248,6 +238,11 @@ class UserGroupController extends AbstractController
         
         try {
             $user = $this->userService->getOrCreateUser($cognitoId, $email);
+            $group = $this->userGroupRepository->findGroupWithMembersAndInvestments($id);
+            
+            if (!$group) {
+                return $this->json(['error' => 'Group not found'], Response::HTTP_NOT_FOUND);
+            }
             
             if (!$group->getUsers()->contains($user)) {
                 return $this->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
@@ -257,8 +252,7 @@ class UserGroupController extends AbstractController
             $investments = [];
             
             foreach ($members as $member) {
-                $memberInvestments = $member->getInvestments();
-                foreach ($memberInvestments as $investment) {
+                foreach ($member->getInvestments() as $investment) {
                     $investments[] = [
                         'id' => $investment->getId(),
                         'companyName' => $investment->getCompany()->getDenomination(),

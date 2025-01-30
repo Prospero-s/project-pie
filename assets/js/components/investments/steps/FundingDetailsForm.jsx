@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, InputNumber, Select, Button } from 'antd';
-import InvestorSelection from '../InvestorSelection';
+import InvestorSelection from './InvestorSelection';
 
 const FundingDetailsForm = ({ companyData, onFinish, t }) => {
   const [form] = Form.useForm();
@@ -38,7 +38,7 @@ const FundingDetailsForm = ({ companyData, onFinish, t }) => {
     >
       <InvestorSelection
         name="investorId"
-        rules={[{ required: true, message: t('investorRequired') }]}
+        rules={[{ required: true, message: t('select_investor.investor-required') }]}
         t={t}
       />
 

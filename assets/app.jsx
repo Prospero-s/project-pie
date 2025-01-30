@@ -31,6 +31,11 @@ import GroupRedirect from "@/components/common/redirect/GroupRedirect";
 import LanguageRedirect from "@/components/common/redirect/LanguageRedirect";
 import.meta.glob(["../img/**"]);
 
+// Exposer navigate globalement
+window._env_ = {
+  navigate: (path) => navigate(path)
+};
+
 // Détecter la langue initiale à partir de l'URL ou des préférences
 const detectInitialLanguage = () => {
   const pathSegments = window.location.pathname.split('/').filter(Boolean);
