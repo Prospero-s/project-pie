@@ -36,6 +36,7 @@ import.meta.glob(["../img/**"]);
 window._env_ = {
   navigate: (path) => navigate(path)
 };
+import InvestmentDetails from "@/pages/InvestmentDetails";
 
 // Détecter la langue initiale à partir de l'URL ou des préférences
 const detectInitialLanguage = () => {
@@ -117,6 +118,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         <Route path="dashboard" element={<Dashboard i18n={i18n} />} />
                         <Route path="investments" element={<Investments i18n={i18n} />} />
                         <Route path="companies" element={<AllCompanies i18n={i18n} />} />
+                        <Route path="investements/:id" element={<InvestmentDetails i18n={i18n} />} />
                       </Routes>
                     </AppLayout>
                   </ProtectedRoute>
