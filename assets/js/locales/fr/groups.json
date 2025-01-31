@@ -34,5 +34,11 @@
         "invalid-email": "L'adresse email n'est pas valide",
         "invitation-exists": "Une invitation a déjà été envoyée à cet utilisateur"
     },
-    "refresh": "Rafraîchir"
+    "refresh": "Rafraîchir",
+    "role": "Rôle",
+    "role-placeholder": "Sélectionner un rôle",
+    "roles": {
+        "ROLE_ADMIN": "Administrateur",
+        "ROLE_MEMBER": "Membre"
+    }
 }

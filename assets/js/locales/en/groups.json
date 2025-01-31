@@ -34,5 +34,11 @@
         "invalid-email": "Invalid email address",
         "invitation-exists": "An invitation has already been sent to this user"
     },
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "role": "Role",
+    "role-placeholder": "Select a role",
+    "roles": {
+        "ROLE_ADMIN": "Administrator",
+        "ROLE_MEMBER": "Member"
+    }
 }

@@ -21,9 +21,6 @@ class Representative
     #[ORM\Column(length: 255)]
     private string $qualite;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $cognitoId = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -59,17 +56,6 @@ class Representative
     public function setQualite(string $qualite): self
     {
         $this->qualite = $qualite;
-        return $this;
-    }
-
-    public function getCognitoId(): ?string
-    {
-        return $this->cognitoId;
-    }
-
-    public function setCognitoId(?string $cognitoId): self
-    {
-        $this->cognitoId = $cognitoId;
         return $this;
     }
 }

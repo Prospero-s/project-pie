@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\GroupInvitation;
 use App\Entity\UserGroup;
 use App\Entity\User;
+use App\Entity\GroupRole;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
@@ -59,12 +60,13 @@ class GroupInvitationRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function createInvitation(UserGroup $group, string $email, User $invitedBy): GroupInvitation
+    public function createInvitation(UserGroup $group, string $email, User $invitedBy, string $role = GroupRole::ROLE_MEMBER): GroupInvitation
     {
         $invitation = new GroupInvitation();
         $invitation->setGroup($group);
         $invitation->setEmail($email);
         $invitation->setInvitedBy($invitedBy);
+        $invitation->setRole($role);
         
         $this->em->persist($invitation);
         
@@ -75,16 +77,24 @@ class GroupInvitationRepository extends ServiceEntityRepository
     {
         $group = $invitation->getGroup();
         $group->addUser($user);
+
+        // Créer le rôle pour l'utilisateur
+        $groupRole = new GroupRole();
+        $groupRole->setUser($user);
+        $groupRole->setUserGroup($group);
+        $groupRole->setRole($invitation->getRole());
         
+        $this->em->persist($groupRole);
         $this->em->remove($invitation);
     }
 
-    public function createInvitationFromRequest(UserGroup $group, string $email, User $invitedBy): GroupInvitation
+    public function createInvitationFromRequest(UserGroup $group, string $email, User $invitedBy, string $role = GroupRole::ROLE_MEMBER): GroupInvitation
     {
         $invitation = new GroupInvitation();
         $invitation->setGroup($group);
         $invitation->setEmail($email);
         $invitation->setInvitedBy($invitedBy);
+        $invitation->setRole($role);
 
         $this->em->persist($invitation);
         

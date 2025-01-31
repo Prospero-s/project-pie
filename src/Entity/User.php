@@ -20,11 +20,11 @@ class User
     #[ORM\Column(type: "string", length: 255, unique: true)]
     private string $cognitoId;
 
+    #[ORM\Column(type: "string", length: 255, unique: true)]
+    private string $name;
+
     #[ORM\Column(type: "string", length: 255)]
     private string $email;
-
-    #[ORM\Column(type: "json")]
-    private array $roles = [];
 
     #[ORM\OneToMany(targetEntity: CompanyInvestment::class, mappedBy: 'user')]
     private Collection $investments;
@@ -39,7 +39,6 @@ class User
     {
         $this->investments = new ArrayCollection();
         $this->createdAt = new \DateTime();
-        $this->roles[] = 'ROLE_USER';
     }
 
     public function getId(): ?int
@@ -58,6 +57,17 @@ class User
         return $this;
     }
 
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+        return $this;
+    }
+
     public function getEmail(): string
     {
         return $this->email;
@@ -66,17 +76,6 @@ class User
     public function setEmail(string $email): self
     {
         $this->email = $email;
-        return $this;
-    }
-
-    public function getRoles(): array
-    {
-        return array_unique($this->roles);
-    }
-
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
         return $this;
     }
 

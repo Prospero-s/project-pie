@@ -82,7 +82,7 @@ export const saveCompany = async (companyData) => {
     const session = await Auth.currentSession();
     const cognitoId = session.getIdToken().payload.sub;
     const email = session.getIdToken().payload.email;
-
+    const name = session.getIdToken().payload.name;
     if (!cognitoId || !email) {
       throw new Error('Utilisateur non authentifié');
     }
@@ -92,7 +92,8 @@ export const saveCompany = async (companyData) => {
       headers: {
         'Content-Type': 'application/json',
         'X-Cognito-Id': cognitoId,
-        'X-Cognito-Email': email
+        'X-Cognito-Email': email,
+        'X-Cognito-Name': name
       },
       body: JSON.stringify({
         siren: companyData.siren,

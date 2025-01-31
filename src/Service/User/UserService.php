@@ -13,7 +13,7 @@ class UserService
         private UserRepository $userRepository
     ) {}
 
-    public function getOrCreateUser(string $cognitoId, string $email): User
+    public function getOrCreateUser(string $cognitoId, string $email, string $name = null): User
     {
         // Chercher d'abord l'utilisateur par cognitoId
         $user = $this->userRepository->findByCognitoId($cognitoId);
@@ -23,18 +23,12 @@ class UserService
             $user = new User();
             $user->setCognitoId($cognitoId);
             $user->setEmail($email);
-            
+            $user->setName($name);
             $this->entityManager->persist($user);
             $this->entityManager->flush();
         }
 
         return $user;
-    }
-
-    public function updateUserRoles(User $user, array $roles): void
-    {
-        $user->setRoles($roles);
-        $this->entityManager->flush();
     }
 
     public function findUserByEmail(string $email): ?User

@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Entity\User;
 use App\Entity\UserGroup;
 use App\Entity\GroupInvitation;
+use App\Entity\GroupRole;
 use App\Repository\UserGroupRepository;
 use App\Repository\UserRepository;
 use App\Repository\GroupInvitationRepository;
@@ -33,6 +34,7 @@ class UserGroupController extends AbstractController
         try {
             $cognitoId = $request->headers->get('x-cognito-id');
             $email = $request->headers->get('x-cognito-email');
+            $name = $request->headers->get('x-cognito-name');
             
             if (!$cognitoId || !$email) {
                 return $this->json([
@@ -40,7 +42,7 @@ class UserGroupController extends AbstractController
                 ], Response::HTTP_UNAUTHORIZED);
             }
 
-            $user = $this->userService->getOrCreateUser($cognitoId, $email);
+            $user = $this->userService->getOrCreateUser($cognitoId, $email, $name);
             
             if (!$user) {
                 return $this->json([
@@ -81,15 +83,16 @@ class UserGroupController extends AbstractController
         try {
             $cognitoId = $request->headers->get('x-cognito-id');
             $email = $request->headers->get('x-cognito-email');
+            $name = $request->headers->get('x-cognito-name');
             
-            if (!$cognitoId || !$email) {
+            if (!$cognitoId || !$email || !$name) {
                 return $this->json([
                     'error' => 'Unauthorized: Missing required headers'
                 ], Response::HTTP_UNAUTHORIZED);
             }
 
             $data = json_decode($request->getContent(), true);
-            $owner = $this->userService->getOrCreateUser($cognitoId, $email);
+            $owner = $this->userService->getOrCreateUser($cognitoId, $email, $name);
             
             $this->entityManager->beginTransaction();
             try {
@@ -107,7 +110,12 @@ class UserGroupController extends AbstractController
                             throw new \Exception('invitation-exists');
                         }
                         
-                        $this->invitationRepository->createInvitation($group, $invitationData['email'], $owner);
+                        $role = $invitationData['role'] ?? GroupRole::ROLE_MEMBER;
+                        if (!in_array($role, [GroupRole::ROLE_ADMIN, GroupRole::ROLE_MEMBER])) {
+                            throw new \Exception('invalid-role');
+                        }
+                        
+                        $this->invitationRepository->createInvitationFromRequest($group, $invitationData['email'], $owner, $role);
                     }
                 }
                 
@@ -229,6 +237,7 @@ class UserGroupController extends AbstractController
     {
         $cognitoId = $request->headers->get('x-cognito-id');
         $email = $request->headers->get('x-cognito-email');
+        $name = $request->headers->get('x-cognito-name');
         
         if (!$cognitoId) {
             return $this->json([

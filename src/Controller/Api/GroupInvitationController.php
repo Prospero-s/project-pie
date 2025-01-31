@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Entity\GroupInvitation;
 use App\Entity\UserGroup;
 use App\Entity\User;
+use App\Entity\GroupRole;
 use App\Repository\GroupInvitationRepository;
 use App\Repository\UserRepository;
 use App\Service\User\UserService;
@@ -31,6 +32,7 @@ class GroupInvitationController extends AbstractController
             $data = json_decode($request->getContent(), true);
             $cognitoId = $request->headers->get('x-cognito-id');
             $email = $request->headers->get('x-cognito-email');
+            $name = $request->headers->get('x-cognito-name');
             
             if (!$cognitoId || !$email) {
                 return $this->json(['error' => 'Missing authentication headers'], Response::HTTP_UNAUTHORIZED);
@@ -45,7 +47,7 @@ class GroupInvitationController extends AbstractController
                 return $this->json(['error' => 'invalid-email'], Response::HTTP_BAD_REQUEST);
             }
 
-            $user = $this->userService->getOrCreateUser($cognitoId, $email);
+            $user = $this->userService->getOrCreateUser($cognitoId, $email, $name);
             $group = $this->entityManager->getRepository(UserGroup::class)->find($data['groupId']);
 
             if (!$group) {
@@ -63,12 +65,27 @@ class GroupInvitationController extends AbstractController
                 return $this->json(['error' => 'invitation-exists'], Response::HTTP_BAD_REQUEST);
             }
 
-            $invitation = $this->invitationRepository->createInvitationFromRequest($group, $data['email'], $user);
+            // Vérifier le rôle demandé
+            $role = $data['role'] ?? GroupRole::ROLE_MEMBER;
+            if (!in_array($role, [GroupRole::ROLE_ADMIN, GroupRole::ROLE_MEMBER])) {
+                return $this->json(['error' => 'invalid-role'], Response::HTTP_BAD_REQUEST);
+            }
+
+            // Vérifier si l'utilisateur a le droit d'attribuer ce rôle
+            $userRole = $this->entityManager->getRepository(GroupRole::class)
+                ->findOneBy(['user' => $user, 'userGroup' => $group]);
+            
+            if (!$userRole || ($role === GroupRole::ROLE_ADMIN && $userRole->getRole() !== GroupRole::ROLE_OWNER)) {
+                return $this->json(['error' => 'Insufficient permissions'], Response::HTTP_FORBIDDEN);
+            }
+
+            $invitation = $this->invitationRepository->createInvitationFromRequest($group, $data['email'], $user, $role);
             $this->entityManager->flush();
 
             return $this->json([
                 'id' => $invitation->getId(),
                 'email' => $invitation->getEmail(),
+                'role' => $invitation->getRole(),
                 'token' => $invitation->getToken(),
                 'expiresAt' => $invitation->getExpiresAt()->format('Y-m-d H:i:s')
             ], Response::HTTP_CREATED);
@@ -82,8 +99,9 @@ class GroupInvitationController extends AbstractController
     {
         $cognitoId = $request->headers->get('x-cognito-id');
         $email = $request->headers->get('x-cognito-email');
+        $name = $request->headers->get('x-cognito-name');
         
-        $user = $this->userService->getOrCreateUser($cognitoId, $email);
+        $user = $this->userService->getOrCreateUser($cognitoId, $email, $name);
         $invitation = $this->invitationRepository->findOneBy(['token' => $token]);
 
         if (!$invitation) {

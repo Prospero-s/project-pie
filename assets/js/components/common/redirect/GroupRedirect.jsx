@@ -31,7 +31,8 @@ const GroupRedirect = () => {
             const headers = {
                 'Authorization': `Bearer ${jwtToken}`,
                 'x-cognito-id': session.getIdToken().payload.sub,
-                'x-cognito-email': session.getIdToken().payload.email
+                'x-cognito-email': session.getIdToken().payload.email,
+                'x-cognito-name': session.getIdToken().payload.name
             };
 
             axios.defaults.headers.common = headers;

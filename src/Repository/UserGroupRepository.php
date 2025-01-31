@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\UserGroup;
 use App\Entity\User;
+use App\Entity\GroupRole;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
@@ -61,8 +62,15 @@ class UserGroupRepository extends ServiceEntityRepository
         $group->setOwner($owner);
         $group->setCreatedAt(new \DateTime());
         $group->addUser($owner);
+
+        // Créer le rôle OWNER pour le créateur
+        $ownerRole = new GroupRole();
+        $ownerRole->setUser($owner);
+        $ownerRole->setUserGroup($group);
+        $ownerRole->setRole(GroupRole::ROLE_OWNER);
         
         $this->em->persist($group);
+        $this->em->persist($ownerRole);
         
         return $group;
     }

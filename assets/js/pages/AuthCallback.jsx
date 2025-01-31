@@ -68,6 +68,7 @@ const AuthCallback = () => {
             // Configurer axios avec les headers
             axios.defaults.headers.common['x-cognito-id'] = userId;
             axios.defaults.headers.common['x-cognito-email'] = formattedUser.email;
+            axios.defaults.headers.common['x-cognito-name'] = formattedUser.name;
             axios.defaults.headers.common['Authorization'] = `Bearer ${idToken.getJwtToken()}`;
 
             setUser(formattedUser);

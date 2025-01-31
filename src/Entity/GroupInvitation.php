@@ -33,6 +33,9 @@ class GroupInvitation
     #[ORM\JoinColumn(nullable: false)]
     private User $invitedBy;
 
+    #[ORM\Column(type: 'string', length: 50)]
+    private string $role = GroupRole::ROLE_MEMBER;
+
     public function __construct()
     {
         $this->token = bin2hex(random_bytes(16));
@@ -95,6 +98,17 @@ class GroupInvitation
     public function setInvitedBy(User $invitedBy): self
     {
         $this->invitedBy = $invitedBy;
+        return $this;
+    }
+
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    public function setRole(string $role): self
+    {
+        $this->role = $role;
         return $this;
     }
 } 

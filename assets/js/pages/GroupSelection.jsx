@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Form, Input, Tabs, Alert, Typography, notification, Spin } from 'antd';
+import { Card, Button, Form, Input, Tabs, Alert, Typography, notification, Spin, Select } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { PlusOutlined, UserAddOutlined, CheckCircleOutlined, ReloadOutlined } from '@ant-design/icons';
@@ -8,7 +8,7 @@ import { Auth } from 'aws-amplify';
 
 const { Title, Text } = Typography;
 
-const EmailInput = ({ email, index, onEmailChange, onRemove, t }) => (
+const EmailInput = ({ email, role, index, onEmailChange, onRoleChange, onRemove, t }) => (
     <div className="flex items-start gap-2">
         <Form.Item className="flex-1 mb-0">
             <Input 
@@ -17,6 +17,16 @@ const EmailInput = ({ email, index, onEmailChange, onRemove, t }) => (
                 placeholder={t('invite-email-placeholder')}
                 suffix={<UserAddOutlined />}
             />
+        </Form.Item>
+        <Form.Item className="w-48 mb-0">
+            <Select
+                value={role}
+                onChange={(value) => onRoleChange(index, value)}
+                placeholder={t('role-placeholder')}
+            >
+                <Select.Option value="ROLE_ADMIN">{t('roles.ROLE_ADMIN')}</Select.Option>
+                <Select.Option value="ROLE_MEMBER">{t('roles.ROLE_MEMBER')}</Select.Option>
+            </Select>
         </Form.Item>
         <Button 
             onClick={() => onRemove(index)}
@@ -37,6 +47,7 @@ const GroupSelection = ({ i18n }) => {
         activeTab: 'create',
         groupName: '',
         inviteEmails: [],
+        inviteRoles: [],
         pendingInvitations: []
     });
     
@@ -56,7 +67,8 @@ const GroupSelection = ({ i18n }) => {
                 axios.defaults.headers.common = {
                     'Authorization': `Bearer ${jwtToken}`,
                     'x-cognito-id': session.getIdToken().payload.sub,
-                    'x-cognito-email': session.getIdToken().payload.email
+                    'x-cognito-email': session.getIdToken().payload.email,
+                    'x-cognito-name': session.getIdToken().payload.name
                 };
                 return true;
             } catch (error) {
@@ -109,18 +121,33 @@ const GroupSelection = ({ i18n }) => {
     }, []);
 
     const handleAddEmail = () => {
-        setFormState(prevState => ({ ...prevState, inviteEmails: [...prevState.inviteEmails, ''] }));
+        setFormState(prevState => ({
+            ...prevState,
+            inviteEmails: [...prevState.inviteEmails, ''],
+            inviteRoles: [...prevState.inviteRoles, 'ROLE_MEMBER']
+        }));
     };
 
     const handleRemoveEmail = (index) => {
         const newEmails = formState.inviteEmails.filter((_, i) => i !== index);
-        setFormState(prevState => ({ ...prevState, inviteEmails: newEmails }));
+        const newRoles = formState.inviteRoles.filter((_, i) => i !== index);
+        setFormState(prevState => ({
+            ...prevState,
+            inviteEmails: newEmails,
+            inviteRoles: newRoles
+        }));
     };
 
     const handleEmailChange = (index, value) => {
         const newEmails = [...formState.inviteEmails];
         newEmails[index] = value;
         setFormState(prevState => ({ ...prevState, inviteEmails: newEmails }));
+    };
+
+    const handleRoleChange = (index, value) => {
+        const newRoles = [...formState.inviteRoles];
+        newRoles[index] = value;
+        setFormState(prevState => ({ ...prevState, inviteRoles: newRoles }));
     };
 
     const validateEmail = (email) => {
@@ -130,14 +157,17 @@ const GroupSelection = ({ i18n }) => {
 
     const handleCreateGroup = async (values) => {
         try {
-            const validEmails = formState.inviteEmails
-                .filter(email => email.trim())
-                .filter(email => validateEmail(email.trim()));
-                
+            const validInvitations = formState.inviteEmails
+                .map((email, index) => ({
+                    email: email.trim(),
+                    role: formState.inviteRoles[index]
+                }))
+                .filter(inv => inv.email && validateEmail(inv.email));
+
             setUiState(prevState => ({ ...prevState, isRedirecting: true }));
             const response = await axios.post('/api/user-groups', { 
                 name: values.name,
-                invitations: validEmails.map(email => ({ email: email.trim() }))
+                invitations: validInvitations
             });
             
             notification.success({
@@ -216,14 +246,16 @@ const GroupSelection = ({ i18n }) => {
                                 <Input placeholder={t('group-name-placeholder')} />
                             </Form.Item>
 
-                            <Form.Item label={formState.inviteEmails.length > 0 ? t('invite-email') : ''} className={formState.inviteEmails.length === 0 ? 'hidden' : ''}>
+                            <Form.Item label={t('invite-email')} className={formState.inviteEmails.length === 0 ? 'hidden' : ''}>
                                 <div className="space-y-3">
                                     {formState.inviteEmails.map((email, index) => (
                                         <EmailInput
                                             key={index}
                                             email={email}
+                                            role={formState.inviteRoles[index]}
                                             index={index}
                                             onEmailChange={handleEmailChange}
+                                            onRoleChange={handleRoleChange}
                                             onRemove={handleRemoveEmail}
                                             t={t}
                                         />
