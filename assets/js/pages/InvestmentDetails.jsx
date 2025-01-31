@@ -89,8 +89,7 @@ const InvestmentDetails = ({ i18n }) => {
 
       <Card className="shadow-lg rounded-lg">
         <InvestmentChart 
-          data={chartData}
-          selectedCompany={investment?.company}
+          selectedCompanyId={investment?.company?.id}
         />
       </Card>
     </div>
