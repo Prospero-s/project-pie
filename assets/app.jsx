@@ -29,6 +29,7 @@ import AppLayout from "@/components/common/layout/AppLayout";
 import GroupSelection from "@/pages/GroupSelection";
 import GroupRedirect from "@/components/common/redirect/GroupRedirect";
 import LanguageRedirect from "@/components/common/redirect/LanguageRedirect";
+import { RedirectProvider } from "@/context/redirectContext";
 import.meta.glob(["../img/**"]);
 
 // Exposer navigate globalement
@@ -83,46 +84,48 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <I18nextProvider i18n={i18n}>
       <UserProvider>
-        <Router>
-          <LanguageRedirect />
-          <GroupRedirect />
-          <Routes>
-            <Route
-              path="/:lng/auth/*"
-              element={
-                <AuthLayout i18n={i18n}>
-                  <Routes>
-                    <Route path="signin" element={<SignIn i18n={i18n} />} />
-                    <Route path="signup" element={<SignUp i18n={i18n} />} />
-                  </Routes>
-                </AuthLayout>
-              }
-            />
-            <Route
-              path="/:lng/group-selection"
-              element={
-                <ProtectedRoute i18n={i18n}>
-                  <GroupSelection i18n={i18n} />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/:lng/*"
-              element={
-                <ProtectedRoute i18n={i18n}>
-                  <AppLayout i18n={i18n}>
+        <RedirectProvider>
+          <Router>
+            <LanguageRedirect />
+            <GroupRedirect />
+            <Routes>
+              <Route
+                path="/:lng/auth/*"
+                element={
+                  <AuthLayout i18n={i18n}>
                     <Routes>
-                      <Route path="dashboard" element={<Dashboard i18n={i18n} />} />
-                      <Route path="investments" element={<Investments i18n={i18n} />} />
-                      <Route path="companies" element={<AllCompanies i18n={i18n} />} />
+                      <Route path="signin" element={<SignIn i18n={i18n} />} />
+                      <Route path="signup" element={<SignUp i18n={i18n} />} />
                     </Routes>
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/auth/callback" element={<AuthCallback i18n={i18n} />} />
-          </Routes>
-        </Router>
+                  </AuthLayout>
+                }
+              />
+              <Route
+                path="/:lng/group-selection"
+                element={
+                  <ProtectedRoute i18n={i18n}>
+                    <GroupSelection i18n={i18n} />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/:lng/*"
+                element={
+                  <ProtectedRoute i18n={i18n}>
+                    <AppLayout i18n={i18n}>
+                      <Routes>
+                        <Route path="dashboard" element={<Dashboard i18n={i18n} />} />
+                        <Route path="investments" element={<Investments i18n={i18n} />} />
+                        <Route path="companies" element={<AllCompanies i18n={i18n} />} />
+                      </Routes>
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/auth/callback" element={<AuthCallback i18n={i18n} />} />
+            </Routes>
+          </Router>
+        </RedirectProvider>
       </UserProvider>
     </I18nextProvider>
   </React.StrictMode>

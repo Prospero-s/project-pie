@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { PlusOutlined, UserAddOutlined, CheckCircleOutlined, ReloadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { Auth } from 'aws-amplify';
+import { useRedirect } from '@/context/redirectContext';
 
 const { Title, Text } = Typography;
 
@@ -41,6 +42,7 @@ const EmailInput = ({ email, role, index, onEmailChange, onRoleChange, onRemove,
 const GroupSelection = ({ i18n }) => {
     const { t } = useTranslation('groups', { i18n });
     const navigate = useNavigate();
+    const { isCheckingRedirect } = useRedirect();
     
     // Regrouper les états liés
     const [formState, setFormState] = useState({
@@ -343,10 +345,8 @@ const GroupSelection = ({ i18n }) => {
         }
     ];
 
-    if (uiState.isLoading || uiState.isRedirecting) {
-        return (
-            <></>
-        );
+    if (isCheckingRedirect || uiState.isLoading || uiState.isRedirecting) {
+        return null;
     }
 
     return (

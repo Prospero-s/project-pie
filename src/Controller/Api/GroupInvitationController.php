@@ -54,8 +54,12 @@ class GroupInvitationController extends AbstractController
                 return $this->json(['error' => 'Group not found'], Response::HTTP_NOT_FOUND);
             }
 
-            if ($group->getOwner()->getId() !== $user->getId()) {
-                return $this->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+            // Vérifier si l'utilisateur a le droit d'inviter
+            $userRole = $this->entityManager->getRepository(GroupRole::class)
+                ->findOneBy(['user' => $user, 'userGroup' => $group]);
+            
+            if (!$userRole || !in_array($userRole->getRole(), [GroupRole::ROLE_OWNER, GroupRole::ROLE_ADMIN])) {
+                return $this->json(['error' => 'Insufficient permissions'], Response::HTTP_FORBIDDEN);
             }
 
             // Vérifier si une invitation existe déjà
@@ -71,12 +75,9 @@ class GroupInvitationController extends AbstractController
                 return $this->json(['error' => 'invalid-role'], Response::HTTP_BAD_REQUEST);
             }
 
-            // Vérifier si l'utilisateur a le droit d'attribuer ce rôle
-            $userRole = $this->entityManager->getRepository(GroupRole::class)
-                ->findOneBy(['user' => $user, 'userGroup' => $group]);
-            
-            if (!$userRole || ($role === GroupRole::ROLE_ADMIN && $userRole->getRole() !== GroupRole::ROLE_OWNER)) {
-                return $this->json(['error' => 'Insufficient permissions'], Response::HTTP_FORBIDDEN);
+            // Vérifier si l'utilisateur peut attribuer ce rôle spécifique
+            if ($role === GroupRole::ROLE_ADMIN && $userRole->getRole() !== GroupRole::ROLE_OWNER) {
+                return $this->json(['error' => 'Insufficient permissions to assign admin role'], Response::HTTP_FORBIDDEN);
             }
 
             $invitation = $this->invitationRepository->createInvitationFromRequest($group, $data['email'], $user, $role);

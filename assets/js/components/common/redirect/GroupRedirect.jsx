@@ -3,12 +3,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { Auth } from 'aws-amplify';
 import { useUser } from '@/context/userContext';
+import { useRedirect } from '@/context/redirectContext';
 
 const GroupRedirect = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useUser();
-    const [isChecking, setIsChecking] = useState(false);
+    const { setIsCheckingRedirect } = useRedirect();
     const [retryCount, setRetryCount] = useState(0);
     const [lastCheckedPath, setLastCheckedPath] = useState('');
 
@@ -16,11 +17,12 @@ const GroupRedirect = () => {
         if (location.pathname.includes('/auth') || 
             location.pathname === lastCheckedPath || 
             !user) {
+            setIsCheckingRedirect(false);
             return;
         }
 
         try {
-            setIsChecking(true);
+            setIsCheckingRedirect(true);
             if (retryCount > 0) {
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
@@ -60,9 +62,9 @@ const GroupRedirect = () => {
                 navigate(`/${lang}/auth/signin`, { replace: true });
             }
         } finally {
-            setIsChecking(false);
+            setIsCheckingRedirect(false);
         }
-    }, [location.pathname, retryCount, user, lastCheckedPath, navigate]);
+    }, [location.pathname, retryCount, user, lastCheckedPath, navigate, setIsCheckingRedirect]);
 
     useEffect(() => {
         setupAuthHeaders();

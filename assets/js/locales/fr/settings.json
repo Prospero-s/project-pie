@@ -1,0 +1,50 @@
+{
+  "title": "Paramètres",
+  "menu": {
+    "group": "Groupe",
+    "profile": "Profil",
+    "preferences": "Préférences"
+  },
+  "sections": {
+    "group": {
+      "members": "Membres",
+      "owner": "Propriétaire",
+      "invite_member": "Inviter un membre",
+      "send_invitation": "Envoyer l'invitation",
+      "email": "Email",
+      "email_placeholder": "Entrez l'adresse email",
+      "email_required": "L'email est requis",
+      "invalid_email": "Email invalide",
+      "role": "Rôle",
+      "role_required": "Le rôle est requis",
+      "roles": {
+        "owner": "Propriétaire",
+        "admin": "Administrateur",
+        "member": "Membre",
+        "role_owner": "Propriétaire",
+        "role_admin": "Administrateur",
+        "role_member": "Membre"
+      },
+      "no_group": "Vous n'êtes membre d'aucun groupe",
+      "error_loading": "Erreur lors du chargement du groupe",
+      "error_inviting": "Erreur lors de l'invitation",
+      "error_auth": "Erreur d'authentification : veuillez vous reconnecter",
+      "error_unauthorized": "Session expirée ou non autorisée",
+      "invitation_sent": "Invitation envoyée avec succès",
+      "invitation_exists": "Une invitation a déjà été envoyée à cette adresse email",
+      "role_updated": "Rôle mis à jour avec succès",
+      "error_updating_role": "Erreur lors de la mise à jour du rôle"
+    },
+    "profile": {
+      "coming_soon": "La gestion du profil sera bientôt disponible"
+    },
+    "preferences": {
+      "coming_soon": "Les préférences seront bientôt disponibles"
+    }
+  },
+  "common": {
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "retry": "Réessayer"
+  }
+} 

@@ -1,0 +1,44 @@
+{
+  "title": "Settings",
+  "menu": {
+    "group": "Group",
+    "profile": "Profile",
+    "preferences": "Preferences"
+  },
+  "sections": {
+    "group": {
+      "members": "Members",
+      "owner": "Owner",
+      "invite_member": "Invite Member",
+      "send_invitation": "Send Invitation",
+      "email": "Email",
+      "email_placeholder": "Enter email address",
+      "email_required": "Email is required",
+      "invalid_email": "Invalid email",
+      "role": "Role",
+      "role_required": "Role is required",
+      "roles": {
+        "admin": "Administrator",
+        "member": "Member"
+      },
+      "no_group": "You are not a member of any group",
+      "error_loading": "Error loading group",
+      "error_inviting": "Error inviting member",
+      "error_auth": "Authentication error: please log in again",
+      "error_unauthorized": "Session expired or unauthorized",
+      "invitation_sent": "Invitation sent successfully",
+      "invitation_exists": "An invitation has already been sent to this email address"
+    },
+    "profile": {
+      "coming_soon": "Profile management will be available soon"
+    },
+    "preferences": {
+      "coming_soon": "Preferences will be available soon"
+    }
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "retry": "Retry"
+  }
+} 

@@ -18,6 +18,8 @@ import enGlobal from './locales/en/global.json';
 import frGlobal from './locales/fr/global.json';
 import enDashboard from './locales/en/dashboard.json';
 import frDashboard from './locales/fr/dashboard.json';
+import enSettings from './locales/en/settings.json';
+import frSettings from './locales/fr/settings.json';
 
 i18n
   .use(initReactI18next)
@@ -31,7 +33,8 @@ i18n
         allCompanies: frAllCompanies,
         groups: frGroups,
         global: frGlobal,
-        dashboard: frDashboard
+        dashboard: frDashboard,
+        settings: frSettings
       },
       en: {
         signin: enSignIn,
@@ -41,7 +44,8 @@ i18n
         allCompanies: enAllCompanies,
         groups: enGroups,
         global: enGlobal,
-        dashboard: enDashboard
+        dashboard: enDashboard,
+        settings: enSettings
       },
     },
     lng: 'fr',

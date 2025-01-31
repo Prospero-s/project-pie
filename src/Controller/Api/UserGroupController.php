@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\GroupRoleRepository;
 
 #[Route('/api/user-groups')]
 class UserGroupController extends AbstractController
@@ -25,8 +26,11 @@ class UserGroupController extends AbstractController
         private UserGroupRepository $userGroupRepository,
         private UserRepository $userRepository,
         private UserService $userService,
-        private GroupInvitationRepository $invitationRepository
-    ) {}
+        private GroupInvitationRepository $invitationRepository,
+        GroupRoleRepository $groupRoleRepository
+    ) {
+        $this->groupRoleRepository = $groupRoleRepository;
+    }
 
     #[Route('', methods: ['GET'])]
     public function list(Request $request): JsonResponse
@@ -55,19 +59,37 @@ class UserGroupController extends AbstractController
                 return $this->json(['groups' => []]);
             }
 
+            $groups = [$group];
+
             return $this->json([
-                'groups' => [[
-                    'id' => $group->getId(),
-                    'name' => $group->getName(),
-                    'owner' => [
-                        'id' => $group->getOwner()->getId(),
-                        'email' => $group->getOwner()->getEmail()
-                    ],
-                    'members' => array_map(fn($member) => [
-                        'id' => $member->getId(),
-                        'email' => $member->getEmail()
-                    ], $group->getUsers()->toArray())
-                ]]
+                'groups' => array_map(function($group) use ($user) {
+                    $members = array_map(function($member) use ($group) {
+                        $role = $this->groupRoleRepository->findOneBy([
+                            'user' => $member,
+                            'userGroup' => $group
+                        ]);
+                        
+                        return [
+                            'id' => $member->getId(),
+                            'email' => $member->getEmail(),
+                            'role' => $role ? $role->getRole() : 'ROLE_MEMBER'
+                        ];
+                    }, $group->getUsers()->toArray());
+
+                    return [
+                        'id' => $group->getId(),
+                        'name' => $group->getName(),
+                        'owner' => [
+                            'id' => $group->getOwner()->getId(),
+                            'email' => $group->getOwner()->getEmail()
+                        ],
+                        'members' => $members,
+                        'currentUserRole' => $this->groupRoleRepository->findOneBy([
+                            'user' => $user,
+                            'userGroup' => $group
+                        ])?->getRole() ?? 'ROLE_MEMBER'
+                    ];
+                }, $groups)
             ]);
         } catch (\Exception $e) {
             return $this->json([
@@ -290,6 +312,54 @@ class UserGroupController extends AbstractController
                 ], $members->toArray()),
                 'investments' => $investments,
                 'createdAt' => $group->getCreatedAt()->format('Y-m-d H:i:s')
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'error' => 'Une erreur est survenue',
+                'message' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/{id}/members/{memberId}/role', methods: ['PUT'])]
+    public function updateMemberRole(UserGroup $group, int $memberId, Request $request): JsonResponse
+    {
+        $cognitoId = $request->headers->get('x-cognito-id');
+        $data = json_decode($request->getContent(), true);
+        
+        if (!$cognitoId) {
+            return $this->json([
+                'error' => 'Unauthorized: Missing cognito ID'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+        
+        try {
+            $currentUser = $this->userRepository->findByCognitoId($cognitoId);
+            if (!$currentUser || $group->getOwner()->getId() !== $currentUser->getId()) {
+                return $this->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+            }
+
+            $memberToUpdate = $this->userRepository->find($memberId);
+            if (!$memberToUpdate) {
+                return $this->json(['error' => 'Member not found'], Response::HTTP_NOT_FOUND);
+            }
+
+            // Vérifier que le rôle est valide
+            if (!in_array($data['role'], [GroupRole::ROLE_ADMIN, GroupRole::ROLE_MEMBER])) {
+                return $this->json(['error' => 'Invalid role'], Response::HTTP_BAD_REQUEST);
+            }
+
+            // Mettre à jour le rôle via le repository
+            $groupRole = $this->groupRoleRepository->updateOrCreateRole($memberToUpdate, $group, $data['role']);
+            $this->entityManager->flush();
+
+            return $this->json([
+                'success' => true,
+                'member' => [
+                    'id' => $memberToUpdate->getId(),
+                    'email' => $memberToUpdate->getEmail(),
+                    'role' => $groupRole->getRole()
+                ]
             ]);
         } catch (\Exception $e) {
             return $this->json([
