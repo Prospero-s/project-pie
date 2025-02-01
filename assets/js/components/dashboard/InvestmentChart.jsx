@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { fetchInvestmentByCompanyIdAndYear } from "../../services/investment/investmentService";
-import { subMonths, addMonths } from "date-fns";
+import { fetchInvestmentByCompanyIdAndYear } from "@/services/investment/investmentService";
 import { Button } from "antd";
 import { useParams } from "react-router-dom";
+import LineChartComponent from "@/components/graphes/LineChart";
 
 const InvestmentChart = () => {
   const [data, setData] = useState([]);
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const currentDate = new Date();
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { id } = useParams();
@@ -15,14 +15,7 @@ const InvestmentChart = () => {
   const loadData = async () => {
     try {
       setIsLoading(true);
-      
-      const response = await fetchInvestmentByCompanyIdAndYear(
-        id,
-        currentYear
-      );
-      
-      console.log(response);
-
+      const response = await fetchInvestmentByCompanyIdAndYear(id, selectedYear);
       setData(response);
       setError(null);
     } catch (err) {
@@ -35,46 +28,32 @@ const InvestmentChart = () => {
 
   useEffect(() => {
     loadData();
-  }, [currentYear]);
-
-  const navigateMonths = (direction) => {
-    setCurrentDate(prev => {
-      if (direction === "previous") {
-        return subMonths(prev, 6);
-      } else {
-        return addMonths(prev, 6);
-      }
-    });
-  };
+  }, [selectedYear, id]);
 
   const nextYear = () => {
-      setCurrentYear(prevYear => prevYear + 1);
+    const nextYear = selectedYear + 1;
+    if (nextYear <= currentDate.getFullYear()) {
+      setSelectedYear(nextYear);
+    }
   };
 
   const prevYear = () => {
-      setCurrentYear(prevYear => prevYear - 1);
+    setSelectedYear(prevYear => prevYear - 1);
   };
 
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">
-          Évolution des investissements
+          Évolution des investissements {selectedYear}
         </h2>
         <div className="flex gap-2">
-          <Button
-            onClick={() => navigateMonths("previous")}
-            variant="outline"
-            size="sm"
+          <Button onClick={prevYear}>← Année précédente</Button>
+          <Button 
+            onClick={nextYear}
+            disabled={selectedYear >= currentDate.getFullYear()}
           >
-            ← 6 mois
-          </Button>
-          <Button
-            onClick={() => navigateMonths("next")}
-            variant="outline"
-            size="sm"
-          >
-            6 mois →
+            Année suivante →
           </Button>
         </div>
       </div>
@@ -88,41 +67,17 @@ const InvestmentChart = () => {
           <div className="flex justify-center items-center h-[350px] text-red-500">
             {error}
           </div>
+        ) : data.length === 0 ? (
+          <div className="flex justify-center items-center h-[350px] text-gray-500">
+            Aucune donnée disponible pour l'année {selectedYear}
+          </div>
         ) : (
-          <ResponsiveContainer width="100%" height={350}>
-            <LineChart data={data}>
-              <XAxis
-                dataKey="month"
-                stroke="#888888"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-                angle={-45}
-                textAnchor="end"
-                height={60}
-              />
-              <YAxis
-                dataKey="investment"
-                stroke="#888888"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-                tickFormatter={(value) => `${(value / 1000).toFixed(0)}k€`}
-              />
-              <Tooltip 
-                formatter={(value) => [`${value.toLocaleString()}€`, "Montant"]}
-                labelStyle={{ color: "#888888" }}
-              />
-              <Line
-                type="monotone"
-                dataKey="investment"
-                stroke="#8884d8"
-                strokeWidth={2}
-                activeDot={{ r: 8 }}
-                dot={{ r: 4 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <LineChartComponent 
+            data={data} 
+            xDataKey="month" 
+            yDataKey="investment"
+            height={350}
+          />
         )}
       </div>
     </div>
