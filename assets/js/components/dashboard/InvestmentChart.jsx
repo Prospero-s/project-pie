@@ -1,136 +1,59 @@
 import React, { useState, useEffect } from "react";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { format, subMonths, addMonths } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { Auth } from 'aws-amplify';
+import { fetchInvestmentByCompanyIdAndYear } from "../../services/investment/investmentService";
+import { subMonths, addMonths } from "date-fns";
+import { Button } from "antd";
+import { useParams } from "react-router-dom";
 
-const getInvestmentGrowthRate = (fundingType) => {
-  if (!fundingType) return 0.05; // Taux par défaut
-  
-  switch (fundingType.toLowerCase()) {
-    case 'seed': return 0.03;
-    case 'seriea': return 0.05;
-    case 'serieb': return 0.07;
-    case 'seriec': return 0.10;
-    case 'growth': return 0.06;
-    case 'ipo': return 0.08;
-    case 'debt': return 0.04;
-    case 'grant': return 0.02;
-    default: return 0.05;
-  }
-};
-
-const InvestmentChart = ({ selectedCompanyId }) => {
-  const [chartData, setChartData] = useState([]);
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [loading, setLoading] = useState(true);
+const InvestmentChart = () => {
+  const [data, setData] = useState([]);
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { id } = useParams();
 
-  const calculateGrowth = (investments) => {
-    if (!Array.isArray(investments) || investments.length === 0) {
-      return [];
-    }
-
-    // Filtrer les investissements pour ne garder que ceux de l'entreprise sélectionnée
-    const filteredInvestments = selectedCompanyId 
-      ? investments.filter(inv => inv.companyId === selectedCompanyId)
-      : investments;
-
-    const monthlyData = new Map();
-    const endDate = new Date();
-    
-    filteredInvestments.forEach(investment => {
-      try {
-        let currentAmount = parseInt(investment.amount) || 0;
-        let currentDate = new Date(investment.investedAt);
-        
-        if (isNaN(currentDate.getTime())) {
-          console.warn('Date invalide:', investment.investedAt);
-          return;
-        }
-
-        const growthRate = getInvestmentGrowthRate(investment.fundingType);
-        
-        while (currentDate <= endDate) {
-          const monthKey = format(currentDate, 'yyyy-MM');
-          const existingAmount = monthlyData.get(monthKey) || 0;
-          monthlyData.set(monthKey, existingAmount + currentAmount);
-          
-          currentAmount = currentAmount * (1 + growthRate);
-          currentDate = addMonths(currentDate, 1);
-        }
-      } catch (err) {
-        console.warn('Erreur de traitement pour un investissement:', err);
-      }
-    });
-
-    return Array.from(monthlyData.entries())
-      .map(([monthKey, amount]) => ({
-        month: format(new Date(monthKey), 'MMMM yyyy', { locale: fr }),
-        amount: Math.round(amount)
-      }))
-      .sort((a, b) => new Date(a.month) - new Date(b.month));
-  };
-
-  const fetchInvestmentData = async () => {
+  const loadData = async () => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       
-      const session = await Auth.currentSession();
-      const cognitoId = session.getIdToken().payload.sub;
+      const response = await fetchInvestmentByCompanyIdAndYear(
+        id,
+        currentYear
+      );
       
-      const response = await fetch('/api/investments/chart-data', {
-        headers: {
-          'x-cognito-id': cognitoId
-        }
-      });
-      
-      const data = await response.json();
-      
-      if (data.error) {
-        throw new Error(data.message || data.error);
-      }
+      console.log(response);
 
-      const processedData = calculateGrowth(data);
-      setChartData(processedData);
+      setData(response);
       setError(null);
     } catch (err) {
-      console.error("Erreur de chargement:", err);
       setError("Erreur lors du chargement des données");
-      setChartData([]); // Réinitialiser les données en cas d'erreur
+      console.error(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchInvestmentData();
-  }, []);
+    loadData();
+  }, [currentYear]);
 
   const navigateMonths = (direction) => {
-    setCurrentDate(prev => direction === 'next' 
-      ? addMonths(prev, 1) 
-      : subMonths(prev, 1)
-    );
+    setCurrentDate(prev => {
+      if (direction === "previous") {
+        return subMonths(prev, 6);
+      } else {
+        return addMonths(prev, 6);
+      }
+    });
   };
 
-  if (loading) return (
-    <div className="flex justify-center items-center h-64">
-      <div className="text-lg">Chargement des données...</div>
-    </div>
-  );
+  const nextYear = () => {
+      setCurrentYear(prevYear => prevYear + 1);
+  };
 
-  if (error) return (
-    <div className="flex justify-center items-center h-64">
-      <div className="text-red-500 text-lg">{error}</div>
-    </div>
-  );
-
-  if (chartData.length === 0) return (
-    <div className="flex justify-center items-center h-64">
-      <div className="text-lg">Aucune donnée disponible</div>
-    </div>
-  );
+  const prevYear = () => {
+      setCurrentYear(prevYear => prevYear - 1);
+  };
 
   return (
     <div className="space-y-8">
@@ -138,59 +61,69 @@ const InvestmentChart = ({ selectedCompanyId }) => {
         <h2 className="text-2xl font-bold">
           Évolution des investissements
         </h2>
-        <div className="flex gap-4">
-          <button 
-            onClick={() => navigateMonths('prev')}
-            className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200"
+        <div className="flex gap-2">
+          <Button
+            onClick={() => navigateMonths("previous")}
+            variant="outline"
+            size="sm"
           >
-            ←
-          </button>
-          <span className="py-2">
-            {format(currentDate, 'MMMM yyyy', { locale: fr })}
-          </span>
-          <button 
-            onClick={() => navigateMonths('next')}
-            className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200"
+            ← 6 mois
+          </Button>
+          <Button
+            onClick={() => navigateMonths("next")}
+            variant="outline"
+            size="sm"
           >
-            →
-          </button>
+            6 mois →
+          </Button>
         </div>
       </div>
       
       <div className="shadow-lg rounded-lg p-6 bg-white">
-        <ResponsiveContainer width="100%" height={350}>
-          <LineChart data={chartData}>
-            <XAxis
-              dataKey="month"
-              stroke="#888888"
-              fontSize={12}
-              tickLine={false}
-              axisLine={false}
-            />
-            <YAxis
-              stroke="#888888"
-              fontSize={12}
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={(value) => `${new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value)}`}
-            />
-            <Tooltip 
-              formatter={(value) => [
-                new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value),
-                "Montant"
-              ]}
-              labelStyle={{ color: "#888888" }}
-            />
-            <Line
-              type="monotone"
-              dataKey="amount"
-              stroke="#8884d8"
-              strokeWidth={2}
-              dot={{ r: 4 }}
-              activeDot={{ r: 8 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        {isLoading ? (
+          <div className="flex justify-center items-center h-[350px]">
+            Chargement...
+          </div>
+        ) : error ? (
+          <div className="flex justify-center items-center h-[350px] text-red-500">
+            {error}
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={350}>
+            <LineChart data={data}>
+              <XAxis
+                dataKey="month"
+                stroke="#888888"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+                angle={-45}
+                textAnchor="end"
+                height={60}
+              />
+              <YAxis
+                dataKey="investment"
+                stroke="#888888"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(value) => `${(value / 1000).toFixed(0)}k€`}
+              />
+              <Tooltip 
+                formatter={(value) => [`${value.toLocaleString()}€`, "Montant"]}
+                labelStyle={{ color: "#888888" }}
+              />
+              <Line
+                type="monotone"
+                dataKey="investment"
+                stroke="#8884d8"
+                strokeWidth={2}
+                activeDot={{ r: 8 }}
+                dot={{ r: 4 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );

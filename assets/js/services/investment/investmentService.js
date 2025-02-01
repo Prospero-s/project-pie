@@ -48,4 +48,18 @@ export const fetchInvestmentById = async (id) => {
     });
     throw error;
   }
-}; 
+};
+
+export const fetchInvestmentByCompanyIdAndYear = async (id, year) => {
+  try {
+    const response = await axios.get(`/api/investments/${id}/${year}`);
+    return response.data;
+  } catch (error) {
+    console.error("Erreur détaillée:", {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
+    throw error;
+  }
+};
