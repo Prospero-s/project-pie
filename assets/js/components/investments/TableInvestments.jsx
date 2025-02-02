@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Skeleton, Table, Tooltip, Select, message } from 'antd';
-import { DeleteOutlined, EyeOutlined, FileAddOutlined, InboxOutlined } from '@ant-design/icons';
+import { Skeleton, Table, message, Tag, Spin } from 'antd';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { fetchInvestments } from '@/services/investment/investmentService';
 import AddCompanyModal from './AddCompanyModal';
+import InvestmentActions from './table/InvestmentActions';
+import EmptyInvestmentState from './table/EmptyInvestmentState';
+import NoResultsState from './table/NoResultsState';
 
 const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
   const { t } = useTranslation('investments', { i18n });
@@ -34,12 +36,20 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
     try {
       setLoading(true);
       const response = await fetchInvestments(params);
+      
+      if (!response.data || !Array.isArray(response.data)) {
+        console.error('Format de données invalide:', response);
+        message.error(t('common.error_invalid_data'));
+        return;
+      }
+
       setInvestments(response.data);
       setPagination({
         current: response.page,
         pageSize: response.limit,
         total: response.total
       });
+      
       if (params.sortField) {
         setSortedInfo({
           columnKey: params.sortField.includes('.') ? params.sortField.split('.')[1] : params.sortField,
@@ -47,6 +57,7 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
         });
       }
     } catch (error) {
+      console.error('Erreur de chargement:', error);
       message.error(t('common.error_loading'));
     } finally {
       setLoading(false);
@@ -67,7 +78,7 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
     }
 
     if (sorter.field) {
-      if (Array.isArray(sorter.field) && sorter.field[0] === 'investment' && sorter.field[1] === 'amount') {
+      if (Array.isArray(sorter.field) && sorter.field[0] === 'investment' && sorter.field[1] === 'totalAmount') {
         params.sortField = 'amount';
       } else {
         params.sortField = Array.isArray(sorter.field) ? sorter.field.join('.') : sorter.field;
@@ -111,6 +122,29 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
     });
   };
 
+  const getFundingTypeColor = (type) => {
+    switch (type) {
+      case 'seed':
+        return 'green';
+      case 'serieA':
+        return 'blue';
+      case 'serieB':
+        return 'purple';
+      case 'serieC':
+        return 'magenta';
+      case 'growth':
+        return 'cyan';
+      case 'ipo':
+        return 'gold';
+      case 'debt':
+        return 'orange';
+      case 'grant':
+        return 'lime';
+      default:
+        return 'default';
+    }
+  };
+
   const columns = [
     {
       title: t('company_details.company.name'),
@@ -152,17 +186,17 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
     },
     {
       title: t('funding.amount'),
-      dataIndex: ['investment', 'amount'],
+      dataIndex: ['investment', 'totalAmount'],
       key: 'amount',
       sorter: true,
       sortOrder: sortedInfo.columnKey === 'amount' ? sortedInfo.order : null,
       render: (_, record) => loading ? 
         <Skeleton.Input block active size="small" /> :
-        (record.investment?.amount ? `${Number(record.investment.amount).toLocaleString()} €` : '-')
+        (record.investment?.totalAmount ? `${Number(record.investment.totalAmount).toLocaleString()} €` : '-')
     },
     {
       title: t('funding.type'),
-      dataIndex: 'investment',
+      dataIndex: ['investment', 'fundingTypes'],
       key: 'fundingType',
       filters: [
         { text: t('funding.types.seed'), value: 'seed' },
@@ -173,10 +207,16 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
         { text: t('funding.types.ipo'), value: 'ipo' },
       ],
       filteredValue: activeFilters.fundingType,
-      render: (investment) => loading ? (
+      render: (_, record) => loading ? (
         <Skeleton.Input block active size="small" />
       ) : (
-        investment?.fundingType ? t(`funding.types.${investment.fundingType}`) : '-'
+        <div className="flex flex-wrap gap-1">
+          {record.investment?.fundingTypes?.map((type, index) => (
+            <Tag key={index} color={getFundingTypeColor(type)}>
+              {t(`funding.types.${type}`)}
+            </Tag>
+          ))}
+        </div>
       ),
     },
     {
@@ -199,21 +239,14 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
       title: t('actions.title'),
       key: 'actions',
       width: 100,
-      render: (text, record) =>
-        loading ? (
-          <Skeleton.Button active size="small" />
-        ) : (
-          <div className="flex items-center gap-4">
-            <FileAddOutlined
-              className="!text-blue-500 hover:!text-blue-700 text-lg cursor-pointer"
-              onClick={() => handleAdd(record.id)}
-            />
-            <DeleteOutlined 
-              className="!text-rose-500 hover:!text-rose-700 text-lg cursor-pointer" 
-              onClick={() => handleDelete(record.id)}
-            />
-          </div>
-        ),
+      render: (text, record) => (
+        <InvestmentActions
+          loading={loading}
+          onAdd={handleAdd}
+          onDelete={handleDelete}
+          recordId={record.id}
+        />
+      ),
     },
   ];
 
@@ -222,10 +255,7 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
   };
 
   const handleAdd = async (newInvestment) => {
-    // Fermer la modal
     setIsModalOpen(false);
-    
-    // Recharger les données avec les paramètres actuels
     await loadInvestments({
       page: pagination.current,
       limit: pagination.pageSize,
@@ -234,6 +264,14 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
       ...activeFilters
     });
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Spin />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -244,35 +282,13 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
         t={t}
       />
       <div className="rounded-lg border border-slate-200 flex flex-col w-full">
-        {loading ? (
-          <div className="flex items-center justify-center p-8">
-            <div className="text-center">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-4"></div>
-              <p className="text-gray-600">{t('common.loading')}</p>
-            </div>
-          </div>
-        ) : investments.length === 0 && !Object.values(activeFilters).some(filter => filter.length > 0) ? (
-          <div className="flex flex-col items-center justify-center p-8 text-center">
-            <div className="bg-gray-50 rounded-full p-4 mb-4">
-              <InboxOutlined className="text-4xl text-gray-400" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {t('no_investments.title')}
-            </h3>
-            <p className="text-gray-600 mb-4">
-              {t('no_investments.description')}
-            </p>
-            <Button type="primary" onClick={() => setIsModalOpen(true)}>
-              {t('common.add')}
-            </Button>
-          </div>
+        {investments.length === 0 && !Object.values(activeFilters).some(filter => filter.length > 0) ? (
+          <EmptyInvestmentState t={t} onAddClick={() => setIsModalOpen(true)} />
         ) : (
           <div className="overflow-x-auto">
             <Table
               columns={columns}
-              size="middle"
               dataSource={investments}
-              loading={loading}
               onChange={handleTableChange}
               pagination={pagination}
               sortDirections={['ascend', 'descend']}
@@ -280,22 +296,9 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
                 index % 2 === 0 ? '!bg-white hover:!bg-blue-50' : '!bg-slate-50 hover:!bg-blue-50'
               }
               locale={{
-                emptyText: (
-                  <div className="flex flex-col items-center justify-center py-8">
-                    <div className="bg-gray-50 rounded-full p-4 mb-4">
-                      <InboxOutlined className="text-4xl text-blue-500" />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      {t('no_results.title')}
-                    </h3>
-                    <p className="text-gray-600 mb-4">
-                      {t('no_results.description')}
-                    </p>
-                    <Button onClick={handleReset} type="primary">
-                      {t('common.reset_filters')}
-                    </Button>
-                  </div>
-                )
+                filterConfirm: t('common.confirm'),
+                filterReset: t('common.reset'),
+                emptyText: <NoResultsState t={t} onReset={handleReset} />
               }}
             />
           </div>

@@ -29,9 +29,11 @@ export const signInWithEmail = async (email, password, t, setUser, navigate, lng
   try {
     const cognitoUser = await Auth.signIn(email, password);
     
+    const userId = cognitoUser.attributes.sub;
+
     // Formatage des données utilisateur
     const userData = {
-      id: cognitoUser.username,
+      id: userId,
       email: cognitoUser.attributes.email,
       user_metadata: {
         full_name: cognitoUser.attributes.name || '',
@@ -44,16 +46,17 @@ export const signInWithEmail = async (email, password, t, setUser, navigate, lng
     };
 
     if (cognitoUser) {
-      openNotificationWithIcon('success', t('login_success'), t('login_success_message'));
       setUser(userData);
       navigate(`/${lng}/dashboard`);
+      openNotificationWithIcon('success', t('login_success'), t('login_success_message'));
     }
     return { showVerificationModal: false };
   } catch (error) {
     if (error.code === 'UserNotConfirmedException') {
       return { showVerificationModal: true };
+    } else {
+      openNotificationWithIcon('error', t('login_error'), t('login_error_message'));
     }
-    openNotificationWithIcon('error', t('login_error'), t('login_error_message'));
     return { showVerificationModal: false };
   }
 };
@@ -186,17 +189,14 @@ export const handleAuthCallback = async (code, state) => {
   }
 };
 
-export const signOut = async (t, lng = 'fr') => {
+export const signOut = async (t, lng = 'fr', navigate) => {
   try {
-    // Récupérer l'utilisateur actuel pour vérifier le type d'authentification
     const currentUser = await Auth.currentAuthenticatedUser();
-    // Les utilisateurs fédérés auront un type d'authentification différent de 'USER_SRP_AUTH'
     const isFederatedUser = currentUser.authenticationFlowType !== 'USER_SRP_AUTH';
 
     await Auth.signOut();
 
     if (isFederatedUser) {
-      // Pour les utilisateurs fédérés, utiliser l'URL de déconnexion Cognito
       const cognitoDomain = import.meta.env.VITE_AWS_COGNITO_DOMAIN;
       const clientId = import.meta.env.VITE_AWS_CLIENT_ID;
       const signOutUrl = encodeURIComponent(`${window.location.protocol}//${window.location.host}/${lng}/auth/signin`);
@@ -207,8 +207,7 @@ export const signOut = async (t, lng = 'fr') => {
 
       window.location.replace(logoutUrl.toString());
     } else {
-      // Pour les utilisateurs standards, rediriger directement
-      window.location.href = `/${lng}/auth/signin`;
+      navigate(`/${lng}/auth/signin`, { replace: true });
     }
 
   } catch (error) {

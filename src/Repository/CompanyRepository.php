@@ -3,35 +3,52 @@
 namespace App\Repository;
 
 use App\Entity\Company;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Representative;
 use App\Entity\CompanyAddress;
 use App\Entity\CompanyInvestment;
+use App\Service\User\UserService;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class CompanyRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry, EntityManagerInterface $em)
-    {
+    public function __construct(
+        ManagerRegistry $registry, 
+        EntityManagerInterface $em,
+        private UserService $userService
+    ) {
         parent::__construct($registry, Company::class);
         $this->em = $em;
     }
 
-    public function saveCompany(string $cognitoId, array $data): array
+    public function saveCompany(string $cognitoId, string $email, array $data): array
     {
         try {
-            // Extraire le sub du token JWT
-            $tokenParts = explode('.', $cognitoId);
-            $payload = json_decode(base64_decode($tokenParts[1]), true);
-            $sub = $payload['sub'] ?? throw new \Exception('Token invalide : sub manquant');
+            // Récupérer l'utilisateur qui crée l'investissement
+            $creatingUser = $this->userService->getOrCreateUser($cognitoId, $email);
+
+            // Récupérer l'utilisateur à qui attribuer l'investissement
+            $investorUser = isset($data['investorId']) && $data['investorId']
+                ? $this->em->getRepository(User::class)->find($data['investorId'])
+                : $creatingUser;
+
+            if (!$investorUser) {
+                throw new \Exception('Investisseur non trouvé');
+            }
+
+            // Vérifier que les utilisateurs sont dans le même groupe
+            if ($creatingUser->getUserGroup() !== $investorUser->getUserGroup()) {
+                throw new \Exception('L\'investisseur doit être dans le même groupe');
+            }
 
             // Recherche ou création de l'entreprise
             $company = $this->em->getRepository(Company::class)->findOneBy(['siren' => $data['siren']]);
             
             if (!$company) {
                 $company = new Company();
-                $company->setCognitoId($sub);
                 $company->setSiren($data['siren']);
                 $company->setDenomination($data['denomination']);
                 $company->setBusinessStructures($data['businessStructures'] ?? null);
@@ -39,6 +56,7 @@ class CompanyRepository extends ServiceEntityRepository
                 $company->setSiret($data['siret'] ?? null);
                 $company->setUpdatedAt(new \DateTime());
                 $company->setSector($data['sector'] ?? null);
+
                 //Création des représentants
                 foreach ($data['representants'] as $representant) {
                     $representantEntity = new Representative();
@@ -65,18 +83,10 @@ class CompanyRepository extends ServiceEntityRepository
                 $this->em->persist($company);
             }
 
-            // Ajout de l'investisseur comme représentant
-            $investorRepresentative = new Representative();
-            $investorRepresentative->setCompany($company);
-            $investorRepresentative->setNom($data['investorName'] ?? 'Investisseur');
-            $investorRepresentative->setQualite('Investisseur');
-            $investorRepresentative->setCognitoId($sub);
-            $this->em->persist($investorRepresentative);
-
-            // Création de l'investissement
+            // Modification de la création de l'investissement
             $investment = new CompanyInvestment();
             $investment->setCompany($company);
-            $investment->setCognitoId($sub);
+            $investment->setUser($investorUser);
             $investment->setFundingType($data['fundingType']);
             $investment->setAmount($data['amountRaised']);
             $investment->setCurrency($data['currency'] ?? 'EUR');
@@ -85,16 +95,16 @@ class CompanyRepository extends ServiceEntityRepository
             $this->em->flush();
 
             return [
-                'success' => true,
-                'company' => [
-                    'id' => $company->getId(),
-                    'siren' => $company->getSiren(),
-                    'denomination' => $company->getDenomination()
-                ],
+                'id' => $company->getId(),
+                'siren' => $company->getSiren(),
+                'denomination' => $company->getDenomination(),
                 'investment' => [
                     'id' => $investment->getId(),
                     'amount' => $investment->getAmount(),
-                    'fundingType' => $investment->getFundingType()
+                    'investor' => [
+                        'id' => $investorUser->getId(),
+                        'email' => $investorUser->getEmail()
+                    ]
                 ]
             ];
         } catch (\Exception $e) {
@@ -102,97 +112,141 @@ class CompanyRepository extends ServiceEntityRepository
         }
     }
 
-    public function findByFilters(array $filters): array
+    public function findByFiltersWithPagination(array $filters, string $cognitoId, int $page = 1, int $limit = 10, string $sortField = 'updatedAt', string $sortOrder = 'desc'): array
     {
-        $qb = $this->createQueryBuilder('c')
-            ->leftJoin('c.investment', 'i')
-            ->where('c.deletedAt is NULL');
+        try {
+            $qb = $this->createQueryBuilder('c')
+                ->select(
+                    'c as company',
+                    '(SELECT COALESCE(SUM(inv_sum.amount), 0) 
+                      FROM App\Entity\CompanyInvestment inv_sum 
+                      JOIN inv_sum.user usr_sum 
+                      JOIN usr_sum.userGroup grp_sum 
+                      WHERE inv_sum.company = c.id 
+                      AND grp_sum.id = (
+                          SELECT DISTINCT g_sum.id 
+                          FROM App\Entity\User u_sum 
+                          JOIN u_sum.userGroup g_sum 
+                          WHERE u_sum.cognitoId = :cognitoId
+                      )
+                    ) as group_total_amount',
+                    '(SELECT MAX(inv_date.investedAt)
+                      FROM App\Entity\CompanyInvestment inv_date
+                      JOIN inv_date.user usr_date
+                      JOIN usr_date.userGroup grp_date
+                      WHERE inv_date.company = c.id
+                      AND grp_date.id = (
+                          SELECT DISTINCT g_date.id
+                          FROM App\Entity\User u_date
+                          JOIN u_date.userGroup g_date
+                          WHERE u_date.cognitoId = :cognitoId
+                      )
+                    ) as last_investment_date'
+                )
+                ->join('c.investments', 'i_main')
+                ->join('i_main.user', 'main_user')
+                ->join('main_user.userGroup', 'main_group')
+                ->where('main_group.id = (
+                    SELECT DISTINCT g.id 
+                    FROM App\Entity\User u 
+                    JOIN u.userGroup g 
+                    WHERE u.cognitoId = :cognitoId
+                )')
+                ->setParameter('cognitoId', $cognitoId)
+                ->groupBy('c.id');
 
-        if (!empty($filters['sector'])) {
-            $qb->andWhere('c.sector = :sector')
-               ->setParameter('sector', $filters['sector']);
-        }
-
-        if (!empty($filters['fundingType'])) {
-            $qb->andWhere('i.fundingType = :fundingType')
-               ->setParameter('fundingType', $filters['fundingType']);
-        }
-
-        return $qb->getQuery()->getResult();
-    }
-
-    public function findByFiltersWithPagination(array $filters, int $page = 1, int $limit = 10, string $sortField = 'updatedAt', string $sortOrder = 'desc'): array
-    {
-        $qb = $this->createQueryBuilder('c')
-            ->select('c', 'i')
-            ->leftJoin('c.investment', 'i')
-            ->where('c.deletedAt is NULL');
-
-        // Application des filtres multiples
-        if (!empty($filters['sector'])) {
-            if (is_array($filters['sector'])) {
+            // Application des filtres
+            if (!empty($filters['sector'])) {
                 $qb->andWhere('c.sector IN (:sectors)')
                    ->setParameter('sectors', $filters['sector']);
-            } else {
-                $qb->andWhere('c.sector = :sector')
-                   ->setParameter('sector', $filters['sector']);
             }
-        }
 
-        if (!empty($filters['fundingType'])) {
-            if (is_array($filters['fundingType'])) {
-                $qb->andWhere('i.fundingType IN (:fundingTypes)')
+            if (!empty($filters['fundingType'])) {
+                $qb->andWhere('i_main.fundingType IN (:fundingTypes)')
                    ->setParameter('fundingTypes', $filters['fundingType']);
-            } else {
-                $qb->andWhere('i.fundingType = :fundingType')
-                   ->setParameter('fundingType', $filters['fundingType']);
             }
-        }
 
-        // Gestion du tri
-        switch ($sortField) {
-            case 'amount':
-                $qb->orderBy('i.amount', $sortOrder);
-                break;
-            case 'updatedAt':
-                $qb->orderBy('c.updatedAt', $sortOrder);
-                break;
-            case 'denomination':
-                $qb->orderBy('c.denomination', $sortOrder);
-                break;
-            default:
-                $qb->orderBy('c.updatedAt', 'DESC');
-        }
+            // Gestion du tri
+            switch ($sortField) {
+                case 'amount':
+                    $qb->orderBy('group_total_amount', $sortOrder);
+                    break;
+                case 'updatedAt':
+                    $qb->orderBy('last_investment_date', $sortOrder);
+                    break;
+                case 'denomination':
+                    $qb->orderBy('c.denomination', $sortOrder);
+                    break;
+                default:
+                    $qb->orderBy('last_investment_date', 'DESC');
+            }
 
-        // Calcul du total avant pagination
-        $countQb = clone $qb;
-        $total = count($countQb->getQuery()->getResult());
+            // Debug de la requête SQL
+            $query = $qb->getQuery();
+            $sql = $query->getSQL();
+            $params = $query->getParameters();
+            
+            // Log pour debug
+            error_log("SQL Query: " . $sql);
+            error_log("Parameters: " . json_encode($params->map(function($param) {
+                return $param->getValue();
+            })));
 
-        // Pagination
-        $qb->setFirstResult(($page - 1) * $limit)
-           ->setMaxResults($limit);
+            // Calcul du total
+            $countQb = clone $qb;
+            $total = count($countQb->getQuery()->getResult());
 
-        $results = $qb->getQuery()->getResult();
+            // Pagination
+            $qb->setFirstResult(($page - 1) * $limit)
+               ->setMaxResults($limit);
 
-        // Formatage des données
-        $formattedResults = array_map(function($company) {
+            $results = $qb->getQuery()->getResult();
+
+            // Après avoir obtenu les résultats, nous allons chercher les types de financement séparément
+            $formattedResults = array_map(function($result) use ($cognitoId) {
+                $company = $result['company'];
+                
+                // Requête séparée pour obtenir les types de financement
+                $fundingTypes = $this->createQueryBuilder('c2')
+                    ->select('DISTINCT i.fundingType')
+                    ->join('c2.investments', 'i')
+                    ->join('i.user', 'u')
+                    ->join('u.userGroup', 'g')
+                    ->where('c2.id = :companyId')
+                    ->andWhere('g.id = (
+                        SELECT DISTINCT g2.id 
+                        FROM App\Entity\User u2 
+                        JOIN u2.userGroup g2 
+                        WHERE u2.cognitoId = :cognitoId
+                    )')
+                    ->setParameter('companyId', $company->getId())
+                    ->setParameter('cognitoId', $cognitoId)
+                    ->getQuery()
+                    ->getScalarResult();
+
+                return [
+                    'id' => $company->getId(),
+                    'denomination' => $company->getDenomination(),
+                    'sector' => $company->getSector(),
+                    'updatedAt' => $result['last_investment_date'] ? 
+                        (new \DateTime($result['last_investment_date']))->format('Y-m-d H:i:s') : null,
+                    'investment' => [
+                        'totalAmount' => (int)$result['group_total_amount'],
+                        'fundingTypes' => array_column($fundingTypes, 'fundingType')
+                    ]
+                ];
+            }, $results);
+
             return [
-                'id' => $company->getId(),
-                'denomination' => $company->getDenomination(),
-                'sector' => $company->getSector(),
-                'updatedAt' => $company->getUpdatedAt()->format('Y-m-d H:i:s'),
-                'investment' => $company->getInvestment() ? [
-                    'amount' => $company->getInvestment()->getAmount(),
-                    'fundingType' => $company->getInvestment()->getFundingType(),
-                ] : null,
+                'data' => $formattedResults,
+                'total' => $total,
+                'page' => $page,
+                'limit' => $limit
             ];
-        }, $results);
-
-        return [
-            'data' => $formattedResults,
-            'total' => $total,
-            'page' => $page,
-            'limit' => $limit
-        ];
+        } catch (\Exception $e) {
+            error_log("Error in findByFiltersWithPagination: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
+            throw $e;
+        }
     }
 } 

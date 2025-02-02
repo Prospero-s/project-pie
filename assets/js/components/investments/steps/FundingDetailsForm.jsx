@@ -1,5 +1,6 @@
 import React from 'react';
 import { Form, InputNumber, Select, Button } from 'antd';
+import InvestorSelection from './InvestorSelection';
 
 const FundingDetailsForm = ({ companyData, onFinish, t }) => {
   const [form] = Form.useForm();
@@ -19,15 +20,28 @@ const FundingDetailsForm = ({ companyData, onFinish, t }) => {
     { value: 'ipo', label: t('funding.types.ipo') }
   ];
 
+  const handleFinish = (values) => {
+    onFinish({
+      ...values,
+      investorId: values.investorId
+    });
+  };
+
   return (
     <Form
       form={form}
       layout="vertical"
-      onFinish={onFinish}
+      onFinish={handleFinish}
       initialValues={{
         currency: companyData?.devise || 'EUR'
       }}
     >
+      <InvestorSelection
+        name="investorId"
+        rules={[{ required: true, message: t('select_investor.investor-required') }]}
+        t={t}
+      />
+
       <Form.Item
         name="fundingType"
         label={t('funding.type')}

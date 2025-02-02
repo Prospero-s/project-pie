@@ -61,8 +61,12 @@ const UserAuthListener = ({ setUser, setLoading }: { setUser: (user: FormattedUs
       const cognitoUser = await Auth.currentAuthenticatedUser();
       if (cognitoUser) {
         const { idToken, accessToken } = cognitoUser.signInUserSession;
+        
+        // Utiliser le sub comme ID Cognito
+        const userId = idToken.payload.sub;
+        
         const userData = {
-          id: cognitoUser.username,
+          id: userId,
           email: idToken.payload.email,
           user_metadata: {
             full_name: idToken.payload.name || '',

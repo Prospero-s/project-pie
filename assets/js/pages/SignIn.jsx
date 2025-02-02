@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '@/context/userContext';
 import SignInForm from '@/components/signin/SignInForm';
-import SignInButtons from '@/components/signin/SignInButtons';
 import VerificationModal from '@/components/signin/VerificationModal';
 import ForgotPasswordModal from '@/components/signin/ForgotPasswordModal';
 import gsap from 'gsap';
@@ -142,7 +141,7 @@ const SignIn = ({ i18n }) => {
           {t('no_account')}{' '}
           <Button
             type="link"
-            href={`/${lng}/auth/signup`}
+            onClick={() => navigate(`/${lng}/auth/signup`)}
             className="text-primary hover:text-primary/80 font-medium !p-0"
           >
             {t('create_account')}

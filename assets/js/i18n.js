@@ -12,10 +12,14 @@ import frInvestments from './locales/fr/investments.json';
 import enInvestments from './locales/en/investments.json';
 import frAllCompanies from './locales/fr/allCompanies.json';
 import enAllCompanies from './locales/en/allCompanies.json';
+import frGroups from './locales/fr/groups.json';
+import enGroups from './locales/en/groups.json';
 import enGlobal from './locales/en/global.json';
 import frGlobal from './locales/fr/global.json';
 import enDashboard from './locales/en/dashboard.json';
 import frDashboard from './locales/fr/dashboard.json';
+import enSettings from './locales/en/settings.json';
+import frSettings from './locales/fr/settings.json';
 
 i18n
   .use(initReactI18next)
@@ -27,8 +31,10 @@ i18n
         menu: frMenu,
         investments: frInvestments,
         allCompanies: frAllCompanies,
+        groups: frGroups,
         global: frGlobal,
-        dashboard: frDashboard
+        dashboard: frDashboard,
+        settings: frSettings
       },
       en: {
         signin: enSignIn,
@@ -36,8 +42,10 @@ i18n
         menu: enMenu,
         investments: enInvestments,
         allCompanies: enAllCompanies,
+        groups: enGroups,
         global: enGlobal,
-        dashboard: enDashboard
+        dashboard: enDashboard,
+        settings: enSettings
       },
     },
     lng: 'fr',

@@ -12,12 +12,13 @@ class CompanyInvestment
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(inversedBy: 'investment')]
+    #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'investments')]
     #[ORM\JoinColumn(nullable: false)]
     private Company $company;
 
-    #[ORM\Column(length: 255)]
-    private string $cognitoId;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'investments')]
+    #[ORM\JoinColumn(nullable: false)]
+    private User $user;
 
     #[ORM\Column(type: 'string', length: 50)]
     private string $fundingType;
@@ -52,14 +53,14 @@ class CompanyInvestment
         return $this;
     }
 
-    public function getCognitoId(): string
+    public function getUser(): User
     {
-        return $this->cognitoId;
+        return $this->user;
     }
 
-    public function setCognitoId(string $cognitoId): self
+    public function setUser(User $user): self
     {
-        $this->cognitoId = $cognitoId;
+        $this->user = $user;
         return $this;
     }
 

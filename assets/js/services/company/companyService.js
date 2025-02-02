@@ -79,11 +79,11 @@ export const fetchCompanyDetails = async (siren, t) => {
 
 export const saveCompany = async (companyData) => {
   try {
-    const cognitoId = await Auth.currentSession()
-      .then(session => session.getIdToken().getJwtToken())
-      .catch(() => null);
-
-    if (!cognitoId) {
+    const session = await Auth.currentSession();
+    const cognitoId = session.getIdToken().payload.sub;
+    const email = session.getIdToken().payload.email;
+    const name = session.getIdToken().payload.name;
+    if (!cognitoId || !email) {
       throw new Error('Utilisateur non authentifié');
     }
 
@@ -91,7 +91,9 @@ export const saveCompany = async (companyData) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Cognito-Id': cognitoId
+        'X-Cognito-Id': cognitoId,
+        'X-Cognito-Email': email,
+        'X-Cognito-Name': name
       },
       body: JSON.stringify({
         siren: companyData.siren,
@@ -104,8 +106,8 @@ export const saveCompany = async (companyData) => {
         fundingType: companyData.fundingType,
         amountRaised: companyData.amountRaised,
         currency: companyData.currency || 'EUR',
-        updatedAt: companyData.updatedAt || new Date().toISOString(),
-        sector: companyData.sector
+        sector: companyData.sector,
+        investorId: companyData.investorId
       })
     });
 
@@ -116,16 +118,16 @@ export const saveCompany = async (companyData) => {
 
     const result = await response.json();
     
-    if (result.success) {
-      openNotificationWithIcon(
-        'success',
-        'Succès',
-        'L\'entreprise a été sauvegardée avec succès'
-      );
-      return result;
-    } else {
+    if (result.success === false) {
       throw new Error(result.error || 'Erreur lors de la sauvegarde');
     }
+
+    openNotificationWithIcon(
+      'success',
+      'Succès',
+      'L\'entreprise a été sauvegardée avec succès'
+    );
+    return result;
 
   } catch (error) {
     console.error('Erreur lors de la sauvegarde:', error);
@@ -136,7 +138,7 @@ export const saveCompany = async (companyData) => {
     );
     throw error;
   }
-}; 
+};
 
 export const getAllCompanies = async (page, pageSize) => {
   try {

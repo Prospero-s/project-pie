@@ -63,11 +63,13 @@ class CompanyController extends AbstractController
             }
 
             $cognitoId = $request->headers->get('X-Cognito-Id');
-            if (!$cognitoId) {
+            $email = $request->headers->get('X-Cognito-Email');
+
+            if (!$cognitoId || !$email) {
                 throw new \Exception('Utilisateur non authentifié');
             }
 
-            $result = $this->companyRepository->saveCompany($cognitoId, $data);
+            $result = $this->companyRepository->saveCompany($cognitoId, $email, $data);
             
             return new JsonResponse($result);
 

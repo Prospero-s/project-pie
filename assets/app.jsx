@@ -26,8 +26,16 @@ import AuthCallback from "@/pages/AuthCallback";
 import AuthLayout from "@/components/common/layout/AuthLayout";
 import ProtectedRoute from "@/components/common/auth/ProtectedRoute";
 import AppLayout from "@/components/common/layout/AppLayout";
-import.meta.glob(["../img/**"]);
+import GroupSelection from "@/pages/GroupSelection";
+import GroupRedirect from "@/components/common/redirect/GroupRedirect";
 import LanguageRedirect from "@/components/common/redirect/LanguageRedirect";
+import { RedirectProvider } from "@/context/redirectContext";
+import.meta.glob(["../img/**"]);
+
+// Exposer navigate globalement
+window._env_ = {
+  navigate: (path) => navigate(path)
+};
 
 // Détecter la langue initiale à partir de l'URL ou des préférences
 const detectInitialLanguage = () => {
@@ -76,10 +84,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <I18nextProvider i18n={i18n}>
       <UserProvider>
-        <Router>
-          <LanguageRedirect />
-          <Routes>
-            <Route
+        <RedirectProvider>
+          <Router>
+            <LanguageRedirect />
+            <GroupRedirect />
+            <Routes>
+              <Route
                 path="/:lng/auth/*"
                 element={
                   <AuthLayout i18n={i18n}>
@@ -88,6 +98,14 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                       <Route path="signup" element={<SignUp i18n={i18n} />} />
                     </Routes>
                   </AuthLayout>
+                }
+              />
+              <Route
+                path="/:lng/group-selection"
+                element={
+                  <ProtectedRoute i18n={i18n}>
+                    <GroupSelection i18n={i18n} />
+                  </ProtectedRoute>
                 }
               />
               <Route
@@ -105,8 +123,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                 }
               />
               <Route path="/auth/callback" element={<AuthCallback i18n={i18n} />} />
-          </Routes>
-        </Router>
+            </Routes>
+          </Router>
+        </RedirectProvider>
       </UserProvider>
     </I18nextProvider>
   </React.StrictMode>

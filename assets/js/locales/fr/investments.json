@@ -1,6 +1,7 @@
 {
   "my_portfolio": "Mon Portefeuille",
   "common": {
+    "error_invalid_data": "Impossible de récupérer les données",
     "add": "Ajouter",
     "cancel": "Annuler",
     "next": "Suivant",
@@ -12,7 +13,8 @@
     "search": "Rechercher",
     "back": "Retour",
     "confirm": "Confirmer",
-    "reset_filters": "Réinitialiser les filtres"
+    "reset_filters": "Réinitialiser les filtres",
+    "reset": "Réinitialiser"
   },
   "creation": {
     "title": "Création d'entreprise",
@@ -125,5 +127,10 @@
   "no_results": {
     "title": "Aucun résultat",
     "description": "Aucune startup ne correspond à vos filtres. Veuillez réessayer avec des filtres différents."
+  },
+  "select_investor": {
+    "investor": "Investisseur",
+    "investor-required": "Veuillez sélectionner un investisseur",
+    "select-investor": "Sélectionner un investisseur"
   }
 }

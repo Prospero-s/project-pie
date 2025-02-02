@@ -1,24 +1,35 @@
-import React from 'react';
-import { Navigate, useLocation, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useUser } from '@/context/userContext';
+import { Auth } from 'aws-amplify';
 
 const ProtectedRoute = ({ children, i18n }) => {
-  const { user, loading } = useUser();
-  const location = useLocation();
-  const { lng } = useParams();
+    const { user, loading } = useUser();
+    const location = useLocation();
+    const [isChecking, setIsChecking] = useState(true);
 
-  if (loading) {
-    return (
-      <>
-      </>
-    );
-  }
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                await Auth.currentAuthenticatedUser();
+                setIsChecking(false);
+            } catch (error) {
+                setIsChecking(false);
+            }
+        };
+        checkAuth();
+    }, []);
 
-  if (!user) {
-    return <Navigate to={`/${i18n.language}/auth/signin`} state={{ from: location }} replace />;
-  }
+    if (loading || isChecking) {
+        return null;
+    }
 
-  return children;
+    if (!user) {
+        const currentLang = i18n.language || 'fr';
+        return <Navigate to={`/${currentLang}/auth/signin`} state={{ from: location }} replace />;
+    }
+
+    return children;
 };
 
 export default ProtectedRoute;
