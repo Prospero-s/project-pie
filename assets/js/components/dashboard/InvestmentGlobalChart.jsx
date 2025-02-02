@@ -1,0 +1,59 @@
+import React, { useState, useEffect, useMemo } from "react";
+import { fetchGlobalInvestments } from "@/services/investment/investmentService";
+import PieChartComponent from "@/components/graphes/PieChart";
+
+export default function InvestmentGlobalChart() {
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const loadData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetchGlobalInvestments();
+      const formattedData = response.map(item => ({
+        ...item,
+        total_investment: parseFloat(item.total_investment)
+      }));
+      setData(formattedData);
+      setError(null);
+    } catch (err) {
+      setError("Erreur lors du chargement des données");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const totalInvestment = useMemo(() => {
+    return data.reduce((sum, curr) => sum + (curr.total_investment || 0), 0);
+  }, [data]);
+
+  if (isLoading) return <div className="flex justify-center items-center h-[400px]">Chargement des données...</div>;
+  if (error) return <div className="flex justify-center items-center h-[400px] text-red-500">{error}</div>;
+  if (!data || data.length === 0) return <div className="flex justify-center items-center h-[400px]">Aucune donnée disponible</div>;
+
+  return (
+    <div className="flex flex-col rounded-lg border bg-white shadow-lg p-6 h-[400px]">
+      <div className="flex flex-col space-y-1.5 mb-4 items-center">
+        <h3 className="text-2xl font-bold text-gray-900">
+          Investissements Globaux
+        </h3>
+        <p className="text-sm text-gray-500">{new Date().getFullYear()}</p>
+      </div>
+      <div className="flex-1">
+        <PieChartComponent 
+          data={data}
+          valueKey="total_investment"
+          nameKey="company_name"
+          height={300}
+          totalValue={totalInvestment}
+          totalLabel="Total investi"
+        />
+      </div>
+    </div>
+  );
+}

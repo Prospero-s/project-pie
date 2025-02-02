@@ -41,4 +41,76 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
 
         return $result->fetchAllAssociative();
     }
+
+    public function fetchGlobalInvestments(string $userId): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT 
+                c.id AS company_id,
+                c.denomination AS company_name,
+            COALESCE(SUM(ci.amount), 0) AS total_investment
+            FROM company c
+            LEFT JOIN company_investment ci 
+            ON c.id = ci.company_id 
+            AND ci.user_id = :userId
+            GROUP BY c.id, c.denomination
+            ORDER BY total_investment DESC;
+        ';
+
+        $stmt = $conn->prepare($sql);
+        $result = $stmt->executeQuery([
+            'userId' => $userId,
+        ]);
+
+        return $result->fetchAllAssociative();
+    }
+
+    public function fetchGlobalFundingInvestments(string $userId): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT 
+                ci.funding_type,
+            COALESCE(SUM(ci.amount), 0) AS total_investment
+            FROM company_investment ci
+            WHERE ci.user_id = :userId
+            GROUP BY ci.funding_type
+            ORDER BY total_investment DESC;
+        ';
+
+        $stmt = $conn->prepare($sql);
+        $result = $stmt->executeQuery([
+            'userId' => $userId,
+        ]);
+
+        return $result->fetchAllAssociative();
+    }
+
+    public function fetchGlobalSectorInvestments(string $userId): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT 
+                c.sector,
+            COALESCE(SUM(ci.amount), 0) AS total_investment
+            FROM company c
+            LEFT JOIN company_investment ci
+            ON c.id = ci.company_id
+            AND ci.user_id = :userId
+            GROUP BY c.sector
+            ORDER BY c.sector, total_investment DESC;
+        ';
+
+        $stmt = $conn->prepare($sql);
+        $result = $stmt->executeQuery([
+            'userId' => $userId,
+        ]);
+
+        return $result->fetchAllAssociative();
+    }
+
 }

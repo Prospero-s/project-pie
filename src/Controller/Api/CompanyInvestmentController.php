@@ -8,17 +8,21 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use App\Repository\UserRepository;
 
 #[Route('/api', name: 'api_')]
 class CompanyInvestmentController extends AbstractController
 {
     private $companyRepository;
     private $companyInvestmentRepository;
+    private $userRepository;
 
-    public function __construct(CompanyRepository $companyRepository, CompanyInvestmentRepository $companyInvestmentRepository)
+    public function __construct(CompanyRepository $companyRepository, CompanyInvestmentRepository $companyInvestmentRepository, UserRepository $userRepository)
     {
         $this->companyRepository = $companyRepository;
         $this->companyInvestmentRepository = $companyInvestmentRepository;
+        $this->userRepository = $userRepository;
     }
 
     #[Route('/investments', name: 'get_investments', methods: ['GET'])]
@@ -63,11 +67,69 @@ class CompanyInvestmentController extends AbstractController
         }
     }
 
+    #[Route('/investments/global/{cognitoId}', methods: ['GET'])]
+    public function getGlobalInvestments(string $cognitoId): JsonResponse
+    {
+        try {
+            $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
+            if (!$user) {
+                throw new \Exception('Utilisateur non trouvé');
+            }
+
+            $globalInvestments = $this->companyInvestmentRepository->fetchGlobalInvestments($user->getId());
+
+            return new JsonResponse($globalInvestments);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'error' => $e->getMessage(),
+                'details' => 'Une erreur est survenue lors de la récupération des investissements globaux'
+            ], 400);
+        }
+    }
+    
+    #[Route('/investments/global/funding/{cognitoId}', methods: ['GET'])]
+    public function getGlobalFundingInvestments(string $cognitoId): JsonResponse
+    {
+        try {
+            $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
+            if (!$user) {
+                throw new \Exception('Utilisateur non trouvé');
+            }
+
+            $fundingInvestments = $this->companyInvestmentRepository->fetchGlobalFundingInvestments($user->getId());
+            return new JsonResponse($fundingInvestments);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'error' => $e->getMessage(),
+                'details' => 'Une erreur est survenue lors de la récupération des investissements par type'
+            ], 400);
+        }
+    }
+
+    #[Route('/investments/global/sector/{cognitoId}', methods: ['GET'])]
+    public function getGlobalSectorInvestments(string $cognitoId): JsonResponse
+    {
+        try {
+            $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
+            if (!$user) {
+                throw new \Exception('Utilisateur non trouvé');
+            }
+
+            $sectorInvestments = $this->companyInvestmentRepository->fetchGlobalSectorInvestments($user->getId());
+            return new JsonResponse($sectorInvestments);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'error' => $e->getMessage(),
+                'details' => 'Une erreur est survenue lors de la récupération des investissements par secteur'
+            ], 400);
+        }
+    }
+
     #[Route('/investments/{id}/{year}', methods: ['GET'])]
     public function findByCompanyIdAndYear(int $id, int $year): JsonResponse
     {
         try {
-            $investments = $this->companyInvestmentRepository->findByCompanyIdAndYear($id, $year);
+           $investments = $this->companyInvestmentRepository->findByCompanyIdAndYear($id, $year);
 
             if (empty($investments)) {
                 return new JsonResponse([
@@ -90,4 +152,5 @@ class CompanyInvestmentController extends AbstractController
             ], 500);
         }
     }
+
 } 
