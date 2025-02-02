@@ -20,16 +20,21 @@ const Dashboard = ({ i18n }) => {
   return (
     <>
       <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">{t('message_start')}, {user.user_metadata.full_name ?? user.email}</h2>
-      <p class="mt-4 text-gray-500">{t('message_description')}</p>
+      <p class="mt-4 mb-8 text-gray-500">{t('message_description')}</p>
       
-      <div className="flex flex-row gap-4">
-        <InvestmentGlobalChart />
-        <InvestmentFundingChart />
-        <InvestmentSectorChart />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white rounded-lg shadow-sm">
+          <InvestmentGlobalChart />
+        </div>
+        <div className="bg-white rounded-lg shadow-sm">
+          <InvestmentFundingChart />
+        </div>
+        <div className="bg-white rounded-lg shadow-sm">
+          <InvestmentSectorChart />
+        </div>
       </div>
-      
 
-      <div className="flex flex-col gap-4">
+      <div className="bg-white rounded-lg shadow-sm p-6">
         <TableInvestments i18n={i18n} />
       </div>
     </>

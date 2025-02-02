@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { fetchGlobalInvestments } from "@/services/investment/investmentService";
-import PieChartComponent from "@/components/graphes/PieChart";
+import DonutChartComponent from "@/components/graphes/DonutChart";
+import { Card, CardTitle, CardDescription, CardContent, CardHeader } from "@/components/ui/card";
 
 export default function InvestmentGlobalChart() {
   const [data, setData] = useState([]);
@@ -37,15 +38,15 @@ export default function InvestmentGlobalChart() {
   if (!data || data.length === 0) return <div className="flex justify-center items-center h-[400px]">Aucune donnée disponible</div>;
 
   return (
-    <div className="flex flex-col rounded-lg border bg-white shadow-lg p-6 h-[400px]">
-      <div className="flex flex-col space-y-1.5 mb-4 items-center">
-        <h3 className="text-2xl font-bold text-gray-900">
+    <Card className="w-full h-[400px]">
+      <CardHeader className="text-center pb-2">
+        <CardTitle className="text-2xl font-bold text-gray-900">
           Investissements Globaux
-        </h3>
-        <p className="text-sm text-gray-500">{new Date().getFullYear()}</p>
-      </div>
-      <div className="flex-1">
-        <PieChartComponent 
+        </CardTitle>
+        <CardDescription className="text-sm text-gray-500 mt-1">{new Date().getFullYear()}</CardDescription>
+      </CardHeader>
+      <CardContent className="flex-1 flex items-center justify-center">
+        <DonutChartComponent 
           data={data}
           valueKey="total_investment"
           nameKey="company_name"
@@ -53,7 +54,7 @@ export default function InvestmentGlobalChart() {
           totalValue={totalInvestment}
           totalLabel="Total investi"
         />
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

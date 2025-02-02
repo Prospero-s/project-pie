@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { fetchGlobalSectorInvestments } from "@/services/investment/investmentService";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts";
 import { useTranslation } from "react-i18next";
 import {
   Card,
@@ -9,19 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-
-const COLORS = [
-  "#0088FE",
-  "#00C49F",
-  "#FFBB28",
-  "#FF8042",
-  "#8884d8"
-];
+import BarChartComponent from "@/components/graphes/BarChart";
 
 const InvestmentSectorChart = () => {
   const { t } = useTranslation("investments");
@@ -51,11 +38,9 @@ const InvestmentSectorChart = () => {
     try {
       setIsLoading(true);
       const response = await fetchGlobalSectorInvestments();
-      // Formater les données en traduisant le secteur et en convertissant le total en nombre
-      const formattedData = response.map((item, index) => ({
+      const formattedData = response.map((item) => ({
         sector: sectorTranslation(item.sector),
-        total_investment: Number(item.total_investment),
-        fill: COLORS[index % COLORS.length]
+        total_investment: Number(item.total_investment)
       }));
       setChartData(formattedData);
       setError(null);
@@ -91,39 +76,37 @@ const InvestmentSectorChart = () => {
     );
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Investissements par secteur</CardTitle>
-        <CardDescription>{new Date().getFullYear()}</CardDescription>
+    <Card className="w-full h-[400px]">
+      <CardHeader className="text-center pb-2">
+        <CardTitle className="text-2xl font-bold text-gray-900">
+          Investissements par secteur
+        </CardTitle>
+        <CardDescription className="text-sm text-gray-500 mt-1">
+          {new Date().getFullYear()}
+        </CardDescription>
       </CardHeader>
-      <CardContent>
-        <ChartContainer className="h-[400px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="sector"
-                angle={-45}
-                textAnchor="end"
-                height={60}
-                interval={0}
-              />
-              <YAxis />
-              <ChartTooltip
-                content={<ChartTooltipContent 
-                  formatter={(value) => `${value.toLocaleString()}€`}
-                  labelFormatter={(label) => `Secteur: ${label}`}
-                />}
-              />
-              <Bar
-                dataKey="total_investment"
-                name="Investissement"
-                fill="#0088FE"
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartContainer>
+      <CardContent className="flex-1 flex items-center justify-center">
+        <BarChartComponent 
+          data={chartData}
+          valueKey="total_investment"
+          nameKey="sector"
+          height={300}
+          tooltipLabelFormatter={(label) => `Secteur: ${label}`}
+          barName="Investissement"
+          margin={{ top: 20, right: 30, left: 40, bottom: 60 }}
+          labelProps={{
+            position: "bottom",
+            angle: -45,
+            textAnchor: "end",
+            fontSize: 12,
+            fill: "#4B5563"
+          }}
+          yAxisProps={{
+            tickFormatter: (value) => `${value}€`,
+            fontSize: 12,
+            fill: "#4B5563"
+          }}
+        />
       </CardContent>
     </Card>
   );
