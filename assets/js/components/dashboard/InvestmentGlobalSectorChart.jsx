@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { fetchGlobalFundingInvestments } from "@/services/investment/investmentService";
+import { fetchGlobalSectorInvestments } from "@/services/investment/investmentService";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -7,37 +8,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import PieChartComponent from "@/components/graphes/PieChart";
-import { useTranslation } from "react-i18next";
+import BarChartComponent from "@/components/graphes/BarChart";
+import { sectorTranslation } from "@/services/graphe/grapheService";
 
-const InvestmentFundingChart = () => {
+const InvestmentGlobalSectorChart = () => {
   const { t } = useTranslation("investments");
+  const { t: charts } = useTranslation("charts");
   const [chartData, setChartData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [totalInvestment, setTotalInvestment] = useState(0);
-
-  // Fonction de traduction des types de financement
-  const translateFundingType = (type) => {
-    return t(`funding.types.${type}`);
-  };
+  const [error, setError] = useState(null);  
 
   const loadData = async () => {
     try {
       setIsLoading(true);
-      const response = await fetchGlobalFundingInvestments();
+      const response = await fetchGlobalSectorInvestments();
       const formattedData = response.map((item) => ({
-        name: translateFundingType(item.funding_type),
-        value: Number(item.total_investment)
+        sector: sectorTranslation(t, item.sector),
+        total_investment: Number(item.total_investment)
       }));
-      
-      const total = formattedData.reduce((sum, item) => sum + item.value, 0);
-      setTotalInvestment(total);
       setChartData(formattedData);
       setError(null);
     } catch (err) {
       console.error("Erreur:", err);
-      setError(t("common.error_invalid_data"));
+      setError("Erreur lors du chargement des données");
     } finally {
       setIsLoading(false);
     }
@@ -50,7 +43,7 @@ const InvestmentFundingChart = () => {
   if (isLoading)
     return (
       <div className="flex justify-center items-center h-[400px]">
-        {t("common.loading")}
+        Chargement des données...
       </div>
     );
   if (error)
@@ -62,7 +55,7 @@ const InvestmentFundingChart = () => {
   if (!chartData || chartData.length === 0)
     return (
       <div className="flex justify-center items-center h-[400px]">
-        {t("no_investments.title")}
+        Aucune donnée disponible
       </div>
     );
 
@@ -70,22 +63,37 @@ const InvestmentFundingChart = () => {
     <Card className="w-full h-[400px]">
       <CardHeader className="text-center pb-2">
         <CardTitle className="text-2xl font-bold text-gray-900">
-          {t("funding.title")}
+          {charts("investmentGlobalSectorChart.title")}
         </CardTitle>
         <CardDescription className="text-sm text-gray-500 mt-1">
           {new Date().getFullYear()}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 flex items-center justify-center">
-        <PieChartComponent 
+        <BarChartComponent 
           data={chartData}
+          dataKey="total_investment"
+          nameKey="sector"
           height={300}
-          totalValue={totalInvestment}
-          totalLabel={t("funding.total")}
+          tooltipLabelFormatter={(label) => `Secteur: ${label}`}
+          barName="Investissement"
+          margin={{ top: 20, right: 30, left: 40, bottom: 60 }}
+          labelProps={{
+            position: "bottom",
+            angle: -45,
+            textAnchor: "end",
+            fontSize: 12,
+            fill: "#4B5563"
+          }}
+          yAxisProps={{
+            tickFormatter: (value) => `${value}€`,
+            fontSize: 12,
+            fill: "#4B5563"
+          }}
         />
       </CardContent>
     </Card>
   );
 };
 
-export default InvestmentFundingChart;
+export default InvestmentGlobalSectorChart;

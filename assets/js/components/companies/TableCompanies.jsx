@@ -3,7 +3,6 @@ import { Button, Skeleton, Table } from 'antd';
 import { DeleteOutlined, FileAddOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import startupsMock from '@/mocks/investements/startupsMock';
 import { getAllCompanies } from '@/services/company/companyService';
 
 const TableCompanies = ({ i18n }) => {
@@ -49,7 +48,7 @@ const TableCompanies = ({ i18n }) => {
           <Skeleton.Input block active size="small" />
         ) : (
           <div className="flex items-center gap-4">
-            <Link to={`/investements/${record.id}`} className="flex items-center gap-4">
+            <Link to={`/company/details/${record.id}`} className="flex items-center gap-4">
               <img
                 src={record.logo ?? "https://www.adaptivewfs.com/wp-content/uploads/2020/07/logo-placeholder-image.png"}
                 alt={record.name ?? "company-default-logo"}
@@ -115,11 +114,6 @@ const TableCompanies = ({ i18n }) => {
   const handleAdd = async () => {
     setIsModalOpen(true);
   };
-
-  const dataSource = startupsMock.map((startup, index) => ({
-    key: index,
-    ...startup,
-  }));
 
   return (
     <>

@@ -34,22 +34,6 @@ export const fetchInvestments = async (params = {}) => {
   }
 };
 
-// Ajout de la nouvelle fonction
-export const fetchInvestmentById = async (id) => {
-  try {
-    // S'assurer que l'URL commence par /api
-    const response = await axios.get(`/api/investments/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error("Erreur détaillée:", {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status
-    });
-    throw error;
-  }
-};
-
 export const fetchInvestmentByCompanyIdAndYear = async (id, year) => {
   console.log("fetchInvestmentByCompanyIdAndYear");
   try {

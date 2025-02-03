@@ -11,7 +11,7 @@ import {
 
 const BarChartComponent = ({
   data,
-  valueKey,
+  dataKey,
   nameKey,
   height = 300,
   barColor = "#0088FE",
@@ -63,7 +63,7 @@ const BarChartComponent = ({
           contentStyle={{ fontSize: "12px" }}
         />
         <Bar
-          dataKey={valueKey}
+          dataKey={dataKey}
           name={barName}
           fill={barColor}
           radius={[4, 4, 0, 0]}

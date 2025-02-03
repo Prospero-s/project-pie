@@ -23,11 +23,14 @@ import Dashboard from "@/pages/Dashboard";
 import Investments from "@/pages/Investments";
 import AllCompanies from "@/pages/AllCompanies";
 import AuthCallback from "@/pages/AuthCallback";
+import GroupSelection from "@/pages/GroupSelection";
+import CompanyDetails from "@/pages/CompanyDetails";
+
 import AuthLayout from "@/components/common/layout/AuthLayout";
 import ProtectedRoute from "@/components/common/auth/ProtectedRoute";
 import AppLayout from "@/components/common/layout/AppLayout";
-import GroupSelection from "@/pages/GroupSelection";
 import GroupRedirect from "@/components/common/redirect/GroupRedirect";
+
 import LanguageRedirect from "@/components/common/redirect/LanguageRedirect";
 import { RedirectProvider } from "@/context/redirectContext";
 import.meta.glob(["../img/**"]);
@@ -36,7 +39,6 @@ import.meta.glob(["../img/**"]);
 window._env_ = {
   navigate: (path) => navigate(path)
 };
-import InvestmentDetails from "@/pages/InvestmentDetails";
 
 // Détecter la langue initiale à partir de l'URL ou des préférences
 const detectInitialLanguage = () => {
@@ -118,7 +120,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         <Route path="dashboard" element={<Dashboard i18n={i18n} />} />
                         <Route path="investments" element={<Investments i18n={i18n} />} />
                         <Route path="companies" element={<AllCompanies i18n={i18n} />} />
-                        <Route path="investements/:id" element={<InvestmentDetails i18n={i18n} />} />
+                        <Route path="company/details/:id" element={<CompanyDetails i18n={i18n} />} />
                       </Routes>
                     </AppLayout>
                   </ProtectedRoute>

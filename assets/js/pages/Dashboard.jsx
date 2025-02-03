@@ -3,8 +3,8 @@ import { useUser } from '@/context/userContext';
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import InvestmentGlobalChart from "@/components/dashboard/InvestmentGlobalChart";
-import InvestmentFundingChart from "@/components/dashboard/InvestmentFundingChart";
-import InvestmentSectorChart from "@/components/dashboard/InvestmentSectorChart";
+import InvestmentGlobalFundingChart from "@/components/dashboard/InvestmentGlobalFundingChart";
+import InvestmentGlobalSectorChart from "@/components/dashboard/InvestmentGlobalSectorChart";
 import TableInvestments from "@/components/investments/TableInvestments";
 
 
@@ -27,10 +27,10 @@ const Dashboard = ({ i18n }) => {
           <InvestmentGlobalChart />
         </div>
         <div className="bg-white rounded-lg shadow-sm">
-          <InvestmentFundingChart />
+          <InvestmentGlobalFundingChart />
         </div>
         <div className="bg-white rounded-lg shadow-sm">
-          <InvestmentSectorChart />
+          <InvestmentGlobalSectorChart />
         </div>
       </div>
 

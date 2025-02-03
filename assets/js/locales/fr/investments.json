@@ -16,26 +16,6 @@
     "reset_filters": "Réinitialiser les filtres",
     "reset": "Réinitialiser"
   },
-  "months": {
-    "january": "Janvier",
-    "february": "Février",
-    "march": "Mars",
-    "april": "Avril",
-    "may": "Mai",
-    "june": "Juin",
-    "july": "Juillet",
-    "august": "Août",
-    "september": "Septembre",
-    "october": "Octobre",
-    "november": "Novembre",
-    "december": "Décembre"
-  },
-  "chart": {
-    "investment_evolution": "Évolution des investissements",
-    "previous_year": "← Année précédente",
-    "next_year": "Année suivante →",
-    "no_data_for_year": "Aucune donnée disponible pour l'année {{year}}"
-  },
   "creation": {
     "title": "Création d'entreprise",
     "select_type": "Choisir le type de création",

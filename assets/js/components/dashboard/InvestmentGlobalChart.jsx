@@ -2,11 +2,13 @@ import React, { useState, useEffect, useMemo } from "react";
 import { fetchGlobalInvestments } from "@/services/investment/investmentService";
 import DonutChartComponent from "@/components/graphes/DonutChart";
 import { Card, CardTitle, CardDescription, CardContent, CardHeader } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
 
 export default function InvestmentGlobalChart() {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { t } = useTranslation("charts");
 
   const loadData = async () => {
     try {
@@ -41,7 +43,7 @@ export default function InvestmentGlobalChart() {
     <Card className="w-full h-[400px]">
       <CardHeader className="text-center pb-2">
         <CardTitle className="text-2xl font-bold text-gray-900">
-          Investissements Globaux
+          {t("investmentGlobalChart.title")}
         </CardTitle>
         <CardDescription className="text-sm text-gray-500 mt-1">{new Date().getFullYear()}</CardDescription>
       </CardHeader>
@@ -52,7 +54,7 @@ export default function InvestmentGlobalChart() {
           nameKey="company_name"
           height={300}
           totalValue={totalInvestment}
-          totalLabel="Total investi"
+          totalLabel={t("investmentGlobalChart.totalInvestment")}
         />
       </CardContent>
     </Card>

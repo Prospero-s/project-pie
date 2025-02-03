@@ -138,8 +138,6 @@ class CompanyInvestmentController extends AbstractController
                 ], 404);
             }
 
-            
-
             return new JsonResponse($investments);
 
         } catch (\Exception $e) {

@@ -10,6 +10,7 @@ import NoResultsState from './table/NoResultsState';
 
 const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
   const { t } = useTranslation('investments', { i18n });
+  const lng = i18n.language;
   const [loading, setLoading] = useState(true);
   const [investments, setInvestments] = useState([]);
   const [pagination, setPagination] = useState({
@@ -154,7 +155,7 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
       sortOrder: sortedInfo.columnKey === 'denomination' ? sortedInfo.order : null,
       render: (text, record) => (
         loading ? <Skeleton.Input block active size="small" /> :
-        <Link to={`/investements/${record.id}`}>
+        <Link to={`/${lng}/company/details/${record.id}`}>
           <div className="flex items-center gap-4">
             <img
               src={record?.company?.logo ?? "https://www.adaptivewfs.com/wp-content/uploads/2020/07/logo-placeholder-image.png"}
