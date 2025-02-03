@@ -49,7 +49,7 @@ class TextractController extends AbstractController
     
             return new JsonResponse($result);
         } catch (\RuntimeException $e) {
-            return new JsonResponse(['error' => $e->getMessage()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

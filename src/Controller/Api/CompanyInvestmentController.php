@@ -14,13 +14,11 @@ use App\Repository\UserRepository;
 #[Route('/api', name: 'api_')]
 class CompanyInvestmentController extends AbstractController
 {
-    private $companyRepository;
     private $companyInvestmentRepository;
     private $userRepository;
 
-    public function __construct(CompanyRepository $companyRepository, CompanyInvestmentRepository $companyInvestmentRepository, UserRepository $userRepository)
+    public function __construct(CompanyInvestmentRepository $companyInvestmentRepository, UserRepository $userRepository)
     {
-        $this->companyRepository = $companyRepository;
         $this->companyInvestmentRepository = $companyInvestmentRepository;
         $this->userRepository = $userRepository;
     }
@@ -153,5 +151,4 @@ class CompanyInvestmentController extends AbstractController
             ], 500);
         }
     }
-
 } 

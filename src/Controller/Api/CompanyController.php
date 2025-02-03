@@ -135,7 +135,7 @@ class CompanyController extends AbstractController
                 'id' => $company->getId(),
                 'denomination' => $company->getDenomination(),
                 'sector' => $company->getSector()
-            ], JsonResponse::HTTP_OK);
+            ], 200);
         } catch (\Exception $e) {
             return new JsonResponse([
                 'error' => $e->getMessage(),
