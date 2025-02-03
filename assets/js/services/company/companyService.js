@@ -164,4 +164,19 @@ export const getAllCompanies = async (page, pageSize) => {
     console.error('Erreur lors de la récupération:', error);
     throw error;
   }
-}; 
+};
+
+export const getCompanyDetailsById = async (id) => {
+  try {
+    // S'assurer que l'URL commence par /api
+    const response = await axios.get(`/api/company/details/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Erreur détaillée:", {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
+    throw error;
+  }
+};
