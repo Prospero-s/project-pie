@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from "react-router-dom";
 import { Button, Typography, Col, Row, Divider, message, Input } from "antd";
 import { useUser } from '@/context/userContext';
@@ -7,9 +8,10 @@ import { saveAsDraft, submitData } from '@/services/textract/textractService'; /
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
-const TextractResults = () => {
+const TextractResults = ( { i18n }) => {
   const navigate = useNavigate();
   const { analyzedData } = useUser();
+  const { t } = useTranslation('documents', { i18n });
   const [company, setCompany] = useState(analyzedData?.company || null);
   const [editedText, setEditedText] = useState(
     analyzedData?.text ? analyzedData.text.join("\n") : ""
@@ -29,7 +31,7 @@ const TextractResults = () => {
 
     if (response.success) {
         message.success(response.message);
-        navigate("/documents"); // Redirection après enregistrement du brouillon
+        navigate("/documents");
     } else {
         message.error(response.message);
     }
@@ -45,8 +47,7 @@ const TextractResults = () => {
     
     if (response.success) {
         message.success(response.message);
-        navigate("/documents"); // Redirection après enregistrement
-    } else {
+        navigate("/documents");
         message.error(response.message);
     }
   }
@@ -64,14 +65,14 @@ const TextractResults = () => {
         <div style={{ padding: 20 }}>
           {company && (
             <Title level={3} style={{ color: "#1890ff" }}>
-              Entreprise : {company.denomination}
+              {t("analyze.company")} : {company.denomination}
             </Title>
           )}
           <Divider />
           <Row gutter={20}>
             <Col span={12}>
               <div style={{ padding: "10px", border: "1px solid #d9d9d9", borderRadius: "5px" }}>
-                <Title level={4}>Texte détecté :</Title>
+                <Title level={4}>{t("analyze.data_extract")} :</Title>
                 <TextArea
                   rows={10}
                   value={editedText}
@@ -90,7 +91,7 @@ const TextractResults = () => {
 
             <Col span={12}>
               <div style={{ padding: "10px", border: "1px solid #d9d9d9", borderRadius: "5px", textAlign: "center" }}>
-                <Title level={4}>Prévisualisation du PDF</Title>
+                <Title level={4}>{t("analyze.file_preview")}</Title>
                 {analyzedData.pdfUrl ? (
                   <iframe
                     src={`http://localhost:80${analyzedData.pdfUrl}`}
@@ -108,15 +109,15 @@ const TextractResults = () => {
           <Row justify="center" gutter={20}>
             <Col>
               <Button type="primary" onClick={handleSubmit}>
-                Confirmé
+                {t("analyze.confirm")}
               </Button>
             </Col>
             <Col>
-              <Button onClick={() => navigate(-1)}>Retour</Button>
+              <Button onClick={() => navigate(-1)}>{t("analyze.cancel")}</Button>
             </Col>
             <Col>
               <Button type="default" onClick={handleSaveAsDraft}>
-                Enregistrer en brouillon
+                {t("analyze.save_draft")}
               </Button>
             </Col>
           </Row>

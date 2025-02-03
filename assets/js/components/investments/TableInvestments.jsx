@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Skeleton, Table, message, Tag, Spin } from 'antd';
+import { Skeleton, Table, message, Tag, Spin, Tooltip } from 'antd';
 import { FileAddOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -252,15 +252,19 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
         loading ? (
           <Skeleton.Button active size="small" />
         ) : (
-          <div>
-            <FileAddOutlined
-              className="!text-blue-500 hover:!text-blue-700 text-lg cursor-pointer"
-              onClick={() => handleOpenPopup(record)}
-            />
-            <DeleteOutlined 
-              className="!text-rose-500 hover:!text-rose-700 text-lg cursor-pointer" 
-              onClick={() => handleDelete(record.id)}
-            />
+          <div className="flex gap-2">
+            <Tooltip title="Upload un fichier">
+              <FileAddOutlined
+                className="!text-blue-500 hover:!text-blue-700 text-lg cursor-pointer"
+                onClick={() => handleOpenPopup(record)}
+              />
+            </Tooltip>
+            <Tooltip title="Supprimer">
+              <DeleteOutlined 
+                className="!text-rose-500 hover:!text-rose-700 text-lg cursor-pointer"
+                onClick={() => handleDelete(record.id)}
+              />
+            </Tooltip>
           </div>
         ),
     },
@@ -301,7 +305,9 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
         <UploadPopup
           visible={isPopupVisible}
           onClose={handleClosePopup}
-          company={selectedCompany} // On passe l'entreprise sélectionnée
+          company={selectedCompany}
+          i18n={i18n}
+          lng={lng}
         />
       )}
       <div className="rounded-lg border border-slate-200 flex flex-col w-full">

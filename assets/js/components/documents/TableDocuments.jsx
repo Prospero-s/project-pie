@@ -149,7 +149,7 @@ const TableDocuments = () => {
         <textarea
           value={modalContent}
           readOnly
-          style={{ width: '100%', height: '200px', resize: 'none', fontFamily: 'monospace' }}
+          style={{ width: '100%', height: '480px', resize: 'none', fontFamily: 'monospace' }}
         />
       </Modal>
     </>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, Upload, Button, message, Typography, Spin } from 'antd';
 import { UploadOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
@@ -8,8 +9,9 @@ import { useUser } from '@/context/userContext';
 
 const { Text } = Typography;
 
-const UploadPopup = ({ visible, onClose, company }) => {
+const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
   const [fileList, setFileList] = useState([]);
+  const { t } = useTranslation('documents', { i18n });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { setAnalyzedData } = useUser();
@@ -68,7 +70,7 @@ const UploadPopup = ({ visible, onClose, company }) => {
         message.success('Analyse réussie !');
         console.log("Données reçues du serveur :", response.data);
         setAnalyzedData({ ...response.data, company });
-        navigate("/textract-results");
+        navigate(`/${lng}/textract-results`);
         setFileList([]);
         onClose();
       } else {
@@ -91,7 +93,7 @@ const UploadPopup = ({ visible, onClose, company }) => {
 
   return (
     <Modal
-      title="Envoyer un document"
+      title={t("modal.upload_title")}
       open={visible}
       onCancel={onClose}
       footer={null}
@@ -104,7 +106,7 @@ const UploadPopup = ({ visible, onClose, company }) => {
       >
         {fileList.length === 0 && (
           <Button icon={<UploadOutlined />} block>
-            Sélectionner un fichier
+            {t("modal.select_file")}
           </Button>
         )}
       </Upload>
@@ -139,7 +141,7 @@ const UploadPopup = ({ visible, onClose, company }) => {
           style={{ marginTop: 20 }}
           disabled={loading}
         >
-          {loading ? <Spin /> : 'Envoyer et analyser'}
+          {loading ? <Spin /> : t("modal.validate")}
         </Button>
       )}
 

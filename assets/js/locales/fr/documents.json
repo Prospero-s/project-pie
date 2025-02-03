@@ -1,3 +1,17 @@
 {
-  "title": "Les documents"
+  "title": "Les documents",
+  "modal": {
+    "upload_title": "Envoyer un document",
+    "select_file": "Selectionner un fichier",
+    "validate": "Envoyer et analyser"
+  },
+  "analyze": {
+    "title": "Previsualisation du PDF",
+    "company": "Entreprise",
+    "data_extract": "Données extraites",
+    "file_preview": "Previsualisation du PDF",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "save_draft": "Enregistrer en brouillon"
+  }
 }
