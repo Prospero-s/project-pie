@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import illustrationLogin from '@img/illustration/illustration-login.webp';
+import illustrationLogin from '@img/illustration/illustration-login-v1.png';
 import logoProspero from '@img/logo/logo-icon-prospero-blue.svg';
 import { useUser } from '@/context/userContext';
 import FooterLayout from '@/components/common/layout/Footer';
