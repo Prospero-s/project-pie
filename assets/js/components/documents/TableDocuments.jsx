@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Tooltip, Table, Skeleton, message } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Button, Tooltip, Table, Skeleton, message, Modal } from 'antd';
+import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { fetchDocuments } from '@/services/documents/documentsService';
 import { useNavigate } from 'react-router-dom';
 import { deleteDocument } from '@/services/documents/documentsService';
@@ -14,6 +14,8 @@ const TableDocuments = () => {
     pageSize: 10,
     total: 0,
   });
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState('');
 
   useEffect(() => {
     loadDocuments();
@@ -34,11 +36,19 @@ const TableDocuments = () => {
     }
   };
 
+  const handleViewDetails = (content) => {
+    setModalContent(JSON.stringify(content, null, 2));
+    setIsModalVisible(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+  };
+
   const loadDocuments = async () => {
     try {
       setLoading(true);
       const response = await fetchDocuments();
-      console.log('Données récupérées:', response);
       setDocuments(response);
       setPagination({
         current: 1,
@@ -55,7 +65,7 @@ const TableDocuments = () => {
 
   const columns = [
     {
-      title: 'Nom de l’entreprise',
+      title: "Nom de l'entreprise",
       dataIndex: 'company',
       key: 'company',
       render: (text) => (loading ? <Skeleton.Input block active size="small" /> : text),
@@ -86,23 +96,6 @@ const TableDocuments = () => {
         ),
     },
     {
-      title: 'Détails',
-      dataIndex: 'kpi',
-      key: 'kpi',
-      render: (kpi) =>
-        loading ? (
-          <Skeleton.Input block active size="small" />
-        ) : (
-          <div className="grid grid-cols-9 gap-4 text-sm">
-            {kpi.slice(0,50).map((item, index) => (
-              <div key={index} className="border border-gray-300 p-2 rounded-md bg-gray-100">
-                {item}
-              </div>
-            ))}
-          </div>
-        ),
-    },
-    {
         title: 'Actions',
         key: 'actions',
         render: (_, record) => (
@@ -110,15 +103,22 @@ const TableDocuments = () => {
             {record.status === 'draft' && (
               <Tooltip title="Modifier">
                 <Button
-                  type="primary"
+                  className="!text-blue-500 hover:!text-blue-700 text-lg cursor-pointer"
                   icon={<EditOutlined />}
                   onClick={() => navigate(`/documents/edit/${record.id}`)}
                 />
               </Tooltip>
             )}
+            <Tooltip title="Voir Détails">
+              <Button
+                className="!text-blue-500 hover:!text-blue-700 text-lg cursor-pointer"
+                icon={<EyeOutlined />}
+                onClick={() => handleViewDetails(record.kpi)}
+              />
+            </Tooltip>
             <Tooltip title="Supprimer">
               <Button
-                type="danger"
+                className="!text-rose-500 hover:!text-rose-700 text-lg cursor-pointer"
                 icon={<DeleteOutlined />}
                 onClick={() => handleDelete(record.id)}
               />
@@ -129,15 +129,30 @@ const TableDocuments = () => {
   ];
 
   return (
-    <div className="rounded-lg border border-slate-200 flex flex-col w-full">
-      <Table
-        columns={columns}
-        dataSource={documents}
-        loading={loading}
-        onChange={handleTableChange}
-        pagination={pagination}
+    <>
+      <div className="rounded-lg border border-slate-200 flex flex-col w-full">
+        <Table
+          columns={columns}
+          dataSource={documents}
+          loading={loading}
+          onChange={handleTableChange}
+          pagination={pagination}
         />
-    </div>
+      </div>
+
+      <Modal
+        title="Détails"
+        visible={isModalVisible}
+        onCancel={handleModalClose}
+        footer={null}
+      >
+        <textarea
+          value={modalContent}
+          readOnly
+          style={{ width: '100%', height: '200px', resize: 'none', fontFamily: 'monospace' }}
+        />
+      </Modal>
+    </>
   );
 };
 

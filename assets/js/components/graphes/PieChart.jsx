@@ -42,9 +42,9 @@ const PieChartComponent = ({
         />
         <Legend
           content={({ payload }) => (
-            <div className="-translate-y-2 flex flex-wrap gap-2">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px', textAlign: 'left' }}>
               {payload.map((entry, index) => (
-                <div key={`legend-${index}`} className="flex items-center justify-center basis-1/4">
+                <div key={`legend-${index}`} className="flex items-center">
                   <div
                     className="w-3 h-3 mr-2"
                     style={{ backgroundColor: entry.color }}
