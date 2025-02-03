@@ -4,7 +4,7 @@ import axios from 'axios';
 export const fetchDocuments = async () => {
     console.log("Appel API à /api/kpi/getAllKpi");  // Debug
     try {
-        const cognitoId = await Auth.currentSession()
+      const cognitoId = await Auth.currentSession()
       .then(session => session.getIdToken().getJwtToken())
       .catch(() => null);
 
@@ -12,7 +12,6 @@ export const fetchDocuments = async () => {
       throw new Error('Utilisateur non authentifié');
     }
       const response = await axios.get('/api/kpi/getAllKpi',  {
-        method: 'GET',
         headers: {
           'X-Cognito-Id': cognitoId
         }

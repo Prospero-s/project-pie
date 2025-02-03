@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Skeleton, Table, message, Tag, Spin } from 'antd';
+import { FileAddOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { fetchInvestments } from '@/services/investment/investmentService';
-import AddCompanyModal from './AddCompanyModal';
-import InvestmentActions from './table/InvestmentActions';
-import EmptyInvestmentState from './table/EmptyInvestmentState';
-import NoResultsState from './table/NoResultsState';
+import AddCompanyModal from '@/components/investments/AddCompanyModal';
+import EmptyInvestmentState from '@/components/investments/table/EmptyInvestmentState';
+import NoResultsState from '@/components/investments/table/NoResultsState';
 import UploadPopup from "@/components/common/upload/UploadPopup"; 
-
-
 
 const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
   const { t } = useTranslation('investments', { i18n });
@@ -33,7 +31,6 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
     setPopupVisible(true);
   };  
   const handleClosePopup = () => setPopupVisible(false);
-  
 
   useEffect(() => {
     loadInvestments({
@@ -256,12 +253,6 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
           <Skeleton.Button active size="small" />
         ) : (
           <div>
-            <InvestmentActions
-              loading={loading}
-              onAdd={handleAdd}
-              onDelete={handleDelete}
-              recordId={record.id}
-            />
             <FileAddOutlined
               className="!text-blue-500 hover:!text-blue-700 text-lg cursor-pointer"
               onClick={() => handleOpenPopup(record)}

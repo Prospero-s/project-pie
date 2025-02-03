@@ -21,7 +21,7 @@ const DropdownNotification = ({ i18n }) => {
       label: (
         <div className="flex flex-col gap-2 px-2 py-1 lg:px-6 lg:py-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-black dark:text-white">
+            <span className="text-sm font-medium text_gray_900">
               {t('notifications')}
             </span>
             <span className="text-xs font-medium text-primary">
@@ -32,7 +32,7 @@ const DropdownNotification = ({ i18n }) => {
             <li className="flex items-center gap-4 border-b border-stroke px-2 py-1 lg:px-4 lg:py-2 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4">
               <div className="flex flex-1 items-center justify-between">
                 <div>
-                  <h6 className="text-sm font-medium text-black dark:text-white">
+                  <h6 className="text-sm font-medium text_gray_900">
                     {t('notification_title')}
                   </h6>
                   <p className="text-sm">{t('notification_message')}</p>

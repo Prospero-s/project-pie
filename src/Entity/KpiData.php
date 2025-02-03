@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\KpiDataRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: KpiDataRepository::class)]
 class KpiData
@@ -28,6 +30,21 @@ class KpiData
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTime $updatedAt = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $deletedAt = null;
+
+    #[ORM\OneToMany(mappedBy: 'kpiData', targetEntity: UploadDocument::class)]
+    private Collection $uploadDocuments;
+
+    public function __construct()
+    {
+        $this->uploadDocuments = new ArrayCollection();
+        $this->setCreatedAt(new \DateTimeImmutable());
+    }
 
     public function getId(): ?int
     {
@@ -89,6 +106,57 @@ class KpiData
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
+    }
+
+    public function getDeletedAt(): ?\DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?\DateTimeImmutable $deletedAt): self
+    {
+        $this->deletedAt = $deletedAt;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UploadDocument>
+     */
+    public function getUploadDocuments(): Collection
+    {
+        return $this->uploadDocuments;
+    }
+
+    public function addUploadDocument(UploadDocument $uploadDocument): self
+    {
+        if (!$this->uploadDocuments->contains($uploadDocument)) {
+            $this->uploadDocuments->add($uploadDocument);
+            $uploadDocument->setKpiData($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUploadDocument(UploadDocument $uploadDocument): self
+    {
+        if ($this->uploadDocuments->removeElement($uploadDocument)) {
+            // Ne pas mettre à null si la relation est non-nullable
+            if ($uploadDocument->getKpiData() === $this) {
+                $uploadDocument->setKpiData($this);
+            }
+        }
 
         return $this;
     }

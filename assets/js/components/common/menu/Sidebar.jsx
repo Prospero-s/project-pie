@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DashboardOutlined, FolderOutlined, FileSearchOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { DashboardOutlined, FolderOutlined, FileSearchOutlined, MenuFoldOutlined, MenuUnfoldOutlined, FolderOpenOutlined } from '@ant-design/icons';
 import { Layout, Menu, Divider } from 'antd';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -43,8 +43,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, i18n }) => {
       label: <Link to={`/${lng}/companies`}>{t('companies')}</Link>,
     },
     {
-      key: 'Documents',
-      icon: <FileSearchOutlined className="!text-2xl lg:text-xl" />,
+      key: 'documents',
+      icon: <FolderOpenOutlined className="!text-2xl lg:text-xl" />,
       label: <Link to={`/${lng}/documents`}>{t('documents')}</Link>,
     },
   ];

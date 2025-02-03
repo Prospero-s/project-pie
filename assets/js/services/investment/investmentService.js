@@ -53,7 +53,12 @@ export const fetchGlobalInvestments = async () => {
         const session = await Auth.currentSession();
         const cognitoId = session.getIdToken().payload.sub;
 
-        const response = await axios.get(`/api/investments/global/${cognitoId}`);
+        const response = await axios.get(`/api/investments/global`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Cognito-Id': cognitoId
+          },
+        });
         return response.data;
     } catch (error) {
         console.error("Erreur détaillée:", {
@@ -70,7 +75,12 @@ export const fetchGlobalFundingInvestments = async () => {
     const session = await Auth.currentSession();
     const cognitoId = session.getIdToken().payload.sub;
 
-    const response = await axios.get(`/api/investments/global/funding/${cognitoId}`);
+    const response = await axios.get(`/api/investments/global/funding`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Cognito-Id': cognitoId
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Erreur détaillée:", {
@@ -87,7 +97,12 @@ export const fetchGlobalSectorInvestments = async () => {
     const session = await Auth.currentSession();
     const cognitoId = session.getIdToken().payload.sub;
 
-    const response = await axios.get(`/api/investments/global/sector/${cognitoId}`);
+    const response = await axios.get(`/api/investments/global/sector`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Cognito-Id': cognitoId
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Erreur détaillée:", {

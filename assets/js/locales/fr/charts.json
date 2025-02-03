@@ -28,7 +28,7 @@
     "totalInvestment": "Investissement total"
   },
   "investmentGlobalFundingChart": {
-    "title": "Évolution des investissements par financement",
+    "title": "Évolution des investissements par types de financements",
     "totalInvestment": "Investissement total"
   }
 }
