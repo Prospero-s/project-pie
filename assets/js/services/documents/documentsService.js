@@ -2,7 +2,6 @@ import { Auth } from 'aws-amplify';
 import axios from 'axios';
 
 export const fetchDocuments = async () => {
-    console.log("Appel API à /api/kpi/getAllKpi");  // Debug
     try {
       const cognitoId = await Auth.currentSession()
       .then(session => session.getIdToken().getJwtToken())
@@ -16,11 +15,9 @@ export const fetchDocuments = async () => {
           'X-Cognito-Id': cognitoId
         }
     });
-      console.log("Réponse API:", response);  // Debug
       return response.data.data;
     } catch (error) {
-      console.error("Erreur API:", error.response || error.message);
-      throw error;
+      throw new Error(`Erreur: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`);
     }
   };
 

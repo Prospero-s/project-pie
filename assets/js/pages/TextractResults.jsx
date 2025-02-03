@@ -49,80 +49,80 @@ const TextractResults = () => {
     } else {
         message.error(response.message);
     }
-};
-
-  if (!analyzedData) {
-    return (
-      <div style={{ padding: 20 }}>
-        <Title level={4}>Aucun résultat disponible</Title>
-        <Button type="primary" onClick={() => navigate("/")}>
-          Retour à l'accueil
-        </Button>
-      </div>
-    );
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      {company && (
-        <Title level={3} style={{ color: "#1890ff" }}>
-          Entreprise : {company.denomination}
-        </Title>
+    <>
+      {!analyzedData ? (
+        <div style={{ padding: 20 }}>
+          <Title level={4}>Aucun résultat disponible</Title>
+          <Button onClick={() => navigate(-1)}>
+            Retour
+          </Button>
+        </div>
+      ) : (
+        <div style={{ padding: 20 }}>
+          {company && (
+            <Title level={3} style={{ color: "#1890ff" }}>
+              Entreprise : {company.denomination}
+            </Title>
+          )}
+          <Divider />
+          <Row gutter={20}>
+            <Col span={12}>
+              <div style={{ padding: "10px", border: "1px solid #d9d9d9", borderRadius: "5px" }}>
+                <Title level={4}>Texte détecté :</Title>
+                <TextArea
+                  rows={10}
+                  value={editedText}
+                  onChange={handleTextChange}
+                  autoSize={{ minRows: 3, maxRows: 20 }}
+                  style={{
+                    width: "100%",
+                    fontFamily: "monospace",
+                    fontSize: "14px",
+                    backgroundColor: "#f5f5f5",
+                    borderRadius: "5px",
+                  }}
+                />
+              </div>
+            </Col>
+
+            <Col span={12}>
+              <div style={{ padding: "10px", border: "1px solid #d9d9d9", borderRadius: "5px", textAlign: "center" }}>
+                <Title level={4}>Prévisualisation du PDF</Title>
+                {analyzedData.pdfUrl ? (
+                  <iframe
+                    src={`http://localhost:80${analyzedData.pdfUrl}`}
+                    title="Prévisualisation du PDF"
+                    style={{ width: "100%", height: "500px", border: "none" }}
+                  />
+                ) : (
+                  <Text>Aucun fichier PDF disponible.</Text>
+                )}
+              </div>
+            </Col>
+          </Row>
+
+          <Divider />
+          <Row justify="center" gutter={20}>
+            <Col>
+              <Button type="primary" onClick={handleSubmit}>
+                Confirmé
+              </Button>
+            </Col>
+            <Col>
+              <Button onClick={() => navigate(-1)}>Retour</Button>
+            </Col>
+            <Col>
+              <Button type="default" onClick={handleSaveAsDraft}>
+                Enregistrer en brouillon
+              </Button>
+            </Col>
+          </Row>
+        </div>
       )}
-      <Divider />
-      <Row gutter={20}>
-        <Col span={12}>
-          <div style={{ padding: "10px", border: "1px solid #d9d9d9", borderRadius: "5px" }}>
-            <Title level={4}>Texte détecté :</Title>
-            <TextArea
-              rows={10}
-              value={editedText}
-              onChange={handleTextChange}
-              autoSize={{ minRows: 3, maxRows: 20 }}
-              style={{
-                width: "100%",
-                fontFamily: "monospace",
-                fontSize: "14px",
-                backgroundColor: "#f5f5f5",
-                borderRadius: "5px",
-              }}
-            />
-          </div>
-        </Col>
-
-        <Col span={12}>
-          <div style={{ padding: "10px", border: "1px solid #d9d9d9", borderRadius: "5px", textAlign: "center" }}>
-            <Title level={4}>Prévisualisation du PDF</Title>
-            {analyzedData.pdfUrl ? (
-              <iframe
-                src={`http://localhost:80${analyzedData.pdfUrl}`}
-                title="Prévisualisation du PDF"
-                style={{ width: "100%", height: "500px", border: "none" }}
-              />
-            ) : (
-              <Text>Aucun fichier PDF disponible.</Text>
-            )}
-          </div>
-        </Col>
-      </Row>
-
-      <Divider />
-      <Row justify="center" gutter={20}>
-        <Col>
-          <Button type="primary" onClick={handleSubmit}>
-            Confirmé
-          </Button>
-        </Col>
-        <Col>
-          <Button onClick={() => navigate("/")}>Retour</Button>
-        </Col>
-        <Col>
-          <Button type="default" onClick={handleSaveAsDraft}>
-            Enregistrer en brouillon
-          </Button>
-        </Col>
-      </Row>
-    </div>
+    </>
   );
 };
 

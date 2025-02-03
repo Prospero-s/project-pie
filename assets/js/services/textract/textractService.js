@@ -7,22 +7,23 @@ export const saveAsDraft = async (analyzedData, editedText, companyId) => {
     const cognitoId = session.getIdToken().payload.sub;
     const updatedData = {
       ...analyzedData,
-      text: editedText.split("\n"),
+      text: editedText.split('\n'),
       companyId: companyId,
-      status: "draft",
+      status: 'draft',
     };
 
-    console.log("Envoi des données en brouillon :", updatedData);
-    await axios.post("/api/kpi/draft", updatedData, {
+    await axios.post('/api/kpi/draft', updatedData, {
       headers: {
         'Content-Type': 'application/json',
         'X-Cognito-Id': cognitoId,
       },
     });
-    return { success: true, message: "Résultats enregistrés en brouillon !" };
+    return { success: true, message: 'Résultats enregistrés en brouillon !' };
   } catch (error) {
-    console.error("Erreur lors de l'enregistrement en brouillon :", error);
-    return { success: false, message: "Erreur lors de l'enregistrement en brouillon." };
+    return { 
+      success: false, 
+      message: `Erreur lors de l\'enregistrement en brouillon: ${error.message}` 
+    };
   }
 };
 
@@ -32,20 +33,21 @@ export const submitData = async (analyzedData, editedText, companyId) => {
       const cognitoId = session.getIdToken().payload.sub;
       const updatedData = {
         ...analyzedData,
-        text: editedText.split("\n"),
+        text: editedText.split('\n'),
         companyId: companyId,
       };
   
-      console.log("Envoi des données finales :", updatedData);
-      await axios.post("/api/kpi/save", updatedData, {
+      await axios.post('/api/kpi/save', updatedData, {
         headers: {
           'Content-Type': 'application/json',
           'X-Cognito-Id': cognitoId,
         },
       });
-      return { success: true, message: "Données enregistrées avec succès !" };
+      return { success: true, message: 'Données enregistrées avec succès !' };
     } catch (error) {
-      console.error("Erreur lors de l'enregistrement :", error);
-      return { success: false, message: "Erreur lors de l'enregistrement des données." };
+      return { 
+        success: false, 
+        message: `Erreur lors de l\'enregistrement des données: ${error.message}` 
+      };
     }
   };
