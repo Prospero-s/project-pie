@@ -14,7 +14,7 @@ const BarChartComponent = ({
   dataKey,
   nameKey,
   height = 300,
-  barColor = "#0088FE",
+  barColor = "#12B76A",
   margin = { top: 20, right: 30, left: 40, bottom: 60 },
   tooltipFormatter = (value) => `${value.toLocaleString()}€`,
   tooltipLabelFormatter = (label) => `${label}`,

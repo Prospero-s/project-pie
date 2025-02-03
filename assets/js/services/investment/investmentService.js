@@ -35,7 +35,6 @@ export const fetchInvestments = async (params = {}) => {
 };
 
 export const fetchInvestmentByCompanyIdAndYear = async (id, year) => {
-  console.log("fetchInvestmentByCompanyIdAndYear");
   try {
     const response = await axios.get(`/api/investments/${id}/${year}`);
     return response.data;

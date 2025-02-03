@@ -16,20 +16,21 @@ export const sectorTranslation = (t, sector) => {
 
 export const monthTranslation = (t, month) => {
   const months = [
-    { value: "01", label: t("months.january") },
-    { value: "02", label: t("months.february") },
-    { value: "03", label: t("months.march") },
-    { value: "04", label: t("months.april") },
-    { value: "05", label: t("months.may") },
-    { value: "06", label: t("months.june") },
-    { value: "07", label: t("months.july") },
-    { value: "08", label: t("months.august") },
-    { value: "09", label: t("months.september") },
-    { value: "10", label: t("months.october") },
-    { value: "11", label: t("months.november") },
-    { value: "12", label: t("months.december") }
+    { value: "January", label: t("months.january") },
+    { value: "February", label: t("months.february") },
+    { value: "March", label: t("months.march") },
+    { value: "April", label: t("months.april") },
+    { value: "May", label: t("months.may") },
+    { value: "June", label: t("months.june") },
+    { value: "July", label: t("months.july") },
+    { value: "August", label: t("months.august") },
+    { value: "September", label: t("months.september") },
+    { value: "October", label: t("months.october") },
+    { value: "November", label: t("months.november") },
+    { value: "December", label: t("months.december") }
   ];
 
-  const matchingMonth = months.find((s) => s.value === month);
-  return matchingMonth ? matchingMonth.label : month;
+  const cleanedMonth = month.trim();
+  const matchingMonth = months.find((s) => s.value === cleanedMonth);
+  return matchingMonth ? matchingMonth.label : cleanedMonth;
 }

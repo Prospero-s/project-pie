@@ -2,11 +2,11 @@ import React from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Label, Legend } from "recharts";
 
 const COLORS = [
-  "#0088FE",  // Bleu
-  "#00C49F",  // Vert
-  "#FFBB28",  // Jaune
+  "#12B76A",  // Vert
+  "#9f1239",  // Rouge
+  "#86198f",  // Jaune
   "#FF8042",  // Orange
-  "#8884d8"   // Violet
+  "#1d4ed8"   // Violet
 ];
 
 const DonutChartComponent = ({ 

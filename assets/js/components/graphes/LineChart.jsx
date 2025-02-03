@@ -19,7 +19,7 @@ const LineChartComponent = ({ data, xDataKey, yDataKey, height = 350 }) => {
         <CartesianGrid strokeDasharray="3 3" vertical={false} />
         <XAxis
           dataKey={xDataKey}
-          stroke="#888888"
+          stroke="#181D27"
           fontSize={12}
           tickLine={false}
           axisLine={false}
@@ -28,7 +28,7 @@ const LineChartComponent = ({ data, xDataKey, yDataKey, height = 350 }) => {
           height={60}
         />
         <YAxis
-          stroke="#888888"
+          stroke="#1d4ed8"
           fontSize={12}
           tickLine={false}
           axisLine={false}
@@ -43,7 +43,7 @@ const LineChartComponent = ({ data, xDataKey, yDataKey, height = 350 }) => {
         <Line
           type="monotone"
           dataKey={yDataKey}
-          stroke="#8884d8"
+          stroke="#12B76A"
           strokeWidth={2}
           dot={{ r: 4, strokeWidth: 2 }}
           activeDot={{ r: 8 }}
