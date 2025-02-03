@@ -32,4 +32,69 @@ export const fetchInvestments = async (params = {}) => {
   } catch (error) {
     throw error;
   }
-}; 
+};
+
+export const fetchInvestmentByCompanyIdAndYear = async (id, year) => {
+  try {
+    const response = await axios.get(`/api/investments/${id}/${year}`);
+    return response.data;
+  } catch (error) {
+    console.error("Erreur détaillée:", {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
+    throw error;
+  }
+};
+
+export const fetchGlobalInvestments = async () => {
+    try {
+        const session = await Auth.currentSession();
+        const cognitoId = session.getIdToken().payload.sub;
+
+        const response = await axios.get(`/api/investments/global/${cognitoId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Erreur détaillée:", {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status
+        });
+        throw error;
+    }
+};
+
+export const fetchGlobalFundingInvestments = async () => {
+  try {
+    const session = await Auth.currentSession();
+    const cognitoId = session.getIdToken().payload.sub;
+
+    const response = await axios.get(`/api/investments/global/funding/${cognitoId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Erreur détaillée:", {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
+    throw error;
+  }
+};
+
+export const fetchGlobalSectorInvestments = async () => {
+  try {
+    const session = await Auth.currentSession();
+    const cognitoId = session.getIdToken().payload.sub;
+
+    const response = await axios.get(`/api/investments/global/sector/${cognitoId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Erreur détaillée:", {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
+    throw error;
+  }
+};

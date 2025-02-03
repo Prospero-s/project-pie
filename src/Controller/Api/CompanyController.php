@@ -121,4 +121,26 @@ class CompanyController extends AbstractController
             ], 400);
         }
     }
-} 
+
+    #[Route('/company/details/{id}', methods: ['GET'])]
+    public function getCompanyDataById(int $id): JsonResponse
+    {
+        try {
+            $company = $this->companyRepository->findOneBy(['id' => $id]);
+            if (!$company) {
+                throw new \Exception('Entreprise non trouvé');
+            }
+
+            return new JsonResponse([
+                'id' => $company->getId(),
+                'denomination' => $company->getDenomination(),
+                'sector' => $company->getSector()
+            ], JsonResponse::HTTP_OK);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'error' => $e->getMessage(),
+                'details' => 'Une erreur est survenue lors de la récupération des investissements globaux'
+            ], 400);
+        }
+    }
+}
