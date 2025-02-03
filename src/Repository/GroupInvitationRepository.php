@@ -11,6 +11,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 class GroupInvitationRepository extends ServiceEntityRepository
 {
+    private EntityManagerInterface $em;
+
     public function __construct(ManagerRegistry $registry, EntityManagerInterface $em)
     {
         parent::__construct($registry, GroupInvitation::class);

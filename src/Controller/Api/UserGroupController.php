@@ -2,9 +2,7 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\User;
 use App\Entity\UserGroup;
-use App\Entity\GroupInvitation;
 use App\Entity\GroupRole;
 use App\Repository\UserGroupRepository;
 use App\Repository\UserRepository;
@@ -21,6 +19,8 @@ use App\Repository\GroupRoleRepository;
 #[Route('/api/user-groups')]
 class UserGroupController extends AbstractController
 {
+    private GroupRoleRepository $groupRoleRepository;
+
     public function __construct(
         private EntityManagerInterface $entityManager,
         private UserGroupRepository $userGroupRepository,

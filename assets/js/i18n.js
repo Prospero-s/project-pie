@@ -22,6 +22,8 @@ import enSettings from './locales/en/settings.json';
 import frSettings from './locales/fr/settings.json';
 import enCharts from './locales/en/charts.json';
 import frCharts from './locales/fr/charts.json';
+import enDocuments from './locales/en/documents.json';
+import frDocuments from './locales/fr/documents.json';
 
 i18n
   .use(initReactI18next)
@@ -37,7 +39,8 @@ i18n
         global: frGlobal,
         dashboard: frDashboard,
         settings: frSettings,
-        charts: frCharts
+        charts: frCharts,
+        documents: frDocuments
       },
       en: {
         signin: enSignIn,
@@ -49,7 +52,8 @@ i18n
         global: enGlobal,
         dashboard: enDashboard,
         settings: enSettings,
-        charts: enCharts
+        charts: enCharts,
+        documents: enDocuments
       },
     },
     lng: 'fr',

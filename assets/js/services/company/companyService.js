@@ -33,7 +33,6 @@ export const fetchCompanyDetails = async (siren, t) => {
     
     // Vérifier d'abord le statut de la réponse
     if (!response.ok) {
-      console.warn(`Erreur API (${response.status}), tentative avec le scraping...`);
       // Si l'API échoue, on force le mode scraping
       response = await fetch(`/api/company/${siren}?mode=scraping`);
       
@@ -44,10 +43,8 @@ export const fetchCompanyDetails = async (siren, t) => {
 
     try {
       apiData = await response.json();
-      console.log('Données brutes reçues:', apiData);
     } catch (parseError) {
-      console.error('Erreur de parsing JSON:', parseError);
-      throw new Error('Format de réponse invalide');
+      throw new Error(`Format de réponse invalide: ${parseError.message} ${parseError.response?.data ? `(${JSON.stringify(parseError.response.data)})` : ''} [Status: ${parseError.response?.status || 'N/A'}]`);
     }
 
     if (apiData.error) {
@@ -67,11 +64,10 @@ export const fetchCompanyDetails = async (siren, t) => {
 
     return companyData;
   } catch (error) {
-    console.error('Erreur lors de la récupération des données:', error);
     openNotificationWithIcon(
       'error',
       t('company_details.error_siren.title'),
-      t('company_details.error_siren.message')
+      `${t('company_details.error_siren.message')} - ${error.message}`
     );
     return null;
   }
@@ -130,7 +126,6 @@ export const saveCompany = async (companyData) => {
     return result;
 
   } catch (error) {
-    console.error('Erreur lors de la sauvegarde:', error);
     openNotificationWithIcon(
       'error',
       'Erreur',
@@ -140,7 +135,7 @@ export const saveCompany = async (companyData) => {
   }
 };
 
-export const getAllCompanies = async (page, pageSize) => {
+export const getAllCompanies = async () => {
   try {
     const cognitoId = await Auth.currentSession()
       .then(session => session.getIdToken().getJwtToken())
@@ -161,22 +156,15 @@ export const getAllCompanies = async (page, pageSize) => {
 
     return result;
   } catch (error) {
-    console.error('Erreur lors de la récupération:', error);
     throw error;
   }
 };
 
 export const getCompanyDetailsById = async (id) => {
   try {
-    // S'assurer que l'URL commence par /api
     const response = await axios.get(`/api/company/details/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Erreur détaillée:", {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status
-    });
-    throw error;
+    throw new Error(`Erreur: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`);
   }
 };

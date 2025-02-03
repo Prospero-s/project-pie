@@ -2,9 +2,9 @@ import React from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Label, Legend } from "recharts";
 
 const COLORS = [
+  "#297CF7",  // Bleu
   "#12B76A",  // Vert
   "#9f1239",  // Rouge
-  "#86198f",  // Jaune
   "#FF8042",  // Orange
   "#1d4ed8"   // Violet
 ];

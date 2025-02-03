@@ -22,16 +22,19 @@ interface UserContextType {
   user: FormattedUser | null;
   setUser: (user: FormattedUser | null) => void;
   loading: boolean;
+  analyzedData: any | null;
+  setAnalyzedData: (data:any | null) => void; 
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<FormattedUser | null>(null);
+  const [analyzedData, setAnalyzedData] = useState(null); // Pour stocker les données d'analyse
   const [loading, setLoading] = useState(true);
 
   return (
-    <UserContext.Provider value={{ user, setUser, loading }}>
+    <UserContext.Provider value={{ user, setUser, loading, analyzedData, setAnalyzedData }}>
       <UserAuthListener setUser={setUser} setLoading={setLoading} />
       {children}
     </UserContext.Provider>

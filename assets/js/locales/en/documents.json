@@ -1,0 +1,17 @@
+{
+  "title": "Documents",
+  "modal": {
+    "upload_title": "Upload document",
+    "select_file": "Select a file",
+    "validate": "Upload et analyze"
+  },
+  "analyze": {
+    "title": "Previsualization PDF",
+    "company": "Company",
+    "data_extract": "Data extract",
+    "file_preview": "Previsualization PDF",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save_draft": "Save draft"
+  }
+}

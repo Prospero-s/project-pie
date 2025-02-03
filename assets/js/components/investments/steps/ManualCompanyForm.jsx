@@ -45,9 +45,13 @@ const ManualCompanyForm = ({ onNext, t }) => {
       <Form.Item
         name="siren"
         label={t('company_details.siren')}
-        rules={[{ required: true, message: t('company_details.siren_required') }]}
+        rules={[
+          { required: true, message: t('company_details.siren_required') },
+          { min: 9, message: t('company_details.siren_invalid') },
+          { max: 9, message: t('company_details.siren_invalid') }
+        ]}
       >
-        <Input placeholder={t('company_details.siren_placeholder')} maxLength={9} />
+        <Input placeholder={t('company_details.siren_placeholder')} minLength={9} maxLength={9} />
       </Form.Item>
 
       <Form.Item

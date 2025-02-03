@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Skeleton, Table, message, Tag, Spin } from 'antd';
+import { Skeleton, Table, message, Tag, Spin, Tooltip } from 'antd';
+import { FileAddOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { fetchInvestments } from '@/services/investment/investmentService';
-import AddCompanyModal from './AddCompanyModal';
-import InvestmentActions from './table/InvestmentActions';
-import EmptyInvestmentState from './table/EmptyInvestmentState';
-import NoResultsState from './table/NoResultsState';
+import AddCompanyModal from '@/components/investments/AddCompanyModal';
+import EmptyInvestmentState from '@/components/investments/table/EmptyInvestmentState';
+import NoResultsState from '@/components/investments/table/NoResultsState';
+import UploadPopup from "@/components/common/upload/UploadPopup"; 
 
 const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
   const { t } = useTranslation('investments', { i18n });
@@ -23,6 +24,13 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
     sector: [],
     fundingType: []
   });
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [isPopupVisible, setPopupVisible] = useState(false);
+  const handleOpenPopup = (company) => {
+    setSelectedCompany(company);
+    setPopupVisible(true);
+  };  
+  const handleClosePopup = () => setPopupVisible(false);
 
   useEffect(() => {
     loadInvestments({
@@ -240,14 +248,25 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
       title: t('actions.title'),
       key: 'actions',
       width: 100,
-      render: (text, record) => (
-        <InvestmentActions
-          loading={loading}
-          onAdd={handleAdd}
-          onDelete={handleDelete}
-          recordId={record.id}
-        />
-      ),
+      render: (text, record) =>
+        loading ? (
+          <Skeleton.Button active size="small" />
+        ) : (
+          <div className="flex gap-2">
+            <Tooltip title="Upload un fichier">
+              <FileAddOutlined
+                className="!text-blue-500 hover:!text-blue-700 text-lg cursor-pointer"
+                onClick={() => handleOpenPopup(record)}
+              />
+            </Tooltip>
+            <Tooltip title="Supprimer">
+              <DeleteOutlined 
+                className="!text-rose-500 hover:!text-rose-700 text-lg cursor-pointer"
+                onClick={() => handleDelete(record.id)}
+              />
+            </Tooltip>
+          </div>
+        ),
     },
   ];
 
@@ -282,6 +301,15 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
         onAdd={handleAdd}
         t={t}
       />
+      {isPopupVisible && (
+        <UploadPopup
+          visible={isPopupVisible}
+          onClose={handleClosePopup}
+          company={selectedCompany}
+          i18n={i18n}
+          lng={lng}
+        />
+      )}
       <div className="rounded-lg border border-slate-200 flex flex-col w-full">
         {investments.length === 0 && !Object.values(activeFilters).some(filter => filter.length > 0) ? (
           <EmptyInvestmentState t={t} onAddClick={() => setIsModalOpen(true)} />

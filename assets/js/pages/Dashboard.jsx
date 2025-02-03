@@ -34,7 +34,7 @@ const Dashboard = ({ i18n }) => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white rounded-lg shadow-sm">
         <TableInvestments i18n={i18n} />
       </div>
     </>

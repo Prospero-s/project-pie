@@ -14,13 +14,11 @@ use App\Repository\UserRepository;
 #[Route('/api', name: 'api_')]
 class CompanyInvestmentController extends AbstractController
 {
-    private $companyRepository;
     private $companyInvestmentRepository;
     private $userRepository;
 
-    public function __construct(CompanyRepository $companyRepository, CompanyInvestmentRepository $companyInvestmentRepository, UserRepository $userRepository)
+    public function __construct(CompanyInvestmentRepository $companyInvestmentRepository, UserRepository $userRepository)
     {
-        $this->companyRepository = $companyRepository;
         $this->companyInvestmentRepository = $companyInvestmentRepository;
         $this->userRepository = $userRepository;
     }
@@ -67,13 +65,14 @@ class CompanyInvestmentController extends AbstractController
         }
     }
 
-    #[Route('/investments/global/{cognitoId}', methods: ['GET'])]
-    public function getGlobalInvestments(string $cognitoId): JsonResponse
+    #[Route('/investments/global', methods: ['GET'])]
+    public function getGlobalInvestments(Request $request): JsonResponse
     {
         try {
+            $cognitoId = $request->headers->get('x-cognito-id');
             $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
-            if (!$user) {
-                throw new \Exception('Utilisateur non trouvé');
+            if (!$cognitoId || !$user) {
+                throw new \Exception('Utilisateur non authentifié ou non trouvé');
             }
 
             $globalInvestments = $this->companyInvestmentRepository->fetchGlobalInvestments($user->getId());
@@ -87,13 +86,14 @@ class CompanyInvestmentController extends AbstractController
         }
     }
     
-    #[Route('/investments/global/funding/{cognitoId}', methods: ['GET'])]
-    public function getGlobalFundingInvestments(string $cognitoId): JsonResponse
+    #[Route('/investments/global/funding', methods: ['GET'])]
+    public function getGlobalFundingInvestments(Request $request): JsonResponse
     {
         try {
+            $cognitoId = $request->headers->get('x-cognito-id');
             $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
-            if (!$user) {
-                throw new \Exception('Utilisateur non trouvé');
+            if (!$cognitoId || !$user) {
+                throw new \Exception('Utilisateur non authentifié ou non trouvé');
             }
 
             $fundingInvestments = $this->companyInvestmentRepository->fetchGlobalFundingInvestments($user->getId());
@@ -106,13 +106,14 @@ class CompanyInvestmentController extends AbstractController
         }
     }
 
-    #[Route('/investments/global/sector/{cognitoId}', methods: ['GET'])]
-    public function getGlobalSectorInvestments(string $cognitoId): JsonResponse
+    #[Route('/investments/global/sector', methods: ['GET'])]
+    public function getGlobalSectorInvestments(Request $request): JsonResponse
     {
         try {
+            $cognitoId = $request->headers->get('x-cognito-id');
             $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
-            if (!$user) {
-                throw new \Exception('Utilisateur non trouvé');
+            if (!$cognitoId || !$user) {
+                throw new \Exception('Utilisateur non authentifié ou non trouvé');
             }
 
             $sectorInvestments = $this->companyInvestmentRepository->fetchGlobalSectorInvestments($user->getId());
@@ -150,5 +151,4 @@ class CompanyInvestmentController extends AbstractController
             ], 500);
         }
     }
-
 } 

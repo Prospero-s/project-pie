@@ -2,7 +2,7 @@ import { Auth } from 'aws-amplify';
 import { CognitoHostedUIIdentityProvider } from '@aws-amplify/auth';
 import { openNotificationWithIcon } from '@/components/common/notification/NotifAlert';
 
-export const signUpWithEmail = async (email, password, fullName, t, navigate, lng) => {
+export const signUpWithEmail = async (email, password, fullName, t) => {
   try {
     await Auth.signUp({
       username: email,
@@ -61,13 +61,12 @@ export const signInWithEmail = async (email, password, t, setUser, navigate, lng
   }
 };
 
-export const signInWithProvider = async (provider, lng, t) => {
+export const signInWithProvider = async (provider, lng) => {
   try {
     const providerName = provider.toLowerCase();
     localStorage.setItem('preferredLanguage', lng);
     
     const redirectUri = encodeURIComponent(`${window.location.origin}/${lng}/auth/callback`);
-    console.log('URL de redirection:', redirectUri);
     
     const customState = encodeURIComponent(JSON.stringify({
       lang: lng,
@@ -93,13 +92,7 @@ export const signInWithProvider = async (provider, lng, t) => {
         throw new Error(`Fournisseur ${provider} non supporté`);
     }
   } catch (error) {
-    console.error('Erreur de connexion:', error);
-    console.error('Détails de l\'erreur:', {
-      message: error.message,
-      code: error.code,
-      name: error.name
-    });
-    throw error;
+    throw new Error(`Erreur de connexion: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`);
   }
 };
 
@@ -109,7 +102,7 @@ export const resendVerificationEmail = async (email, t) => {
     openNotificationWithIcon('success', t('verification_email_resent'), t('check_inbox'));
     return true;
   } catch (error) {
-    openNotificationWithIcon('error', t('resend_error'), t('resend_error_message'));
+    openNotificationWithIcon('error', t('resend_error'), `${t('resend_error_message')} - ${error.message}`);
     return false;
   }
 };
@@ -127,7 +120,7 @@ export const resetPassword = async (email, t) => {
     openNotificationWithIcon(
       'error', 
       t('forgot_password.error'), 
-      t('forgot_password.error_message')
+      `${t('forgot_password.error_message')} - ${error.message}`
     );
     return false;
   }
@@ -140,7 +133,7 @@ export const updatePassword = async (oldPassword, newPassword, t) => {
     openNotificationWithIcon('success', t('success'), t('success_message'));
     return true;
   } catch (error) {
-    openNotificationWithIcon('error', t('error'), t('error_message'));
+    openNotificationWithIcon('error', t('error'), `${t('error_message')} - ${error.message}`);
     return false;
   }
 };
@@ -173,19 +166,18 @@ export const confirmResetPassword = async (email, code, newPassword, t) => {
     openNotificationWithIcon(
       'error', 
       t('forgot_password.error'), 
-      t('forgot_password.error_message')
+      `${t('forgot_password.error_message')} - ${error.message}`
     );
     return false;
   }
 };
 
-export const handleAuthCallback = async (code, state) => {
+export const handleAuthCallback = async () => {
   try {
-    // Traitement du code d'autorisation
     const result = await Auth.federatedSignIn();
     return result;
   } catch (error) {
-    throw error;
+    throw new Error(`Erreur lors du callback d'authentification: ${error.message}`);
   }
 };
 
@@ -211,7 +203,7 @@ export const signOut = async (t, lng = 'fr', navigate) => {
     }
 
   } catch (error) {
-    openNotificationWithIcon('error', t('logout_error'), t('logout_error_message'));
+    openNotificationWithIcon('error', t('logout_error'), `${t('logout_error_message')} - ${error.message}`);
     window.location.href = `/${lng}/auth/signin`;
   }
 };

@@ -37,6 +37,7 @@ RUN install-php-extensions \
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
+RUN mkdir -p /var/www/html/public/uploads && chown -R www-data:www-data /var/www/html/public/uploads
 
 # Dev FrankenPHP image
 FROM frankenphp_base AS frankenphp_dev

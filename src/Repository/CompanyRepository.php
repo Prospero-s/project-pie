@@ -11,10 +11,11 @@ use App\Entity\Representative;
 use App\Entity\CompanyAddress;
 use App\Entity\CompanyInvestment;
 use App\Service\User\UserService;
-use Doctrine\Common\Collections\ArrayCollection;
 
 class CompanyRepository extends ServiceEntityRepository
 {
+    private EntityManagerInterface $em;
+    
     public function __construct(
         ManagerRegistry $registry, 
         EntityManagerInterface $em,
