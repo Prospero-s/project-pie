@@ -107,8 +107,8 @@ const CompanyMap = ({ address }) => {
         const customIcon = L.divIcon({
           className: 'custom-marker-container',
           html: `
-            <div class="marker-pin"></div>
-            <div class="marker-pulse"></div>
+            <div className="marker-pin"></div>
+            <div className="marker-pulse"></div>
           `,
           iconSize: [40, 40],
           iconAnchor: [20, 20]
@@ -215,15 +215,15 @@ const CompanyMap = ({ address }) => {
         L.marker([lat, lng], { icon: customIcon })
           .addTo(map)
           .bindPopup(`
-            <div class="popup-content">
-              <div class="popup-header">
+            <div className="popup-content">
+              <div className="popup-header">
                 Adresse
               </div>
-              <div class="popup-body">
-                <div class="popup-address">
+              <div className="popup-body">
+                <div className="me="popup-address">
                   ${address.streetNumber ? `${address.streetNumber} ` : ''}${address.streetTypes || ''} ${address.voie || ''}
                 </div>
-                <div class="popup-city">
+                <div className="popup-city">
                   ${address.codePostal || ''} ${address.commune || ''}
                 </div>
               </div>

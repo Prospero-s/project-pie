@@ -65,12 +65,6 @@ const TableDocuments = () => {
 
   const columns = [
     {
-      title: "Nom de l'entreprise",
-      dataIndex: 'company',
-      key: 'company',
-      render: (text) => (loading ? <Skeleton.Input block active size="small" /> : text),
-    },
-    {
       title: 'Statut',
       dataIndex: 'status',
       key: 'status',
@@ -79,6 +73,18 @@ const TableDocuments = () => {
         { text: 'Traité', value: 'processed' },
       ],
       onFilter: (value, record) => record.status === value,
+    },
+    {
+      title: "Nom du fichier",
+      dataIndex: 'pdfUrl',
+      key: 'pdfUrl',
+      render: (text) => (loading ? <Skeleton.Input block active size="small" /> : text),
+    },
+    {
+      title: "Nom de l'entreprise",
+      dataIndex: 'company',
+      key: 'company',
+      render: (text) => (loading ? <Skeleton.Input block active size="small" /> : text),
     },
     {
       title: 'Dernière mise à jour',
