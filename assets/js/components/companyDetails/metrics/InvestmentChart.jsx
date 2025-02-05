@@ -81,7 +81,7 @@ const InvestmentChart = () => {
           data={data} 
           xDataKey="month" 
           yDataKey="investment"
-          height={350}
+          height={200}
         />
       )}
     </div>

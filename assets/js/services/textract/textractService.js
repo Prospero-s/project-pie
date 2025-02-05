@@ -47,7 +47,7 @@ export const submitData = async (analyzedData, editedText, companyId) => {
     } catch (error) {
       return { 
         success: false, 
-        message: `Erreur lors de l\'enregistrement des données: ${error.message}` 
+        message: `Erreur lors de l'enregistrement des données: ${error.message}` 
       };
     }
   };

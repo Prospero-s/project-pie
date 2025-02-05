@@ -44,10 +44,10 @@ const TextractResults = ( { i18n }) => {
     }
 
     const response = await submitData(analyzedData, editedText, company?.id);
-    
     if (response.success) {
         message.success(response.message);
         navigate("/documents");
+    } else {
         message.error(response.message);
     }
   }
