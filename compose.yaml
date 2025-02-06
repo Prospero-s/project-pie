@@ -52,6 +52,11 @@ services:
       - "5173:5173"  # Expose le port de Vite
     environment:
       - VITE_SERVER_HOST=0.0.0.0  # Permet d'écouter toutes les connexions
+      - HOST=0.0.0.0
+      - CHOKIDAR_USEPOLLING=true
+      - VITE_DEV_SERVER_URL=https://tryprospero.fr:5173
+      - VITE_HMR_HOST=tryprospero.fr
+      - VITE_HMR_PORT=5173
     depends_on:
       - php  # Assure que Symfony démarre avant Vite
     networks:

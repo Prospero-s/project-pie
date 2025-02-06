@@ -76,12 +76,6 @@ Amplify.configure({
       responseType: 'code',
       clientId: import.meta.env.VITE_AWS_CLIENT_ID,
       providers: ['Google', 'Microsoft']
-    },
-    cookieStorage: {
-      domain: 'localhost',
-      path: '/',
-      expires: 365,
-      secure: true
     }
   }
 });

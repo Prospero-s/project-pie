@@ -26,16 +26,16 @@ export default defineConfig({
     watch: {
       usePolling: true,
     },
-    https: process.env.APP_ENV === 'dev' ? {
-      key: './frankenphp/certs/tls.key',
-      cert: './frankenphp/certs/tls.pem',
-    } : false,
+    https: true,
     host: "0.0.0.0",
     port: 5173,
     strictPort: true,
     hmr: {
-      host: 'localhost'
-    }
+      host: 'tryprospero.fr',
+      clientPort: 5173,
+      protocol: 'https'
+    },
+    cors: true,
   },
   build: {
     rollupOptions: {
@@ -43,6 +43,10 @@ export default defineConfig({
         app: "./assets/app.jsx",
       },
     },
+    manifest: true,
+    outDir: 'public/build',
+    assetsDir: '',
+    emptyOutDir: true,
   },
   define: {
     global: 'window',
