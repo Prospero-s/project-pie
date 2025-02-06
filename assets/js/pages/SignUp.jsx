@@ -74,10 +74,15 @@ const SignUp = ({ i18n }) => {
 
   return (
     <>
-      <div className="w-full p-2 sm:p-6" ref={formRef}>
-        <h2 className="mb-8 text-2xl font-bold text-black text-center">
-          {t('title')}
-        </h2>
+      <div className="w-full" ref={formRef}>
+        <div className='mb-8'>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+            {t('title')}
+          </h2>
+          <h4 className="text-gray-600 text-md mb-6">
+            {t('subtitle')}
+          </h4>
+        </div>
         <form onSubmit={handleSignUp} className="space-y-4">
           <SignUpForm
             t={t}

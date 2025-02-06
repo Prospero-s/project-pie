@@ -7,17 +7,17 @@ const SignUpLink = ({ t, lng }) => {
 
   return (
     <div className="mt-6 text-center">
-      <p>
+      <p className="text-sm text-gray-600">
         {t('already_have_account')}{' '}
-      <Button
-        onClick={() => navigate(`/${lng}/auth/signin`)}
-        className="text-primary text-base !p-0"
-        type="link"
-      >
-        {t('sign_in')}
-      </Button>
-    </p>
-  </div>
+        <Button
+          type="link"
+          onClick={() => navigate(`/${lng}/auth/signin`)}
+          className="text-primary hover:text-primary/80 font-medium !p-0"
+        >
+          {t('sign_in')}
+        </Button>
+      </p>
+    </div>
   );
 };
 

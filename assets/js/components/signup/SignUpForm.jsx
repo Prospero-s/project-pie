@@ -5,41 +5,47 @@ import PasswordField from '@/components/common/field/PasswordField';
 
 const SignUpForm = ({ t, fullName, setFullName, email, setEmail, password, setPassword, confirmPassword, setConfirmPassword, passwordMatch, handleConfirmPasswordChange }) => (
   <div className="space-y-4">
-    <InputField
-      label={t('full_name')}
-      value={fullName}
-      onChange={(e) => setFullName(e.target.value)}
-      placeholder={t('enter_full_name')}
-      className="w-full rounded-lg border border-stroke bg-transparent py-4 sm:py-3 px-4 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-    />
-    <InputField
-      label={t('email')}
-      value={email}
-      onChange={(e) => setEmail(e.target.value)}
-      placeholder={t('enter_email')}
-      className="w-full rounded-lg border border-stroke bg-transparent py-4 sm:py-3 px-4 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-    />
-    <PasswordStrengthField
-      label={t('password')}
-      value={password}
-      onChange={(e) => setPassword(e.target.value)}
-      placeholder={t('enter_password')}
-      className="w-full rounded-lg border border-stroke bg-transparent py-4 sm:py-3 px-4 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-    />
-    <PasswordField
-      label={t('confirm_password')}
-      value={confirmPassword}
-      onChange={handleConfirmPasswordChange}
-      placeholder={t('reenter_password')}
-      className={`w-full rounded-lg border ${
-        !passwordMatch && confirmPassword
-          ? 'border-rose-500'
-          : 'border-stroke dark:border-form-strokedark'
-      } bg-transparent py-4 sm:py-3 px-4 text-black outline-none focus:border-primary focus-visible:shadow-none dark:bg-form-input dark:text-white dark:focus:border-primary`}
-    />
-    {!passwordMatch && confirmPassword && (
-      <p className="text-sm text-rose-500">{t('password_mismatch')}</p>
-    )}
+    <div className="space-y-1.5">
+      <label className="block text-sm font-medium text-gray-700">{t('full_name')}</label>
+      <InputField
+        value={fullName}
+        onChange={(e) => setFullName(e.target.value)}
+        placeholder={t('enter_full_name')}
+        className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-gray-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm"
+      />
+    </div>
+    <div className="space-y-1.5">
+      <label className="block text-sm font-medium text-gray-700">{t('email')}</label>
+      <InputField
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder={t('enter_email')}
+        className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-gray-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm"
+      />
+    </div>
+    <div className="space-y-1.5">
+      <label className="block text-sm font-medium text-gray-700">{t('password')}</label>
+      <PasswordStrengthField
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder={t('enter_password')}
+        className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-gray-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm"
+      />
+    </div>
+    <div className="space-y-1.5">
+      <label className="block text-sm font-medium text-gray-700">{t('confirm_password')}</label>
+      <PasswordField
+        value={confirmPassword}
+        onChange={handleConfirmPasswordChange}
+        placeholder={t('reenter_password')}
+        className={`w-full h-10 rounded-lg border ${
+          !passwordMatch && confirmPassword ? 'border-rose-500' : 'border-gray-300'
+        } bg-white px-3 text-gray-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm`}
+      />
+      {!passwordMatch && confirmPassword && (
+        <p className="text-sm text-rose-500 mt-1">{t('password_mismatch')}</p>
+      )}
+    </div>
   </div>
 );
 

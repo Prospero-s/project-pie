@@ -13,5 +13,31 @@
     "confirm": "Confirmer",
     "cancel": "Annuler",
     "save_draft": "Enregistrer en brouillon"
+  },
+  "empty": {
+    "title": "Aucun document",
+    "description": "Vous n'avez pas encore ajouté de documents. Commencez par télécharger votre premier document.",
+    "action": "Ajouter un document"
+  },
+  "table": {
+    "status": "Statut",
+    "filename": "Nom du fichier",
+    "company": "Nom de l'entreprise",
+    "last_update": "Dernière mise à jour",
+    "actions": "Actions",
+    "statuses": {
+      "draft": "Brouillon",
+      "processed": "Traité"
+    },
+    "tooltips": {
+      "edit": "Modifier",
+      "view": "Voir Détails",
+      "delete": "Supprimer"
+    }
+  },
+  "messages": {
+    "delete_success": "Document supprimé avec succès !",
+    "delete_error": "Erreur lors de la suppression du document.",
+    "loading_error": "Erreur lors du chargement des documents"
   }
 }

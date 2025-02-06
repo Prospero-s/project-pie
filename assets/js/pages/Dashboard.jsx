@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useUser } from '@/context/userContext';
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import InvestmentGlobalChart from "@/components/dashboard/InvestmentGlobalChart";
 import InvestmentGlobalFundingChart from "@/components/dashboard/InvestmentGlobalFundingChart";
 import InvestmentGlobalSectorChart from "@/components/dashboard/InvestmentGlobalSectorChart";
@@ -12,6 +12,7 @@ const Dashboard = ({ i18n }) => {
   const { t } = useTranslation('dashboard', { i18n });
   const { user } = useUser();
   const lng = useParams().lng;
+  const navigate = useNavigate();
 
   useEffect(() => {
     i18n.changeLanguage(lng);
@@ -35,7 +36,10 @@ const Dashboard = ({ i18n }) => {
       </div>
 
       <div className="bg-white rounded-lg shadow-sm">
-        <TableInvestments i18n={i18n} />
+        <TableInvestments 
+          i18n={i18n} 
+          onAddClick={() => navigate(`/${lng}/investments?modal=add`)} 
+        />
       </div>
     </>
   );

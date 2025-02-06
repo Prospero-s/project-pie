@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Tooltip, Table, Skeleton, message, Modal } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import { fetchDocuments } from '@/services/documents/documentsService';
+import { fetchDocuments, deleteDocument } from '@/services/documents/documentsService';
 import { useNavigate } from 'react-router-dom';
-import { deleteDocument } from '@/services/documents/documentsService';
+import { useTranslation } from 'react-i18next';
+import EmptyDocumentState from './EmptyDocumentState';
 
-const TableDocuments = () => {
+const TableDocuments = ({ t }) => {
   const [loading, setLoading] = useState(true);
   const [documents, setDocuments] = useState([]);
   const navigate = useNavigate();
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
-    total: 0,
   });
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState('');
@@ -29,10 +29,10 @@ const TableDocuments = () => {
   const handleDelete = async (id) => {
     try {
       await deleteDocument(id);
-      message.success("Document supprimé avec succès !");
+      message.success(t('messages.delete_success'));
       setDocuments((prevDocuments) => prevDocuments.filter(doc => doc.id !== id));
     } catch (error) {
-      message.error("Erreur lors de la suppression du document.");
+      message.error(t('messages.delete_error'));
     }
   };
 
@@ -56,8 +56,8 @@ const TableDocuments = () => {
         total: response.length || 0,
       });
     } catch (error) {
-      message.error('Erreur lors du chargement des documents');
-      console.error(error); // Debug
+      message.error(t('messages.loading_error'));
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -65,29 +65,39 @@ const TableDocuments = () => {
 
   const columns = [
     {
-      title: 'Statut',
+      title: t('table.status'),
       dataIndex: 'status',
       key: 'status',
       filters: [
-        { text: 'Brouillon', value: 'draft' },
-        { text: 'Traité', value: 'processed' },
+        { text: t('table.statuses.draft'), value: 'draft' },
+        { text: t('table.statuses.processed'), value: 'processed' },
       ],
       onFilter: (value, record) => record.status === value,
+      render: (status) => 
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : t(`table.statuses.${status}`),
     },
     {
-      title: "Nom du fichier",
+      title: t('table.filename'),
       dataIndex: 'pdfUrl',
       key: 'pdfUrl',
-      render: (text) => (loading ? <Skeleton.Input block active size="small" /> : text),
+      render: (text) => 
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : text,
     },
     {
-      title: "Nom de l'entreprise",
+      title: t('table.company'),
       dataIndex: 'company',
       key: 'company',
-      render: (text) => (loading ? <Skeleton.Input block active size="small" /> : text),
+      render: (text) => 
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : text,
     },
     {
-      title: 'Dernière mise à jour',
+      title: t('table.last_update'),
       dataIndex: 'createdAt',
       key: 'createdAt',
       render: (date) =>
@@ -102,12 +112,15 @@ const TableDocuments = () => {
         ),
     },
     {
-        title: 'Actions',
-        key: 'actions',
-        render: (_, record) => (
+      title: t('table.actions'),
+      key: 'actions',
+      render: (_, record) =>
+        loading ? (
+          <Skeleton.Button active size="small" />
+        ) : (
           <div className="flex gap-2">
             {record.status === 'draft' && (
-              <Tooltip title="Modifier">
+              <Tooltip title={t('table.tooltips.edit')}>
                 <Button
                   className="!text-blue-500 hover:!text-blue-700 text-lg cursor-pointer"
                   icon={<EditOutlined />}
@@ -115,14 +128,14 @@ const TableDocuments = () => {
                 />
               </Tooltip>
             )}
-            <Tooltip title="Voir Détails">
+            <Tooltip title={t('table.tooltips.view')}>
               <Button
                 className="!text-blue-500 hover:!text-blue-700 text-lg cursor-pointer"
                 icon={<EyeOutlined />}
                 onClick={() => handleViewDetails(record.kpi)}
               />
             </Tooltip>
-            <Tooltip title="Supprimer">
+            <Tooltip title={t('table.tooltips.delete')}>
               <Button
                 className="!text-rose-500 hover:!text-rose-700 text-lg cursor-pointer"
                 icon={<DeleteOutlined />}
@@ -131,19 +144,29 @@ const TableDocuments = () => {
             </Tooltip>
           </div>
         ),
-      }
+    }
   ];
 
   return (
     <>
-      <div className="rounded-lg border border-slate-200 flex flex-col w-full">
-        <Table
-          columns={columns}
-          dataSource={documents}
-          loading={loading}
-          onChange={handleTableChange}
-          pagination={pagination}
-        />
+      <div className="bg-white rounded-lg border border-slate-300 flex flex-col w-full">
+        <div className="overflow-x-auto">
+          <Table
+            columns={columns}
+            dataSource={loading ? Array(5).fill({}) : documents}
+            pagination={pagination}
+            onChange={handleTableChange}
+            rowClassName={(record, index) =>
+              index % 2 === 0 ? '!bg-white' : '!bg-slate-50'
+            }
+            size="middle"
+            locale={{
+              emptyText: documents.length === 0 && !loading ? (
+                <EmptyDocumentState t={t} />
+              ) : null
+            }}
+          />
+        </div>
       </div>
 
       <Modal

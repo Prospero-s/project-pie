@@ -75,7 +75,7 @@ class CompanyInvestmentController extends AbstractController
                 throw new \Exception('Utilisateur non authentifié ou non trouvé');
             }
 
-            $globalInvestments = $this->companyInvestmentRepository->fetchGlobalInvestments($user->getId());
+            $globalInvestments = $this->companyInvestmentRepository->fetchGlobalInvestments($user->getUserGroup());
 
             return new JsonResponse($globalInvestments);
         } catch (\Exception $e) {
@@ -96,7 +96,7 @@ class CompanyInvestmentController extends AbstractController
                 throw new \Exception('Utilisateur non authentifié ou non trouvé');
             }
 
-            $fundingInvestments = $this->companyInvestmentRepository->fetchGlobalFundingInvestments($user->getId());
+            $fundingInvestments = $this->companyInvestmentRepository->fetchGlobalFundingInvestments($user->getUserGroup());
             return new JsonResponse($fundingInvestments);
         } catch (\Exception $e) {
             return new JsonResponse([
@@ -116,7 +116,7 @@ class CompanyInvestmentController extends AbstractController
                 throw new \Exception('Utilisateur non authentifié ou non trouvé');
             }
 
-            $sectorInvestments = $this->companyInvestmentRepository->fetchGlobalSectorInvestments($user->getId());
+            $sectorInvestments = $this->companyInvestmentRepository->fetchGlobalSectorInvestments($user->getUserGroup());
             return new JsonResponse($sectorInvestments);
         } catch (\Exception $e) {
             return new JsonResponse([
@@ -127,10 +127,16 @@ class CompanyInvestmentController extends AbstractController
     }
 
     #[Route('/investments/{id}/{year}', methods: ['GET'])]
-    public function findByCompanyIdAndYear(int $id, int $year): JsonResponse
+    public function findByCompanyIdAndYear(Request $request, int $id, int $year): JsonResponse
     {
         try {
-           $investments = $this->companyInvestmentRepository->findByCompanyIdAndYear($id, $year);
+            $cognitoId = $request->headers->get('x-cognito-id');
+            $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
+            if (!$cognitoId || !$user) {
+                throw new \Exception('Utilisateur non authentifié ou non trouvé');
+            }
+
+            $investments = $this->companyInvestmentRepository->findByCompanyIdAndYear($id, $year, $user->getUserGroup());
 
             if (empty($investments)) {
                 return new JsonResponse([
@@ -140,15 +146,11 @@ class CompanyInvestmentController extends AbstractController
             }
 
             return new JsonResponse($investments);
-
         } catch (\Exception $e) {
-            // Log plus détaillé pour le debug
-            error_log($e->getMessage());
-            
             return new JsonResponse([
-                'error' => 'Internal server error',
-                'debug' => $e->getMessage()
-            ], 500);
+                'error' => $e->getMessage(),
+                'details' => 'Une erreur est survenue lors de la récupération des investissements'
+            ], 400);
         }
     }
 } 

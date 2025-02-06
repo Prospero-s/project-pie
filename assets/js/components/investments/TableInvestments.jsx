@@ -9,7 +9,7 @@ import EmptyInvestmentState from '@/components/investments/table/EmptyInvestment
 import NoResultsState from '@/components/investments/table/NoResultsState';
 import UploadPopup from "@/components/common/upload/UploadPopup"; 
 
-const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
+const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen, onAddClick }) => {
   const { t } = useTranslation('investments', { i18n });
   const lng = i18n.language;
   const [loading, setLoading] = useState(true);
@@ -310,9 +310,11 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen }) => {
           lng={lng}
         />
       )}
-      <div className="rounded-lg border border-slate-200 flex flex-col w-full">
+      <div className="bg-white rounded-lg border border-slate-300 flex flex-col w-full">
         {investments.length === 0 && !Object.values(activeFilters).some(filter => filter.length > 0) ? (
-          <EmptyInvestmentState t={t} onAddClick={() => setIsModalOpen(true)} />
+          <EmptyInvestmentState 
+            t={t}
+            onAddClick={onAddClick || (() => setIsModalOpen(true))} />
         ) : (
           <div className="overflow-x-auto">
             <Table

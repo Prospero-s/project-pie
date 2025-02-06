@@ -63,14 +63,18 @@ const TableCompanies = ({ i18n }) => {
       title: t('company.sector'),
       dataIndex: 'sector',
       key: 'sector',
-      filters: uniqueSectors.map(sector => ({ text: sector, value: sector })),
+      filters: uniqueSectors.map(sector => ({ 
+        text: t(`company_details.sectors.${sector}`), 
+        value: sector 
+      })),
       onFilter: (value, record) => record.sector === value,
       filterMode: 'menu',
       filterSearch: true,
       sorter: (a, b) => a.sector.localeCompare(b.sector),
       sortDirections: ['ascend', 'descend'],
-      render: (text) =>
-        loading ? <Skeleton.Input block active size="small" /> : text,
+      render: (sector) =>
+        loading ? <Skeleton.Input block active size="small" /> : 
+        (sector ? t(`company_details.sectors.${sector}`) : '-'),
     },
     {
       title: t('company.created_at'),
@@ -84,27 +88,7 @@ const TableCompanies = ({ i18n }) => {
         ) : (
           new Date(date).toLocaleDateString()
         ),
-    },
-    {
-      title: t('actions.title'),
-      key: 'actions',
-      width: 100,
-      render: (text, record) =>
-        loading ? (
-          <Skeleton.Button active size="small" />
-        ) : (
-          <div className="flex items-center gap-4">
-            <FileAddOutlined
-              className="!text-blue-500 hover:!text-blue-700 text-lg cursor-pointer"
-              onClick={() => handleAdd(record.id)}
-            />
-            <DeleteOutlined 
-              className="!text-rose-500 hover:!text-rose-700 text-lg cursor-pointer" 
-              onClick={() => handleDelete(record.id)}
-            />
-          </div>
-        ),
-    },
+    }
   ];
 
   const handleDelete = (id) => {
@@ -117,7 +101,7 @@ const TableCompanies = ({ i18n }) => {
 
   return (
     <>
-      <div className="rounded-lg border border-slate-200 flex flex-col w-full">
+      <div className="bg-white rounded-lg border border-slate-300 flex flex-col w-full">
         <div className="overflow-x-auto">
           <Table
             columns={columns}

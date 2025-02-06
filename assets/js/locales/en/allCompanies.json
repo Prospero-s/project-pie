@@ -28,5 +28,16 @@
     "title": "Actions",
     "view_details": "View details",
     "add_investment": "Add investment"
+  },
+  "company_details": {
+    "sectors": {
+      "technology": "Technology",
+      "healthcare": "Healthcare",
+      "finance": "Finance",
+      "retail": "Retail",
+      "manufacturing": "Manufacturing",
+      "energy": "Energy",
+      "education": "Education"
+    }
   }
 }

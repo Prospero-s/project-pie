@@ -27,84 +27,73 @@ const DonutChartComponent = ({
     }));
 
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <PieChart>
-        <Pie
-          data={sortedData}
-          dataKey={valueKey}
-          nameKey={nameKey}
-          cx="50%"
-          cy="45%"
-          innerRadius={60}
-          outerRadius={90}
-        >
-          {sortedData.map((entry, index) => (
-            <Cell
-              key={`cell-${index}`}
-              fill={COLORS[index % COLORS.length]}
+    <div className="w-full h-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+          <Pie
+            data={sortedData}
+            dataKey={valueKey}
+            nameKey={nameKey}
+            cx="50%"
+            cy="50%"
+            innerRadius="60%"
+            outerRadius="80%"
+            paddingAngle={2}
+            activeShape={false}
+            style={{ outline: 'none' }}
+          >
+            {sortedData.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={COLORS[index % COLORS.length]}
+              />
+            ))}
+            <Label
+              position="center"
+              content={({ viewBox }) => {
+                const { cx, cy } = viewBox;
+                return (
+                  <g transform={`translate(${cx},${cy})`}>
+                    <text
+                      y={-8}
+                      dominantBaseline="central"
+                      textAnchor="middle"
+                      style={{ fontSize: 'clamp(12px, 1.2vw, 14px)' }}
+                    >
+                      {new Intl.NumberFormat("fr-FR", {
+                        style: "currency",
+                        currency: "EUR",
+                        maximumFractionDigits: 0,
+                      }).format(totalValue)}
+                    </text>
+                    <text
+                      y={12}
+                      dominantBaseline="central"
+                      textAnchor="middle"
+                      style={{ fontSize: 'clamp(10px, 1vw, 12px)' }}
+                    >
+                      {totalLabel}
+                    </text>
+                  </g>
+                );
+              }}
             />
-          ))}
-          <Label
-            position="center"
-            content={({ viewBox }) => {
-              const { cx, cy } = viewBox;
-              return (
-                <>
-                  <text
-                    x={cx}
-                    y={cy - 10}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    style={{ fontSize: '20px', fontWeight: 'bold', fill: '#1F2937' }}
-                  >
-                    {new Intl.NumberFormat("fr-FR", {
-                      style: "currency",
-                      currency: "EUR",
-                      maximumFractionDigits: 0,
-                    }).format(totalValue)}
-                  </text>
-                  <text
-                    x={cx}
-                    y={cy + 15}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    style={{ fontSize: '14px', fill: '#6B7280' }}
-                  >
-                    {totalLabel}
-                  </text>
-                </>
-              );
+          </Pie>
+          <Tooltip
+            formatter={(value) => new Intl.NumberFormat('fr-FR', {
+              style: 'currency',
+              currency: 'EUR'
+            }).format(value)}
+            contentStyle={{
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              border: '1px solid #e5e7eb',
+              borderRadius: '6px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}
           />
-        </Pie>
-        <Tooltip
-          formatter={(value) => new Intl.NumberFormat('fr-FR', {
-            style: 'currency',
-            currency: 'EUR'
-          }).format(value)}
-        />
-        <Legend
-          layout="horizontal"
-          align="center"
-          verticalAlign="bottom"
-          content={({ payload }) => (
-            <div className="flex flex-wrap justify-center gap-6 mt-4">
-              {payload.map((entry, index) => (
-                <div key={`legend-${index}`} className="flex items-center whitespace-nowrap">
-                  <div
-                    className="w-3 h-3 mr-2 rounded-sm"
-                    style={{ backgroundColor: entry.color }}
-                  />
-                  <span className="text-sm text-gray-600">
-                    {entry.value}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        />
-      </PieChart>
-    </ResponsiveContainer>
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
 

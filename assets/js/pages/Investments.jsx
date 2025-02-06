@@ -2,18 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Breadcrumb from '@/components/common/breadcrumb/Breadcrumb';
 import TableInvestments from '@/components/investments/TableInvestments';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { Button } from 'antd';
 
 const Investments = ({ i18n }) => {
   const { t } = useTranslation('investments', { i18n });
   const lng = useParams().lng;
+  const [searchParams] = useSearchParams();
+  const [isModalOpen, setIsModalOpen] = useState(searchParams.get('modal') === 'add');
 
   useEffect(() => {
     i18n.changeLanguage(lng);
   }, [lng, i18n]);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div className="flex flex-col gap-4">

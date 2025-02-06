@@ -132,5 +132,8 @@
     "investor": "Investisseur",
     "investor-required": "Veuillez sélectionner un investisseur",
     "select-investor": "Sélectionner un investisseur"
+  },
+  "no_data": {
+    "title": "Aucune donnée trouvée"
   }
 }
