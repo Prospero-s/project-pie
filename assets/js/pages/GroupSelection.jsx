@@ -346,7 +346,11 @@ const GroupSelection = ({ i18n }) => {
     ];
 
     if (isCheckingRedirect || uiState.isLoading || uiState.isRedirecting) {
-        return null;
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <Spin size="large" />
+            </div>
+        );
     }
 
     return (
