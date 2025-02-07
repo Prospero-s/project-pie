@@ -6,9 +6,8 @@
 	}
 }
 
-{$CADDY_EXTRA_CONFIG}
 
-{$SERVER_NAME:localhost} {
+{$SERVER_NAME:tryprospero.fr} {
 	log {
 		{$CADDY_SERVER_LOG_OPTIONS}
 		# Redact the authorization query parameter that can be set by Mercure
@@ -21,6 +20,32 @@
 
 	root * /app/public
 	encode zstd br gzip
+
+	handle /@vite/* {
+		reverse_proxy vite:5173
+	}
+	handle /node_modules/* {
+		reverse_proxy vite:5173
+	}
+
+	# Ajout des en-têtes CORS
+	header {
+		Access-Control-Allow-Origin "{$CORS_ALLOW_ORIGIN}"
+		Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+		Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+		Access-Control-Max-Age "3600"
+		# En-têtes de sécurité
+		Strict-Transport-Security "max-age=31536000;"
+		X-Frame-Options "DENY"
+		X-Content-Type-Options "nosniff"
+		?Permissions-Policy "browsing-topics=()"
+	}
+
+	# Gestion des requêtes PHP avec FrankenPHP
+	handle {
+		root * /app/public
+		php_server
+	}
 
 	mercure {
 		# Transport to use (default to Bolt)
@@ -40,9 +65,6 @@
 	vulcain
 
 	{$CADDY_SERVER_EXTRA_DIRECTIVES}
-
-	# Disable Topics tracking if not enabled explicitly: https://github.com/jkarlin/topics
-	header ?Permissions-Policy "browsing-topics=()"
-
-	php_server
 }
+
+{$CADDY_EXTRA_CONFIG}
