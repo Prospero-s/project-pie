@@ -20,6 +20,10 @@ class CompanyInvestment
     #[ORM\JoinColumn(nullable: false)]
     private User $user;
 
+    #[ORM\ManyToOne(targetEntity: UserGroup::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private UserGroup $userGroup;
+
     #[ORM\Column(type: 'string', length: 50)]
     private string $fundingType;
 
@@ -61,6 +65,17 @@ class CompanyInvestment
     public function setUser(User $user): self
     {
         $this->user = $user;
+        return $this;
+    }
+
+    public function getUserGroup(): UserGroup
+    {
+        return $this->userGroup;
+    }
+
+    public function setUserGroup(UserGroup $userGroup): self
+    {
+        $this->userGroup = $userGroup;
         return $this;
     }
 

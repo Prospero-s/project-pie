@@ -29,7 +29,7 @@ const PasswordStrengthField = ({ label, value, onChange, placeholder, className 
 
   return (
     <div className="space-y-2">
-      <label className="block font-medium text-black dark:text-white">{label}</label>
+      <label className="block font-medium text-black">{label}</label>
       <div className="relative">
         <Input.Password
           value={value}

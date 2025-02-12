@@ -29,7 +29,7 @@ const DropdownNotification = ({ i18n }) => {
             </span>
           </div>
           <ul className="flex flex-col gap-4">
-            <li className="flex items-center gap-4 border-b border-stroke px-2 py-1 lg:px-4 lg:py-2 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4">
+            <li className="flex items-center gap-4 border-b border-stroke px-2 py-1 lg:px-4 lg:py-2 hover:bg-gray-2">
               <div className="flex flex-1 items-center justify-between">
                 <div>
                   <h6 className="text-sm font-medium text_gray_900">
@@ -53,7 +53,7 @@ const DropdownNotification = ({ i18n }) => {
       placement={isMobile ? 'bottomLeft' : 'bottom'} 
       arrow
     >
-      <Badge count={5} className="cursor-pointer">
+      <Badge className="cursor-pointer">
         <BellOutlined className="text-2xl lg:text-3xl hover:text-primary transition-colors duration-300" />
       </Badge>
     </Dropdown>

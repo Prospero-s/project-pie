@@ -3,15 +3,41 @@
   "modal": {
     "upload_title": "Upload document",
     "select_file": "Select a file",
-    "validate": "Upload et analyze"
+    "validate": "Upload and analyze"
   },
   "analyze": {
-    "title": "Previsualization PDF",
+    "title": "PDF Preview",
     "company": "Company",
     "data_extract": "Data extract",
-    "file_preview": "Previsualization PDF",
+    "file_preview": "PDF Preview",
     "confirm": "Confirm",
     "cancel": "Cancel",
-    "save_draft": "Save draft"
+    "save_draft": "Save as draft"
+  },
+  "empty": {
+    "title": "No documents",
+    "description": "You haven't added any documents yet. Start by uploading your first document.",
+    "action": "Add document"
+  },
+  "table": {
+    "status": "Status",
+    "filename": "Filename",
+    "company": "Company name",
+    "last_update": "Last update",
+    "actions": "Actions",
+    "statuses": {
+      "draft": "Draft",
+      "processed": "Processed"
+    },
+    "tooltips": {
+      "edit": "Edit",
+      "view": "View Details",
+      "delete": "Delete"
+    }
+  },
+  "messages": {
+    "delete_success": "Document successfully deleted!",
+    "delete_error": "Error while deleting document.",
+    "loading_error": "Error while loading documents"
   }
 }

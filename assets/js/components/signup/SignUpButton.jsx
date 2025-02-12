@@ -6,10 +6,8 @@ const SignUpButton = ({ t, isFormValid }) => (
     type="primary"
     htmlType="submit"
     disabled={!isFormValid()}
-    className={`w-full rounded-lg border h-12 flex items-center justify-center bg-primary p-4 text-white transition ${
-      isFormValid()
-        ? 'hover:bg-opacity-90'
-        : 'opacity-50 cursor-not-allowed'
+    className={`w-full rounded-lg h-10 text-sm font-medium flex items-center justify-center bg-primary p-0 text-white transition ${
+      isFormValid() ? 'hover:bg-opacity-90' : 'opacity-50 cursor-not-allowed'
     }`}
   >
     {t('create_account')}

@@ -88,6 +88,7 @@ class CompanyRepository extends ServiceEntityRepository
             $investment = new CompanyInvestment();
             $investment->setCompany($company);
             $investment->setUser($investorUser);
+            $investment->setUserGroup($investorUser->getUserGroup());
             $investment->setFundingType($data['fundingType']);
             $investment->setAmount($data['amountRaised']);
             $investment->setCurrency($data['currency'] ?? 'EUR');
@@ -116,44 +117,34 @@ class CompanyRepository extends ServiceEntityRepository
     public function findByFiltersWithPagination(array $filters, string $cognitoId, int $page = 1, int $limit = 10, string $sortField = 'updatedAt', string $sortOrder = 'desc'): array
     {
         try {
+            // Correction de la requête pour récupérer le groupe de l'utilisateur
+            $user = $this->em->createQueryBuilder()
+                ->select('u')
+                ->from('App\Entity\User', 'u')
+                ->where('u.cognitoId = :cognitoId')
+                ->setParameter('cognitoId', $cognitoId)
+                ->getQuery()
+                ->getSingleResult();
+
+            $userGroup = $user->getUserGroup();
+
             $qb = $this->createQueryBuilder('c')
                 ->select(
                     'c as company',
                     '(SELECT COALESCE(SUM(inv_sum.amount), 0) 
                       FROM App\Entity\CompanyInvestment inv_sum 
-                      JOIN inv_sum.user usr_sum 
-                      JOIN usr_sum.userGroup grp_sum 
                       WHERE inv_sum.company = c.id 
-                      AND grp_sum.id = (
-                          SELECT DISTINCT g_sum.id 
-                          FROM App\Entity\User u_sum 
-                          JOIN u_sum.userGroup g_sum 
-                          WHERE u_sum.cognitoId = :cognitoId
-                      )
+                      AND inv_sum.userGroup = :userGroup
                     ) as group_total_amount',
                     '(SELECT MAX(inv_date.investedAt)
                       FROM App\Entity\CompanyInvestment inv_date
-                      JOIN inv_date.user usr_date
-                      JOIN usr_date.userGroup grp_date
                       WHERE inv_date.company = c.id
-                      AND grp_date.id = (
-                          SELECT DISTINCT g_date.id
-                          FROM App\Entity\User u_date
-                          JOIN u_date.userGroup g_date
-                          WHERE u_date.cognitoId = :cognitoId
-                      )
+                      AND inv_date.userGroup = :userGroup
                     ) as last_investment_date'
                 )
                 ->join('c.investments', 'i_main')
-                ->join('i_main.user', 'main_user')
-                ->join('main_user.userGroup', 'main_group')
-                ->where('main_group.id = (
-                    SELECT DISTINCT g.id 
-                    FROM App\Entity\User u 
-                    JOIN u.userGroup g 
-                    WHERE u.cognitoId = :cognitoId
-                )')
-                ->setParameter('cognitoId', $cognitoId)
+                ->where('i_main.userGroup = :userGroup')
+                ->setParameter('userGroup', $userGroup)
                 ->groupBy('c.id');
 
             // Application des filtres
@@ -182,17 +173,6 @@ class CompanyRepository extends ServiceEntityRepository
                     $qb->orderBy('last_investment_date', 'DESC');
             }
 
-            // Debug de la requête SQL
-            $query = $qb->getQuery();
-            $sql = $query->getSQL();
-            $params = $query->getParameters();
-            
-            // Log pour debug
-            error_log("SQL Query: " . $sql);
-            error_log("Parameters: " . json_encode($params->map(function($param) {
-                return $param->getValue();
-            })));
-
             // Calcul du total
             $countQb = clone $qb;
             $total = count($countQb->getQuery()->getResult());
@@ -203,25 +183,18 @@ class CompanyRepository extends ServiceEntityRepository
 
             $results = $qb->getQuery()->getResult();
 
-            // Après avoir obtenu les résultats, nous allons chercher les types de financement séparément
-            $formattedResults = array_map(function($result) use ($cognitoId) {
+            // Récupération des types de financement
+            $formattedResults = array_map(function($result) use ($userGroup) {
                 $company = $result['company'];
                 
-                // Requête séparée pour obtenir les types de financement
+                // Requête simplifiée pour obtenir les types de financement
                 $fundingTypes = $this->createQueryBuilder('c2')
                     ->select('DISTINCT i.fundingType')
                     ->join('c2.investments', 'i')
-                    ->join('i.user', 'u')
-                    ->join('u.userGroup', 'g')
                     ->where('c2.id = :companyId')
-                    ->andWhere('g.id = (
-                        SELECT DISTINCT g2.id 
-                        FROM App\Entity\User u2 
-                        JOIN u2.userGroup g2 
-                        WHERE u2.cognitoId = :cognitoId
-                    )')
+                    ->andWhere('i.userGroup = :userGroup')
                     ->setParameter('companyId', $company->getId())
-                    ->setParameter('cognitoId', $cognitoId)
+                    ->setParameter('userGroup', $userGroup)
                     ->getQuery()
                     ->getScalarResult();
 
