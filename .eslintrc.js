@@ -1,30 +1,21 @@
 module.exports = {
+    parser: '@babel/eslint-parser',
+    parserOptions: {
+        requireConfigFile: false,
+        ecmaVersion: 2020,
+        sourceType: 'module',
+    },
     env: {
         browser: true,
-        es2021: true,
-        node: true,
+        es6: true,
     },
     extends: [
         'eslint:recommended',
         'plugin:react/recommended',
-        'plugin:react/jsx-runtime'
+        'plugin:prettier/recommended'
     ],
-    parserOptions: {
-        ecmaFeatures: {
-            jsx: true
-        },
-        ecmaVersion: 'latest',
-        sourceType: 'module'
-    },
-    plugins: [
-        'react'
-    ],
-    settings: {
-        react: {
-            version: 'detect'
-        }
-    },
     rules: {
-        'react/react-in-jsx-scope': 'off'
+        'react/react-in-jsx-scope': 'off',
+        'prettier/prettier': 'error'
     }
 }; 
