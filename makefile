@@ -114,3 +114,12 @@ lint-eslint: ## Lance ESLint
 .PHONY: lint-eslint-fix
 lint-eslint-fix: ## Corrige automatiquement les erreurs ESLint
 	$(DOCKER_COMPOSE) exec $(PHP_CONTAINER) npx eslint "assets/js/**/*.{js,jsx,ts,tsx}" --fix
+
+.PHONY: lint-phpcs
+lint-phpcs: ## Lance PHP Code Sniffer
+	$(SYMFONY) composer cs-check
+
+.PHONY: lint-phpcs-fix
+lint-phpcs-fix: ## Corrige automatiquement les erreurs PHP Code Sniffer
+	$(SYMFONY) composer cs-fix
+

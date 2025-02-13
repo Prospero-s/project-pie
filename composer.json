@@ -70,7 +70,9 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "phpstan": "php -d memory_limit=-1 vendor/bin/phpstan analyse"
+        "phpstan": "php -d memory_limit=-1 vendor/bin/phpstan analyse",
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf"
     },
     "conflict": {
         "symfony/symfony": "*"
@@ -87,6 +89,7 @@
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-doctrine": "^2.0",
         "phpstan/phpstan-symfony": "^2.0",
+        "squizlabs/php_codesniffer": "^3.11",
         "symfony/debug-bundle": "7.1.*",
         "symfony/maker-bundle": "^1.62",
         "symfony/stopwatch": "7.1.*",
