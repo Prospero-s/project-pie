@@ -117,9 +117,12 @@ lint-eslint-fix: ## Corrige automatiquement les erreurs ESLint
 
 .PHONY: lint-phpcs
 lint-phpcs: ## Lance PHP Code Sniffer
-	$(SYMFONY) composer cs-check
+	$(COMPOSER) cs-check
 
 .PHONY: lint-phpcs-fix
 lint-phpcs-fix: ## Corrige automatiquement les erreurs PHP Code Sniffer
-	$(SYMFONY) composer cs-fix
+	$(COMPOSER) cs-fix
 
+.PHONY: phpstan
+phpstan: ## Lance PHPStan
+	$(COMPOSER) phpstan
