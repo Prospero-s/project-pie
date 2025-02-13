@@ -95,4 +95,4 @@ class UserGroup
         $this->createdAt = $createdAt;
         return $this;
     }
-} 
+}

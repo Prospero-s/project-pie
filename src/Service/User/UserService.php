@@ -11,13 +11,14 @@ class UserService
     public function __construct(
         private EntityManagerInterface $entityManager,
         private UserRepository $userRepository
-    ) {}
+    ) {
+    }
 
     public function getOrCreateUser(string $cognitoId, string $email, string $name = null): User
     {
         // Chercher d'abord l'utilisateur par cognitoId
         $user = $this->userRepository->findByCognitoId($cognitoId);
-        
+
         if (!$user) {
             // Si l'utilisateur n'existe pas, le créer
             $user = new User();
@@ -44,7 +45,7 @@ class UserService
     public function getUserGroupByCognitoId(string $cognitoId): ?\App\Entity\UserGroup
     {
         $user = $this->userRepository->findByCognitoId($cognitoId);
-        
+
         return $user?->getUserGroup();
     }
-} 
+}

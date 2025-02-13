@@ -118,4 +118,4 @@ class User
         $this->userGroup = $userGroup;
         return $this;
     }
-} 
+}

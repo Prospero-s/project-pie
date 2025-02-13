@@ -32,14 +32,14 @@ class UserGroupController extends AbstractController
         $this->groupRoleRepository = $groupRoleRepository;
     }
 
-    #[Route('', methods: ['GET'])]
+    #[Route(methods: ['GET'])]
     public function list(Request $request): JsonResponse
     {
         try {
             $cognitoId = $request->headers->get('x-cognito-id');
             $email = $request->headers->get('x-cognito-email');
             $name = $request->headers->get('x-cognito-name');
-            
+
             if (!$cognitoId || !$email) {
                 return $this->json([
                     'error' => 'Unauthorized: Missing required headers'
@@ -47,12 +47,6 @@ class UserGroupController extends AbstractController
             }
 
             $user = $this->userService->getOrCreateUser($cognitoId, $email, $name);
-            
-            if (!$user) {
-                return $this->json([
-                    'error' => 'User not found'
-                ], Response::HTTP_NOT_FOUND);
-            }
 
             $group = $user->getUserGroup();
             if (!$group) {
@@ -62,13 +56,13 @@ class UserGroupController extends AbstractController
             $groups = [$group];
 
             return $this->json([
-                'groups' => array_map(function($group) use ($user) {
-                    $members = array_map(function($member) use ($group) {
+                'groups' => array_map(function ($group) use ($user) {
+                    $members = array_map(function ($member) use ($group) {
                         $role = $this->groupRoleRepository->findOneBy([
                             'user' => $member,
                             'userGroup' => $group
                         ]);
-                        
+
                         return [
                             'id' => $member->getId(),
                             'email' => $member->getEmail(),
@@ -99,14 +93,14 @@ class UserGroupController extends AbstractController
         }
     }
 
-    #[Route('', methods: ['POST'])]
+    #[Route(methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
         try {
             $cognitoId = $request->headers->get('x-cognito-id');
             $email = $request->headers->get('x-cognito-email');
             $name = $request->headers->get('x-cognito-name');
-            
+
             if (!$cognitoId || !$email || !$name) {
                 return $this->json([
                     'error' => 'Unauthorized: Missing required headers'
@@ -115,35 +109,35 @@ class UserGroupController extends AbstractController
 
             $data = json_decode($request->getContent(), true);
             $owner = $this->userService->getOrCreateUser($cognitoId, $email, $name);
-            
+
             $this->entityManager->beginTransaction();
             try {
                 $group = $this->userGroupRepository->createGroup($data['name'], $owner);
-                
+
                 // Gérer les invitations
                 if (!empty($data['invitations'])) {
                     foreach ($data['invitations'] as $invitationData) {
                         if (!filter_var($invitationData['email'], FILTER_VALIDATE_EMAIL)) {
                             throw new \Exception('invalid-email');
                         }
-                        
+
                         $existingInvitation = $this->invitationRepository->findExistingInvitation($invitationData['email'], $group);
                         if ($existingInvitation) {
                             throw new \Exception('invitation-exists');
                         }
-                        
+
                         $role = $invitationData['role'] ?? GroupRole::ROLE_MEMBER;
                         if (!in_array($role, [GroupRole::ROLE_ADMIN, GroupRole::ROLE_MEMBER])) {
                             throw new \Exception('invalid-role');
                         }
-                        
+
                         $this->invitationRepository->createInvitationFromRequest($group, $invitationData['email'], $owner, $role);
                     }
                 }
-                
+
                 $this->entityManager->flush();
                 $this->entityManager->commit();
-                
+
                 return $this->json([
                     'id' => $group->getId(),
                     'name' => $group->getName(),
@@ -152,7 +146,6 @@ class UserGroupController extends AbstractController
                         'email' => $owner->getEmail()
                     ]
                 ], Response::HTTP_CREATED);
-                
             } catch (\Exception $e) {
                 $this->entityManager->rollback();
                 throw $e;
@@ -169,13 +162,13 @@ class UserGroupController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
         $cognitoId = $request->headers->get('x-cognito-id');
-        
+
         if (!$cognitoId) {
             return $this->json([
                 'error' => 'Unauthorized: Missing cognito ID'
             ], Response::HTTP_UNAUTHORIZED);
         }
-        
+
         try {
             $group = $this->userGroupRepository->findGroupWithMembers($id);
             if (!$group) {
@@ -214,13 +207,13 @@ class UserGroupController extends AbstractController
     public function removeMember(UserGroup $group, int $memberId, Request $request): JsonResponse
     {
         $cognitoId = $request->headers->get('x-cognito-id');
-        
+
         if (!$cognitoId) {
             return $this->json([
                 'error' => 'Unauthorized: Missing cognito ID'
             ], Response::HTTP_UNAUTHORIZED);
         }
-        
+
         try {
             $currentUser = $this->userRepository->findByCognitoId($cognitoId);
             if (!$currentUser || $group->getOwner()->getId() !== $currentUser->getId()) {
@@ -260,28 +253,28 @@ class UserGroupController extends AbstractController
         $cognitoId = $request->headers->get('x-cognito-id');
         $email = $request->headers->get('x-cognito-email');
         $name = $request->headers->get('x-cognito-name');
-        
+
         if (!$cognitoId) {
             return $this->json([
                 'error' => 'Unauthorized: Missing cognito ID'
             ], Response::HTTP_UNAUTHORIZED);
         }
-        
+
         try {
             $user = $this->userService->getOrCreateUser($cognitoId, $email);
             $group = $this->userGroupRepository->findGroupWithMembersAndInvestments($id);
-            
+
             if (!$group) {
                 return $this->json(['error' => 'Group not found'], Response::HTTP_NOT_FOUND);
             }
-            
+
             if (!$group->getUsers()->contains($user)) {
                 return $this->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
             }
 
             $members = $group->getUsers();
             $investments = [];
-            
+
             foreach ($members as $member) {
                 foreach ($member->getInvestments() as $investment) {
                     $investments[] = [
@@ -326,13 +319,13 @@ class UserGroupController extends AbstractController
     {
         $cognitoId = $request->headers->get('x-cognito-id');
         $data = json_decode($request->getContent(), true);
-        
+
         if (!$cognitoId) {
             return $this->json([
                 'error' => 'Unauthorized: Missing cognito ID'
             ], Response::HTTP_UNAUTHORIZED);
         }
-        
+
         try {
             $currentUser = $this->userRepository->findByCognitoId($cognitoId);
             if (!$currentUser || $group->getOwner()->getId() !== $currentUser->getId()) {
@@ -368,4 +361,4 @@ class UserGroupController extends AbstractController
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-} 
+}

@@ -8,6 +8,7 @@ use Psr\Log\LoggerInterface;
 
 class InpiCompanyScraper implements CompanyScraperInterface
 {
+    /** @var array<string, array{timestamp: int, data: array<string, mixed>}> */
     private array $cache = [];
     private const CACHE_TTL = 3600; // 1 heure
     private const BASE_URL = 'https://data.inpi.fr/entreprises/';  // URL INPI
@@ -15,13 +16,23 @@ class InpiCompanyScraper implements CompanyScraperInterface
     public function __construct(
         private readonly HttpClientInterface $client,
         private readonly LoggerInterface $logger
-    ) {}
+    ) {
+    }
 
+    /**
+     * @param string $source
+     * @return bool
+     */
     public function supports(string $source): bool
     {
         return $source === 'inpi';
     }
 
+    /**
+     * @param string $siren
+     * @param bool $forceScraping
+     * @return array<string, mixed>
+     */
     public function scrape(string $siren, bool $forceScraping = false): array
     {
         // Vérifier le cache si le scraping n'est pas forcé
@@ -32,10 +43,10 @@ class InpiCompanyScraper implements CompanyScraperInterface
         try {
             $html = $this->fetchHtmlWithRetry($siren);
             $crawler = new Crawler($html);
-            
+
             // Extraire toutes les données en une seule passe
             $data = $this->extractAllData($crawler, $siren);
-            
+
             // Mettre en cache
             $this->cache[$siren] = [
                 'timestamp' => time(),
@@ -52,12 +63,21 @@ class InpiCompanyScraper implements CompanyScraperInterface
         }
     }
 
+    /**
+     * @param string $siren
+     * @return bool
+     */
     private function hasValidCache(string $siren): bool
     {
-        return isset($this->cache[$siren]) && 
+        return isset($this->cache[$siren]) &&
                (time() - $this->cache[$siren]['timestamp']) < self::CACHE_TTL;
     }
 
+    /**
+     * @param string $siren
+     * @param int $maxRetries
+     * @return string
+     */
     private function fetchHtmlWithRetry(string $siren, int $maxRetries = 3): string
     {
         $attempt = 0;
@@ -89,6 +109,11 @@ class InpiCompanyScraper implements CompanyScraperInterface
         throw new \Exception('Impossible de récupérer les données après ' . $maxRetries . ' tentatives');
     }
 
+    /**
+     * @param Crawler $crawler
+     * @param string $siren
+     * @return array<string, mixed>
+     */
     private function extractAllData(Crawler $crawler, string $siren): array
     {
         // Extraire toutes les données nécessaires en une seule passe
@@ -106,7 +131,7 @@ class InpiCompanyScraper implements CompanyScraperInterface
 
         // Utiliser filter() une seule fois et stocker le résultat
         $blocDetails = $crawler->filter('.bloc-detail-notice');
-        
+
         // Extraire les données en parallèle si possible
         $data['denomination'] = $this->extractDenomination($blocDetails);
         $data['businessStructures'] = $this->extractBusinessStructures($blocDetails);
@@ -153,6 +178,10 @@ class InpiCompanyScraper implements CompanyScraperInterface
         return $data;
     }
 
+    /**
+     * @param Crawler $blocDetails
+     * @return string
+     */
     private function extractDenomination(Crawler $blocDetails): string
     {
         // Extraction des données de base avec les bons sélecteurs
@@ -163,6 +192,10 @@ class InpiCompanyScraper implements CompanyScraperInterface
         return trim($denomination);
     }
 
+    /**
+     * @param Crawler $blocDetails
+     * @return string
+     */
     private function extractBusinessStructures(Crawler $blocDetails): string
     {
         $businessStructures = $blocDetails->reduce(function (Crawler $node) {
@@ -172,6 +205,10 @@ class InpiCompanyScraper implements CompanyScraperInterface
         return trim($businessStructures);
     }
 
+    /**
+     * @param Crawler $blocDetails
+     * @return array<string, mixed>
+     */
     private function extractAdresse(Crawler $blocDetails): array
     {
         // Extraction améliorée de l'adresse
@@ -185,7 +222,7 @@ class InpiCompanyScraper implements CompanyScraperInterface
             // Nettoyer les espaces multiples et les retours à la ligne
             $adresseText = preg_replace('/\s+/', ' ', trim($adresseText));
             $parts = array_values(array_filter(explode(' ', $adresseText)));
-            
+
             $typesVoie = [
                 'RUE' => 'RUE',
                 'R' => 'RUE',
@@ -231,7 +268,9 @@ class InpiCompanyScraper implements CompanyScraperInterface
                     // Collecter tous les mots jusqu'à "FRANCE" pour la commune
                     $communeParts = [];
                     for ($i = $index + 1; $i < count($parts); $i++) {
-                        if ($parts[$i] === 'FRANCE') break;
+                        if ($parts[$i] === 'FRANCE') {
+                            break;
+                        }
                         $communeParts[] = $parts[$i];
                     }
                     $commune = implode(' ', $communeParts);
@@ -255,7 +294,7 @@ class InpiCompanyScraper implements CompanyScraperInterface
                 }
 
                 // Collecter le nom de la voie
-                if ($voieFound && !$codePostal) {
+                if ($voieFound) {
                     $voie[] = $part;
                 }
             }
@@ -278,18 +317,22 @@ class InpiCompanyScraper implements CompanyScraperInterface
         return $adresse;
     }
 
+    /**
+     * @param Crawler $crawler
+     * @return array<string, array<string, string|null>>
+     */
     private function extractRepresentants(Crawler $crawler): array
     {
         $representants = [];
         $crawler->filter('.row')->each(function (Crawler $node) use (&$representants) {
             if ($node->filter('h3')->count() && str_contains($node->filter('h3')->text(), 'Représentants')) {
                 $currentRepresentant = [];
-                
+
                 $node->children('.col-12.col-md-2, .col-12.col-md-4')->each(function (Crawler $col) use (&$currentRepresentant, &$representants) {
                     // Vérifier s'il y a un bloc dirigeant
                     if ($col->filter('.bloc-dirigeant')->count() > 0) {
                         $label = $col->filter('.inpi-light')->text();
-                        
+
                         // Cas d'un nom/prénom
                         if (str_contains($label, 'Nom, Prénom')) {
                             if (!empty($currentRepresentant)) {
@@ -318,7 +361,7 @@ class InpiCompanyScraper implements CompanyScraperInterface
                         }
                     }
                 });
-                
+
                 // Ajouter le dernier représentant s'il existe et a une qualité
                 if (!empty($currentRepresentant) && $currentRepresentant['qualite']) {
                     $representants[] = $currentRepresentant;
@@ -329,8 +372,11 @@ class InpiCompanyScraper implements CompanyScraperInterface
         return $representants;
     }
 
+    /**
+     * @return int
+     */
     public function getPriority(): int
     {
         return 100;
     }
-} 
+}

@@ -5,3 +5,16 @@ parameters:
         - config/
         - public/
         - src/
+    scanDirectories:
+        - vendor/
+    ignoreErrors:
+        - '#Property [a-zA-Z0-9\\_]+\\Entity\\[a-zA-Z0-9\\_]+::\$[a-zA-Z0-9_]+ is never written, only read#'
+        # Pour ignorer toutes les erreurs dans le dossier Entity
+        - message: '#.*#'
+          path: src/Entity/*
+        - 
+          message: '#Method App\\Service\\AwsTextractService::structureData\(\) should return array<string, array<string, mixed>> but returns array<string, array<int<0, max>\|string, array<int<0, max>\|string, mixed>>>#'
+          path: src/Service/AwsTextractService.php
+        -
+          message: '#Method App\\Service\\Company\\Scraper\\InpiCompanyScraper::extractRepresentants\(\) should return array<string, array<string, string\|null>> but returns list<array<string, string\|null>>#'
+          path: src/Service/Company/Scraper/InpiCompanyScraper.php

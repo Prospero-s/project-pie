@@ -9,6 +9,10 @@ use App\Entity\GroupRole;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+
+/**
+ * @extends ServiceEntityRepository<GroupInvitation>
+ */
 class GroupInvitationRepository extends ServiceEntityRepository
 {
     private EntityManagerInterface $em;
@@ -19,6 +23,10 @@ class GroupInvitationRepository extends ServiceEntityRepository
         $this->em = $em;
     }
 
+    /**
+     * @param string $email
+     * @return list<GroupInvitation>
+     */
     public function findValidInvitationsByEmail(string $email): array
     {
         return $this->createQueryBuilder('i')
@@ -30,6 +38,10 @@ class GroupInvitationRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @param string $token
+     * @return GroupInvitation|null
+     */
     public function findValidInvitationByToken(string $token): ?GroupInvitation
     {
         return $this->createQueryBuilder('i')
@@ -41,6 +53,9 @@ class GroupInvitationRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * @return int
+     */
     public function deleteExpiredInvitations(): int
     {
         return $this->createQueryBuilder('i')
@@ -51,6 +66,11 @@ class GroupInvitationRepository extends ServiceEntityRepository
             ->execute();
     }
 
+    /**
+     * @param string $email
+     * @param UserGroup $group
+     * @return GroupInvitation|null
+     */
     public function findExistingInvitation(string $email, UserGroup $group): ?GroupInvitation
     {
         return $this->createQueryBuilder('i')
@@ -62,6 +82,13 @@ class GroupInvitationRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * @param UserGroup $group
+     * @param string $email
+     * @param User $invitedBy
+     * @param string $role
+     * @return GroupInvitation
+     */
     public function createInvitation(UserGroup $group, string $email, User $invitedBy, string $role = GroupRole::ROLE_MEMBER): GroupInvitation
     {
         $invitation = new GroupInvitation();
@@ -69,12 +96,16 @@ class GroupInvitationRepository extends ServiceEntityRepository
         $invitation->setEmail($email);
         $invitation->setInvitedBy($invitedBy);
         $invitation->setRole($role);
-        
+
         $this->em->persist($invitation);
-        
+
         return $invitation;
     }
 
+    /**
+     * @param GroupInvitation $invitation
+     * @param User $user
+     */
     public function acceptInvitation(GroupInvitation $invitation, User $user): void
     {
         $group = $invitation->getGroup();
@@ -85,11 +116,18 @@ class GroupInvitationRepository extends ServiceEntityRepository
         $groupRole->setUser($user);
         $groupRole->setUserGroup($group);
         $groupRole->setRole($invitation->getRole());
-        
+
         $this->em->persist($groupRole);
         $this->em->remove($invitation);
     }
 
+    /**
+     * @param UserGroup $group
+     * @param string $email
+     * @param User $invitedBy
+     * @param string $role
+     * @return GroupInvitation
+     */
     public function createInvitationFromRequest(UserGroup $group, string $email, User $invitedBy, string $role = GroupRole::ROLE_MEMBER): GroupInvitation
     {
         $invitation = new GroupInvitation();
@@ -99,7 +137,7 @@ class GroupInvitationRepository extends ServiceEntityRepository
         $invitation->setRole($role);
 
         $this->em->persist($invitation);
-        
+
         return $invitation;
     }
-} 
+}

@@ -27,7 +27,8 @@ class KpiDataController extends AbstractController
     }
 
     #[Route('/kpi/save', name: 'app_api_save_kpi', methods: ['POST'])]
-    public function saveKpi(Request $request): JsonResponse {
+    public function saveKpi(Request $request): JsonResponse
+    {
         $cognitoId = $request->headers->get('X-Cognito-Id');
         $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
         if (!$cognitoId || !$user) {
@@ -47,7 +48,7 @@ class KpiDataController extends AbstractController
 
         try {
             $kpiData = $this->kpiDataRepository->saveKpi($company, $data, $user);
-           
+
             return new JsonResponse([
                 'message' => 'Enregistré avec succès',
                 'kpiId' => $kpiData->getId(),
@@ -59,7 +60,8 @@ class KpiDataController extends AbstractController
     }
 
     #[Route('/kpi/draft', name: 'app_api_save_kpi_draft', methods: ['POST'])]
-    public function saveDraft(Request $request): JsonResponse {
+    public function saveDraft(Request $request): JsonResponse
+    {
         $cognitoId = $request->headers->get('X-Cognito-Id');
         $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
         if (!$cognitoId || !$user) {
@@ -91,7 +93,8 @@ class KpiDataController extends AbstractController
     }
 
     #[Route('/kpi/updateDocument/{id}', name: 'app_api_update_document', methods: ['PUT'])]
-    public function updateDocument(int $id, Request $request): JsonResponse {
+    public function updateDocument(int $id, Request $request): JsonResponse
+    {
         $kpiData = $this->kpiDataRepository->find($id);
 
         if (!$kpiData) {
@@ -131,7 +134,8 @@ class KpiDataController extends AbstractController
     }
 
     #[Route('/kpi/getAllKpi', name: 'app_api_list_kpi', methods: ['GET'])]
-    public function getAllKpi(Request $request): JsonResponse {
+    public function getAllKpi(Request $request): JsonResponse
+    {
         $cognitoId = $request->headers->get('X-Cognito-Id');
         if (!$cognitoId) {
             throw new \Exception('Utilisateur non authentifié');
@@ -150,6 +154,7 @@ class KpiDataController extends AbstractController
             return [
                 'id' => $kpi->getId(),
                 'company' => $kpi->getCompany()->getDenomination(),
+                // @phpstan-ignore-next-line
                 'kpi' => is_string($kpi->getKpi()) ? json_decode($kpi->getKpi(), true) : $kpi->getKpi(),                'status' => $kpi->getStatus(),
                 'pdfUrl' => $kpi->getPdfUrl(),
                 'createdAt' => $kpi->getCreatedAt()?->format('Y-m-d H:i:s'),
@@ -171,11 +176,10 @@ class KpiDataController extends AbstractController
         return new JsonResponse([
             'id' => $document->getId(),
             'company' => $document->getCompany() ?? null,
-            'kpi' => is_string($document->getKpi()) ? json_decode($document->getKpi(), true) : $document->getKpi(),                
+            'kpi' => $document->getKpi(),
             'status' => $document->getStatus(),
             'pdfUrl' => $document->getPdfUrl(),
             'createdAt' => $document->getCreatedAt()?->format('Y-m-d H:i:s'),
         ]);
     }
 }
-

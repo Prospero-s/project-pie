@@ -7,6 +7,9 @@ use App\Entity\UserGroup;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<CompanyInvestment>
+ */
 class CompanyInvestmentRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -14,10 +17,16 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
         parent::__construct($registry, CompanyInvestment::class);
     }
 
+    /**
+     * @param int $companyId
+     * @param int $year
+     * @param UserGroup $userGroup
+     * @return list<array<string, mixed>>
+     */
     public function findByCompanyIdAndYear(int $companyId, int $year, UserGroup $userGroup): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        
+
         $sql = "
             WITH RECURSIVE months AS (
                 SELECT generate_series(1, 12) AS month_number
@@ -45,6 +54,10 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
         return $result->fetchAllAssociative();
     }
 
+    /**
+     * @param UserGroup $userGroup
+     * @return list<array<string, mixed>>
+     */
     public function fetchGlobalInvestments(UserGroup $userGroup): array
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -71,6 +84,10 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
         return $result->fetchAllAssociative();
     }
 
+    /**
+     * @param UserGroup $userGroup
+     * @return list<array<string, mixed>>
+     */
     public function fetchGlobalFundingInvestments(UserGroup $userGroup): array
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -94,6 +111,10 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
         return $result->fetchAllAssociative();
     }
 
+    /**
+     * @param UserGroup $userGroup
+     * @return list<array<string, mixed>>
+     */
     public function fetchGlobalSectorInvestments(UserGroup $userGroup): array
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -118,5 +139,4 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
 
         return $result->fetchAllAssociative();
     }
-
 }

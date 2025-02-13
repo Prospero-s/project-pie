@@ -13,7 +13,8 @@ class CompanyDataAggregator implements CompanyDataAggregatorInterface
     public function __construct(
         private readonly iterable $scrapers,
         private readonly LoggerInterface $logger
-    ) {}
+    ) {
+    }
 
     public function aggregate(string $siren): array
     {
@@ -25,10 +26,10 @@ class CompanyDataAggregator implements CompanyDataAggregatorInterface
                 $this->logger->info('Tentative de scraping avec ' . get_class($scraper), [
                     'siren' => $siren
                 ]);
-                
+
                 $data = $scraper->scrape($siren);
                 $aggregatedData = array_merge($aggregatedData, $data);
-                
+
                 $this->logger->info('Scraping réussi avec ' . get_class($scraper), [
                     'siren' => $siren
                 ]);
@@ -37,7 +38,7 @@ class CompanyDataAggregator implements CompanyDataAggregatorInterface
                     'scraper' => get_class($scraper),
                     'error' => $e->getMessage()
                 ];
-                
+
                 $this->logger->warning('Échec du scraping avec ' . get_class($scraper), [
                     'siren' => $siren,
                     'error' => $e->getMessage()
@@ -51,4 +52,4 @@ class CompanyDataAggregator implements CompanyDataAggregatorInterface
 
         return $aggregatedData;
     }
-} 
+}

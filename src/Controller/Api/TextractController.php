@@ -17,7 +17,7 @@ class TextractController extends AbstractController
     public function __construct(AwsTextractService $textractService)
     {
         $this->textractService = $textractService;
-    } 
+    }
 
     #[Route('/textract/analyze', name: 'app_textract_analyze', methods: ['POST'])]
     public function uploadFileKpi(Request $request): JsonResponse
@@ -27,26 +27,33 @@ class TextractController extends AbstractController
             if (!$cognitoId) {
                 throw new \Exception('Utilisateur non authentifié');
             }
-    
+
             $file = $request->files->get('document');
             if (!$file) {
                 return new JsonResponse(['error' => 'No file uploaded'], JsonResponse::HTTP_BAD_REQUEST);
             }
-    
-            $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads';
+
+            $projectDir = $this->getParameter('kernel.project_dir');
+
+            if (!is_string($projectDir)) {
+                throw new \UnexpectedValueException('The "kernel.project_dir" parameter must be a string.');
+            }
+
+            $uploadDir = $projectDir . '/public/uploads';
+
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0777, true);
             }
-    
+
             $fileName = uniqid('pdf_') . '.' . $file->guessExtension();
             $filePath = $uploadDir . '/' . $fileName;
             $file->move($uploadDir, $fileName);
-    
+
             $result = $this->textractService->analyzeDocument($filePath);
-    
+
             $pdfUrl = '/uploads/' . $fileName;
             $result['pdfUrl'] = $pdfUrl;
-    
+
             return new JsonResponse($result);
         } catch (\RuntimeException $e) {
             return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);

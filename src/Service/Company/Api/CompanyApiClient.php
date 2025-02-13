@@ -12,13 +12,18 @@ class CompanyApiClient implements CompanyApiClientInterface
         private readonly LoggerInterface $logger,
         private readonly string $apiUsername,
         private readonly string $apiPassword
-    ) {}
+    ) {
+    }
 
+    /**
+     * @param string $siren
+     * @return array<string, mixed>
+     */
     public function fetchCompanyData(string $siren): array
     {
         $token = $this->getAuthToken();
         $apiUrl = "https://registre-national-entreprises.inpi.fr/api/companies/{$siren}";
-        
+
         $this->logger->debug('Requête API entreprise', [
             'siren' => $siren,
             'url' => $apiUrl
@@ -32,14 +37,17 @@ class CompanyApiClient implements CompanyApiClientInterface
 
         $data = $response->toArray();
         $this->logger->info('Données API récupérées avec succès', ['siren' => $siren]);
-        
+
         return $this->formatApiResponse($data);
     }
 
+    /**
+     * @return string
+     */
     public function getAuthToken(): string
     {
         $loginUrl = "https://registre-national-entreprises.inpi.fr/api/sso/login";
-        
+
         if (!$this->apiUsername || !$this->apiPassword) {
             throw new \Exception('Credentials manquants dans les variables d\'environnement');
         }
@@ -71,9 +79,13 @@ class CompanyApiClient implements CompanyApiClientInterface
         return $data['token'];
     }
 
+    /**
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
     private function formatApiResponse(array $data): array
     {
         // TODO: Implémenter le formatage des données
         return $data;
     }
-} 
+}

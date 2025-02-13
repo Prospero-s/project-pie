@@ -12,12 +12,15 @@ use App\Entity\CompanyAddress;
 use App\Entity\CompanyInvestment;
 use App\Service\User\UserService;
 
+/**
+ * @extends ServiceEntityRepository<Company>
+ */
 class CompanyRepository extends ServiceEntityRepository
 {
     private EntityManagerInterface $em;
-    
+
     public function __construct(
-        ManagerRegistry $registry, 
+        ManagerRegistry $registry,
         EntityManagerInterface $em,
         private UserService $userService
     ) {
@@ -25,6 +28,12 @@ class CompanyRepository extends ServiceEntityRepository
         $this->em = $em;
     }
 
+    /**
+     * @param string $cognitoId
+     * @param string $email
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
     public function saveCompany(string $cognitoId, string $email, array $data): array
     {
         try {
@@ -47,7 +56,7 @@ class CompanyRepository extends ServiceEntityRepository
 
             // Recherche ou création de l'entreprise
             $company = $this->em->getRepository(Company::class)->findOneBy(['siren' => $data['siren']]);
-            
+
             if (!$company) {
                 $company = new Company();
                 $company->setSiren($data['siren']);
@@ -77,7 +86,7 @@ class CompanyRepository extends ServiceEntityRepository
                     $address->setCodePostal($data['adresse']['codePostal'] ?? null);
                     $address->setCommune($data['adresse']['commune'] ?? null);
                     $address->setPays($data['adresse']['pays'] ?? 'FRANCE');
-                    
+
                     $this->em->persist($address);
                 }
 
@@ -114,6 +123,15 @@ class CompanyRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @param array<string, mixed> $filters
+     * @param string $cognitoId
+     * @param int $page
+     * @param int $limit
+     * @param string $sortField
+     * @param string $sortOrder
+     * @return array<string, mixed>
+     */
     public function findByFiltersWithPagination(array $filters, string $cognitoId, int $page = 1, int $limit = 10, string $sortField = 'updatedAt', string $sortOrder = 'desc'): array
     {
         try {
@@ -184,9 +202,9 @@ class CompanyRepository extends ServiceEntityRepository
             $results = $qb->getQuery()->getResult();
 
             // Récupération des types de financement
-            $formattedResults = array_map(function($result) use ($userGroup) {
+            $formattedResults = array_map(function ($result) use ($userGroup) {
                 $company = $result['company'];
-                
+
                 // Requête simplifiée pour obtenir les types de financement
                 $fundingTypes = $this->createQueryBuilder('c2')
                     ->select('DISTINCT i.fundingType')
@@ -202,7 +220,7 @@ class CompanyRepository extends ServiceEntityRepository
                     'id' => $company->getId(),
                     'denomination' => $company->getDenomination(),
                     'sector' => $company->getSector(),
-                    'updatedAt' => $result['last_investment_date'] ? 
+                    'updatedAt' => $result['last_investment_date'] ?
                         (new \DateTime($result['last_investment_date']))->format('Y-m-d H:i:s') : null,
                     'investment' => [
                         'totalAmount' => (int)$result['group_total_amount'],
@@ -223,4 +241,4 @@ class CompanyRepository extends ServiceEntityRepository
             throw $e;
         }
     }
-} 
+}

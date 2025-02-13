@@ -14,8 +14,8 @@ use App\Repository\UserRepository;
 #[Route('/api', name: 'api_')]
 class CompanyInvestmentController extends AbstractController
 {
-    private $companyInvestmentRepository;
-    private $userRepository;
+    private CompanyInvestmentRepository $companyInvestmentRepository;
+    private UserRepository $userRepository;
 
     public function __construct(CompanyInvestmentRepository $companyInvestmentRepository, UserRepository $userRepository)
     {
@@ -85,7 +85,7 @@ class CompanyInvestmentController extends AbstractController
             ], 400);
         }
     }
-    
+
     #[Route('/investments/global/funding', methods: ['GET'])]
     public function getGlobalFundingInvestments(Request $request): JsonResponse
     {
@@ -153,4 +153,4 @@ class CompanyInvestmentController extends AbstractController
             ], 400);
         }
     }
-} 
+}

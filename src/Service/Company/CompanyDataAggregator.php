@@ -7,10 +7,18 @@ use Psr\Log\LoggerInterface;
 
 class CompanyDataAggregator
 {
+    /** @var list<CompanyScraperInterface> */
     private array $scrapers;
+
+    /** @var LoggerInterface */
     private LoggerInterface $logger;
+
+    /** @var array<string> */
     private array $requiredFields = ['denomination', 'siren', 'businessStructures'];
 
+    /**
+     * @param iterable<CompanyScraperInterface> $scrapers
+     */
     public function __construct(iterable $scrapers, LoggerInterface $logger)
     {
         // Convertir l'iterable en array et trier par priorité
@@ -18,11 +26,16 @@ class CompanyDataAggregator
         usort($scrapersArray, function ($a, $b) {
             return $b->getPriority() <=> $a->getPriority();
         });
-        
+
         $this->scrapers = $scrapersArray;
         $this->logger = $logger;
     }
 
+    /**
+     * @param string $siren
+     * @param bool $forceScraping
+     * @return array<string, mixed>
+     */
     public function getCompanyData(string $siren, bool $forceScraping = false): array
     {
         $errors = [];
@@ -43,7 +56,6 @@ class CompanyDataAggregator
                     $this->logger->info('Données complètes obtenues', ['source' => get_class($scraper)]);
                     return $data;
                 }
-
             } catch (\Exception $e) {
                 $this->logger->error('Erreur avec le scraper: ' . get_class($scraper), [
                     'error' => $e->getMessage(),
@@ -68,6 +80,10 @@ class CompanyDataAggregator
         throw new \Exception($errorMessage);
     }
 
+    /**
+     * @param array<string, mixed> $data
+     * @return bool
+     */
     private function hasRequiredFields(array $data): bool
     {
         foreach ($this->requiredFields as $field) {
@@ -78,6 +94,11 @@ class CompanyDataAggregator
         return true;
     }
 
+    /**
+     * @param array<string, mixed> $existingData
+     * @param array<string, mixed> $newData
+     * @return array<string, mixed>
+     */
     private function mergeData(array $existingData, array $newData): array
     {
         $merged = $existingData;
@@ -88,4 +109,4 @@ class CompanyDataAggregator
         }
         return $merged;
     }
-} 
+}
