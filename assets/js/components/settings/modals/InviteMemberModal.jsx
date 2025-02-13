@@ -6,7 +6,14 @@ import { useTranslation } from 'react-i18next';
 
 const { Option } = Select;
 
-const InviteMemberModal = ({ visible, onClose, onSuccess, groupId, user, i18n }) => {
+const InviteMemberModal = ({
+  visible,
+  onClose,
+  onSuccess,
+  groupId,
+  user,
+  i18n,
+}) => {
   const { t } = useTranslation('settings', { i18n });
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -16,29 +23,33 @@ const InviteMemberModal = ({ visible, onClose, onSuccess, groupId, user, i18n })
       const values = await form.validateFields();
       setLoading(true);
 
-      await axios.post('/api/group-invitations', {
-        email: values.email,
-        groupId: groupId,
-        role: values.role
-      }, {
-        headers: {
-          'x-cognito-id': user?.id,
-          'x-cognito-email': user?.email,
-          'x-cognito-name': user?.user_metadata?.full_name
-        }
-      });
+      await axios.post(
+        '/api/group-invitations',
+        {
+          email: values.email,
+          groupId: groupId,
+          role: values.role,
+        },
+        {
+          headers: {
+            'x-cognito-id': user?.id,
+            'x-cognito-email': user?.email,
+            'x-cognito-name': user?.user_metadata?.full_name,
+          },
+        },
+      );
 
       form.resetFields();
       onSuccess();
     } catch (error) {
       if (error.response?.data?.error === 'invitation-exists') {
         notification.error({
-          message: t('sections.group.invitation_exists')
+          message: t('sections.group.invitation_exists'),
         });
       } else {
         notification.error({
           message: t('sections.group.error_inviting'),
-          description: error.message
+          description: error.message,
         });
       }
     } finally {
@@ -67,7 +78,7 @@ const InviteMemberModal = ({ visible, onClose, onSuccess, groupId, user, i18n })
           onClick={handleSubmit}
         >
           {t('sections.group.send_invitation')}
-        </Button>
+        </Button>,
       ]}
     >
       <Form
@@ -80,7 +91,7 @@ const InviteMemberModal = ({ visible, onClose, onSuccess, groupId, user, i18n })
           label={t('sections.group.email')}
           rules={[
             { required: true, message: t('sections.group.email_required') },
-            { type: 'email', message: t('sections.group.invalid_email') }
+            { type: 'email', message: t('sections.group.invalid_email') },
           ]}
         >
           <Input
@@ -93,12 +104,16 @@ const InviteMemberModal = ({ visible, onClose, onSuccess, groupId, user, i18n })
           name="role"
           label={t('sections.group.role')}
           rules={[
-            { required: true, message: t('sections.group.role_required') }
+            { required: true, message: t('sections.group.role_required') },
           ]}
         >
           <Select>
-            <Option value="ROLE_ADMIN">{t('sections.group.roles.admin')}</Option>
-            <Option value="ROLE_MEMBER">{t('sections.group.roles.member')}</Option>
+            <Option value="ROLE_ADMIN">
+              {t('sections.group.roles.admin')}
+            </Option>
+            <Option value="ROLE_MEMBER">
+              {t('sections.group.roles.member')}
+            </Option>
           </Select>
         </Form.Item>
       </Form>
@@ -106,4 +121,4 @@ const InviteMemberModal = ({ visible, onClose, onSuccess, groupId, user, i18n })
   );
 };
 
-export default InviteMemberModal; 
+export default InviteMemberModal;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { Layout } from 'antd';
@@ -21,7 +21,10 @@ const FooterLayout = ({ i18n, isDashboard }) => {
     </Footer>
   ) : (
     <div className="px-8 py-6 lg:px-12">
-      <span className="text-sm text-gray-500"> © 2024 - {new Date().getFullYear()} | {t('copyright')}</span>
+      <span className="text-sm text-gray-500">
+        {' '}
+        © 2024 - {new Date().getFullYear()} | {t('copyright')}
+      </span>
     </div>
   );
 };

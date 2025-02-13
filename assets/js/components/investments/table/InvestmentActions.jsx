@@ -11,12 +11,12 @@ const InvestmentActions = ({ loading, onAdd, onDelete, recordId }) => {
         className="!text-blue-500 hover:!text-blue-700 text-lg cursor-pointer"
         onClick={() => onAdd(recordId)}
       />
-      <DeleteOutlined 
-        className="!text-rose-500 hover:!text-rose-700 text-lg cursor-pointer" 
+      <DeleteOutlined
+        className="!text-rose-500 hover:!text-rose-700 text-lg cursor-pointer"
         onClick={() => onDelete(recordId)}
       />
     </div>
   );
 };
 
-export default InvestmentActions; 
+export default InvestmentActions;

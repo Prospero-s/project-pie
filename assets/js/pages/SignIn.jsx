@@ -6,7 +6,14 @@ import SignInForm from '@/components/signin/SignInForm';
 import VerificationModal from '@/components/signin/VerificationModal';
 import ForgotPasswordModal from '@/components/signin/ForgotPasswordModal';
 import gsap from 'gsap';
-import { signInWithEmail, signInWithProvider, resendVerificationEmail, resetPassword, confirmSignUp, confirmResetPassword } from '@/services/auth/awsAuthService';
+import {
+  signInWithEmail,
+  signInWithProvider,
+  resendVerificationEmail,
+  resetPassword,
+  confirmSignUp,
+  confirmResetPassword,
+} from '@/services/auth/awsAuthService';
 import { Button } from 'antd';
 
 const SignIn = ({ i18n }) => {
@@ -40,25 +47,18 @@ const SignIn = ({ i18n }) => {
     return email.trim() !== '' && password.trim() !== '';
   };
 
-  const handleSignIn = async (e) => {
+  const handleSignIn = async e => {
     e.preventDefault();
     setLoading(true);
-    const result = await signInWithEmail(email, password, t, setUser, navigate, lng);
+    const result = await signInWithEmail(
+      email,
+      password,
+      t,
+      setUser,
+      navigate,
+      lng,
+    );
     setShowVerificationModal(result.showVerificationModal);
-    setLoading(false);
-  };
-
-  const handleSignInWithGoogle = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    await signInWithProvider('Google', lng, t);
-    setLoading(false);
-  };
-
-  const handleSignInWithMicrosoft = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    await signInWithProvider('Microsoft', lng, t);
     setLoading(false);
   };
 
@@ -68,18 +68,24 @@ const SignIn = ({ i18n }) => {
     setLoading(false);
   };
 
-  const handleForgotPassword = async (e) => {
+  const handleForgotPassword = async e => {
     e.preventDefault();
     setShowForgotPasswordModal(true);
   };
 
-  const handleForgotPasswordSubmit = async (email) => {
+  const handleForgotPasswordSubmit = async email => {
     return await resetPassword(email, t);
   };
 
   const handleConfirmCode = async () => {
     setLoading(true);
-    const success = await confirmSignUp(email, verificationCode, t, navigate, lng);
+    const success = await confirmSignUp(
+      email,
+      verificationCode,
+      t,
+      navigate,
+      lng,
+    );
     if (success) {
       await signInWithEmail(email, password, t, setUser, navigate, lng);
       setShowVerificationModal(false);
@@ -88,22 +94,21 @@ const SignIn = ({ i18n }) => {
   };
 
   const handleConfirmPasswordReset = async (code, newPassword) => {
-    return await confirmResetPassword(forgotPasswordEmail, code, newPassword, t);
-  };
-
-  const handleMicrosoftSignIn = () => {
-    signInWithProvider('Microsoft', lng, t);
+    return await confirmResetPassword(
+      forgotPasswordEmail,
+      code,
+      newPassword,
+      t,
+    );
   };
 
   return (
     <div className="w-full" ref={formRef}>
-      <div className='mb-8'>
+      <div className="mb-8">
         <h2 className="text-2xl font-semibold text-gray-900 mb-2">
           {t('login_title')}
         </h2>
-        <h4 className="text-gray-600 text-md mb-6">
-          {t('login_subtitle')}
-        </h4>
+        <h4 className="text-gray-600 text-md mb-6">{t('login_subtitle')}</h4>
       </div>
       <SignInForm
         t={t}
@@ -122,7 +127,11 @@ const SignIn = ({ i18n }) => {
           disabled={loading}
           className="w-full h-10 flex items-center justify-center gap-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors text-sm"
         >
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+          <img
+            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+            alt="Google"
+            className="w-5 h-5"
+          />
           {t('continue_with_google')}
         </Button>
       </div>
@@ -132,7 +141,11 @@ const SignIn = ({ i18n }) => {
           disabled={loading}
           className="w-full h-10 flex items-center justify-center gap-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors text-sm"
         >
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/microsoft.svg" alt="Microsoft" className="w-5 h-5" />
+          <img
+            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/microsoft.svg"
+            alt="Microsoft"
+            className="w-5 h-5"
+          />
           {t('continue_with_microsoft')}
         </Button>
       </div>

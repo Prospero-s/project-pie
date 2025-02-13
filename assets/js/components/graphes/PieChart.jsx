@@ -1,18 +1,15 @@
-import React from "react";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import React from 'react';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 const COLORS = [
-  "#297CF7",  // Bleu
-  "#12B76A",  // Vert
-  "#9f1239",  // Rouge
-  "#FF8042",  // Orange
-  "#1d4ed8"   // Violet
+  '#297CF7', // Bleu
+  '#12B76A', // Vert
+  '#9f1239', // Rouge
+  '#FF8042', // Orange
+  '#1d4ed8', // Violet
 ];
 
-const PieChartComponent = ({ 
-  data, 
-  height = "100%"
-}) => {
+const PieChartComponent = ({ data, height = '100%' }) => {
   return (
     <div className="w-full h-full">
       <ResponsiveContainer width="100%" height={height}>
@@ -35,17 +32,19 @@ const PieChartComponent = ({
             ))}
           </Pie>
           <Tooltip
-            formatter={(value) => new Intl.NumberFormat('fr-FR', {
-              style: 'currency',
-              currency: 'EUR',
-              maximumFractionDigits: 0
-            }).format(value)}
+            formatter={value =>
+              new Intl.NumberFormat('fr-FR', {
+                style: 'currency',
+                currency: 'EUR',
+                maximumFractionDigits: 0,
+              }).format(value)
+            }
             contentStyle={{
-              backgroundColor: "rgba(255, 255, 255, 0.95)",
-              border: "1px solid #E5E7EB",
-              borderRadius: "6px",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-              fontSize: "12px"
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              border: '1px solid #E5E7EB',
+              borderRadius: '6px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              fontSize: '12px',
             }}
           />
         </PieChart>
@@ -54,4 +53,4 @@ const PieChartComponent = ({
   );
 };
 
-export default PieChartComponent; 
+export default PieChartComponent;

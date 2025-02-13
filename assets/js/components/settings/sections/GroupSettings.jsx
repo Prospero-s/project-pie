@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, List, Avatar, Tag, Spin, notification, Select } from 'antd';
+import {
+  Card,
+  Button,
+  List,
+  Avatar,
+  Tag,
+  Spin,
+  notification,
+  Select,
+} from 'antd';
 import { UserOutlined, PlusOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import InviteMemberModal from '../modals/InviteMemberModal';
@@ -23,20 +32,24 @@ const GroupSettings = ({ user, i18n }) => {
         headers: {
           'x-cognito-id': user?.id,
           'x-cognito-email': user?.email,
-          'x-cognito-name': user?.user_metadata?.full_name
-        }
+          'x-cognito-name': user?.user_metadata?.full_name,
+        },
       });
-      
+
       if (response.data.groups && response.data.groups.length > 0) {
         setGroup(response.data.groups[0]);
         const isOwner = response.data.groups[0].owner.email === user?.email;
-        setUserRole(isOwner ? 'ROLE_OWNER' : response.data.groups[0].currentUserRole || 'ROLE_MEMBER');
+        setUserRole(
+          isOwner
+            ? 'ROLE_OWNER'
+            : response.data.groups[0].currentUserRole || 'ROLE_MEMBER',
+        );
       }
       setLoading(false);
     } catch (error) {
       notification.error({
         message: t('sections.group.error_loading'),
-        description: error.message
+        description: error.message,
       });
       setLoading(false);
     }
@@ -45,7 +58,7 @@ const GroupSettings = ({ user, i18n }) => {
   const handleInvitationSuccess = () => {
     setIsInviteModalVisible(false);
     notification.success({
-      message: t('sections.group.invitation_sent')
+      message: t('sections.group.invitation_sent'),
     });
     fetchGroupData();
   };
@@ -53,37 +66,41 @@ const GroupSettings = ({ user, i18n }) => {
   const handleRoleChange = async (memberId, newRole) => {
     try {
       setChangingRole(true);
-      await axios.put(`/api/user-groups/${group.id}/members/${memberId}/role`, {
-        role: newRole
-      }, {
-        headers: {
-          'x-cognito-id': user?.id,
-          'x-cognito-email': user?.email,
-          'x-cognito-name': user?.user_metadata?.full_name
-        }
-      });
+      await axios.put(
+        `/api/user-groups/${group.id}/members/${memberId}/role`,
+        {
+          role: newRole,
+        },
+        {
+          headers: {
+            'x-cognito-id': user?.id,
+            'x-cognito-email': user?.email,
+            'x-cognito-name': user?.user_metadata?.full_name,
+          },
+        },
+      );
 
       notification.success({
-        message: t('sections.group.role_updated')
+        message: t('sections.group.role_updated'),
       });
-      
+
       fetchGroupData();
     } catch (error) {
       notification.error({
         message: t('sections.group.error_updating_role'),
-        description: error.message
+        description: error.message,
       });
     } finally {
       setChangingRole(false);
     }
   };
 
-  const getRoleLabel = (role) => {
+  const getRoleLabel = role => {
     const roleKey = role?.toLowerCase()?.replace('role_', '') || 'member';
     return t(`sections.group.roles.${roleKey}`);
   };
 
-  const getRoleColor = (role) => {
+  const getRoleColor = role => {
     switch (role) {
       case 'ROLE_OWNER':
         return 'gold';
@@ -94,7 +111,7 @@ const GroupSettings = ({ user, i18n }) => {
     }
   };
 
-  const renderMemberRole = (member) => {
+  const renderMemberRole = member => {
     if (member.email === group.owner.email) {
       return <Tag color="gold">{getRoleLabel('ROLE_OWNER')}</Tag>;
     }
@@ -103,7 +120,7 @@ const GroupSettings = ({ user, i18n }) => {
       return (
         <Select
           value={member.role || 'ROLE_MEMBER'}
-          onChange={(newRole) => handleRoleChange(member.id, newRole)}
+          onChange={newRole => handleRoleChange(member.id, newRole)}
           disabled={changingRole}
           style={{ width: 140 }}
         >
@@ -159,7 +176,7 @@ const GroupSettings = ({ user, i18n }) => {
       <Card title={t('sections.group.members')}>
         <List
           dataSource={group.members}
-          renderItem={(member) => (
+          renderItem={member => (
             <List.Item>
               <List.Item.Meta
                 avatar={<Avatar icon={<UserOutlined />} />}
@@ -185,4 +202,4 @@ const GroupSettings = ({ user, i18n }) => {
   );
 };
 
-export default GroupSettings; 
+export default GroupSettings;

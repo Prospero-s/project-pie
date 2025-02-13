@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useState, useEffect } from 'react';
+import React, { createContext, ReactNode, useContext, useState, useEffect } from 'react';
 import { Auth, Hub } from 'aws-amplify';
 
 interface UserMetadata {

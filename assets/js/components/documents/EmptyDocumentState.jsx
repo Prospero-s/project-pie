@@ -12,11 +12,7 @@ const EmptyDocumentState = ({ t, onAddClick }) => {
       <p className="text-sm text-slate-500 mb-4 text-center max-w-md">
         {t('empty.description')}
       </p>
-      <Button
-        type="primary"
-        onClick={onAddClick}
-        className="bg-blue-500"
-      >
+      <Button type="primary" onClick={onAddClick} className="bg-blue-500">
         {t('empty.action')}
       </Button>
     </div>

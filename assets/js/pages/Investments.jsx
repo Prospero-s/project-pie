@@ -9,7 +9,9 @@ const Investments = ({ i18n }) => {
   const { t } = useTranslation('investments', { i18n });
   const lng = useParams().lng;
   const [searchParams] = useSearchParams();
-  const [isModalOpen, setIsModalOpen] = useState(searchParams.get('modal') === 'add');
+  const [isModalOpen, setIsModalOpen] = useState(
+    searchParams.get('modal') === 'add',
+  );
 
   useEffect(() => {
     i18n.changeLanguage(lng);
@@ -24,7 +26,11 @@ const Investments = ({ i18n }) => {
         </Button>
       </div>
       <div className="flex flex-col gap-4">
-        <TableInvestments i18n={i18n} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+        <TableInvestments
+          i18n={i18n}
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+        />
       </div>
     </div>
   );

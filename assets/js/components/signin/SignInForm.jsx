@@ -3,10 +3,22 @@ import { Button, Checkbox } from 'antd';
 import InputField from '@/components/common/field/InputField';
 import PasswordField from '@/components/common/field/PasswordField';
 
-const SignInForm = ({ t, email, setEmail, password, setPassword, handleSignIn, isFormValid, loading, handleForgotPassword }) => (
+const SignInForm = ({
+  t,
+  email,
+  setEmail,
+  password,
+  setPassword,
+  handleSignIn,
+  isFormValid,
+  loading,
+  handleForgotPassword,
+}) => (
   <form onSubmit={handleSignIn} className="space-y-4">
     <div className="space-y-1.5">
-      <label className="block text-sm font-medium text-gray-700">{t('email')}</label>
+      <label className="block text-sm font-medium text-gray-700">
+        {t('email')}
+      </label>
       <InputField
         value={email}
         onChange={e => setEmail(e.target.value)}
@@ -15,7 +27,9 @@ const SignInForm = ({ t, email, setEmail, password, setPassword, handleSignIn, i
       />
     </div>
     <div className="space-y-1.5">
-      <label className="block text-sm font-medium text-gray-700">{t('password')}</label>
+      <label className="block text-sm font-medium text-gray-700">
+        {t('password')}
+      </label>
       <PasswordField
         value={password}
         onChange={e => setPassword(e.target.value)}
