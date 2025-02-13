@@ -89,8 +89,12 @@ class GroupInvitationRepository extends ServiceEntityRepository
      * @param string $role
      * @return GroupInvitation
      */
-    public function createInvitation(UserGroup $group, string $email, User $invitedBy, string $role = GroupRole::ROLE_MEMBER): GroupInvitation
-    {
+    public function createInvitation(
+        UserGroup $group,
+        string $email,
+        User $invitedBy,
+        string $role = GroupRole::ROLE_MEMBER
+    ): GroupInvitation {
         $invitation = new GroupInvitation();
         $invitation->setGroup($group);
         $invitation->setEmail($email);
@@ -128,8 +132,12 @@ class GroupInvitationRepository extends ServiceEntityRepository
      * @param string $role
      * @return GroupInvitation
      */
-    public function createInvitationFromRequest(UserGroup $group, string $email, User $invitedBy, string $role = GroupRole::ROLE_MEMBER): GroupInvitation
-    {
+    public function createInvitationFromRequest(
+        UserGroup $group,
+        string $email,
+        User $invitedBy,
+        string $role = GroupRole::ROLE_MEMBER
+    ): GroupInvitation {
         $invitation = new GroupInvitation();
         $invitation->setGroup($group);
         $invitation->setEmail($email);

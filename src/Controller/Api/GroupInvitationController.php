@@ -76,10 +76,18 @@ class GroupInvitationController extends AbstractController
 
             // Vérifier si l'utilisateur peut attribuer ce rôle spécifique
             if ($role === GroupRole::ROLE_ADMIN && $userRole->getRole() !== GroupRole::ROLE_OWNER) {
-                return $this->json(['error' => 'Insufficient permissions to assign admin role'], Response::HTTP_FORBIDDEN);
+                return $this->json(
+                    ['error' => 'Insufficient permissions to assign admin role'],
+                    Response::HTTP_FORBIDDEN
+                );
             }
 
-            $invitation = $this->invitationRepository->createInvitationFromRequest($group, $data['email'], $user, $role);
+            $invitation = $this->invitationRepository->createInvitationFromRequest(
+                $group,
+                $data['email'],
+                $user,
+                $role
+            );
             $this->entityManager->flush();
 
             return $this->json([

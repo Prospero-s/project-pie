@@ -132,8 +132,14 @@ class CompanyRepository extends ServiceEntityRepository
      * @param string $sortOrder
      * @return array<string, mixed>
      */
-    public function findByFiltersWithPagination(array $filters, string $cognitoId, int $page = 1, int $limit = 10, string $sortField = 'updatedAt', string $sortOrder = 'desc'): array
-    {
+    public function findByFiltersWithPagination(
+        array $filters,
+        string $cognitoId,
+        int $page = 1,
+        int $limit = 10,
+        string $sortField = 'updatedAt',
+        string $sortOrder = 'desc'
+    ): array {
         try {
             // Correction de la requête pour récupérer le groupe de l'utilisateur
             $user = $this->em->createQueryBuilder()

@@ -121,7 +121,11 @@ class UserGroupController extends AbstractController
                             throw new \Exception('invalid-email');
                         }
 
-                        $existingInvitation = $this->invitationRepository->findExistingInvitation($invitationData['email'], $group);
+                        $existingInvitation = $this->invitationRepository->findExistingInvitation(
+                            $invitationData['email'],
+                            $group
+                        );
+
                         if ($existingInvitation) {
                             throw new \Exception('invitation-exists');
                         }
@@ -131,7 +135,12 @@ class UserGroupController extends AbstractController
                             throw new \Exception('invalid-role');
                         }
 
-                        $this->invitationRepository->createInvitationFromRequest($group, $invitationData['email'], $owner, $role);
+                        $this->invitationRepository->createInvitationFromRequest(
+                            $group,
+                            $invitationData['email'],
+                            $owner,
+                            $role
+                        );
                     }
                 }
 

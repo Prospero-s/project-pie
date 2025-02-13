@@ -15,7 +15,15 @@ class CompanyFixtures extends Fixture
     private array $businessStructures = ['SARL', 'SAS', 'SA', 'EURL', 'SASU'];
 
     /** @var array<string> */
-    private array $sectors = ['Technology', 'Healthcare', 'Finance', 'Manufacturing', 'Retail', 'Energy', 'Real Estate'];
+    private array $sectors = [
+        'Technology',
+        'Healthcare',
+        'Finance',
+        'Manufacturing',
+        'Retail',
+        'Energy',
+        'Real Estate'
+    ];
 
     /** @var array<string> */
     private array $codeApe = ['6201Z', '7022Z', '6420Z', '4791A', '3511Z'];

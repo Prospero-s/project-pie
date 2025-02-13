@@ -19,8 +19,11 @@ class KpiDataController extends AbstractController
     private CompanyRepository $companyRepository;
     private UserRepository $userRepository;
 
-    public function __construct(KpiDataRepository $kpiDataRepository, CompanyRepository $companyRepository, UserRepository $userRepository)
-    {
+    public function __construct(
+        KpiDataRepository $kpiDataRepository,
+        CompanyRepository $companyRepository,
+        UserRepository $userRepository
+    ) {
         $this->kpiDataRepository = $kpiDataRepository;
         $this->companyRepository = $companyRepository;
         $this->userRepository = $userRepository;
@@ -142,7 +145,11 @@ class KpiDataController extends AbstractController
         }
 
         $status = $request->query->get('status', null);
-        $documents = $status ? $this->kpiDataRepository->findKpiByStatus($status) : array_merge($this->kpiDataRepository->findKpiByStatus('processed'), $this->kpiDataRepository->findKpiByStatus('draft'));
+        $documents = $status ? $this->kpiDataRepository->findKpiByStatus($status)
+        : array_merge(
+            $this->kpiDataRepository->findKpiByStatus('processed'),
+            $this->kpiDataRepository->findKpiByStatus('draft')
+        );
 
         // Vérification si des documents existent
         if (!$documents) {
@@ -155,7 +162,8 @@ class KpiDataController extends AbstractController
                 'id' => $kpi->getId(),
                 'company' => $kpi->getCompany()->getDenomination(),
                 // @phpstan-ignore-next-line
-                'kpi' => is_string($kpi->getKpi()) ? json_decode($kpi->getKpi(), true) : $kpi->getKpi(),                'status' => $kpi->getStatus(),
+                'kpi' => is_string($kpi->getKpi()) ? json_decode($kpi->getKpi(), true)
+                : $kpi->getKpi(),                'status' => $kpi->getStatus(),
                 'pdfUrl' => $kpi->getPdfUrl(),
                 'createdAt' => $kpi->getCreatedAt()?->format('Y-m-d H:i:s'),
             ];

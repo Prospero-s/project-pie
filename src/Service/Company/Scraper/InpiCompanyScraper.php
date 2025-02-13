@@ -87,7 +87,10 @@ class InpiCompanyScraper implements CompanyScraperInterface
                     'timeout' => 5,
                     'max_duration' => 10,
                     'headers' => [
-                        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                        'User-Agent' =>
+                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' .
+                        'AppleWebKit/537.36 (KHTML, like Gecko) ' .
+                        'Chrome/91.0.4472.124 Safari/537.36',
                         'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                         'Accept-Language' => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
                     ]
@@ -328,7 +331,8 @@ class InpiCompanyScraper implements CompanyScraperInterface
             if ($node->filter('h3')->count() && str_contains($node->filter('h3')->text(), 'Représentants')) {
                 $currentRepresentant = [];
 
-                $node->children('.col-12.col-md-2, .col-12.col-md-4')->each(function (Crawler $col) use (&$currentRepresentant, &$representants) {
+                $node->children('.col-12.col-md-2, .col-12.col-md-4')
+                ->each(function (Crawler $col) use (&$currentRepresentant, &$representants) {
                     // Vérifier s'il y a un bloc dirigeant
                     if ($col->filter('.bloc-dirigeant')->count() > 0) {
                         $label = $col->filter('.inpi-light')->text();
@@ -342,9 +346,7 @@ class InpiCompanyScraper implements CompanyScraperInterface
                                 'nom' => trim($col->filter('.highlight-text')->text()),
                                 'qualite' => null
                             ];
-                        }
-                        // Cas d'une dénomination
-                        elseif (str_contains($label, 'Dénomination')) {
+                        } elseif (str_contains($label, 'Dénomination')) {
                             if (!empty($currentRepresentant)) {
                                 $representants[] = $currentRepresentant;
                             }
@@ -352,9 +354,7 @@ class InpiCompanyScraper implements CompanyScraperInterface
                                 'nom' => trim($col->filter('.font-size-0-9-rem')->last()->text()),
                                 'qualite' => null
                             ];
-                        }
-                        // Cas de la qualité
-                        elseif (str_contains($label, 'Qualité')) {
+                        } elseif (str_contains($label, 'Qualité')) {
                             if (!empty($currentRepresentant)) {
                                 $currentRepresentant['qualite'] = trim($col->filter('.font-size-0-9-rem.m-0')->text());
                             }
