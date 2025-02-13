@@ -35,6 +35,7 @@ export default [
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off', // Disabled, if need, install typescript
       'prettier/prettier': 'error',
+      'no-console': ['error', { allow: ['warn', 'error'] }],
     },
   },
 ];
