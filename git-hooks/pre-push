@@ -1,0 +1,36 @@
+# .git/hooks/pre-push
+#!/bin/bash
+
+# Vérifier que bash est bien utilisé
+if [ -z "$BASH_VERSION" ]; then
+    echo "❌ Ce script doit être exécuté avec bash."
+    exit 1
+fi
+
+# Regex pour les noms de branches
+branch_regex='^(feat|fix|hotfix|release|docs)/[A-Z]+-[0-9]+-[a-z0-9-]+$'
+
+# Lire les références poussées depuis stdin
+while read local_ref local_sha remote_ref remote_sha
+do
+    # Extraire le nom de la branche à partir de la référence distante
+    branch_name=$(echo "$remote_ref" | sed 's,refs/heads/,,')
+
+    # Vérifier si c'est une branche
+    if echo "$remote_ref" | grep -q '^refs/heads/'; then
+        if ! echo "$branch_name" | grep -Eq "$branch_regex"; then
+            echo "--------------------------------"
+            echo "❌ Le format du nom de la branche '$branch_name' est invalide."
+            echo "Format attendu: <type>/<ticket-id>-<description>"
+            echo "Types autorisés: feat, fix, hotfix, release, docs"
+            echo "👀 Exemple: feat/PRSP-123-ajout-de-la-fonctionnalite-de-login"
+            echo "--------------------------------"
+            exit 1
+        fi
+    fi
+done
+
+echo "--------------------------------"
+echo "✅ Format des noms de branches validé pour tous les éléments poussés"
+echo "--------------------------------"
+exit 0
