@@ -1,23 +1,26 @@
 # .git/hooks/pre-push
-#!/bin/bash
-
-# Vérifier que bash est bien utilisé
-if [ -z "$BASH_VERSION" ]; then
-    echo "❌ Ce script doit être exécuté avec bash."
-    exit 1
-fi
+#!/usr/bin/env bash
 
 # Regex pour les noms de branches
-branch_regex='^(feat|fix|hotfix|release|docs)/[A-Z]+-[0-9]+-[a-z0-9-]+$'
+branch_regex='^(feat|fix|hotfix|release|docs)/[A-Z]+-[0-9]+(-[a-z0-9]+)+$'
 
-# Lire les références poussées depuis stdin
-while read local_ref local_sha remote_ref remote_sha
-do
-    # Extraire le nom de la branche à partir de la référence distante
-    branch_name=$(echo "$remote_ref" | sed 's,refs/heads/,,')
+z40=0000000000000000000000000000000000000000
 
-    # Vérifier si c'est une branche
-    if echo "$remote_ref" | grep -q '^refs/heads/'; then
+while read local_ref local_sha remote_ref remote_sha; do
+    if [ "$local_sha" = $z40 ]; then
+        # Handle delete
+        continue
+    fi
+
+    if [ "$remote_sha" = $z40 ]; then
+        # New branch
+        branch_name=${remote_ref#refs/heads/}
+    else
+        # Update to existing branch
+        branch_name=${remote_ref#refs/heads/}
+    fi
+
+    if [ -n "$branch_name" ]; then
         if ! echo "$branch_name" | grep -Eq "$branch_regex"; then
             echo "--------------------------------"
             echo "❌ Le format du nom de la branche '$branch_name' est invalide."

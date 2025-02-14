@@ -6,13 +6,13 @@ if [ -z "$BASH_VERSION" ]; then
     exit 1
 fi
 
-commit_msg_file=$1
+commit_msg_file="$1"
 commit_msg=$(cat "$commit_msg_file")
 
-# Format regex
-commit_regex='^(feat|fix|docs|style|refactor|test|chore)(\([a-zA-Z0-9-]+\))?: .{1,150}$'
+# Format regex encore plus strict
+commit_regex='^(feat|fix|docs|style|refactor|test|chore)(\([a-zA-Z0-9-]+\))?: [A-Za-z][A-Za-z0-9 ._-]{1,149}$'
 
-if ! [[ "$commit_msg" =~ $commit_regex ]]; then
+if ! echo "$commit_msg" | grep -P "$commit_regex" > /dev/null 2>&1; then
     echo "--------------------------------"
     echo "❌ Le format du message de commit est invalide."
     echo "Format attendu: <type>(<scope>): <description>"
