@@ -21,7 +21,7 @@ const CompanyMap = ({ address }) => {
 
         // Vérification de la validité minimale de l'adresse
         if (!address.codePostal || !address.commune) {
-          throw new Error('Adresse insuffisante pour l\'affichage de la carte');
+          throw new Error("Adresse insuffisante pour l'affichage de la carte");
         }
 
         // Nettoyage de la carte existante
@@ -32,7 +32,8 @@ const CompanyMap = ({ address }) => {
 
         // Création du conteneur de la carte
         const mapContainer = containerRef.current;
-        mapContainer.innerHTML = '<div id="map" style="height: 100%; width: 100%;"></div>';
+        mapContainer.innerHTML =
+          '<div id="map" style="height: 100%; width: 100%;"></div>';
         const mapElement = mapContainer.firstChild;
 
         // Construction de l'adresse complète
@@ -47,7 +48,7 @@ const CompanyMap = ({ address }) => {
         // Première tentative avec l'adresse complète
         let query = addressParts.join(' ');
         let response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=fr&limit=1`
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=fr&limit=1`,
         );
         let data = await response.json();
 
@@ -55,7 +56,7 @@ const CompanyMap = ({ address }) => {
         if (!data || data.length === 0) {
           query = `${address.streetTypes} ${address.voie} ${address.commune} ${address.codePostal} France`;
           response = await fetch(
-            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=fr&limit=1`
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=fr&limit=1`,
           );
           data = await response.json();
         }
@@ -64,7 +65,7 @@ const CompanyMap = ({ address }) => {
         if (!data || data.length === 0) {
           query = `${address.commune} ${address.codePostal} France`;
           response = await fetch(
-            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=fr&limit=1`
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=fr&limit=1`,
           );
           data = await response.json();
         }
@@ -90,18 +91,23 @@ const CompanyMap = ({ address }) => {
           keyboard: true,
           tap: true,
           bounceAtZoomLimits: true,
-          maxBoundsViscosity: 1.0
+          maxBoundsViscosity: 1.0,
         });
 
         mapRef.current = map;
 
-        L.control.zoom({
-          position: 'topright'
-        }).addTo(map);
+        L.control
+          .zoom({
+            position: 'topright',
+          })
+          .addTo(map);
 
-        L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
-          maxZoom: 20
-        }).addTo(map);
+        L.tileLayer(
+          'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png',
+          {
+            maxZoom: 20,
+          },
+        ).addTo(map);
 
         // Création du marqueur personnalisé avec les nouvelles couleurs
         const customIcon = L.divIcon({
@@ -111,7 +117,7 @@ const CompanyMap = ({ address }) => {
             <div className="marker-pulse"></div>
           `,
           iconSize: [40, 40],
-          iconAnchor: [20, 20]
+          iconAnchor: [20, 20],
         });
 
         // Styles mis à jour avec les nouvelles couleurs
@@ -214,7 +220,8 @@ const CompanyMap = ({ address }) => {
 
         L.marker([lat, lng], { icon: customIcon })
           .addTo(map)
-          .bindPopup(`
+          .bindPopup(
+            `
             <div className="popup-content">
               <div className="popup-header">
                 Adresse
@@ -228,17 +235,19 @@ const CompanyMap = ({ address }) => {
                 </div>
               </div>
             </div>
-          `, {
-            className: 'custom-popup',
-            closeButton: true,
-            autoClose: false,
-            closeOnClick: false
-          })
+          `,
+            {
+              className: 'custom-popup',
+              closeButton: true,
+              autoClose: false,
+              closeOnClick: false,
+            },
+          )
           .openPopup();
 
         setLoading(false);
       } catch (err) {
-        console.error('Erreur lors de l\'initialisation de la carte:', err);
+        console.error("Erreur lors de l'initialisation de la carte:", err);
         setError(err.message);
         setLoading(false);
       }
@@ -274,4 +283,4 @@ const CompanyMap = ({ address }) => {
   );
 };
 
-export default CompanyMap; 
+export default CompanyMap;

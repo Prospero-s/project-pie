@@ -21,16 +21,18 @@ export const fetchInvestments = async (params = {}) => {
       queryParams.fundingType = params.fundingType.join(',');
     }
 
-    const response = await axios.get('/api/investments', { 
+    const response = await axios.get('/api/investments', {
       params: queryParams,
       headers: {
-        'x-cognito-id': cognitoId
-      }
+        'x-cognito-id': cognitoId,
+      },
     });
 
     return response.data;
   } catch (error) {
-    throw new Error(`Erreur: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`);
+    throw new Error(
+      `Erreur: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`,
+    );
   }
 };
 
@@ -39,25 +41,29 @@ export const fetchInvestmentByCompanyIdAndYear = async (id, year) => {
     const response = await axios.get(`/api/investments/${id}/${year}`);
     return response.data;
   } catch (error) {
-    throw new Error(`Erreur: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`);
+    throw new Error(
+      `Erreur: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`,
+    );
   }
 };
 
 export const fetchGlobalInvestments = async () => {
-    try {
-        const session = await Auth.currentSession();
-        const cognitoId = session.getIdToken().payload.sub;
+  try {
+    const session = await Auth.currentSession();
+    const cognitoId = session.getIdToken().payload.sub;
 
-        const response = await axios.get('/api/investments/global', {
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Cognito-Id': cognitoId
-          },
-        });
-        return response.data;
-    } catch (error) {
-      throw new Error(`Erreur: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`);
-    }
+    const response = await axios.get('/api/investments/global', {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Cognito-Id': cognitoId,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      `Erreur: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`,
+    );
+  }
 };
 
 export const fetchGlobalFundingInvestments = async () => {
@@ -68,12 +74,14 @@ export const fetchGlobalFundingInvestments = async () => {
     const response = await axios.get('/api/investments/global/funding', {
       headers: {
         'Content-Type': 'application/json',
-        'X-Cognito-Id': cognitoId
+        'X-Cognito-Id': cognitoId,
       },
     });
     return response.data;
   } catch (error) {
-    throw new Error(`Erreur: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`);
+    throw new Error(
+      `Erreur: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`,
+    );
   }
 };
 
@@ -85,11 +93,13 @@ export const fetchGlobalSectorInvestments = async () => {
     const response = await axios.get('/api/investments/global/sector', {
       headers: {
         'Content-Type': 'application/json',
-        'X-Cognito-Id': cognitoId
+        'X-Cognito-Id': cognitoId,
       },
     });
     return response.data;
   } catch (error) {
-    throw new Error(`Erreur: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`);
+    throw new Error(
+      `Erreur: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`,
+    );
   }
 };

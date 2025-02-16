@@ -19,20 +19,23 @@ const AutomaticCompanyForm = ({ onNext }) => {
     { value: 'healthcare', label: t('company_details.sectors.healthcare') },
     { value: 'finance', label: t('company_details.sectors.finance') },
     { value: 'retail', label: t('company_details.sectors.retail') },
-    { value: 'manufacturing', label: t('company_details.sectors.manufacturing') },
+    {
+      value: 'manufacturing',
+      label: t('company_details.sectors.manufacturing'),
+    },
     { value: 'energy', label: t('company_details.sectors.energy') },
     { value: 'education', label: t('company_details.sectors.education') },
-    { value: 'other', label: t('company_details.sectors.other') }
+    { value: 'other', label: t('company_details.sectors.other') },
   ];
 
-  const handleSearch = async (values) => {
+  const handleSearch = async values => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const cleanSiren = values.siren.replace(/\s/g, '');
       const data = await fetchCompanyDetails(cleanSiren, t);
-      
+
       if (data) {
         setCompanyData(data);
         setShowConfirmation(true);
@@ -44,10 +47,10 @@ const AutomaticCompanyForm = ({ onNext }) => {
     }
   };
 
-  const handleConfirm = (values) => {
+  const handleConfirm = values => {
     onNext({
       ...companyData,
-      sector: values.sector
+      sector: values.sector,
     });
   };
 
@@ -60,7 +63,12 @@ const AutomaticCompanyForm = ({ onNext }) => {
             <Form.Item
               name="sector"
               label={t('company_details.company.sector')}
-              rules={[{ required: true, message: t('company_details.sector_required') }]}
+              rules={[
+                {
+                  required: true,
+                  message: t('company_details.sector_required'),
+                },
+              ]}
             >
               <Select placeholder={t('company_details.select_sector')}>
                 {sectors.map(sector => (
@@ -71,11 +79,13 @@ const AutomaticCompanyForm = ({ onNext }) => {
               </Select>
             </Form.Item>
             <div className="flex justify-end gap-3">
-              <Button onClick={() => {
-                setShowConfirmation(false);
-                setCompanyData(null);
-                form.resetFields();
-              }}>
+              <Button
+                onClick={() => {
+                  setShowConfirmation(false);
+                  setCompanyData(null);
+                  form.resetFields();
+                }}
+              >
                 {t('common.back')}
               </Button>
               <Button type="primary" htmlType="submit">
@@ -89,18 +99,9 @@ const AutomaticCompanyForm = ({ onNext }) => {
   }
 
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      onFinish={handleSearch}
-    >
+    <Form form={form} layout="vertical" onFinish={handleSearch}>
       {error && (
-        <Alert
-          message={error}
-          type="error"
-          showIcon
-          className="mb-4"
-        />
+        <Alert message={error} type="error" showIcon className="mb-4" />
       )}
 
       <Form.Item
@@ -110,8 +111,8 @@ const AutomaticCompanyForm = ({ onNext }) => {
           { required: true, message: t('company_details.siren_required') },
           {
             pattern: /^\d{9}$/,
-            message: t('company_details.siren_invalid')
-          }
+            message: t('company_details.siren_invalid'),
+          },
         ]}
         normalize={value => value.replace(/\s/g, '')}
       >
@@ -145,4 +146,4 @@ const AutomaticCompanyForm = ({ onNext }) => {
   );
 };
 
-export default AutomaticCompanyForm; 
+export default AutomaticCompanyForm;

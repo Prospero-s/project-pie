@@ -1,6 +1,6 @@
 import React from 'react';
-import { TrendingUp } from "lucide-react";
-import { Bar, BarChart, XAxis, YAxis, Tooltip } from "recharts";
+import { TrendingUp } from 'lucide-react';
+import { Bar, BarChart, XAxis, YAxis, Tooltip } from 'recharts';
 
 import {
   Card,
@@ -9,14 +9,14 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/card';
 
 const chartData = [
-  { browser: "chrome", visitors: 275, fill: "#2563EB" },
-  { browser: "safari", visitors: 200, fill: "#60A8FB" },
-  { browser: "firefox", visitors: 187, fill: "#3B86F7" },
-  { browser: "edge", visitors: 173, fill: "#90C6FE" },
-  { browser: "other", visitors: 90, fill: "#BDDCFE" },
+  { browser: 'chrome', visitors: 275, fill: '#2563EB' },
+  { browser: 'safari', visitors: 200, fill: '#60A8FB' },
+  { browser: 'firefox', visitors: 187, fill: '#3B86F7' },
+  { browser: 'edge', visitors: 173, fill: '#90C6FE' },
+  { browser: 'other', visitors: 90, fill: '#BDDCFE' },
 ];
 
 const BarChartMixedComponent = () => {
@@ -44,7 +44,11 @@ const BarChartMixedComponent = () => {
             />
             <XAxis dataKey="visitors" type="number" hide />
             <Tooltip />
-            <Bar dataKey="visitors" radius={5} fill={({ payload }) => payload.fill} />
+            <Bar
+              dataKey="visitors"
+              radius={5}
+              fill={({ payload }) => payload.fill}
+            />
           </BarChart>
         </div>
       </CardContent>

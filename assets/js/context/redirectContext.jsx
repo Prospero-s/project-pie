@@ -6,7 +6,9 @@ export const RedirectProvider = ({ children }) => {
   const [isCheckingRedirect, setIsCheckingRedirect] = useState(true);
 
   return (
-    <RedirectContext.Provider value={{ isCheckingRedirect, setIsCheckingRedirect }}>
+    <RedirectContext.Provider
+      value={{ isCheckingRedirect, setIsCheckingRedirect }}
+    >
       {children}
     </RedirectContext.Provider>
   );

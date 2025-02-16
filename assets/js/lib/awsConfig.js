@@ -1,2 +1,2 @@
 import './polyfills';
-export { Auth } from 'aws-amplify'; 
+export { Auth } from 'aws-amplify';

@@ -6,7 +6,6 @@ import DropdownUser from './DropdownUser';
 const { Header } = Layout;
 
 const AppHeader = ({ user, setUser, i18n }) => {
-
   return (
     <Header className="site-layout-background bg-white h-16 p-6">
       <div className="flex justify-between lg:justify-end items-center h-full mr-4 ml-4">

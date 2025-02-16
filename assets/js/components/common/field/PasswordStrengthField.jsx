@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
 import { Input } from 'antd';
 
-const PasswordStrengthField = ({ label, value, onChange, placeholder, className }) => {
+const PasswordStrengthField = ({
+  label,
+  value,
+  onChange,
+  placeholder,
+  className,
+}) => {
   const [passwordStrength, setPasswordStrength] = useState(0);
 
-  const checkPasswordStrength = (pass) => {
+  const checkPasswordStrength = pass => {
     let strength = 0;
     const hasLowerCase = /[a-z]/.test(pass);
     const hasUpperCase = /[A-Z]/.test(pass);
@@ -21,7 +27,7 @@ const PasswordStrengthField = ({ label, value, onChange, placeholder, className 
     setPasswordStrength(Math.min(strength, 100));
   };
 
-  const handlePasswordChange = (e) => {
+  const handlePasswordChange = e => {
     const newPassword = e.target.value;
     onChange(e);
     checkPasswordStrength(newPassword);
@@ -54,8 +60,8 @@ const PasswordStrengthField = ({ label, value, onChange, placeholder, className 
         {passwordStrength < 75
           ? 'Le mot de passe doit contenir au moins 8 caractères.'
           : passwordStrength === 100
-          ? 'Mot de passe fort'
-          : 'Mot de passe moyen'}
+            ? 'Mot de passe fort'
+            : 'Mot de passe moyen'}
       </p>
     </div>
   );

@@ -42,15 +42,15 @@ const DropdownNotification = ({ i18n }) => {
             </li>
           </ul>
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   return (
-    <Dropdown 
-      menu={{ items }} 
-      trigger={['click']} 
-      placement={isMobile ? 'bottomLeft' : 'bottom'} 
+    <Dropdown
+      menu={{ items }}
+      trigger={['click']}
+      placement={isMobile ? 'bottomLeft' : 'bottom'}
       arrow
     >
       <Badge className="cursor-pointer">

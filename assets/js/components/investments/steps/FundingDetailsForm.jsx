@@ -8,7 +8,7 @@ const FundingDetailsForm = ({ companyData, onFinish, t }) => {
   const currencies = [
     { value: 'EUR', label: '€ (EUR)' },
     { value: 'USD', label: '$ (USD)' },
-    { value: 'GBP', label: '£ (GBP)' }
+    { value: 'GBP', label: '£ (GBP)' },
   ];
 
   const fundingTypes = [
@@ -17,13 +17,13 @@ const FundingDetailsForm = ({ companyData, onFinish, t }) => {
     { value: 'serieB', label: t('funding.types.serieB') },
     { value: 'serieC', label: t('funding.types.serieC') },
     { value: 'growth', label: t('funding.types.growth') },
-    { value: 'ipo', label: t('funding.types.ipo') }
+    { value: 'ipo', label: t('funding.types.ipo') },
   ];
 
-  const handleFinish = (values) => {
+  const handleFinish = values => {
     onFinish({
       ...values,
-      investorId: values.investorId
+      investorId: values.investorId,
     });
   };
 
@@ -33,12 +33,14 @@ const FundingDetailsForm = ({ companyData, onFinish, t }) => {
       layout="vertical"
       onFinish={handleFinish}
       initialValues={{
-        currency: companyData?.devise || 'EUR'
+        currency: companyData?.devise || 'EUR',
       }}
     >
       <InvestorSelection
         name="investorId"
-        rules={[{ required: true, message: t('select_investor.investor-required') }]}
+        rules={[
+          { required: true, message: t('select_investor.investor-required') },
+        ]}
         t={t}
       />
 
@@ -66,7 +68,9 @@ const FundingDetailsForm = ({ companyData, onFinish, t }) => {
           <InputNumber
             min={0}
             style={{ width: '100%' }}
-            formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
+            formatter={value =>
+              `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+            }
             parser={value => value.replace(/\s/g, '')}
           />
         </Form.Item>
@@ -95,4 +99,4 @@ const FundingDetailsForm = ({ companyData, onFinish, t }) => {
   );
 };
 
-export default FundingDetailsForm; 
+export default FundingDetailsForm;

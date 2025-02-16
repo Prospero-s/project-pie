@@ -9,13 +9,16 @@ const ManualCompanyForm = ({ onNext, t }) => {
     { value: 'healthcare', label: t('company_details.sectors.healthcare') },
     { value: 'finance', label: t('company_details.sectors.finance') },
     { value: 'retail', label: t('company_details.sectors.retail') },
-    { value: 'manufacturing', label: t('company_details.sectors.manufacturing') },
+    {
+      value: 'manufacturing',
+      label: t('company_details.sectors.manufacturing'),
+    },
     { value: 'energy', label: t('company_details.sectors.energy') },
     { value: 'education', label: t('company_details.sectors.education') },
-    { value: 'other', label: t('company_details.sectors.other') }
+    { value: 'other', label: t('company_details.sectors.other') },
   ];
 
-  const onFinish = (values) => {
+  const onFinish = values => {
     onNext({
       denomination: values.denomination.trim(),
       siren: values.siren.replace(/\s/g, ''),
@@ -25,19 +28,21 @@ const ManualCompanyForm = ({ onNext, t }) => {
       adresse: null,
       codeApe: null,
       siret: null,
-      updatedAt: null
+      updatedAt: null,
     });
   };
 
   return (
-    <Form
-      layout="vertical"
-      onFinish={onFinish}
-    >
+    <Form layout="vertical" onFinish={onFinish}>
       <Form.Item
         name="denomination"
         label={t('company_details.company.name')}
-        rules={[{ required: true, message: t('company_details.company.name_required') }]}
+        rules={[
+          {
+            required: true,
+            message: t('company_details.company.name_required'),
+          },
+        ]}
       >
         <Input placeholder={t('company_details.company.name_placeholder')} />
       </Form.Item>
@@ -48,16 +53,22 @@ const ManualCompanyForm = ({ onNext, t }) => {
         rules={[
           { required: true, message: t('company_details.siren_required') },
           { min: 9, message: t('company_details.siren_invalid') },
-          { max: 9, message: t('company_details.siren_invalid') }
+          { max: 9, message: t('company_details.siren_invalid') },
         ]}
       >
-        <Input placeholder={t('company_details.siren_placeholder')} minLength={9} maxLength={9} />
+        <Input
+          placeholder={t('company_details.siren_placeholder')}
+          minLength={9}
+          maxLength={9}
+        />
       </Form.Item>
 
       <Form.Item
         name="sector"
         label={t('company_details.company.sector')}
-        rules={[{ required: true, message: t('company_details.sector_required') }]}
+        rules={[
+          { required: true, message: t('company_details.sector_required') },
+        ]}
       >
         <Select placeholder={t('company_details.select_sector')}>
           {sectors.map(sector => (
@@ -77,4 +88,4 @@ const ManualCompanyForm = ({ onNext, t }) => {
   );
 };
 
-export default ManualCompanyForm; 
+export default ManualCompanyForm;

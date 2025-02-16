@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Tooltip, Table, Skeleton, message, Modal } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import { fetchDocuments, deleteDocument } from '@/services/documents/documentsService';
+import {
+  fetchDocuments,
+  deleteDocument,
+} from '@/services/documents/documentsService';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import EmptyDocumentState from './EmptyDocumentState';
 
 const TableDocuments = ({ t }) => {
@@ -21,22 +23,22 @@ const TableDocuments = ({ t }) => {
     loadDocuments();
   }, []);
 
-  const handleTableChange = (pagination, filters, sorter) => {
+  const handleTableChange = pagination => {
     setPagination(pagination);
     loadDocuments();
   };
-  
-  const handleDelete = async (id) => {
+
+  const handleDelete = async id => {
     try {
       await deleteDocument(id);
       message.success(t('messages.delete_success'));
-      setDocuments((prevDocuments) => prevDocuments.filter(doc => doc.id !== id));
+      setDocuments(prevDocuments => prevDocuments.filter(doc => doc.id !== id));
     } catch (error) {
-      message.error(t('messages.delete_error'));
+      message.error(`${t('messages.delete_error')}: ${error.message || error}`);
     }
   };
 
-  const handleViewDetails = (content) => {
+  const handleViewDetails = content => {
     setModalContent(JSON.stringify(content, null, 2));
     setIsModalVisible(true);
   };
@@ -73,34 +75,32 @@ const TableDocuments = ({ t }) => {
         { text: t('table.statuses.processed'), value: 'processed' },
       ],
       onFilter: (value, record) => record.status === value,
-      render: (status) => 
+      render: status =>
         loading ? (
           <Skeleton.Input block active size="small" />
-        ) : t(`table.statuses.${status}`),
+        ) : (
+          t(`table.statuses.${status}`)
+        ),
     },
     {
       title: t('table.filename'),
       dataIndex: 'pdfUrl',
       key: 'pdfUrl',
-      render: (text) => 
-        loading ? (
-          <Skeleton.Input block active size="small" />
-        ) : text,
+      render: text =>
+        loading ? <Skeleton.Input block active size="small" /> : text,
     },
     {
       title: t('table.company'),
       dataIndex: 'company',
       key: 'company',
-      render: (text) => 
-        loading ? (
-          <Skeleton.Input block active size="small" />
-        ) : text,
+      render: text =>
+        loading ? <Skeleton.Input block active size="small" /> : text,
     },
     {
       title: t('table.last_update'),
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: (date) =>
+      render: date =>
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : (
@@ -144,7 +144,7 @@ const TableDocuments = ({ t }) => {
             </Tooltip>
           </div>
         ),
-    }
+    },
   ];
 
   return (
@@ -161,9 +161,10 @@ const TableDocuments = ({ t }) => {
             }
             size="middle"
             locale={{
-              emptyText: documents.length === 0 && !loading ? (
-                <EmptyDocumentState t={t} />
-              ) : null
+              emptyText:
+                documents.length === 0 && !loading ? (
+                  <EmptyDocumentState t={t} />
+                ) : null,
             }}
           />
         </div>
@@ -178,7 +179,12 @@ const TableDocuments = ({ t }) => {
         <textarea
           value={modalContent}
           readOnly
-          style={{ width: '100%', height: '480px', resize: 'none', fontFamily: 'monospace' }}
+          style={{
+            width: '100%',
+            height: '480px',
+            resize: 'none',
+            fontFamily: 'monospace',
+          }}
         />
       </Modal>
     </>

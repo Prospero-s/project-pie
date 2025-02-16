@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Avatar, Dropdown } from 'antd';
-import { 
-  LogoutOutlined, 
-  SettingOutlined, 
-  UserOutlined 
+import {
+  LogoutOutlined,
+  SettingOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import { signOut } from '@/services/auth/awsAuthService';
 import { useNavigate } from 'react-router-dom';
@@ -24,39 +24,44 @@ const DropdownUser = ({ i18n, user }) => {
     {
       key: 'profile',
       icon: <UserOutlined className="!text-base" />,
-      label: <a href={`/${lng}/profile`} className="text-base">{t('profile')}</a>
+      label: (
+        <a href={`/${lng}/profile`} className="text-base">
+          {t('profile')}
+        </a>
+      ),
     },
     {
       key: 'settings',
       icon: <SettingOutlined className="!text-base" />,
-      label: <div onClick={() => setIsSettingsModalVisible(true)} className="text-base">{t('settings')}</div>
+      label: (
+        <div
+          onClick={() => setIsSettingsModalVisible(true)}
+          className="text-base"
+        >
+          {t('settings')}
+        </div>
+      ),
     },
     {
-      type: 'divider'
+      type: 'divider',
     },
     {
       key: 'logout',
       icon: <LogoutOutlined className="!text-base" />,
       label: <div className="text-base">{t('logout')}</div>,
-      onClick: handleLogout
-    }
+      onClick: handleLogout,
+    },
   ];
 
   return (
     <>
-      <Dropdown 
-        menu={{ items }} 
-        trigger={['click']} 
-        placement="bottomRight"
-      >
+      <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
         <div className="flex items-center gap-4 cursor-pointer text-lg">
           <div className="hidden lg:block text-right">
             <span className="block font-medium">
               {user?.user_metadata?.full_name}
             </span>
-            <span className="block text-sm lg:text-base">
-              {user?.email}
-            </span>
+            <span className="block text-sm lg:text-base">{user?.email}</span>
           </div>
           <Avatar
             size="large"

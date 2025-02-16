@@ -2,15 +2,15 @@ import React from 'react';
 import { Modal, Button, Input } from 'antd';
 import { MailOutlined } from '@ant-design/icons';
 
-const VerificationModal = ({ 
-  t, 
-  showVerificationModal, 
-  setShowVerificationModal, 
-  resendVerificationEmail, 
+const VerificationModal = ({
+  t,
+  showVerificationModal,
+  setShowVerificationModal,
+  resendVerificationEmail,
   verificationCode,
   setVerificationCode,
   handleConfirmCode,
-  loading 
+  loading,
 }) => (
   <Modal
     open={showVerificationModal}
@@ -25,12 +25,10 @@ const VerificationModal = ({
       <h3 className="text-lg font-medium text-gray-900 mb-2">
         {t('email_not_verified')}
       </h3>
-      <p className="text-sm text-gray-500 mb-4">
-        {t('please_verify_email')}
-      </p>
+      <p className="text-sm text-gray-500 mb-4">{t('please_verify_email')}</p>
       <Input
         value={verificationCode}
-        onChange={(e) => setVerificationCode(e.target.value)}
+        onChange={e => setVerificationCode(e.target.value)}
         placeholder={t('verification_code')}
         className="mb-4"
       />

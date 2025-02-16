@@ -6,7 +6,7 @@ const LanguageRedirect = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { i18n } = useTranslation();
-  
+
   useEffect(() => {
     // Ignorer le chemin de callback
     if (location.pathname === '/auth/callback') {
@@ -15,12 +15,12 @@ const LanguageRedirect = () => {
 
     const allowedLanguages = ['fr', 'en'];
     const pathSegments = location.pathname.split('/').filter(Boolean);
-    
+
     // Si le premier segment est une langue valide
     if (allowedLanguages.includes(pathSegments[0])) {
       // Mettre à jour la langue dans i18n
       i18n.changeLanguage(pathSegments[0]);
-      
+
       // Vérifier si c'est la langue stockée
       const storedLang = localStorage.getItem('preferredLanguage');
       if (storedLang && storedLang !== pathSegments[0]) {
@@ -35,11 +35,12 @@ const LanguageRedirect = () => {
     // Si pas de langue dans l'URL
     const storedLang = localStorage.getItem('preferredLanguage');
     const userLang = navigator.language.split('-')[0];
-    const defaultLang = storedLang || (allowedLanguages.includes(userLang) ? userLang : 'fr');
-    
+    const defaultLang =
+      storedLang || (allowedLanguages.includes(userLang) ? userLang : 'fr');
+
     // Mettre à jour la langue dans i18n
     i18n.changeLanguage(defaultLang);
-    
+
     if (storedLang) {
       localStorage.removeItem('preferredLanguage');
     }
@@ -52,4 +53,4 @@ const LanguageRedirect = () => {
   return null;
 };
 
-export default LanguageRedirect; 
+export default LanguageRedirect;

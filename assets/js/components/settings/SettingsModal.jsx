@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Menu } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { TeamOutlined, UserOutlined, SettingOutlined } from '@ant-design/icons';
+import { TeamOutlined, SettingOutlined } from '@ant-design/icons';
 import GroupSettings from './sections/GroupSettings';
 
 const SettingsModal = ({ visible, onClose, user, i18n }) => {
@@ -48,12 +48,10 @@ const SettingsModal = ({ visible, onClose, user, i18n }) => {
           items={menuItems}
           onClick={({ key }) => setCurrentSection(key)}
         />
-        <div className="flex-1 p-6 overflow-y-auto">
-          {renderContent()}
-        </div>
+        <div className="flex-1 p-6 overflow-y-auto">{renderContent()}</div>
       </div>
     </Modal>
   );
 };
 
-export default SettingsModal; 
+export default SettingsModal;

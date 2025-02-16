@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 import { getCompanyDetailsById } from '@/services/company/companyService';
 import { Card, Tabs } from 'antd';
 import AllMetrics from '@/components/companyDetails/metrics/AllMetrics';
@@ -43,27 +43,27 @@ const CompanyDetails = ({ i18n }) => {
         <Tabs
           items={[
             {
-              key: "1",
+              key: '1',
               label: metrics('all_metrics'),
               children: <AllMetrics />,
             },
             {
-              key: "2",
+              key: '2',
               label: metrics('global_metrics'),
               children: <GlobalMetrics />,
             },
             {
-              key: "3",
+              key: '3',
               label: metrics('documents'),
               children: <AllMetrics />,
             },
             {
-              key: "4",
+              key: '4',
               label: metrics('investment_details'),
               children: <InvestmentDetails />,
             },
             {
-              key: "5",
+              key: '5',
               label: metrics('info'),
               children: <AllMetrics />,
             },
@@ -74,4 +74,4 @@ const CompanyDetails = ({ i18n }) => {
   );
 };
 
-export default CompanyDetails; 
+export default CompanyDetails;
