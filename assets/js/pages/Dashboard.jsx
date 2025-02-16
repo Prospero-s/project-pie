@@ -1,12 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 import { useUser } from '@/context/userContext';
-import { useTranslation } from "react-i18next";
-import { useParams, useNavigate } from "react-router-dom";
-import InvestmentGlobalChart from "@/components/dashboard/InvestmentGlobalChart";
-import InvestmentGlobalFundingChart from "@/components/dashboard/InvestmentGlobalFundingChart";
-import InvestmentGlobalSectorChart from "@/components/dashboard/InvestmentGlobalSectorChart";
-import TableInvestments from "@/components/investments/TableInvestments";
-
+import { useTranslation } from 'react-i18next';
+import { useParams, useNavigate } from 'react-router-dom';
+import InvestmentGlobalChart from '@/components/dashboard/InvestmentGlobalChart';
+import InvestmentGlobalFundingChart from '@/components/dashboard/InvestmentGlobalFundingChart';
+import InvestmentGlobalSectorChart from '@/components/dashboard/InvestmentGlobalSectorChart';
+import TableInvestments from '@/components/investments/TableInvestments';
 
 const Dashboard = ({ i18n }) => {
   const { t } = useTranslation('dashboard', { i18n });
@@ -17,12 +16,14 @@ const Dashboard = ({ i18n }) => {
   useEffect(() => {
     i18n.changeLanguage(lng);
   }, [lng, i18n]);
-  
+
   return (
     <>
-      <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">{t('message_start')}, {user.user_metadata.full_name ?? user.email}</h2>
+      <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        {t('message_start')}, {user.user_metadata.full_name ?? user.email}
+      </h2>
       <p className="mt-4 mb-8 text-gray-500">{t('message_description')}</p>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white rounded-lg shadow-sm">
           <InvestmentGlobalChart />
@@ -36,13 +37,13 @@ const Dashboard = ({ i18n }) => {
       </div>
 
       <div className="bg-white rounded-lg shadow-sm">
-        <TableInvestments 
-          i18n={i18n} 
-          onAddClick={() => navigate(`/${lng}/investments?modal=add`)} 
+        <TableInvestments
+          i18n={i18n}
+          onAddClick={() => navigate(`/${lng}/investments?modal=add`)}
         />
       </div>
     </>
   );
-}
+};
 
 export default Dashboard;

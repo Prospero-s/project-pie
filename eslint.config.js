@@ -1,30 +1,41 @@
-import js from "@eslint/js";
+import globals from 'globals';
+import pluginJs from '@eslint/js';
+import pluginReact from 'eslint-plugin-react';
+import pluginPrettier from 'eslint-plugin-prettier';
+import babelParser from '@babel/eslint-parser';
 
+/** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
   {
-    linterOptions: {
-      reportUnusedDisableDirectives: true,
-    },
+    files: ['**/*.{js,mjs,cjs,jsx,ts,tsx}'],
     languageOptions: {
-      ecmaVersion: "latest",
-      sourceType: "module",
-      globals: {
-        window: true,
-        document: true,
-        console: true,
-        module: true,
-        require: true,
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: globals.browser,
+      parser: babelParser,
+      parserOptions: {
+        requireConfigFile: false,
+        babelOptions: {
+          presets: ['@babel/preset-react'],
+        },
       },
     },
-    files: ["assets/js/**/*.{js,jsx,ts,tsx}"],
+    plugins: {
+      react: pluginReact,
+      prettier: pluginPrettier,
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
     rules: {
-      // Basic rules
-      "semi": ["error", "always"],
-      "quotes": ["error", "single"],
-      "no-unused-vars": "warn",
-      "no-console": "warn",
-      
-      // Add more rules as needed
+      ...pluginJs.configs.recommended.rules,
+      ...pluginReact.configs.recommended.rules,
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off', // Disabled, if need, install typescript
+      'prettier/prettier': 'error',
+      'no-console': ['error', { allow: ['warn', 'error'] }],
     },
   },
-]; 
+];

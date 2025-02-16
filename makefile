@@ -107,10 +107,10 @@ logs-php:
 	$(DOCKER_COMPOSE) exec $(PHP_CONTAINER) tail -f var/log/dev.log
 
 # Commandes de qualité de code
-.PHONY: lint-eslint
-lint-eslint: ## Lance ESLint
-	$(DOCKER_COMPOSE) exec $(PHP_CONTAINER) npx eslint "assets/js/**/*.{js,jsx,ts,tsx}"
+.PHONY: lint
+lint: ## Lance ESLint
+	$(DOCKER_COMPOSE) exec $(PHP_CONTAINER) npm run lint
 
-.PHONY: lint-eslint-fix
-lint-eslint-fix: ## Corrige automatiquement les erreurs ESLint
-	$(DOCKER_COMPOSE) exec $(PHP_CONTAINER) npx eslint "assets/js/**/*.{js,jsx,ts,tsx}" --fix
+.PHONY: lint-fix
+lint-fix: ## Corrige automatiquement les erreurs ESLint
+	$(DOCKER_COMPOSE) exec $(PHP_CONTAINER)  npm run lint-fix

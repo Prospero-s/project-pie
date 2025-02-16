@@ -1,5 +1,13 @@
 import React from 'react';
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from 'recharts';
+import {
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+} from 'recharts';
 
 const LineChartComponent = ({ data, xDataKey, yDataKey, height = 350 }) => {
   // Calculer la valeur max pour l'axe Y
@@ -7,7 +15,7 @@ const LineChartComponent = ({ data, xDataKey, yDataKey, height = 350 }) => {
   const padding = maxValue * 0.1; // 10% de padding au-dessus de la valeur max
 
   // Formater les grands nombres
-  const formatYAxis = (value) => {
+  const formatYAxis = value => {
     if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M€`;
     if (value >= 1000) return `${(value / 1000).toFixed(0)}k€`;
     return `${value}€`;
@@ -15,7 +23,10 @@ const LineChartComponent = ({ data, xDataKey, yDataKey, height = 350 }) => {
 
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <LineChart data={data} margin={{ top: 10, right: 30, left: 20, bottom: 30 }}>
+      <LineChart
+        data={data}
+        margin={{ top: 10, right: 30, left: 20, bottom: 30 }}
+      >
         <CartesianGrid strokeDasharray="3 3" vertical={false} />
         <XAxis
           dataKey={xDataKey}
@@ -37,8 +48,8 @@ const LineChartComponent = ({ data, xDataKey, yDataKey, height = 350 }) => {
           allowDataOverflow={false}
         />
         <Tooltip
-          formatter={(value) => [`${value.toLocaleString()}€`, "Montant"]}
-          labelStyle={{ color: "#888888" }}
+          formatter={value => [`${value.toLocaleString()}€`, 'Montant']}
+          labelStyle={{ color: '#888888' }}
         />
         <Line
           type="monotone"

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   BarChart as RechartsBarChart,
   Bar,
@@ -6,52 +6,59 @@ import {
   YAxis,
   CartesianGrid,
   ResponsiveContainer,
-  Tooltip
-} from "recharts";
+  Tooltip,
+} from 'recharts';
 
 const BarChartComponent = ({
   data,
   dataKey,
   nameKey,
-  height = 300,
-  barColor = "#297CF7",
+  height,
+  barColor = '#297CF7',
   margin = { top: 20, right: 20, left: 50, bottom: 70 },
-  tooltipFormatter = (value) => `${value.toLocaleString()}€`,
-  tooltipLabelFormatter = (label) => `${label}`,
-  barName = "Valeur",
+  tooltipFormatter = value => `${value.toLocaleString()}€`,
+  tooltipLabelFormatter = label => `${label}`,
+  barName = 'Valeur',
   labelProps = {},
-  yAxisProps = {}
+  yAxisProps = {},
 }) => {
   const defaultLabelProps = {
-    position: "bottom",
+    position: 'bottom',
     angle: -45,
-    textAnchor: "end",
+    textAnchor: 'end',
     fontSize: 12,
-    fill: "#6B7280",
+    fill: '#6B7280',
     dy: 10,
-    ...labelProps
+    ...labelProps,
   };
 
   const defaultYAxisProps = {
-    tickFormatter: (value) => `${value.toLocaleString()}€`,
+    tickFormatter: value => `${value.toLocaleString()}€`,
     fontSize: 12,
-    fill: "#6B7280",
+    fill: '#6B7280',
     width: 80,
-    ...yAxisProps
+    ...yAxisProps,
   };
 
   return (
     <div className="w-full h-full">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height={height}>
         <RechartsBarChart
           data={data}
           margin={{ ...margin, bottom: Math.max(margin.bottom, 40) }}
           barSize={40}
         >
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+          <CartesianGrid
+            strokeDasharray="3 3"
+            vertical={false}
+            stroke="#E5E7EB"
+          />
           <XAxis
             dataKey={nameKey}
-            tick={{ ...defaultLabelProps, fontSize: 'clamp(10px, 1.2vw, 12px)' }}
+            tick={{
+              ...defaultLabelProps,
+              fontSize: 'clamp(10px, 1.2vw, 12px)',
+            }}
             height={1}
             width={0}
             interval={0}
@@ -69,12 +76,12 @@ const BarChartComponent = ({
           <Tooltip
             formatter={tooltipFormatter}
             labelFormatter={tooltipLabelFormatter}
-            contentStyle={{ 
-              fontSize: "12px",
-              backgroundColor: "rgba(255, 255, 255, 0.95)",
-              border: "1px solid #E5E7EB",
-              borderRadius: "6px",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+            contentStyle={{
+              fontSize: '12px',
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              border: '1px solid #E5E7EB',
+              borderRadius: '6px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
             }}
             cursor={{ fill: 'rgba(41, 124, 247, 0.1)' }}
           />
@@ -91,4 +98,4 @@ const BarChartComponent = ({
   );
 };
 
-export default BarChartComponent; 
+export default BarChartComponent;

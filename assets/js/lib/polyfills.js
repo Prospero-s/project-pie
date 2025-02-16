@@ -9,4 +9,4 @@ if (typeof process === 'undefined') {
 import { Buffer as BufferPolyfill } from 'buffer';
 if (typeof Buffer === 'undefined') {
   window.Buffer = BufferPolyfill;
-} 
+}

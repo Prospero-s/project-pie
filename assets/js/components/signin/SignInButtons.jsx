@@ -2,7 +2,12 @@ import React from 'react';
 import { Button } from 'antd';
 import { GoogleOutlined, WindowsOutlined } from '@ant-design/icons';
 
-const SignInButtons = ({ t, signInWithGoogle, signInWithMicrosoft, loading }) => (
+const SignInButtons = ({
+  t,
+  signInWithGoogle,
+  signInWithMicrosoft,
+  loading,
+}) => (
   <div className="space-y-2">
     <Button
       onClick={signInWithGoogle}

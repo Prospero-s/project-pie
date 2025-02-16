@@ -22,18 +22,17 @@ const AddCompanyModal = ({ visible, onCancel, onAdd, t }) => {
     onCancel();
   };
 
-  const handleFinish = async (fundingData) => {
+  const handleFinish = async fundingData => {
     try {
       const completeData = {
         ...companyData,
         fundingType: fundingData.fundingType,
         amountRaised: fundingData.amountRaised,
         currency: fundingData.currency || 'EUR',
-        investorId: fundingData.investorId
+        investorId: fundingData.investorId,
       };
 
-      console.log('completeData', completeData);
-      const savedCompany = await saveCompany(completeData);
+      await saveCompany(completeData);
       onAdd({ ...companyData, ...fundingData });
       handleCancel();
     } catch (error) {
@@ -44,40 +43,45 @@ const AddCompanyModal = ({ visible, onCancel, onAdd, t }) => {
   const steps = [
     {
       title: t('creation.title'),
-      content: <SelectCreationType 
-        onSelect={setCreationType} 
-        onNext={() => setCurrentStep(1)}
-        t={t}
-      />
+      content: (
+        <SelectCreationType
+          onSelect={setCreationType}
+          onNext={() => setCurrentStep(1)}
+          t={t}
+        />
+      ),
     },
     {
       title: t('company_details.title'),
-      content: creationType === 'automatic' ? (
-        <AutomaticCompanyForm
-          onNext={(data) => {
-            setCompanyData(data);
-            setCurrentStep(2);
-          }}
-          t={t}
-        />
-      ) : (
-        <ManualCompanyForm
-          onNext={(data) => {
-            setCompanyData(data);
-            setCurrentStep(2);
-          }}
-          t={t}
-        />
-      )
+      content:
+        creationType === 'automatic' ? (
+          <AutomaticCompanyForm
+            onNext={data => {
+              setCompanyData(data);
+              setCurrentStep(2);
+            }}
+            t={t}
+          />
+        ) : (
+          <ManualCompanyForm
+            onNext={data => {
+              setCompanyData(data);
+              setCurrentStep(2);
+            }}
+            t={t}
+          />
+        ),
     },
     {
       title: t('funding.title'),
-      content: <FundingDetailsForm
-        companyData={companyData}
-        onFinish={handleFinish}
-        t={t}
-      />
-    }
+      content: (
+        <FundingDetailsForm
+          companyData={companyData}
+          onFinish={handleFinish}
+          t={t}
+        />
+      ),
+    },
   ];
 
   return (
@@ -95,12 +99,10 @@ const AddCompanyModal = ({ visible, onCancel, onAdd, t }) => {
     >
       <div className="flex flex-col mt-8">
         <Steps current={currentStep} items={steps} className="mb-8" />
-        <div className="flex-grow">
-          {steps[currentStep].content}
-        </div>
+        <div className="flex-grow">{steps[currentStep].content}</div>
       </div>
     </Modal>
   );
 };
 
-export default AddCompanyModal; 
+export default AddCompanyModal;

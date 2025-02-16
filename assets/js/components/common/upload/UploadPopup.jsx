@@ -17,9 +17,9 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
   const { setAnalyzedData } = useUser();
   const navigate = useNavigate();
 
-  const handleFileChange = ({ file, fileList }) => {
+  const handleFileChange = ({ file }) => {
     if (file.size > 5 * 1024 * 1024) {
-      message.error("La taille du fichier dépasse la limite de 5MB.");
+      message.error('La taille du fichier dépasse la limite de 5MB.');
       return;
     }
 
@@ -39,7 +39,7 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
   const handleUpload = async () => {
     if (fileList.length === 0) {
       setError("Veuillez sélectionner un fichier avant de l'envoyer.");
-      message.error("Aucun fichier sélectionné.");
+      message.error('Aucun fichier sélectionné.');
       return;
     }
 
@@ -52,7 +52,7 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
       setLoading(true);
       setError(null);
       const cognitoId = await Auth.currentSession()
-        .then((session) => session.getIdToken().getJwtToken())
+        .then(session => session.getIdToken().getJwtToken())
         .catch(() => null);
 
       if (!cognitoId) {
@@ -60,28 +60,29 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
       }
 
       const response = await axios.post('/api/textract/analyze', formData, {
-        headers: { 
+        headers: {
           'Content-Type': 'multipart/form-data',
-          'X-Cognito-Id': cognitoId
+          'X-Cognito-Id': cognitoId,
         },
       });
 
       if (response.data) {
         message.success('Analyse réussie !');
-        console.log("Données reçues du serveur :", response.data);
         setAnalyzedData({ ...response.data, company });
         navigate(`/${lng}/textract-results`);
         setFileList([]);
         onClose();
       } else {
-        setError("Analyse échouée. Aucune donnée reçue du serveur.");
-        message.error("Aucune donnée reçue du serveur.");
+        setError('Analyse échouée. Aucune donnée reçue du serveur.');
+        message.error('Aucune donnée reçue du serveur.');
       }
     } catch (error) {
       if (error.response) {
         setError("Erreur lors de l'analyse du fichier. Veuillez réessayer.");
       } else if (error.request) {
-        setError("La requête a été envoyée, mais aucune réponse n'a été reçue.");
+        setError(
+          "La requête a été envoyée, mais aucune réponse n'a été reçue.",
+        );
       } else {
         setError("Erreur lors de l'analyse du fichier. Veuillez réessayer.");
       }
@@ -93,7 +94,7 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
 
   return (
     <Modal
-      title={t("modal.upload_title")}
+      title={t('modal.upload_title')}
       open={visible}
       onCancel={onClose}
       footer={null}
@@ -106,7 +107,7 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
       >
         {fileList.length === 0 && (
           <Button icon={<UploadOutlined />} block>
-            {t("modal.select_file")}
+            {t('modal.select_file')}
           </Button>
         )}
       </Upload>
@@ -141,7 +142,7 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
           style={{ marginTop: 20 }}
           disabled={loading}
         >
-          {loading ? <Spin /> : t("modal.validate")}
+          {loading ? <Spin /> : t('modal.validate')}
         </Button>
       )}
 

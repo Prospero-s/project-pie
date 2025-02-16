@@ -58,49 +58,57 @@ const AllMetrics = () => {
       title: 'Métrique',
       dataIndex: 'metric',
       key: 'metric',
-      render: (text) => (loading ? <Skeleton.Input block active size="small" /> : text),
+      render: text =>
+        loading ? <Skeleton.Input block active size="small" /> : text,
     },
     {
       title: '(A) T4 FY2022',
       dataIndex: 'Q4_FY2022',
       key: 'Q4_FY2022',
-      render: (text) => (loading ? <Skeleton.Input block active size="small" /> : text),
+      render: text =>
+        loading ? <Skeleton.Input block active size="small" /> : text,
     },
     {
       title: '(A) T1 FY2023',
       dataIndex: 'Q1_FY2023',
       key: 'Q1_FY2023',
-      render: (text) => (loading ? <Skeleton.Input block active size="small" /> : text),
+      render: text =>
+        loading ? <Skeleton.Input block active size="small" /> : text,
     },
     {
       title: '(A) T2 FY2023',
       dataIndex: 'Q2_FY2023',
       key: 'Q2_FY2023',
-      render: (text) => (loading ? <Skeleton.Input block active size="small" /> : text),
+      render: text =>
+        loading ? <Skeleton.Input block active size="small" /> : text,
     },
     {
       title: '(A) T3 FY2023',
       dataIndex: 'Q3_FY2023',
       key: 'Q3_FY2023',
-      render: (text) => (loading ? <Skeleton.Input block active size="small" /> : text),
+      render: text =>
+        loading ? <Skeleton.Input block active size="small" /> : text,
     },
     {
       title: '(A) T4 FY2023',
       dataIndex: 'Q4_FY2023',
       key: 'Q4_FY2023',
-      render: (text) => (loading ? <Skeleton.Input block active size="small" /> : text),
+      render: text =>
+        loading ? <Skeleton.Input block active size="small" /> : text,
     },
     {
       title: '(A) T1 FY2024',
       dataIndex: 'Q1_FY2024',
       key: 'Q1_FY2024',
-      render: (text) => (loading ? <Skeleton.Input block active size="small" /> : text),
+      render: text =>
+        loading ? <Skeleton.Input block active size="small" /> : text,
     },
     {
       title: '(A) T2 FY2024',
       dataIndex: 'Q2_FY2024',
       key: 'Q2_FY2024',
-      render: (text) => (loading ? <Skeleton.Input block active size="small" /> : text),
+      render: text =>
+        loading ? <Skeleton.Input block active size="small" /> : text,
     },
   ];
 

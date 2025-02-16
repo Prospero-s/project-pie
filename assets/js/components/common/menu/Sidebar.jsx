@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { DashboardOutlined, FolderOutlined, FileSearchOutlined, MenuFoldOutlined, MenuUnfoldOutlined, FolderOpenOutlined } from '@ant-design/icons';
+import {
+  DashboardOutlined,
+  FolderOutlined,
+  FileSearchOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  FolderOpenOutlined,
+} from '@ant-design/icons';
 import { Layout, Menu, Divider } from 'antd';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -55,14 +62,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, i18n }) => {
       width={240}
       collapsible={!isMobile}
       collapsed={isMobile || !sidebarOpen}
-      onCollapse={(collapsed) => setSidebarOpen(!collapsed)}
+      onCollapse={collapsed => setSidebarOpen(!collapsed)}
       trigger={null}
     >
       <div className="flex items-center justify-between h-16 px-4">
-        <img 
-          src={sidebarOpen ? logoProspero : logoIconProspero} 
-          alt="Logo" 
-          className="h-6 w-auto transition-all duration-300" 
+        <img
+          src={sidebarOpen ? logoProspero : logoIconProspero}
+          alt="Logo"
+          className="h-6 w-auto transition-all duration-300"
         />
         <button
           className="p-2 ml-2 bg-gray_200 text-black rounded-md hover:bg-blue-500 hover:text-white transition-all duration-300"

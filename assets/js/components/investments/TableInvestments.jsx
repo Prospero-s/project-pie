@@ -7,9 +7,14 @@ import { fetchInvestments } from '@/services/investment/investmentService';
 import AddCompanyModal from '@/components/investments/AddCompanyModal';
 import EmptyInvestmentState from '@/components/investments/table/EmptyInvestmentState';
 import NoResultsState from '@/components/investments/table/NoResultsState';
-import UploadPopup from "@/components/common/upload/UploadPopup"; 
+import UploadPopup from '@/components/common/upload/UploadPopup';
 
-const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen, onAddClick }) => {
+const TableInvestments = ({
+  i18n,
+  isModalOpen,
+  setIsModalOpen,
+  onAddClick,
+}) => {
   const { t } = useTranslation('investments', { i18n });
   const lng = i18n.language;
   const [loading, setLoading] = useState(true);
@@ -17,19 +22,19 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen, onAddClick }) => 
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
-    total: 0
+    total: 0,
   });
   const [sortedInfo, setSortedInfo] = useState({});
   const [activeFilters, setActiveFilters] = useState({
     sector: [],
-    fundingType: []
+    fundingType: [],
   });
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [isPopupVisible, setPopupVisible] = useState(false);
-  const handleOpenPopup = (company) => {
+  const handleOpenPopup = company => {
     setSelectedCompany(company);
     setPopupVisible(true);
-  };  
+  };
   const handleClosePopup = () => setPopupVisible(false);
 
   useEffect(() => {
@@ -37,7 +42,7 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen, onAddClick }) => 
       page: 1,
       limit: 10,
       sortField: 'updatedAt',
-      sortOrder: 'desc'
+      sortOrder: 'desc',
     });
   }, []);
 
@@ -45,7 +50,7 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen, onAddClick }) => 
     try {
       setLoading(true);
       const response = await fetchInvestments(params);
-      
+
       if (!response.data || !Array.isArray(response.data)) {
         console.error('Format de données invalide:', response);
         message.error(t('common.error_invalid_data'));
@@ -56,13 +61,15 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen, onAddClick }) => 
       setPagination({
         current: response.page,
         pageSize: response.limit,
-        total: response.total
+        total: response.total,
       });
-      
+
       if (params.sortField) {
         setSortedInfo({
-          columnKey: params.sortField.includes('.') ? params.sortField.split('.')[1] : params.sortField,
-          order: params.sortOrder === 'asc' ? 'ascend' : 'descend'
+          columnKey: params.sortField.includes('.')
+            ? params.sortField.split('.')[1]
+            : params.sortField,
+          order: params.sortOrder === 'asc' ? 'ascend' : 'descend',
         });
       }
     } catch (error) {
@@ -87,22 +94,28 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen, onAddClick }) => 
     }
 
     if (sorter.field) {
-      if (Array.isArray(sorter.field) && sorter.field[0] === 'investment' && sorter.field[1] === 'totalAmount') {
+      if (
+        Array.isArray(sorter.field) &&
+        sorter.field[0] === 'investment' &&
+        sorter.field[1] === 'totalAmount'
+      ) {
         params.sortField = 'amount';
       } else {
-        params.sortField = Array.isArray(sorter.field) ? sorter.field.join('.') : sorter.field;
+        params.sortField = Array.isArray(sorter.field)
+          ? sorter.field.join('.')
+          : sorter.field;
       }
       params.sortOrder = sorter.order === 'ascend' ? 'asc' : 'desc';
     }
 
     setActiveFilters({
       sector: filters.sector || [],
-      fundingType: filters.fundingType || []
+      fundingType: filters.fundingType || [],
     });
 
     setSortedInfo({
       columnKey: Array.isArray(sorter.field) ? sorter.field[1] : sorter.field,
-      order: sorter.order
+      order: sorter.order,
     });
 
     loadInvestments(params);
@@ -111,27 +124,27 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen, onAddClick }) => 
   const handleReset = () => {
     setActiveFilters({
       sector: [],
-      fundingType: []
+      fundingType: [],
     });
     setSortedInfo({
       columnKey: null,
-      order: null
+      order: null,
     });
     setPagination({
       ...pagination,
-      current: 1
+      current: 1,
     });
-    
+
     // Recharger les données avec les paramètres par défaut
     loadInvestments({
       page: 1,
       limit: pagination.pageSize,
       sortField: 'updatedAt',
-      sortOrder: 'desc'
+      sortOrder: 'desc',
     });
   };
 
-  const getFundingTypeColor = (type) => {
+  const getFundingTypeColor = type => {
     switch (type) {
       case 'seed':
         return 'green';
@@ -160,20 +173,26 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen, onAddClick }) => 
       dataIndex: 'denomination',
       key: 'denomination',
       sorter: true,
-      sortOrder: sortedInfo.columnKey === 'denomination' ? sortedInfo.order : null,
-      render: (text, record) => (
-        loading ? <Skeleton.Input block active size="small" /> :
-        <Link to={`/${lng}/company/details/${record.id}`}>
-          <div className="flex items-center gap-4">
-            <img
-              src={record?.company?.logo ?? "https://www.adaptivewfs.com/wp-content/uploads/2020/07/logo-placeholder-image.png"}
-              alt={record?.company?.name ?? "company-default-logo"}
-              className="w-10 h-10 rounded-full"
-            />
-            <span>{text || '-'}</span>
-          </div>
-        </Link>
-      )
+      sortOrder:
+        sortedInfo.columnKey === 'denomination' ? sortedInfo.order : null,
+      render: (text, record) =>
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : (
+          <Link to={`/${lng}/company/details/${record.id}`}>
+            <div className="flex items-center gap-4">
+              <img
+                src={
+                  record?.company?.logo ??
+                  'https://www.adaptivewfs.com/wp-content/uploads/2020/07/logo-placeholder-image.png'
+                }
+                alt={record?.company?.name ?? 'company-default-logo'}
+                className="w-10 h-10 rounded-full"
+              />
+              <span>{text || '-'}</span>
+            </div>
+          </Link>
+        ),
     },
     {
       title: t('company_details.company.sector'),
@@ -184,14 +203,22 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen, onAddClick }) => 
         { text: t('company_details.sectors.healthcare'), value: 'healthcare' },
         { text: t('company_details.sectors.finance'), value: 'finance' },
         { text: t('company_details.sectors.retail'), value: 'retail' },
-        { text: t('company_details.sectors.manufacturing'), value: 'manufacturing' },
+        {
+          text: t('company_details.sectors.manufacturing'),
+          value: 'manufacturing',
+        },
         { text: t('company_details.sectors.energy'), value: 'energy' },
         { text: t('company_details.sectors.education'), value: 'education' },
       ],
       filteredValue: activeFilters.sector,
-      render: (sector) => loading ? 
-        <Skeleton.Input block active size="small" /> :
-        (sector ? t(`company_details.sectors.${sector}`) : '-')
+      render: sector =>
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : sector ? (
+          t(`company_details.sectors.${sector}`)
+        ) : (
+          '-'
+        ),
     },
     {
       title: t('funding.amount'),
@@ -199,9 +226,14 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen, onAddClick }) => 
       key: 'amount',
       sorter: true,
       sortOrder: sortedInfo.columnKey === 'amount' ? sortedInfo.order : null,
-      render: (_, record) => loading ? 
-        <Skeleton.Input block active size="small" /> :
-        (record.investment?.totalAmount ? `${Number(record.investment.totalAmount).toLocaleString()} €` : '-')
+      render: (_, record) =>
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : record.investment?.totalAmount ? (
+          `${Number(record.investment.totalAmount).toLocaleString()} €`
+        ) : (
+          '-'
+        ),
     },
     {
       title: t('funding.type'),
@@ -216,17 +248,18 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen, onAddClick }) => 
         { text: t('funding.types.ipo'), value: 'ipo' },
       ],
       filteredValue: activeFilters.fundingType,
-      render: (_, record) => loading ? (
-        <Skeleton.Input block active size="small" />
-      ) : (
-        <div className="flex flex-wrap gap-1">
-          {record.investment?.fundingTypes?.map((type, index) => (
-            <Tag key={index} color={getFundingTypeColor(type)}>
-              {t(`funding.types.${type}`)}
-            </Tag>
-          ))}
-        </div>
-      ),
+      render: (_, record) =>
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : (
+          <div className="flex flex-wrap gap-1">
+            {record.investment?.fundingTypes?.map((type, index) => (
+              <Tag key={index} color={getFundingTypeColor(type)}>
+                {t(`funding.types.${type}`)}
+              </Tag>
+            ))}
+          </div>
+        ),
     },
     {
       title: t('company_details.company.details.last_update'),
@@ -234,15 +267,18 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen, onAddClick }) => 
       key: 'updatedAt',
       sorter: true,
       sortOrder: sortedInfo.columnKey === 'updatedAt' ? sortedInfo.order : null,
-      render: (date) => loading ? (
-        <Skeleton.Input block active size="small" />
-      ) : (
-        date ? new Date(date).toLocaleDateString('fr-FR', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        }) : '-'
-      ),
+      render: date =>
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : date ? (
+          new Date(date).toLocaleDateString('fr-FR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })
+        ) : (
+          '-'
+        ),
     },
     {
       title: t('actions.title'),
@@ -260,7 +296,7 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen, onAddClick }) => 
               />
             </Tooltip>
             <Tooltip title="Supprimer">
-              <DeleteOutlined 
+              <DeleteOutlined
                 className="!text-rose-500 hover:!text-rose-700 text-lg cursor-pointer"
                 onClick={() => handleDelete(record.id)}
               />
@@ -270,18 +306,22 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen, onAddClick }) => 
     },
   ];
 
-  const handleDelete = (id) => {
-    console.log('Suppression de la startup avec l\'ID:', id);
+  const handleDelete = id => {
+    console.error("Suppression de la startup avec l'ID:", id);
   };
 
-  const handleAdd = async (newInvestment) => {
+  const handleAdd = async () => {
     setIsModalOpen(false);
     await loadInvestments({
       page: pagination.current,
       limit: pagination.pageSize,
       sortField: sortedInfo.columnKey || 'updatedAt',
-      sortOrder: sortedInfo.order ? (sortedInfo.order === 'ascend' ? 'asc' : 'desc') : 'desc',
-      ...activeFilters
+      sortOrder: sortedInfo.order
+        ? sortedInfo.order === 'ascend'
+          ? 'asc'
+          : 'desc'
+        : 'desc',
+      ...activeFilters,
     });
   };
 
@@ -295,9 +335,9 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen, onAddClick }) => 
 
   return (
     <>
-      <AddCompanyModal 
-        visible={isModalOpen} 
-        onCancel={() => setIsModalOpen(false)} 
+      <AddCompanyModal
+        visible={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
         onAdd={handleAdd}
         t={t}
       />
@@ -311,10 +351,12 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen, onAddClick }) => 
         />
       )}
       <div className="bg-white rounded-lg border border-slate-300 flex flex-col w-full">
-        {investments.length === 0 && !Object.values(activeFilters).some(filter => filter.length > 0) ? (
-          <EmptyInvestmentState 
+        {investments.length === 0 &&
+        !Object.values(activeFilters).some(filter => filter.length > 0) ? (
+          <EmptyInvestmentState
             t={t}
-            onAddClick={onAddClick || (() => setIsModalOpen(true))} />
+            onAddClick={onAddClick || (() => setIsModalOpen(true))}
+          />
         ) : (
           <div className="overflow-x-auto">
             <Table
@@ -324,12 +366,14 @@ const TableInvestments = ({ i18n, isModalOpen, setIsModalOpen, onAddClick }) => 
               pagination={pagination}
               sortDirections={['ascend', 'descend']}
               rowClassName={(record, index) =>
-                index % 2 === 0 ? '!bg-white hover:!bg-blue-50' : '!bg-slate-50 hover:!bg-blue-50'
+                index % 2 === 0
+                  ? '!bg-white hover:!bg-blue-50'
+                  : '!bg-slate-50 hover:!bg-blue-50'
               }
               locale={{
                 filterConfirm: t('common.confirm'),
                 filterReset: t('common.reset'),
-                emptyText: <NoResultsState t={t} onReset={handleReset} />
+                emptyText: <NoResultsState t={t} onReset={handleReset} />,
               }}
             />
           </div>

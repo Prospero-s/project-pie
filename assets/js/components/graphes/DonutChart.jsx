@@ -1,21 +1,28 @@
-import React from "react";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Label, Legend } from "recharts";
+import React from 'react';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  Label,
+} from 'recharts';
 
 const COLORS = [
-  "#297CF7",  // Bleu
-  "#12B76A",  // Vert
-  "#9f1239",  // Rouge
-  "#FF8042",  // Orange
-  "#1d4ed8"   // Violet
+  '#297CF7', // Bleu
+  '#12B76A', // Vert
+  '#9f1239', // Rouge
+  '#FF8042', // Orange
+  '#1d4ed8', // Violet
 ];
 
-const DonutChartComponent = ({ 
-  data, 
-  valueKey, 
-  nameKey, 
-  height = 300,
+const DonutChartComponent = ({
+  data,
+  valueKey,
+  nameKey,
+  height,
   totalValue,
-  totalLabel = "Total investi"
+  totalLabel = 'Total investi',
 }) => {
   // Trier les données par valeur décroissante et prendre les 5 premiers
   const sortedData = [...data]
@@ -23,12 +30,14 @@ const DonutChartComponent = ({
     .slice(0, 5)
     .map(item => ({
       ...item,
-      [nameKey]: item[nameKey].charAt(0).toUpperCase() + item[nameKey].slice(1).toLowerCase()
+      [nameKey]:
+        item[nameKey].charAt(0).toUpperCase() +
+        item[nameKey].slice(1).toLowerCase(),
     }));
 
   return (
     <div className="w-full h-full">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height={height}>
         <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
           <Pie
             data={sortedData}
@@ -60,9 +69,9 @@ const DonutChartComponent = ({
                       textAnchor="middle"
                       style={{ fontSize: 'clamp(12px, 1.2vw, 14px)' }}
                     >
-                      {new Intl.NumberFormat("fr-FR", {
-                        style: "currency",
-                        currency: "EUR",
+                      {new Intl.NumberFormat('fr-FR', {
+                        style: 'currency',
+                        currency: 'EUR',
                         maximumFractionDigits: 0,
                       }).format(totalValue)}
                     </text>
@@ -80,15 +89,17 @@ const DonutChartComponent = ({
             />
           </Pie>
           <Tooltip
-            formatter={(value) => new Intl.NumberFormat('fr-FR', {
-              style: 'currency',
-              currency: 'EUR'
-            }).format(value)}
+            formatter={value =>
+              new Intl.NumberFormat('fr-FR', {
+                style: 'currency',
+                currency: 'EUR',
+              }).format(value)
+            }
             contentStyle={{
               backgroundColor: 'rgba(255, 255, 255, 0.95)',
               border: '1px solid #e5e7eb',
               borderRadius: '6px',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
             }}
           />
         </PieChart>
@@ -97,4 +108,4 @@ const DonutChartComponent = ({
   );
 };
 
-export default DonutChartComponent; 
+export default DonutChartComponent;

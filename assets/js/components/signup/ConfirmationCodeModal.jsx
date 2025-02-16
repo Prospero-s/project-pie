@@ -1,14 +1,14 @@
 import React from 'react';
 import { Modal, Input, Button } from 'antd';
 
-const ConfirmationCodeModal = ({ 
-  t, 
-  visible, 
-  onClose, 
-  onConfirm, 
-  code, 
-  setCode, 
-  loading 
+const ConfirmationCodeModal = ({
+  t,
+  visible,
+  onClose,
+  onConfirm,
+  code,
+  setCode,
+  loading,
 }) => {
   return (
     <Modal
@@ -21,16 +21,12 @@ const ConfirmationCodeModal = ({
         <p>{t('enter_verification_code')}</p>
         <Input
           value={code}
-          onChange={(e) => setCode(e.target.value)}
+          onChange={e => setCode(e.target.value)}
           placeholder={t('verification_code')}
         />
         <div className="flex justify-end space-x-2">
           <Button onClick={onClose}>{t('cancel')}</Button>
-          <Button 
-            type="primary" 
-            onClick={onConfirm}
-            loading={loading}
-          >
+          <Button type="primary" onClick={onConfirm} loading={loading}>
             {t('verify')}
           </Button>
         </div>
@@ -39,4 +35,4 @@ const ConfirmationCodeModal = ({
   );
 };
 
-export default ConfirmationCodeModal; 
+export default ConfirmationCodeModal;

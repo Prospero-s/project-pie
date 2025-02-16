@@ -11,9 +11,7 @@ const NoResultsState = ({ t, onReset }) => {
       <h3 className="text-lg font-medium text-gray-900 mb-2">
         {t('no_results.title')}
       </h3>
-      <p className="text-gray-600 mb-4">
-        {t('no_results.description')}
-      </p>
+      <p className="text-gray-600 mb-4">{t('no_results.description')}</p>
       <Button onClick={onReset} type="primary">
         {t('common.reset_filters')}
       </Button>
@@ -21,4 +19,4 @@ const NoResultsState = ({ t, onReset }) => {
   );
 };
 
-export default NoResultsState; 
+export default NoResultsState;

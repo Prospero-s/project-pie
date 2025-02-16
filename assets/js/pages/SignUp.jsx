@@ -36,7 +36,7 @@ const SignUp = ({ i18n }) => {
     );
   }, []);
 
-  const handleConfirmPasswordChange = (e) => {
+  const handleConfirmPasswordChange = e => {
     const confirmPass = e.target.value;
     setConfirmPassword(confirmPass);
     setPasswordMatch(confirmPass === password);
@@ -52,11 +52,18 @@ const SignUp = ({ i18n }) => {
     );
   };
 
-  const handleSignUp = async (e) => {
+  const handleSignUp = async e => {
     e.preventDefault();
     if (isFormValid()) {
       setLoading(true);
-      const success = await signUpWithEmail(email, password, fullName, t, navigate, lng);
+      const success = await signUpWithEmail(
+        email,
+        password,
+        fullName,
+        t,
+        navigate,
+        lng,
+      );
       if (success) {
         setRegisteredEmail(email);
         setShowConfirmationModal(true);
@@ -75,13 +82,11 @@ const SignUp = ({ i18n }) => {
   return (
     <>
       <div className="w-full" ref={formRef}>
-        <div className='mb-8'>
+        <div className="mb-8">
           <h2 className="text-2xl font-semibold text-gray-900 mb-2">
             {t('title')}
           </h2>
-          <h4 className="text-gray-600 text-md mb-6">
-            {t('subtitle')}
-          </h4>
+          <h4 className="text-gray-600 text-md mb-6">{t('subtitle')}</h4>
         </div>
         <form onSubmit={handleSignUp} className="space-y-4">
           <SignUpForm

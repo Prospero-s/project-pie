@@ -27,49 +27,47 @@ import frDocuments from './locales/fr/documents.json';
 import enMetrics from './locales/en/metrics.json';
 import frMetrics from './locales/fr/metrics.json';
 
-i18n
-  .use(initReactI18next)
-  .init({
-    resources: {
-      fr: {
-        signin: frSignIn,
-        signup: frSignUp,
-        menu: frMenu,
-        investments: frInvestments,
-        allCompanies: frAllCompanies,
-        groups: frGroups,
-        global: frGlobal,
-        dashboard: frDashboard,
-        settings: frSettings,
-        charts: frCharts,
-        documents: frDocuments,
-        metrics: frMetrics
-      },
-      en: {
-        signin: enSignIn,
-        signup: enSignUp,
-        menu: enMenu,
-        investments: enInvestments,
-        allCompanies: enAllCompanies,
-        groups: enGroups,
-        global: enGlobal,
-        dashboard: enDashboard,
-        settings: enSettings,
-        charts: enCharts,
-        documents: enDocuments,
-        metrics: enMetrics
-      },
+i18n.use(initReactI18next).init({
+  resources: {
+    fr: {
+      signin: frSignIn,
+      signup: frSignUp,
+      menu: frMenu,
+      investments: frInvestments,
+      allCompanies: frAllCompanies,
+      groups: frGroups,
+      global: frGlobal,
+      dashboard: frDashboard,
+      settings: frSettings,
+      charts: frCharts,
+      documents: frDocuments,
+      metrics: frMetrics,
     },
-    lng: 'fr',
-    fallbackLng: 'en',
-    interpolation: {
-      escapeValue: false,
+    en: {
+      signin: enSignIn,
+      signup: enSignUp,
+      menu: enMenu,
+      investments: enInvestments,
+      allCompanies: enAllCompanies,
+      groups: enGroups,
+      global: enGlobal,
+      dashboard: enDashboard,
+      settings: enSettings,
+      charts: enCharts,
+      documents: enDocuments,
+      metrics: enMetrics,
     },
-    react: {
-      useSuspense: false,
-      bindI18n: 'languageChanged loaded',
-    },
-    initImmediate: true
-  });
+  },
+  lng: 'fr',
+  fallbackLng: 'en',
+  interpolation: {
+    escapeValue: false,
+  },
+  react: {
+    useSuspense: false,
+    bindI18n: 'languageChanged loaded',
+  },
+  initImmediate: true,
+});
 
 export default i18n;
