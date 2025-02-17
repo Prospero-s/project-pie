@@ -2,7 +2,7 @@
 #!/usr/bin/env bash
 
 # Regex pour les noms de branches
-branch_regex='^(feat|fix|docs|style|refactor|test|chore)/[A-Z]+-[0-9]+(-[a-z0-9]+)+$'
+branch_regex='^(feat|fix|docs|style|refactor|test|chore)/PROS-[0-9]+(-[a-z0-9]+)+$'
 
 z40=0000000000000000000000000000000000000000
 
@@ -24,9 +24,9 @@ while read local_ref local_sha remote_ref remote_sha; do
         if ! echo "$branch_name" | grep -Eq "$branch_regex"; then
             echo "--------------------------------"
             echo "❌ Le format du nom de la branche '$branch_name' est invalide."
-            echo "Format attendu: <type>/<ticket-id>-<description>"
+            echo "Format attendu: <type>/PROS-<ticket-id>-<description>"
             echo "Types autorisés: feat, fix, docs, style, refactor, test, chore"
-            echo "👀 Exemple: feat/PRSP-123-ajout-de-la-fonctionnalite-de-login"
+            echo "👀 Exemple: feat/PROS-123-ajout-de-la-fonctionnalite-de-login"
             echo "--------------------------------"
             exit 1
         fi
