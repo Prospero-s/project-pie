@@ -14,7 +14,9 @@ const TextractResults = ({ i18n }) => {
   const { t } = useTranslation('documents', { i18n });
   const company = analyzedData?.company || null;
   const [editedText, setEditedText] = useState(
-    analyzedData?.text ? analyzedData.text.join('\n') : '',
+    analyzedData?.text?.content && Array.isArray(analyzedData.text.content) 
+      ? analyzedData.text.content.join("\n") 
+      : ""
   );
 
   const handleTextChange = e => {

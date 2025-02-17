@@ -17,21 +17,30 @@ class SocieteCompanyScraper implements CompanyScraperInterface
         $this->logger = $logger;
     }
 
+    /**
+     * @param string $source
+     * @return bool
+     */
     public function supports(string $source): bool
     {
         return $source === 'societe';
     }
 
+    /**
+     * @param string $siren
+     * @param bool $forceScraping
+     * @return array<string, mixed>
+     */
     public function scrape(string $siren, bool $forceScraping = false): array
     {
         $this->logger->info('Début du scraping Societe.com', ['siren' => $siren]);
-        
+
         try {
             $response = $this->client->request('GET', "https://www.societe.com/societe/{$siren}.html");
             $html = $response->getContent();
-            
+
             $crawler = new Crawler($html);
-            
+
             $data = [
                 'siren' => $siren,
                 'denomination' => $this->extractDenomination($crawler),
@@ -43,7 +52,6 @@ class SocieteCompanyScraper implements CompanyScraperInterface
 
             $this->logger->info('Données Societe.com extraites avec succès', ['data' => $data]);
             return $data;
-
         } catch (\Exception $e) {
             $this->logger->error('Erreur lors du scraping Societe.com', [
                 'siren' => $siren,
@@ -53,6 +61,10 @@ class SocieteCompanyScraper implements CompanyScraperInterface
         }
     }
 
+    /**
+     * @param Crawler $crawler
+     * @return string
+     */
     private function extractDenomination(Crawler $crawler): string
     {
         try {
@@ -63,6 +75,10 @@ class SocieteCompanyScraper implements CompanyScraperInterface
         }
     }
 
+    /**
+     * @param Crawler $crawler
+     * @return string
+     */
     private function extractBusinessStructures(Crawler $crawler): string
     {
         try {
@@ -73,11 +89,14 @@ class SocieteCompanyScraper implements CompanyScraperInterface
         }
     }
 
+    /**
+     * @return array<string, string>
+     */
     private function extractAdresse(Crawler $crawler): array
     {
         try {
             $adresseText = $crawler->filter('.company-address')->text();
-            
+
             // Extraction du code postal et de la ville
             preg_match('/(\d{5})\s+(.+)$/', $adresseText, $cpvilleMatches);
 
@@ -95,6 +114,10 @@ class SocieteCompanyScraper implements CompanyScraperInterface
         }
     }
 
+    /**
+     * @param Crawler $crawler
+     * @return string
+     */
     private function extractSiret(Crawler $crawler): string
     {
         try {
@@ -105,6 +128,9 @@ class SocieteCompanyScraper implements CompanyScraperInterface
         }
     }
 
+    /**
+     * @return array{montant: string, devise: string}
+     */
     private function extractCapital(Crawler $crawler): array
     {
         try {
@@ -121,8 +147,11 @@ class SocieteCompanyScraper implements CompanyScraperInterface
         }
     }
 
+    /**
+     * @return int
+     */
     public function getPriority(): int
     {
         return 25;
     }
-} 
+}

@@ -17,7 +17,8 @@ class CompanyController extends AbstractController
         private readonly CompanyServiceInterface $companyService,
         private readonly CompanyRepository $companyRepository,
         private readonly LoggerInterface $logger
-    ) {}
+    ) {
+    }
 
     #[Route('/company/{siren}', name: 'get_company', methods: ['GET'])]
     public function getCompanyDetails(string $siren, Request $request): JsonResponse
@@ -31,11 +32,10 @@ class CompanyController extends AbstractController
         try {
             $mode = $request->query->get('mode');
             $forceScraping = $mode === 'scraping';
-            
-            $companyData = $this->companyService->getCompanyData($siren, $forceScraping);
-            
-            return new JsonResponse($companyData);
 
+            $companyData = $this->companyService->getCompanyData($siren, $forceScraping);
+
+            return new JsonResponse($companyData);
         } catch (\Exception $e) {
             $this->logger->error('Erreur critique dans getCompanyDetails', [
                 'error' => $e->getMessage(),
@@ -57,7 +57,7 @@ class CompanyController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true);
             $this->logger->info('Données reçues:', ['data' => $data]);
-            
+
             if (!$data) {
                 throw new \Exception('Données JSON invalides');
             }
@@ -70,9 +70,8 @@ class CompanyController extends AbstractController
             }
 
             $result = $this->companyRepository->saveCompany($cognitoId, $email, $data);
-            
-            return new JsonResponse($result);
 
+            return new JsonResponse($result);
         } catch (\Exception $e) {
             $this->logger->error('Erreur critique dans saveCompany', [
                 'error' => $e->getMessage(),

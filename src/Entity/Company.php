@@ -37,7 +37,7 @@ class Company
 
     #[ORM\Column(type: 'datetime_immutable')]
     private \DateTimeImmutable $createdAt;
-    
+
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $deletedAt = null;
 
@@ -62,8 +62,8 @@ class Company
         return $this->id;
     }
 
-    public function getSiren(): string  
-    {   
+    public function getSiren(): string
+    {
         return $this->siren;
     }
 
@@ -219,4 +219,4 @@ class Company
         $this->sector = $sector;
         return $this;
     }
-} 
+}

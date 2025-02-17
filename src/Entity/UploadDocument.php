@@ -66,4 +66,4 @@ class UploadDocument
         $this->uploadedAt = $uploadedAt;
         return $this;
     }
-} 
+}

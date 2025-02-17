@@ -114,3 +114,15 @@ lint: ## Lance ESLint
 .PHONY: lint-fix
 lint-fix: ## Corrige automatiquement les erreurs ESLint
 	$(DOCKER_COMPOSE) exec $(PHP_CONTAINER)  npm run lint-fix
+
+.PHONY: lint-phpcs
+lint-phpcs: ## Lance PHP Code Sniffer
+	$(COMPOSER) cs-check
+
+.PHONY: lint-phpcs-fix
+lint-phpcs-fix: ## Corrige automatiquement les erreurs PHP Code Sniffer
+	$(COMPOSER) cs-fix
+
+.PHONY: phpstan
+phpstan: ## Lance PHPStan
+	$(COMPOSER) phpstan

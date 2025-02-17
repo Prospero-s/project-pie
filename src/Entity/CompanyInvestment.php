@@ -122,4 +122,4 @@ class CompanyInvestment
         $this->investedAt = $investedAt;
         return $this;
     }
-} 
+}

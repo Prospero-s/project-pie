@@ -60,3 +60,12 @@ next-env.d.ts
 /public/uploads
 config/secrets/dev/dev.decrypt.private.php
 config/secrets/dev/dev.encrypt.public.php
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###
+
+###> squizlabs/php_codesniffer ###
+/.phpcs-cache
+/phpcs.xml
+###< squizlabs/php_codesniffer ###

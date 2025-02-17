@@ -14,11 +14,13 @@ use App\Repository\UserRepository;
 #[Route('/api', name: 'api_')]
 class CompanyInvestmentController extends AbstractController
 {
-    private $companyInvestmentRepository;
-    private $userRepository;
+    private CompanyInvestmentRepository $companyInvestmentRepository;
+    private UserRepository $userRepository;
 
-    public function __construct(CompanyInvestmentRepository $companyInvestmentRepository, UserRepository $userRepository)
-    {
+    public function __construct(
+        CompanyInvestmentRepository $companyInvestmentRepository,
+        UserRepository $userRepository
+    ) {
         $this->companyInvestmentRepository = $companyInvestmentRepository;
         $this->userRepository = $userRepository;
     }
@@ -85,7 +87,7 @@ class CompanyInvestmentController extends AbstractController
             ], 400);
         }
     }
-    
+
     #[Route('/investments/global/funding', methods: ['GET'])]
     public function getGlobalFundingInvestments(Request $request): JsonResponse
     {
@@ -96,7 +98,10 @@ class CompanyInvestmentController extends AbstractController
                 throw new \Exception('Utilisateur non authentifié ou non trouvé');
             }
 
-            $fundingInvestments = $this->companyInvestmentRepository->fetchGlobalFundingInvestments($user->getUserGroup());
+            $fundingInvestments = $this->companyInvestmentRepository->fetchGlobalFundingInvestments(
+                $user->getUserGroup()
+            );
+
             return new JsonResponse($fundingInvestments);
         } catch (\Exception $e) {
             return new JsonResponse([
@@ -116,7 +121,10 @@ class CompanyInvestmentController extends AbstractController
                 throw new \Exception('Utilisateur non authentifié ou non trouvé');
             }
 
-            $sectorInvestments = $this->companyInvestmentRepository->fetchGlobalSectorInvestments($user->getUserGroup());
+            $sectorInvestments = $this->companyInvestmentRepository->fetchGlobalSectorInvestments(
+                $user->getUserGroup()
+            );
+
             return new JsonResponse($sectorInvestments);
         } catch (\Exception $e) {
             return new JsonResponse([
@@ -136,7 +144,11 @@ class CompanyInvestmentController extends AbstractController
                 throw new \Exception('Utilisateur non authentifié ou non trouvé');
             }
 
-            $investments = $this->companyInvestmentRepository->findByCompanyIdAndYear($id, $year, $user->getUserGroup());
+            $investments = $this->companyInvestmentRepository->findByCompanyIdAndYear(
+                $id,
+                $year,
+                $user->getUserGroup()
+            );
 
             if (empty($investments)) {
                 return new JsonResponse([
@@ -153,4 +165,4 @@ class CompanyInvestmentController extends AbstractController
             ], 400);
         }
     }
-} 
+}

@@ -12,4 +12,4 @@ enum KpiStatus: string
     {
         return $this->value;
     }
-} 
+}

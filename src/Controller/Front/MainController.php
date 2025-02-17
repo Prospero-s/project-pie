@@ -13,7 +13,7 @@ class MainController extends AbstractController
     public function signin(Request $request, string $lng): Response
     {
         $request->getSession()->set('_locale', $lng);
-        
+
         return $this->render('main/index.html.twig', [
             'controller_name' => 'MainController',
             'locale' => $lng
@@ -24,7 +24,7 @@ class MainController extends AbstractController
     public function signup(Request $request, string $lng): Response
     {
         $request->getSession()->set('_locale', $lng);
-        
+
         return $this->render('main/index.html.twig', [
             'controller_name' => 'MainController',
             'locale' => $lng
@@ -32,10 +32,10 @@ class MainController extends AbstractController
     }
 
     #[Route('/{lng}/dashboard', name: 'app_dashboard', requirements: ['lng' => 'fr|en'])]
-    public function dashboard(Request$request, string $lng): Response
+    public function dashboard(Request $request, string $lng): Response
     {
         $request->getSession()->set('_locale', $lng);
-        
+
         return $this->render('main/index.html.twig', [
             'controller_name' => 'MainController',
             'locale' => $lng
@@ -46,7 +46,7 @@ class MainController extends AbstractController
     public function investments(Request $request, string $lng): Response
     {
         $request->getSession()->set('_locale', $lng);
-        
+
         return $this->render('main/index.html.twig', [
             'controller_name' => 'MainController',
             'locale' => $lng
@@ -57,7 +57,7 @@ class MainController extends AbstractController
     public function allCompanies(Request $request, string $lng): Response
     {
         $request->getSession()->set('_locale', $lng);
-        
+
         return $this->render('main/index.html.twig', [
             'controller_name' => 'MainController',
             'locale' => $lng
@@ -74,7 +74,7 @@ class MainController extends AbstractController
         ]);
     }
 
-    #[Route('/',name: 'app_redirect')]
+    #[Route('/', name: 'app_redirect')]
     public function redirectToLocale(Request $request): Response
     {
         $preferredLanguage = $request->getPreferredLanguage(['fr', 'en']);

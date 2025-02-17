@@ -8,14 +8,24 @@ use App\Entity\GroupRole;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+
+/**
+ * @extends ServiceEntityRepository<UserGroup>
+ */
 class UserGroupRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry, EntityManagerInterface $em)
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, UserGroup::class);
-        $this->em = $em;
+        $this->entityManager = $entityManager;
     }
 
+    /**
+     * @param string $cognitoId
+     * @return list<UserGroup>
+     */
     public function findByMemberCognitoId(string $cognitoId): array
     {
         return $this->createQueryBuilder('ug')
@@ -28,11 +38,19 @@ class UserGroupRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findByOwnerCognitoId(string $cognitoId): array
-    {
-        return $this->findBy(['ownerCognitoId' => $cognitoId]);
-    }
+    // /**
+    //  * @param string $cognitoId
+    //  * @return list<UserGroup>
+    //  */
+    // public function findByOwnerCognitoId(string $cognitoId): array
+    // {
+    //     return $this->findBy(['ownerCognitoId' => $cognitoId]);
+    // }
 
+    /**
+     * @param int $groupId
+     * @return UserGroup|null
+     */
     public function findGroupWithMembersAndInvestments(int $groupId): ?UserGroup
     {
         return $this->createQueryBuilder('g')
@@ -45,6 +63,10 @@ class UserGroupRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * @param int $groupId
+     * @return UserGroup|null
+     */
     public function findGroupWithMembers(int $groupId): ?UserGroup
     {
         return $this->createQueryBuilder('g')
@@ -55,6 +77,12 @@ class UserGroupRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * @param string $name
+     * @param User $owner
+     * @param list<string> $invitationEmails
+     * @return UserGroup
+     */
     public function createGroup(string $name, User $owner, array $invitationEmails = []): UserGroup
     {
         $group = new UserGroup();
@@ -68,22 +96,30 @@ class UserGroupRepository extends ServiceEntityRepository
         $ownerRole->setUser($owner);
         $ownerRole->setUserGroup($group);
         $ownerRole->setRole(GroupRole::ROLE_OWNER);
-        
-        $this->em->persist($group);
-        $this->em->persist($ownerRole);
-        
+
+        $this->entityManager->persist($group);
+        $this->entityManager->persist($ownerRole);
+
         return $group;
     }
 
+    /**
+     * @param UserGroup $group
+     * @param User $member
+     */
     public function addMemberToGroup(UserGroup $group, User $member): void
     {
         $group->addUser($member);
-        $this->em->persist($group);
+        $this->entityManager->persist($group);
     }
 
+    /**
+     * @param UserGroup $group
+     * @param User $member
+     */
     public function removeMemberFromGroup(UserGroup $group, User $member): void
     {
         $group->removeUser($member);
-        $this->em->persist($group);
+        $this->entityManager->persist($group);
     }
 }

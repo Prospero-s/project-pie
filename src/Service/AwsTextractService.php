@@ -21,6 +21,10 @@ class AwsTextractService
         ]);
     }
 
+    /**
+     * @param string $filePath
+     * @return array<string, mixed>
+     */
     public function analyzeDocument(string $filePath): array
     {
         try {
@@ -37,12 +41,16 @@ class AwsTextractService
         }
     }
 
+    /**
+     * @param array<string, mixed> $data
+     * @return array<string, array<string, mixed>>
+     */
     private function structureData(array $data): array
     {
         $blocks = $data['Blocks'] ?? [];
 
         $structuredData = [
-            'text' => [],
+            'text' => ['content' => []],
             'tables' => [],
             'forms' => []
         ];
@@ -50,7 +58,7 @@ class AwsTextractService
         foreach ($blocks as $block) {
             switch ($block['BlockType']) {
                 case 'LINE':
-                    $structuredData['text'][] = $block['Text'];
+                    $structuredData['text']['content'][] = $block['Text'];
                     break;
 
                 case 'TABLE':
@@ -71,12 +79,19 @@ class AwsTextractService
             }
         }
 
-        // Supprime les sections vides pour un rendu propre
         return array_filter($structuredData, function ($section) {
+            if (isset($section['content'])) {
+                return !empty($section['content']);
+            }
             return !empty($section);
         });
     }
 
+    /**
+     * @param array<string, mixed> $blocks
+     * @param array<string, mixed> $tableBlock
+     * @return array<string, array<string, string>>
+     */
     private function extractTable(array $blocks, array $tableBlock): array
     {
         $table = [];
@@ -94,6 +109,11 @@ class AwsTextractService
         return $table;
     }
 
+    /**
+     * @param array<string, mixed> $blocks
+     * @param array<string, mixed> $keyBlock
+     * @return array<string, string>
+     */
     private function extractKeyValue(array $blocks, array $keyBlock): array
     {
         $valueBlock = null;
@@ -110,6 +130,11 @@ class AwsTextractService
         ];
     }
 
+    /**
+     * @param array<string, mixed> $blocks
+     * @param string $id
+     * @return array<string, mixed>|null
+     */
     private function findBlockById(array $blocks, string $id): ?array
     {
         foreach ($blocks as $block) {

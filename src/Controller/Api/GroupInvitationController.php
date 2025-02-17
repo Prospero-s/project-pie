@@ -2,9 +2,7 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\GroupInvitation;
 use App\Entity\UserGroup;
-use App\Entity\User;
 use App\Entity\GroupRole;
 use App\Repository\GroupInvitationRepository;
 use App\Repository\UserRepository;
@@ -23,9 +21,10 @@ class GroupInvitationController extends AbstractController
         private EntityManagerInterface $entityManager,
         private GroupInvitationRepository $invitationRepository,
         private UserService $userService
-    ) {}
+    ) {
+    }
 
-    #[Route('', methods: ['POST'])]
+    #[Route(methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
         try {
@@ -33,7 +32,7 @@ class GroupInvitationController extends AbstractController
             $cognitoId = $request->headers->get('x-cognito-id');
             $email = $request->headers->get('x-cognito-email');
             $name = $request->headers->get('x-cognito-name');
-            
+
             if (!$cognitoId || !$email) {
                 return $this->json(['error' => 'Missing authentication headers'], Response::HTTP_UNAUTHORIZED);
             }
@@ -57,7 +56,7 @@ class GroupInvitationController extends AbstractController
             // Vérifier si l'utilisateur a le droit d'inviter
             $userRole = $this->entityManager->getRepository(GroupRole::class)
                 ->findOneBy(['user' => $user, 'userGroup' => $group]);
-            
+
             if (!$userRole || !in_array($userRole->getRole(), [GroupRole::ROLE_OWNER, GroupRole::ROLE_ADMIN])) {
                 return $this->json(['error' => 'Insufficient permissions'], Response::HTTP_FORBIDDEN);
             }
@@ -77,10 +76,18 @@ class GroupInvitationController extends AbstractController
 
             // Vérifier si l'utilisateur peut attribuer ce rôle spécifique
             if ($role === GroupRole::ROLE_ADMIN && $userRole->getRole() !== GroupRole::ROLE_OWNER) {
-                return $this->json(['error' => 'Insufficient permissions to assign admin role'], Response::HTTP_FORBIDDEN);
+                return $this->json(
+                    ['error' => 'Insufficient permissions to assign admin role'],
+                    Response::HTTP_FORBIDDEN
+                );
             }
 
-            $invitation = $this->invitationRepository->createInvitationFromRequest($group, $data['email'], $user, $role);
+            $invitation = $this->invitationRepository->createInvitationFromRequest(
+                $group,
+                $data['email'],
+                $user,
+                $role
+            );
             $this->entityManager->flush();
 
             return $this->json([
@@ -101,7 +108,7 @@ class GroupInvitationController extends AbstractController
         $cognitoId = $request->headers->get('x-cognito-id');
         $email = $request->headers->get('x-cognito-email');
         $name = $request->headers->get('x-cognito-name');
-        
+
         $user = $this->userService->getOrCreateUser($cognitoId, $email, $name);
         $invitation = $this->invitationRepository->findOneBy(['token' => $token]);
 
@@ -137,7 +144,7 @@ class GroupInvitationController extends AbstractController
     {
         try {
             $email = $request->headers->get('x-cognito-email');
-            
+
             if (!$email) {
                 return $this->json([
                     'error' => 'Unauthorized: Missing required headers'
@@ -167,4 +174,4 @@ class GroupInvitationController extends AbstractController
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-} 
+}

@@ -126,7 +126,7 @@ class CompanyAddress
             $this->commune,
             $this->pays !== 'FRANCE' ? $this->pays : null
         ]);
-        
+
         return implode(' ', $parts);
     }
-} 
+}

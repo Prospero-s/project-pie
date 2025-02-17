@@ -65,4 +65,4 @@ class GroupRole
         $this->role = $role;
         return $this;
     }
-} 
+}

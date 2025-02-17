@@ -111,4 +111,4 @@ class GroupInvitation
         $this->role = $role;
         return $this;
     }
-} 
+}

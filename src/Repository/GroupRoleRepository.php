@@ -9,14 +9,25 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 
+/**
+ * @extends ServiceEntityRepository<GroupRole>
+ */
 class GroupRoleRepository extends ServiceEntityRepository
 {
+    private EntityManagerInterface $em;
+
     public function __construct(ManagerRegistry $registry, EntityManagerInterface $em)
     {
         parent::__construct($registry, GroupRole::class);
         $this->em = $em;
     }
 
+    /**
+     * @param User $user
+     * @param UserGroup $group
+     * @param string $role
+     * @return GroupRole
+     */
     public function updateOrCreateRole(User $user, UserGroup $group, string $role): GroupRole
     {
         // Supprimer l'ancien rôle s'il existe
@@ -35,10 +46,10 @@ class GroupRoleRepository extends ServiceEntityRepository
         $groupRole->setUser($user);
         $groupRole->setUserGroup($group);
         $groupRole->setRole($role);
-        
+
         $this->em->persist($groupRole);
         $this->em->flush();
-        
+
         return $groupRole;
     }
-} 
+}

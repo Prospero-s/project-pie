@@ -17,18 +17,27 @@ class PappersCompanyScraper implements CompanyScraperInterface
         $this->logger = $logger;
     }
 
+    /**
+     * @param string $source
+     * @return bool
+     */
     public function supports(string $source): bool
     {
         return $source === 'pappers';
     }
 
+    /**
+     * @param string $siren
+     * @param bool $forceScraping
+     * @return array<string, mixed>
+     */
     public function scrape(string $siren, bool $forceScraping = false): array
     {
         try {
             $this->logger->info('Début du scraping Pappers', ['siren' => $siren]);
-            
+
             $response = $this->client->request('GET', "https://www.pappers.fr/entreprise/{$siren}");
-            
+
             if ($response->getStatusCode() !== 200) {
                 throw new \Exception('Page Pappers non accessible');
             }
@@ -47,7 +56,6 @@ class PappersCompanyScraper implements CompanyScraperInterface
 
             $this->logger->info('Données Pappers extraites avec succès', ['data' => $data]);
             return $data;
-
         } catch (\Exception $e) {
             $this->logger->error('Erreur lors du scraping Pappers', [
                 'siren' => $siren,
@@ -57,6 +65,10 @@ class PappersCompanyScraper implements CompanyScraperInterface
         }
     }
 
+    /**
+     * @param Crawler $crawler
+     * @return string
+     */
     private function extractDenomination(Crawler $crawler): string
     {
         try {
@@ -67,24 +79,38 @@ class PappersCompanyScraper implements CompanyScraperInterface
         }
     }
 
+    /**
+     * @param Crawler $crawler
+     * @return string
+     */
     private function extractBusinessStructures(Crawler $crawler): string
     {
         try {
-            return $crawler->filter('table tr')->filter(function(Crawler $node) {
-                return str_contains($node->text(), 'Forme juridique');
-            })->filter('td')->text('');
+            return $crawler->filter('table tr')
+                ->reduce(function (Crawler $node) {
+                    return str_contains($node->text(), 'Forme juridique');
+                })
+                ->filter('td')
+                ->text('');
         } catch (\Exception $e) {
             $this->logger->warning('Impossible d\'extraire la forme juridique');
             return '';
         }
     }
 
+    /**
+     * @param Crawler $crawler
+     * @return array<string, mixed>
+     */
     private function extractAdresse(Crawler $crawler): array
     {
         try {
-            $adresseText = $crawler->filter('table tr')->filter(function(Crawler $node) {
-                return str_contains($node->text(), 'Adresse');
-            })->filter('td')->text('');
+            $adresseText = $crawler->filter('table tr')
+                ->reduce(function (Crawler $node) {
+                    return str_contains($node->text(), 'Adresse');
+                })
+                ->filter('td')
+                ->text('');
 
             // Extraction du code postal et de la ville
             preg_match('/(\d{5})\s+(.+)$/', $adresseText, $cpvilleMatches);
@@ -103,24 +129,38 @@ class PappersCompanyScraper implements CompanyScraperInterface
         }
     }
 
+    /**
+     * @param Crawler $crawler
+     * @return string
+     */
     private function extractSiret(Crawler $crawler): string
     {
         try {
-            return $crawler->filter('table tr')->filter(function(Crawler $node) {
-                return str_contains($node->text(), 'SIRET');
-            })->filter('td')->text('');
+            return $crawler->filter('table tr')
+                ->reduce(function (Crawler $node) {
+                    return str_contains($node->text(), 'SIRET');
+                })
+                ->filter('td')
+                ->text('');
         } catch (\Exception $e) {
             $this->logger->warning('Impossible d\'extraire le SIRET');
             return '';
         }
     }
 
+    /**
+     * @param Crawler $crawler
+     * @return array<string, string>
+     */
     private function extractCapital(Crawler $crawler): array
     {
         try {
-            $capitalText = $crawler->filter('table tr')->filter(function(Crawler $node) {
-                return str_contains($node->text(), 'Capital social');
-            })->filter('td')->text('');
+            $capitalText = $crawler->filter('table tr')
+                ->reduce(function (Crawler $node) {
+                    return str_contains($node->text(), 'Capital social');
+                })
+                ->filter('td')
+                ->text('');
 
             preg_match('/(\d+(?:\s\d+)*(?:,\d+)?)\s*(€|EUR)?/', $capitalText, $matches);
 
@@ -134,6 +174,9 @@ class PappersCompanyScraper implements CompanyScraperInterface
         }
     }
 
+    /**
+     * @return int
+     */
     public function getPriority(): int
     {
         return 50;
