@@ -23,6 +23,6 @@ if ! echo "$commit_msg" | grep -P "$commit_regex" > /dev/null 2>&1; then
 fi
 
 echo "--------------------------------"
-echo "✅ Format du message de commit validé"
+echo "✅ Le format du message de commit est valide"
 echo "--------------------------------"
 exit 0 

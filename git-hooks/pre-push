@@ -34,6 +34,6 @@ while read local_ref local_sha remote_ref remote_sha; do
 done
 
 echo "--------------------------------"
-echo "✅ Format des noms de branches validé pour tous les éléments poussés"
+echo "✅ Le format du nom de la branche est valide"
 echo "--------------------------------"
 exit 0
