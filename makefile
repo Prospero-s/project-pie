@@ -74,6 +74,7 @@ test-db-aws:
 
 test-all-db: test-db-local test-db-aws
 
+# Commandes pour installer les hooks
 hooks:
 	chmod +x ./scripts/install-hooks.sh
 	./scripts/install-hooks.sh
