@@ -75,6 +75,7 @@ test-db-aws:
 test-all-db: test-db-local test-db-aws
 
 hooks:
+	chmod +x ./scripts/install-hooks.sh
 	./scripts/install-hooks.sh
 
 # Commandes pour les migrations
