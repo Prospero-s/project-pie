@@ -27,6 +27,8 @@ while read local_ref local_sha remote_ref remote_sha; do
             echo "Format attendu: <type>/PROS-<ticket-id>-<description>"
             echo "Types autorisés: feat, fix, docs, style, refactor, test, chore"
             echo "👀 Exemple: feat/PROS-123-ajout-de-la-fonctionnalite-de-login"
+            echo "⚠️ Pour renommer la branche, utilisez la commande suivante:"
+            echo "git branch -m <ancien_nom> <nouveau_nom>"
             echo "--------------------------------"
             exit 1
         fi
