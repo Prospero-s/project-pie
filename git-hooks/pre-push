@@ -1,4 +1,3 @@
-# .git/hooks/pre-push
 #!/usr/bin/env bash
 
 # Vérifier que bash est bien utilisé
