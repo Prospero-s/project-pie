@@ -28,6 +28,7 @@ help:
 	@echo "  test-db-local     - Vérifier la connexion à la base de données locale"
 	@echo "  test-db-aws       - Vérifier la connexion à la base de données AWS"
 	@echo "  test-all-db       - Vérifier les deux bases de données"
+	@echo "  hooks     - Installer les hooks Git"
 
 # Cibles
 
@@ -72,6 +73,11 @@ test-db-aws:
 	DATABASE_URL="$$DATABASE_URL_AWS" $(SYMFONY) doctrine:migrations:status
 
 test-all-db: test-db-local test-db-aws
+
+# Commandes pour installer les hooks
+hooks:
+	chmod +x ./scripts/install-hooks.sh
+	./scripts/install-hooks.sh
 
 # Commandes pour les migrations
 

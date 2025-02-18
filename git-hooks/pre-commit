@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+# Vérifier que bash est bien utilisé
+if [ -z "$BASH_VERSION" ]; then
+    echo "❌ Ce script doit être exécuté avec bash."
+    exit 1
+fi
+
+# Fichiers à vérifier
+FILES=$(git diff --cached --name-only --diff-filter=ACM "*.js" "*.jsx")
+
+# Regex pour détecter uniquement le texte brut non traduit
+# On ignore les balises vides, les textes entre crochets, et les chaînes déjà traduites
+TEXT_REGEX='<[^>]+>(?!.*t\(.*\))[^<{}]*[a-zA-ZÀ-ÿ][^<{}]*</[^>]+>'
+
+ERRORS=0
+
+for FILE in $FILES; do
+    # Vérifier si le fichier contient du texte brut non traduit
+    if grep -Pq "$TEXT_REGEX" "$FILE"; then
+        echo "------------------------------------------------------------------------------------------------"
+        echo "❌ Fichier 【 $FILE 】 contient du texte non traduit :"
+        echo ""
+        
+        # Afficher les lignes problématiques
+        grep -Pn "$TEXT_REGEX" "$FILE" | while read -r LINE; do
+            echo "Ligne $LINE"
+        done
+        
+        echo ""
+        echo "⚠️ Veuillez utiliser la fonction de traduction 【 t() 】 pour tout texte affiché à l'utilisateur."
+        echo "👀 Exemple : <p>{t('mon.texte')}</p>"
+        echo "------------------------------------------------------------------------------------------------"
+        ERRORS=$((ERRORS + 1))
+    fi
+done
+
+if [ $ERRORS -gt 0 ]; then
+    echo "❌ $ERRORS fichier(s) contiennent du texte non traduit. Commit bloqué."
+    echo "------------------------------------------------------------------------------------------------"
+    exit 1
+fi
+
+echo "--------------------------------"
+echo "✅ Tous les textes sont correctement traduits"
+echo "--------------------------------"
+exit 0 
