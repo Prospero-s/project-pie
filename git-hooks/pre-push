@@ -1,6 +1,12 @@
 # .git/hooks/pre-push
 #!/usr/bin/env bash
 
+# Vérifier que bash est bien utilisé
+if [ -z "$BASH_VERSION" ]; then
+    echo "❌ Ce script doit être exécuté avec bash."
+    exit 1
+fi
+
 # Regex pour les noms de branches
 branch_regex='^(feat|fix|docs|style|refactor|test|chore)/PROS-[0-9]+(-[a-z0-9]+)+$'
 
