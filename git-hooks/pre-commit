@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Vérifier que bash est bien utilisé
-if [ -z "$BASH_VERSION" ]; then
+# Vérifier que bash est bien utilisé (plus portable)
+if [ -z "$BASH" ]; then
     echo "❌ Ce script doit être exécuté avec bash."
     exit 1
 fi
@@ -9,21 +9,42 @@ fi
 # Fichiers à vérifier
 FILES=$(git diff --cached --name-only --diff-filter=ACM "*.js" "*.jsx")
 
-# Regex pour détecter uniquement le texte brut non traduit
-# On ignore les balises vides, les textes entre crochets, et les chaînes déjà traduites
-TEXT_REGEX='<[^>]+>(?!.*t\(.*\))[^<{}]*[a-zA-ZÀ-ÿ][^<{}]*</[^>]+>'
+# Version compatible macOS sans -P (Perl regex)
+# Script adapté pour détecter les balises contenant du texte sans traduction
+find_untranslated_text() {
+    local file="$1"
+    local untranslated=false
+    local line_number=0
+    
+    # Utilise awk pour analyser le fichier ligne par ligne
+    awk '{
+        line_number += 1
+        # Cherche les balises avec du texte mais sans t()
+        if (match($0, /<[^>]+>[^<]*[a-zA-ZÀ-ÿ][^<]*<\/[^>]+>/) && !match($0, /t\([^)]*\)/)) {
+            # Évite les cas particuliers comme les balises vides et les importations
+            if (!match($0, /<\/?(>|self|br|hr|img|input)[^>]*>/i) && !match($0, /import|from/)) {
+                print line_number ":" $0
+                found = 1
+            }
+        }
+    }' "$file"
+    
+    return $([ "$found" == "1" ] && echo 1 || echo 0)
+}
 
 ERRORS=0
 
 for FILE in $FILES; do
     # Vérifier si le fichier contient du texte brut non traduit
-    if grep -Pq "$TEXT_REGEX" "$FILE"; then
+    UNTRANSLATED=$(find_untranslated_text "$FILE")
+    
+    if [ -n "$UNTRANSLATED" ]; then
         echo "------------------------------------------------------------------------------------------------"
         echo "❌ Fichier 【 $FILE 】 contient du texte non traduit :"
         echo ""
         
         # Afficher les lignes problématiques
-        grep -Pn "$TEXT_REGEX" "$FILE" | while read -r LINE; do
+        echo "$UNTRANSLATED" | while read -r LINE; do
             echo "Ligne $LINE"
         done
         

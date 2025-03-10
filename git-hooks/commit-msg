@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Vérifier que bash est bien utilisé
-if [ -z "$BASH_VERSION" ]; then
+# Vérifier que bash est bien utilisé (plus portable)
+if [ -z "$BASH" ]; then
     echo "❌ Ce script doit être exécuté avec bash."
     exit 1
 fi
@@ -9,10 +9,10 @@ fi
 commit_msg_file="$1"
 commit_msg=$(cat "$commit_msg_file")
 
-# Format regex encore plus strict
+# Format regex compatible avec macOS (sans -P)
 commit_regex='^(feat|fix|docs|style|refactor|test|chore)(\([a-zA-Z0-9-]+\))?: [A-Za-z][A-Za-z0-9 ._-]{1,149}$'
 
-if ! echo "$commit_msg" | grep -P "$commit_regex" > /dev/null 2>&1; then
+if ! echo "$commit_msg" | grep -E "$commit_regex" > /dev/null 2>&1; then
     echo "--------------------------------"
     echo "❌ Le format du message de commit est invalide."
     echo "Format attendu: <type>(<scope>): <description>"

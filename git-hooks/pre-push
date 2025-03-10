@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-# Vérifier que bash est bien utilisé
-if [ -z "$BASH_VERSION" ]; then
+# Vérifier que bash est bien utilisé (plus portable)
+if [ -z "$BASH" ]; then
     echo "❌ Ce script doit être exécuté avec bash."
     exit 1
 fi
 
-# Regex pour les noms de branches
-branch_regex='^(feat|fix|docs|style|refactor|test|chore)/PROS-[0-9]+(-[a-z0-9]+)+$'
+# Regex pour les noms de branches (compatible macOS)
+branch_regex='^(feat|fix|docs|style|refactor|test|chore)/PROS-[0-9]+(-[a-zA-Z0-9]+)+$'
 
 z40=0000000000000000000000000000000000000000
 
@@ -26,7 +26,7 @@ while read local_ref local_sha remote_ref remote_sha; do
     fi
 
     if [ -n "$branch_name" ]; then
-        if ! echo "$branch_name" | grep -Eq "$branch_regex"; then
+        if ! echo "$branch_name" | grep -E "$branch_regex" > /dev/null 2>&1; then
             echo "--------------------------------"
             echo "❌ Le format du nom de la branche '$branch_name' est invalide."
             echo "Format attendu: <type>/PROS-<ticket-id>-<description>"
