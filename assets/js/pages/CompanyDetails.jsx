@@ -21,8 +21,8 @@ const CompanyDetails = ({ i18n }) => {
   const loadInvestmentData = async () => {
     try {
       setLoading(true);
-      const response = await getCompanyDetailsById(id); // Fix later
-      setCompany(response);
+      const data = await getCompanyDetailsById(id); // Fix later
+      setCompany(data);
     } catch (error) {
       console.error('Erreur lors du chargement:', error);
     } finally {
@@ -50,7 +50,7 @@ const CompanyDetails = ({ i18n }) => {
             {
               key: '2',
               label: metrics('global_metrics'),
-              children: <GlobalMetrics />,
+              children: <GlobalMetrics company={company}/>,
             },
             {
               key: '3',

@@ -142,4 +142,20 @@ class CompanyController extends AbstractController
             ], 400);
         }
     }
+
+    /* #[Route('/company/details/{id}/chart-data', methods: ['GET'])]
+    public function getChartData(Request $request, int $id): JsonResponse
+    {
+        $xAxis = $request->query->get('xAxis');
+        $yAxis = $request->query->all('yAxis'); // Tableau des valeurs de l'axe Y
+        $filters = $request->query->all('filters'); // Tableau des filtres
+
+        if (!$xAxis || empty($yAxis)) {
+            return new JsonResponse(['error' => 'Les paramètres xAxis et yAxis sont obligatoires.'], 400);
+        }
+
+        $this->companyRepository->getCompanyDetailledChart($filters, $yAxis, $xAxis, $id)
+
+        return new JsonResponse($result);
+    } */
 }

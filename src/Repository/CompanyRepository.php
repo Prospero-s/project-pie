@@ -247,4 +247,29 @@ class CompanyRepository extends ServiceEntityRepository
             throw $e;
         }
     }
+
+    public function getCompanyDetailledChart(array $filters, array $yAxis, string $xAxis, int $companyId){
+        $selectFields = array_merge([$xAxis], $yAxis);
+        //TODO: remplacer par le FilterQueryProcessor pour retourner le resultat en doctrine:
+        // $companies = $filterQueryProcessor->processFilters($filters, $selectedFields, Company::class);
+        // return $companies
+
+
+        
+        $query = 'SELECT ' . implode(', ', array_map(fn($field) => '`$field`', $selectFields)) . ' FROM company';
+        
+        $queryParams = [];
+        if (!empty($filters)) {
+            $filterConditions = [];
+            foreach ($filters as $key => $value) {
+                $filterConditions[] = "$key = :$key";
+                $queryParams[$key] = $value;
+            }
+            $query .= ' WHERE ' . implode(' AND ', $filterConditions);
+        }
+
+        // Exécution de la requête
+        $stmt = $connection->prepare($query);
+        $result = $stmt->executeQuery($queryParams)->fetchAllAssociative();
+    }
 }
