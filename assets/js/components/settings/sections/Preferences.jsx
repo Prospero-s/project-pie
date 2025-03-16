@@ -1,22 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { CheckOutlined } from '@ant-design/icons';
 import { Spin, Divider, Switch, Select, Space, Button, Flex } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { fetchNotificationSettings } from '@/services/notification/notificationService';
 
-const Notifications = ({ user, i18n }) => {
+const Preferences = ({ user, i18n }) => {
   const { t } = useTranslation('settings', { i18n });
+  const [settings, setSettings] = useState(null); // Initialisez avec `null` pour indiquer qu'il n'y a pas de données au début
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // fetchGroupData();
-  }, []);
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchNotificationSettings(user);
+        setSettings(data.settings); // Mise à jour de l'état avec les données récupérées
+      } catch (error) {
+        console.error('Error fetching notification settings:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [user]);
+
+  const handleToggle = setting => {
+    setSettings(prevSettings => ({
+      ...prevSettings,
+      [setting]: !prevSettings[setting],
+    }));
+  };
 
   const handleChange = value => {
     // console.log(`selected ${value}`);
   };
 
-  if (!loading) {
-    return <Spin />;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center">
+        <Spin size="large" />
+      </div>
+    );
   }
 
   return (
@@ -27,24 +52,24 @@ const Notifications = ({ user, i18n }) => {
           <span>{t('notification.email_enabled')}</span>
           <Switch
             checkedChildren={<CheckOutlined />}
-            unCheckedChildren={<CloseOutlined />}
-            defaultChecked
+            checked={settings.email_enabled}
+            onChange={() => handleToggle('email_enabled')}
           />
         </div>
         <div className="flex justify-between items-center">
           <span>{t('notification.sms_enabled')}</span>
           <Switch
             checkedChildren={<CheckOutlined />}
-            unCheckedChildren={<CloseOutlined />}
-            defaultChecked
+            checked={settings.sms_enabled}
+            onChange={() => handleToggle('sms_enabled')}
           />
         </div>
         <div className="flex justify-between items-center">
           <span>{t('notification.push_enabled')}</span>
           <Switch
             checkedChildren={<CheckOutlined />}
-            unCheckedChildren={<CloseOutlined />}
-            defaultChecked
+            checked={settings.push_enabled}
+            onChange={() => handleToggle('push_enabled')}
           />
         </div>
       </div>
@@ -85,4 +110,4 @@ const Notifications = ({ user, i18n }) => {
   );
 };
 
-export default Notifications;
+export default Preferences;

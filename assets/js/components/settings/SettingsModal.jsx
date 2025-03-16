@@ -3,7 +3,7 @@ import { Modal, Menu } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { TeamOutlined, SettingOutlined } from '@ant-design/icons';
 import GroupSettings from './sections/GroupSettings';
-import Notifications from './sections/Notifications';
+import Preferences from './sections/Preferences';
 
 const SettingsModal = ({ visible, onClose, user, i18n }) => {
   const { t } = useTranslation('settings', { i18n });
@@ -27,7 +27,7 @@ const SettingsModal = ({ visible, onClose, user, i18n }) => {
       case 'group':
         return <GroupSettings user={user} i18n={i18n} />;
       case 'preferences':
-        return <Notifications user={user} i18n={i18n} />;
+        return <Preferences user={user} i18n={i18n} />;
       default:
         return null;
     }

@@ -53,4 +53,29 @@ class NotificationSettingsController extends AbstractController
             return new JsonResponse(['error' => $e->getMessage()], 500);
         }
     }
+
+    #[Route('/fetch', methods: ['GET'])]
+    public function fetchNotificationSettings(Request $request): JsonResponse
+    {
+        try {
+            $cognitoId = $request->headers->get('x-cognito-id');
+            $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
+
+            if (!$cognitoId || !$user) {
+                throw new \Exception('Utilisateur non authentifié');
+            }
+
+            $settings = $user->getNotificationSettings();
+
+            return new JsonResponse([
+                'settings' => [
+                    'email_enabled' => $settings->isEmailEnabled(),
+                    'sms_enabled' => $settings->isSmsEnabled(),
+                    'push_enabled' => $settings->isPushEnabled()
+                ]
+            ], 201);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 500);
+        }
+    }
 }

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/context/userContext';
 import { useTranslation } from 'react-i18next';
 import { handleAuthCallback } from '@/services/auth/authCallbackService';
-import { initOResetNotifications } from '@/services/notification/notificationService';
+import { initOResetNotificationSettings } from '@/services/notification/notificationService';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ const AuthCallback = () => {
 
   const initUserSettings = () => {
     // Add others settings here
-    initOResetNotifications();
+    initOResetNotificationSettings();
   };
 
   useEffect(() => {
