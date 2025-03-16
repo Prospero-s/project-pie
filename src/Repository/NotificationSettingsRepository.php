@@ -39,4 +39,26 @@ class NotificationSettingsRepository extends ServiceEntityRepository
         $this->em->persist($settings);
         $this->em->flush();
     }
+
+    /**
+     * Change user's notifications settings
+     * @param NotificationSettings $settings
+     * @param string $param
+     * @throws \Exception
+     * @return void
+     */
+    public function changeNotificationsSettings(NotificationSettings $settings, string $param)
+    {
+        $setter = 'set' . str_replace('_', '', ucwords($param, '_')); // example: setEmailEnabled
+        $getter = 'is' . str_replace('_', '', ucwords($param, '_')); // example: isEmailEnabled
+
+        if (method_exists($settings, $setter) && method_exists($settings, $getter)) {
+            $settings->$setter(!$settings->$getter());
+        } else {
+            throw new \Exception("Méthode $getter ou $setter inexistante dans NotificationSettings");
+        }
+
+        $this->em->persist($settings);
+        $this->em->flush();
+    }
 }

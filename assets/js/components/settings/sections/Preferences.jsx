@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { CheckOutlined } from '@ant-design/icons';
 import { Spin, Divider, Switch, Select, Space, Button, Flex } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { fetchNotificationSettings } from '@/services/notification/notificationService';
+import {
+  fetchNotificationSettings,
+  changeNotificationSettings,
+} from '@/services/notification/notificationService';
 
 const Preferences = ({ user, i18n }) => {
   const { t } = useTranslation('settings', { i18n });
-  const [settings, setSettings] = useState(null); // Initialisez avec `null` pour indiquer qu'il n'y a pas de données au début
+  const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,7 +17,7 @@ const Preferences = ({ user, i18n }) => {
       try {
         setLoading(true);
         const data = await fetchNotificationSettings(user);
-        setSettings(data.settings); // Mise à jour de l'état avec les données récupérées
+        setSettings(data.settings);
       } catch (error) {
         console.error('Error fetching notification settings:', error);
       } finally {
@@ -30,10 +33,10 @@ const Preferences = ({ user, i18n }) => {
       ...prevSettings,
       [setting]: !prevSettings[setting],
     }));
-  };
 
-  const handleChange = value => {
-    // console.log(`selected ${value}`);
+    changeNotificationSettings(user, { [setting]: !settings[setting] }).catch(
+      error => console.error('Error changing notification settings:', error),
+    );
   };
 
   if (loading) {
@@ -80,7 +83,6 @@ const Preferences = ({ user, i18n }) => {
           <Select
             className="w-48"
             placeholder={t('preferences.languages.placeholder')}
-            onChange={handleChange}
             options={[
               {
                 value: 'fr',

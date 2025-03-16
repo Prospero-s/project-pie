@@ -2,8 +2,6 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\NotificationSettings;
-use App\Enum\NotificationStatus;
 use App\Repository\NotificationSettingsRepository;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -78,4 +76,37 @@ class NotificationSettingsController extends AbstractController
             return new JsonResponse(['error' => $e->getMessage()], 500);
         }
     }
+
+    #[Route('/update', methods: ['PUT'])]
+    public function changeNotificationSettings(Request $request): JsonResponse
+    {
+        try {
+            // Récupération et validation de l'utilisateur
+            $cognitoId = $request->headers->get('x-cognito-id');
+            if (!$cognitoId) {
+                return new JsonResponse(['error' => 'Cognito ID manquant'], 400);
+            }
+
+            $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
+            if (!$user) {
+                return new JsonResponse(['error' => 'Utilisateur non trouvé'], 404);
+            }
+
+            $data = json_decode($request->getContent(), true);
+            if (!isset($data['updatedSettings']) || !is_array($data['updatedSettings'])) {
+                return new JsonResponse(['error' => 'Paramètres de notification invalides'], 400);
+            }
+
+            $settingsEntity = $user->getNotificationSettings();
+
+            foreach ($data['updatedSettings'] as $param => $value) {
+                $this->notificationSettingsRepository->changeNotificationsSettings($settingsEntity, $param);
+            }
+
+            return new JsonResponse(['message' => 'Statut des notifications mis à jour'], 200);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => 'Erreur : ' . $e->getMessage()], 500);
+        }
+    }
+
 }
