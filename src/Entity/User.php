@@ -35,10 +35,20 @@ class User
     #[ORM\ManyToOne(targetEntity: UserGroup::class, inversedBy: 'users')]
     private ?UserGroup $userGroup = null;
 
+    #[ORM\OneToOne(mappedBy: 'userId', cascade: ['persist', 'remove'])]
+    private ?NotificationSettings $notificationSettings = null;
+
+    /**
+     * @var Collection<int, UserNotifications>
+     */
+    #[ORM\OneToMany(targetEntity: UserNotifications::class, mappedBy: 'userId')]
+    private Collection $userNotifications;
+
     public function __construct()
     {
         $this->investments = new ArrayCollection();
         $this->createdAt = new \DateTime();
+        $this->userNotifications = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -116,6 +126,53 @@ class User
     public function setUserGroup(?UserGroup $userGroup): self
     {
         $this->userGroup = $userGroup;
+        return $this;
+    }
+
+    public function getNotificationSettings(): ?NotificationSettings
+    {
+        return $this->notificationSettings;
+    }
+
+    public function setNotificationSettings(NotificationSettings $notificationSettings): static
+    {
+        // set the owning side of the relation if necessary
+        if ($notificationSettings->getUserId() !== $this) {
+            $notificationSettings->setUserId($this);
+        }
+
+        $this->notificationSettings = $notificationSettings;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserNotifications>
+     */
+    public function getUserNotifications(): Collection
+    {
+        return $this->userNotifications;
+    }
+
+    public function addUserNotification(UserNotifications $userNotification): static
+    {
+        if (!$this->userNotifications->contains($userNotification)) {
+            $this->userNotifications->add($userNotification);
+            $userNotification->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserNotification(UserNotifications $userNotification): static
+    {
+        if ($this->userNotifications->removeElement($userNotification)) {
+            // set the owning side to null (unless already changed)
+            if ($userNotification->getUserId() === $this) {
+                $userNotification->setUserId(null);
+            }
+        }
+
         return $this;
     }
 }
