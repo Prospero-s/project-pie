@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-#[Route('/api', name: 'api_')]
+#[Route('/api/kpi', name: 'api_')]
 class KpiDataController extends AbstractController
 {
     private KpiDataRepository $kpiDataRepository;
@@ -29,7 +29,7 @@ class KpiDataController extends AbstractController
         $this->userRepository = $userRepository;
     }
 
-    #[Route('/kpi/save', name: 'app_api_save_kpi', methods: ['POST'])]
+    #[Route('/save', name: 'app_api_save_kpi', methods: ['POST'])]
     public function saveKpi(Request $request): JsonResponse
     {
         $cognitoId = $request->headers->get('X-Cognito-Id');
@@ -62,7 +62,7 @@ class KpiDataController extends AbstractController
         }
     }
 
-    #[Route('/kpi/draft', name: 'app_api_save_kpi_draft', methods: ['POST'])]
+    #[Route('/draft', name: 'app_api_save_kpi_draft', methods: ['POST'])]
     public function saveDraft(Request $request): JsonResponse
     {
         $cognitoId = $request->headers->get('X-Cognito-Id');
@@ -95,7 +95,7 @@ class KpiDataController extends AbstractController
         }
     }
 
-    #[Route('/kpi/updateDocument/{id}', name: 'app_api_update_document', methods: ['PUT'])]
+    #[Route('/updateDocument/{id}', name: 'app_api_update_document', methods: ['PUT'])]
     public function updateDocument(int $id, Request $request): JsonResponse
     {
         $kpiData = $this->kpiDataRepository->find($id);
@@ -122,7 +122,7 @@ class KpiDataController extends AbstractController
         return new JsonResponse(['message' => 'Document mis à jour avec succès']);
     }
 
-    #[Route('/kpi/delete/{id}', name: 'app_api_delete_kpi', methods: ['DELETE'])]
+    #[Route('/delete/{id}', name: 'app_api_delete_kpi', methods: ['DELETE'])]
     public function deleteKpi(int $id): JsonResponse
     {
         $kpiData = $this->kpiDataRepository->find($id);
@@ -136,7 +136,7 @@ class KpiDataController extends AbstractController
         return new JsonResponse(['message' => 'Document supprimé avec succès']);
     }
 
-    #[Route('/kpi/getAllKpi', name: 'app_api_list_kpi', methods: ['GET'])]
+    #[Route('/getAllKpi', name: 'app_api_list_kpi', methods: ['GET'])]
     public function getAllKpi(Request $request): JsonResponse
     {
         $cognitoId = $request->headers->get('X-Cognito-Id');
@@ -172,7 +172,7 @@ class KpiDataController extends AbstractController
         return new JsonResponse(['data' => $kpiData], 200);
     }
 
-    #[Route('/kpi/getDocument/{id}', name: 'get_document', methods: ['GET'])]
+    #[Route('/getDocument/{id}', name: 'get_document', methods: ['GET'])]
     public function getDocument(int $id): JsonResponse
     {
         $document = $this->kpiDataRepository->find($id);
