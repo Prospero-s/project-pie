@@ -8,6 +8,8 @@
   "logoutErrorMessage": "An error occurred while logging out.",
   "notifications": "Notifications",
   "view_all": "View all",
+  "read_all": "Read all",
+  "delete_all": "Delete all",
   "notification_title": "Notification",
   "notification_message": "You have 5 new notifications",
   "notification_time": "2 minutes ago",

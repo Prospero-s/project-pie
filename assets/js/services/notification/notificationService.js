@@ -1,7 +1,7 @@
 import { Auth } from 'aws-amplify';
 import axios from 'axios';
 
-export const initOResetNotificationSettings = async () => {
+export const initOResetNotificationSettings = async user => {
   try {
     const cognitoId = await Auth.currentSession()
       .then(session => session.getIdToken().getJwtToken())
@@ -12,7 +12,7 @@ export const initOResetNotificationSettings = async () => {
     }
     const response = await axios.post('/api/notification-settings/resets', {
       headers: {
-        'X-Cognito-Id': cognitoId,
+        'x-cognito-id': user?.id,
       },
     });
     return response.data.data;
@@ -77,7 +77,7 @@ export const changeNotificationSettings = async (user, updatedSettings) => {
   }
 };
 
-export const fetchNotifications = async () => {
+export const getTypeNotification = async () => {
   try {
     const cognitoId = await Auth.currentSession()
       .then(session => session.getIdToken().getJwtToken())
@@ -86,11 +86,66 @@ export const fetchNotifications = async () => {
     if (!cognitoId) {
       throw new Error('Utilisateur non authentifié');
     }
+
+    const response = await axios.get('/api/notifications/getTypes');
+
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      `Erreur: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`,
+    );
+  }
+};
+
+export const sendNotification = async (user, title, message, type, email) => {
+  try {
+    const cognitoId = await Auth.currentSession()
+      .then(session => session.getIdToken().getJwtToken())
+      .catch(() => null);
+
+    if (!cognitoId) {
+      throw new Error('Utilisateur non authentifié');
+    }
+
+    const response = await axios.post(
+      '/api/notifications/send',
+      {
+        title: title,
+        message: message,
+        type: type,
+        to: email,
+      },
+      {
+        headers: {
+          'x-cognito-id': user?.id,
+        },
+      },
+    );
+
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      `Erreur: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`,
+    );
+  }
+};
+
+export const fetchNotifications = async user => {
+  try {
+    const cognitoId = await Auth.currentSession()
+      .then(session => session.getIdToken().getJwtToken())
+      .catch(() => null);
+
+    if (!cognitoId) {
+      throw new Error('Utilisateur non authentifié');
+    }
+
     const response = await axios.get('/api/notifications/fetch', {
       headers: {
-        'X-Cognito-Id': cognitoId,
+        'x-cognito-id': user?.id,
       },
     });
+
     console.log(response.data);
     return response.data;
   } catch (error) {

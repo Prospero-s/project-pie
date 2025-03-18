@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\NotificationsRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -26,8 +28,16 @@ class Notifications
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $deletedAt = null;
+    /**
+     * @var Collection<int, UserNotifications>
+     */
+    #[ORM\OneToMany(targetEntity: UserNotifications::class, mappedBy: 'notification')]
+    private Collection $userNotifications;
+
+    public function __construct()
+    {
+        $this->userNotifications = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -90,6 +100,36 @@ class Notifications
     public function setDeletedAt(?\DateTimeImmutable $deletedAt): static
     {
         $this->deletedAt = $deletedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserNotifications>
+     */
+    public function getUserNotifications(): Collection
+    {
+        return $this->userNotifications;
+    }
+
+    public function addUserNotification(UserNotifications $userNotification): static
+    {
+        if (!$this->userNotifications->contains($userNotification)) {
+            $this->userNotifications->add($userNotification);
+            $userNotification->setNotification($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserNotification(UserNotifications $userNotification): static
+    {
+        if ($this->userNotifications->removeElement($userNotification)) {
+            // set the owning side to null (unless already changed)
+            if ($userNotification->getNotification() === $this) {
+                $userNotification->setNotification(null);
+            }
+        }
 
         return $this;
     }
