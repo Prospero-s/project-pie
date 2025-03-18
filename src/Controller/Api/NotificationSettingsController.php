@@ -27,7 +27,7 @@ class NotificationSettingsController extends AbstractController
     public function resetNotificationSettings(Request $request): JsonResponse
     {
         try {
-            $cognitoId = $request->headers->get('X-Cognito-Id');
+            $cognitoId = $request->headers->get('x-cognito-id');
             $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
     
             if (!$cognitoId || !$user) {
