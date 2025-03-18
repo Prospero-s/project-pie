@@ -9,8 +9,8 @@ fi
 commit_msg_file="$1"
 commit_msg=$(cat "$commit_msg_file")
 
-# Format regex compatible avec macOS (sans -P)
-commit_regex='^(feat|fix|docs|style|refactor|test|chore)(\([a-zA-Z0-9-]+\))?: [A-Za-z][A-Za-z0-9 ._-]{1,149}$'
+# Format regex compatible avec macOS (sans -P) - modifiée pour accepter plus de caractères spéciaux
+commit_regex='^(feat|fix|docs|style|refactor|test|chore)(\([a-zA-Z0-9,_.\-\+\(\)]+\))?: [A-Za-z].*$'
 
 if ! echo "$commit_msg" | grep -E "$commit_regex" > /dev/null 2>&1; then
     echo "--------------------------------"
