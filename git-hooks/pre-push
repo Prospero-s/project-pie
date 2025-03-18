@@ -7,7 +7,7 @@ if [ -z "$BASH" ]; then
 fi
 
 # Regex pour les noms de branches (compatible macOS) - modifiée pour accepter plus de caractères spéciaux
-branch_regex='^(feat|fix|docs|style|refactor|test|chore)/PROS-[0-9]+(-[a-zA-Z0-9,_.\-+()[\]{}@#$%^&*!?:;'\''\"~`=\/]+)+$'
+branch_regex='^(feat|fix|docs|style|refactor|test|chore)/PROS-[0-9]+(-[a-zA-Z0-9_.-]+)+$'
 
 z40=0000000000000000000000000000000000000000
 
