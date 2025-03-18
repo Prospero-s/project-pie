@@ -24,7 +24,6 @@ const GroupRedirect = () => {
     }
 
     try {
-      setIsCheckingRedirect(true);
       if (retryCount > 0) {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
@@ -41,19 +40,33 @@ const GroupRedirect = () => {
 
       axios.defaults.headers.common = headers;
 
-      const response = await axios.get('/api/user-groups', { headers });
-      const hasGroup = response.data.groups && response.data.groups.length > 0;
-      const isOnGroupSelection = location.pathname.includes('/group-selection');
-      const lang = location.pathname.split('/')[1] || 'fr';
-
-      if (hasGroup && isOnGroupSelection) {
-        navigate(`/${lang}/dashboard`, { replace: true });
-      } else if (
-        !hasGroup &&
-        !isOnGroupSelection &&
+      if (
+        !location.pathname.includes('/group-selection') &&
         !location.pathname.includes('/auth')
       ) {
-        navigate(`/${lang}/group-selection`, { replace: true });
+        const response = await axios.get('/api/user-groups', { headers });
+        const hasGroup =
+          response.data.groups && response.data.groups.length > 0;
+        const lang = location.pathname.split('/')[1] || 'fr';
+
+        if (!hasGroup) {
+          setIsCheckingRedirect(true);
+          navigate(`/${lang}/group-selection`, { replace: true });
+          return;
+        }
+      }
+
+      if (location.pathname.includes('/group-selection')) {
+        const response = await axios.get('/api/user-groups', { headers });
+        const hasGroup =
+          response.data.groups && response.data.groups.length > 0;
+        const lang = location.pathname.split('/')[1] || 'fr';
+
+        if (hasGroup) {
+          setIsCheckingRedirect(true);
+          navigate(`/${lang}/dashboard`, { replace: true });
+          return;
+        }
       }
 
       setLastCheckedPath(location.pathname);
@@ -68,6 +81,7 @@ const GroupRedirect = () => {
         !location.pathname.includes('/auth')
       ) {
         const lang = location.pathname.split('/')[1] || 'fr';
+        setIsCheckingRedirect(true);
         navigate(`/${lang}/auth/signin`, { replace: true });
       }
     } finally {

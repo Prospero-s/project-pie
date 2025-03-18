@@ -7,6 +7,7 @@ const PasswordStrengthField = ({
   onChange,
   placeholder,
   className,
+  t,
 }) => {
   const [passwordStrength, setPasswordStrength] = useState(0);
 
@@ -35,7 +36,7 @@ const PasswordStrengthField = ({
 
   return (
     <div className="space-y-2">
-      <label className="block font-medium text-black">{label}</label>
+      <label className="block font-medium text-black">{t(label)}</label>
       <div className="relative">
         <Input.Password
           value={value}
@@ -58,10 +59,10 @@ const PasswordStrengthField = ({
         }`}
       >
         {passwordStrength < 75
-          ? 'Le mot de passe doit contenir au moins 8 caractères.'
+          ? t('password_requirements')
           : passwordStrength === 100
-            ? 'Mot de passe fort'
-            : 'Mot de passe moyen'}
+            ? t('password_strong')
+            : t('password_good')}
       </p>
     </div>
   );

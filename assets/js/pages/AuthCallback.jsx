@@ -55,9 +55,34 @@ const AuthCallback = () => {
             axios.defaults.headers.common['x-cognito-email'] =
               formattedUser.email;
             axios.defaults.headers.common['x-cognito-name'] =
-              formattedUser.name;
+              formattedUser.user_metadata.full_name;
             axios.defaults.headers.common['Authorization'] =
               `Bearer ${idToken.getJwtToken()}`;
+
+            // Vérifier si l'utilisateur est nouveau sur Cognito
+            try {
+              // Au lieu de vérifier côté client, on laisse le backend déterminer
+              // si l'utilisateur est nouveau et envoyer l'email si nécessaire
+              const welcomeResponse = await axios.post(
+                '/api/auth/send-welcome-email',
+                {
+                  email: formattedUser.email,
+                  fullName:
+                    formattedUser.user_metadata.full_name || 'Utilisateur',
+                },
+              );
+
+              if (welcomeResponse.data.emailSent) {
+                console.error(
+                  'Email de bienvenue envoyé à un nouvel utilisateur',
+                );
+              }
+            } catch (emailError) {
+              console.error(
+                "Erreur lors de l'envoi de l'email de bienvenue:",
+                emailError,
+              );
+            }
 
             setUser(formattedUser);
 
