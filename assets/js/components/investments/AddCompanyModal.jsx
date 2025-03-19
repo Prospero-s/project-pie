@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Steps } from 'antd';
 import SelectCreationType from './steps/SelectCreationType';
 import ManualCompanyForm from './steps/ManualCompanyForm';
@@ -10,6 +10,26 @@ const AddCompanyModal = ({ visible, onCancel, onAdd, t }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [creationType, setCreationType] = useState(null);
   const [companyData, setCompanyData] = useState(null);
+  const [modalWidth, setModalWidth] = useState(1200);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  // Fonction pour ajuster la largeur de la modale et détecter les petits écrans
+  useEffect(() => {
+    const handleResize = () => {
+      const windowWidth = window.innerWidth;
+      // Définir la largeur de la modale à 90% de la largeur de la fenêtre, mais pas plus de 1200px
+      setModalWidth(Math.min(windowWidth * 0.9, 1200));
+      setIsSmallScreen(windowWidth < 768);
+    };
+
+    // Appliquer au chargement et lors du redimensionnement
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const resetState = () => {
     setCurrentStep(0);
@@ -90,16 +110,28 @@ const AddCompanyModal = ({ visible, onCancel, onAdd, t }) => {
       open={visible}
       onCancel={handleCancel}
       footer={null}
-      width={1200}
+      width={modalWidth}
       centered
-      className="!max-w-[100vw]"
-      style={{
-        top: 20,
+      className="add-company-modal"
+      styles={{
+        body: {
+          maxHeight: 'calc(100vh - 200px)',
+          overflow: 'auto',
+          padding: isSmallScreen ? '16px 20px' : '24px 32px',
+        },
       }}
     >
-      <div className="flex flex-col mt-8">
-        <Steps current={currentStep} items={steps} className="mb-8" />
-        <div className="flex-grow">{steps[currentStep].content}</div>
+      <div className="flex flex-col mt-4">
+        <Steps
+          current={currentStep}
+          items={steps}
+          className="mb-6 md:mb-8"
+          responsive
+          size={isSmallScreen ? 'small' : 'default'}
+        />
+        <div className="flex-grow px-2 md:px-4">
+          {steps[currentStep].content}
+        </div>
       </div>
     </Modal>
   );
