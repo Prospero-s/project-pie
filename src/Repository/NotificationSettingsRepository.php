@@ -23,7 +23,7 @@ class NotificationSettingsRepository extends ServiceEntityRepository
 
     /**
      * Reset user's notifications settings
-     * @param mixed $settings
+     * @param NotificationSettings|null $settings
      * @param User $user
      * @return void
      */

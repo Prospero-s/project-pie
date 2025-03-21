@@ -9,6 +9,7 @@ const DropdownNotification = ({ i18n, user }) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [countNotifications, setCountNotifications] = useState(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -16,6 +17,7 @@ const DropdownNotification = ({ i18n, user }) => {
         setLoading(true);
         const data = await fetchNotifications(user);
         setNotifications(data.notifications);
+        setCountNotifications(data.notifications.length);
       } catch (error) {
         console.error('Error fetching notification settings:', error);
       } finally {
@@ -34,40 +36,51 @@ const DropdownNotification = ({ i18n, user }) => {
 
   const items =
     notifications.length > 0
-      ? notifications.map(notification => ({
-          key: notification.id.toString(), // Assure-toi que c'est une string
-          label: (
-            <div className="flex flex-col gap-2 px-2 py-1 lg:px-6 lg:py-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text_gray_900">
-                  {t('notifications')}
-                </span>
-                <span className="text-xs font-medium text-primary">
-                  {t('view_all')}
-                </span>
-              </div>
-              <ul className="flex flex-col gap-4">
-                <li className="flex items-center gap-4 border-b border-stroke px-2 py-1 lg:px-4 lg:py-2 hover:bg-gray-2">
-                  <div className="flex flex-1 items-center justify-between">
-                    <div>
-                      <h6 className="text-sm font-medium text_gray_900">
-                        {notification.title}
-                      </h6>
-                      <p className="text-sm text_gray_900">
-                        {notification.message}
-                      </p>
-                      <p className="text-xs">
-                        {new Date(
-                          notification.created_at.date,
-                        ).toLocaleString()}
-                      </p>
-                    </div>
+      ? [
+          {
+            key: 'notifications_list',
+            label: (
+              <div className="flex flex-col gap-2 px-2 py-1 lg:px-6 lg:py-4">
+                {/* Affichage de l'en-tête seulement si notifications.length > 0 */}
+                {notifications.length > 0 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text_gray_900">
+                      {t('notifications')}
+                    </span>
+                    <span className="text-xs font-medium text-primary">
+                      {t('view_all')}
+                    </span>
                   </div>
-                </li>
-              </ul>
-            </div>
-          ),
-        }))
+                )}
+                {/* Boucle sur les notifications */}
+                <ul className="flex flex-col gap-4">
+                  {notifications.map(notification => (
+                    <li
+                      key={notification.id}
+                      className="flex items-center gap-4 border-b border-stroke px-2 py-1 lg:px-4 lg:py-2 hover:bg-gray-2"
+                    >
+                      <div className="flex flex-1 items-center justify-between">
+                        <div>
+                          <h6 className="text-sm font-medium text_gray_900">
+                            {notification.title}
+                          </h6>
+                          <p className="text-sm text_gray_900">
+                            {notification.message}
+                          </p>
+                          <p className="text-xs">
+                            {new Date(
+                              notification.created_at.date,
+                            ).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ),
+          },
+        ]
       : [
           {
             key: 'no_notifications',
@@ -94,7 +107,7 @@ const DropdownNotification = ({ i18n, user }) => {
       placement={isMobile ? 'bottomLeft' : 'bottom'}
       arrow
     >
-      <Badge className="cursor-pointer">
+      <Badge count={countNotifications} className="cursor-pointer">
         <BellOutlined className="text-2xl lg:text-3xl hover:text-primary transition-colors duration-300" />
       </Badge>
     </Dropdown>

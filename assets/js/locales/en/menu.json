@@ -10,6 +10,7 @@
   "view_all": "View all",
   "read_all": "Read all",
   "delete_all": "Delete all",
+  "no_notifications": "No notifications",
   "notification_title": "Notification",
   "notification_message": "You have 5 new notifications",
   "notification_time": "2 minutes ago",
