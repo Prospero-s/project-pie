@@ -3,5 +3,89 @@
   "global_metrics": "Global Metrics",
   "documents": "Documents",
   "investment_details": "Investment Details",
-  "info": "Info"
+  "info": "Info",
+  
+  "data": "Data",
+  "no_data": "No data available",
+  "custom_chart": "Custom Chart",
+  "unsupported_chart_type": "Unsupported chart type",
+  
+  "layout": {
+    "columns": "Columns",
+    "move": "Move",
+    "resize": "Resize"
+  },
+  
+  "drawer": {
+    "title": "Data Explorer",
+    "execute": "Execute",
+    "select_query": "Select a predefined query",
+    "results": "Results",
+    "add_chart": "Add Chart",
+    "chart_title": "Chart Title",
+    "chart_title_placeholder": "Enter a title for the chart",
+    "chart_type": "Chart Type",
+    "add_chart_button": "Add this chart"
+  },
+  
+  "chart_types": {
+    "bar": "Bar",
+    "line": "Line",
+    "area": "Area",
+    "pie": "Pie"
+  },
+  
+  "queries": {
+    "monthly_revenue": {
+      "name": "Monthly Revenue",
+      "description": "Shows monthly revenue for the last 12 months"
+    },
+    "clients_by_sector": {
+      "name": "Clients by Sector",
+      "description": "Distribution of clients by business sector"
+    },
+    "arr_growth": {
+      "name": "ARR Growth",
+      "description": "Evolution of Annual Recurring Revenue by quarter"
+    },
+    "top_clients": {
+      "name": "Top 10 Clients",
+      "description": "List of the 10 largest clients by value"
+    },
+    "headcount": {
+      "name": "Headcount Evolution",
+      "description": "Number of employees by quarter"
+    },
+    "investments": {
+      "name": "Investments",
+      "description": "Investment value by quarter"
+    }
+  },
+  
+  "default_query": {
+    "name": "Default Query",
+    "description": "A default query"
+  },
+  
+  "errors": {
+    "cannot_load_queries": "Unable to load predefined queries. Using default queries.",
+    "select_query": "Please select a query to execute",
+    "invalid_format": "Invalid results format",
+    "query_execution": "Error executing query",
+    "unknown": "Unknown error",
+    "cannot_transform_data": "Unable to transform data for chart",
+    "cannot_create_chart": "Cannot create chart: "
+  },
+  
+  "info": {
+    "no_results": "The query returned no results"
+  },
+  
+  "warnings": {
+    "execute_query_first": "Please execute a query first to get data"
+  },
+  
+  "success": {
+    "chart_added": "Chart added successfully"
+  }
 }

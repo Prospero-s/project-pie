@@ -1,7 +1,91 @@
 {
-  "all_metrics": "Tous les indicateurs",
-  "global_metrics": "Indicateurs globaux",
+  "all_metrics": "Toutes les Métriques",
+  "global_metrics": "Métriques Globales",
   "documents": "Documents",
-  "investment_details": "Détails de l'investissement",
-  "info": "Info"
+  "investment_details": "Détails d'Investissement",
+  "info": "Info",
+  
+  "data": "Données",
+  "no_data": "Aucune donnée disponible",
+  "custom_chart": "Graphique Personnalisé",
+  "unsupported_chart_type": "Type de graphique non pris en charge",
+  
+  "layout": {
+    "columns": "Colonnes",
+    "move": "Déplacer",
+    "resize": "Redimensionner"
+  },
+  
+  "drawer": {
+    "title": "Explorateur de Données",
+    "execute": "Exécuter",
+    "select_query": "Sélectionnez une requête prédéfinie",
+    "results": "Résultats",
+    "add_chart": "Ajouter un Graphique",
+    "chart_title": "Titre du Graphique",
+    "chart_title_placeholder": "Entrez un titre pour le graphique",
+    "chart_type": "Type de Graphique",
+    "add_chart_button": "Ajouter ce graphique"
+  },
+  
+  "chart_types": {
+    "bar": "Barre",
+    "line": "Ligne",
+    "area": "Zone",
+    "pie": "Camembert"
+  },
+  
+  "queries": {
+    "monthly_revenue": {
+      "name": "Revenu Mensuel",
+      "description": "Montre le revenu mensuel pour les 12 derniers mois"
+    },
+    "clients_by_sector": {
+      "name": "Clients par Secteur",
+      "description": "Répartition des clients par secteur d'activité"
+    },
+    "arr_growth": {
+      "name": "Croissance ARR",
+      "description": "Évolution du revenu annuel récurrent par trimestre"
+    },
+    "top_clients": {
+      "name": "Top 10 Clients",
+      "description": "Liste des 10 plus grands clients par valeur"
+    },
+    "headcount": {
+      "name": "Évolution des Effectifs",
+      "description": "Nombre d'employés par trimestre"
+    },
+    "investments": {
+      "name": "Investissements",
+      "description": "Valeur des investissements par trimestre"
+    }
+  },
+  
+  "default_query": {
+    "name": "Requête par Défaut",
+    "description": "Une requête par défaut"
+  },
+  
+  "errors": {
+    "cannot_load_queries": "Impossible de charger les requêtes prédéfinies. Utilisation des requêtes par défaut.",
+    "select_query": "Veuillez sélectionner une requête à exécuter",
+    "invalid_format": "Format de résultats invalide",
+    "query_execution": "Erreur lors de l'exécution de la requête",
+    "unknown": "Erreur inconnue",
+    "cannot_transform_data": "Impossible de transformer les données pour le graphique",
+    "cannot_create_chart": "Impossible de créer le graphique : "
+  },
+  
+  "info": {
+    "no_results": "La requête n'a retourné aucun résultat"
+  },
+  
+  "warnings": {
+    "execute_query_first": "Veuillez d'abord exécuter une requête pour obtenir des données"
+  },
+  
+  "success": {
+    "chart_added": "Graphique ajouté avec succès"
+  }
 }

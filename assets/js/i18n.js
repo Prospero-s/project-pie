@@ -30,6 +30,11 @@ import frMetrics from './locales/fr/metrics.json';
 i18n.use(initReactI18next).init({
   resources: {
     fr: {
+      translation: {
+        ...frGlobal,
+        ...frMetrics,
+        metrics: frMetrics
+      },
       signin: frSignIn,
       signup: frSignUp,
       menu: frMenu,
@@ -44,6 +49,11 @@ i18n.use(initReactI18next).init({
       metrics: frMetrics,
     },
     en: {
+      translation: {
+        ...enGlobal,
+        ...enMetrics,
+        metrics: enMetrics
+      },
       signin: enSignIn,
       signup: enSignUp,
       menu: enMenu,
@@ -67,6 +77,8 @@ i18n.use(initReactI18next).init({
     useSuspense: false,
     bindI18n: 'languageChanged loaded',
   },
+  defaultNS: 'translation',
+  ns: ['translation', 'signin', 'signup', 'menu', 'investments', 'allCompanies', 'groups', 'global', 'dashboard', 'settings', 'charts', 'documents', 'metrics'],
   initImmediate: true,
 });
 
