@@ -6,7 +6,7 @@ import { fetchNotifications } from '@/services/notification/notificationService'
 
 const DropdownNotification = ({ i18n, user }) => {
   const { t } = useTranslation('menu', { i18n });
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
+  const [isMobile] = useState(window.innerWidth < 640);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [countNotifications, setCountNotifications] = useState(null);
@@ -27,11 +27,8 @@ const DropdownNotification = ({ i18n, user }) => {
 
     loadData();
 
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 640);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const interval = setInterval(loadData, 10000);
+    return () => clearInterval(interval);
   }, [user]);
 
   const items =
@@ -41,7 +38,6 @@ const DropdownNotification = ({ i18n, user }) => {
             key: 'notifications_list',
             label: (
               <div className="flex flex-col gap-2 px-2 py-1 lg:px-6 lg:py-4">
-                {/* Affichage de l'en-tête seulement si notifications.length > 0 */}
                 {notifications.length > 0 && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text_gray_900">
@@ -52,7 +48,6 @@ const DropdownNotification = ({ i18n, user }) => {
                     </span>
                   </div>
                 )}
-                {/* Boucle sur les notifications */}
                 <ul className="flex flex-col gap-4">
                   {notifications.map(notification => (
                     <li
