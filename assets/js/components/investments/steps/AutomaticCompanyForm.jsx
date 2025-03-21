@@ -114,12 +114,34 @@ const AutomaticCompanyForm = ({ onNext }) => {
             message: t('company_details.siren_invalid'),
           },
         ]}
-        normalize={value => value.replace(/\s/g, '')}
+        normalize={value => (value ? value.replace(/\s/g, '') : '')}
+        getValueFromEvent={e => {
+          const value = e.target.value;
+          return value ? value.replace(/\s/g, '') : '';
+        }}
       >
         <Input
           placeholder={t('company_details.siren_placeholder')}
           maxLength={9}
           disabled={loading}
+          onChange={e => {
+            const value = e.target.value;
+            if (value) {
+              const cleanValue = value.replace(/\s/g, '');
+              if (cleanValue !== value) {
+                form.setFieldsValue({ siren: cleanValue });
+              }
+            }
+          }}
+          onPaste={e => {
+            const clipboardData = e.clipboardData || window.clipboardData;
+            const pastedText = clipboardData.getData('Text');
+            if (pastedText) {
+              e.preventDefault();
+              const cleanValue = pastedText.replace(/\s/g, '');
+              form.setFieldsValue({ siren: cleanValue });
+            }
+          }}
         />
       </Form.Item>
 
