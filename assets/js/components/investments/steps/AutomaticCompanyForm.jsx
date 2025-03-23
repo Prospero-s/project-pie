@@ -56,8 +56,15 @@ const AutomaticCompanyForm = ({ onNext }) => {
 
   if (showConfirmation && companyData) {
     return (
-      <div className="company-confirmation">
-        <Card title={t('company_details.confirmation_title')} className="mb-4">
+      <div className="company-confirmation px-1 sm:px-2">
+        <Card
+          title={t('company_details.confirmation_title')}
+          className="mb-4"
+          styles={{
+            header: { padding: '12px 16px', fontSize: '16px' },
+            body: { padding: '12px 16px' },
+          }}
+        >
           <CompanyDetails company={companyData} />
           <Form onFinish={handleConfirm} className="mt-4">
             <Form.Item
@@ -69,8 +76,13 @@ const AutomaticCompanyForm = ({ onNext }) => {
                   message: t('company_details.sector_required'),
                 },
               ]}
+              labelCol={{ span: 24 }}
+              wrapperCol={{ span: 24 }}
             >
-              <Select placeholder={t('company_details.select_sector')}>
+              <Select
+                placeholder={t('company_details.select_sector')}
+                popupMatchSelectWidth={false}
+              >
                 {sectors.map(sector => (
                   <Option key={sector.value} value={sector.value}>
                     {sector.label}
@@ -78,17 +90,22 @@ const AutomaticCompanyForm = ({ onNext }) => {
                 ))}
               </Select>
             </Form.Item>
-            <div className="flex justify-end gap-3">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 mt-4">
               <Button
                 onClick={() => {
                   setShowConfirmation(false);
                   setCompanyData(null);
                   form.resetFields();
                 }}
+                className="w-full sm:w-auto mb-2 sm:mb-0"
               >
                 {t('common.back')}
               </Button>
-              <Button type="primary" htmlType="submit">
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="w-full sm:w-auto"
+              >
                 {t('common.confirm')}
               </Button>
             </div>
@@ -99,7 +116,12 @@ const AutomaticCompanyForm = ({ onNext }) => {
   }
 
   return (
-    <Form form={form} layout="vertical" onFinish={handleSearch}>
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={handleSearch}
+      className="px-1 sm:px-2"
+    >
       {error && (
         <Alert message={error} type="error" showIcon className="mb-4" />
       )}
@@ -146,20 +168,20 @@ const AutomaticCompanyForm = ({ onNext }) => {
       </Form.Item>
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center p-8 bg-blue-50 rounded-lg mb-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+        <div className="flex flex-col items-center justify-center p-4 sm:p-8 bg-blue-50 rounded-lg mb-4">
+          <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-blue-500 mb-4"></div>
           <div className="text-center">
-            <p className="text-lg font-medium text-blue-700 mb-2">
+            <p className="text-base sm:text-lg font-medium text-blue-700 mb-2">
               {t('company_details.loading.title')}
             </p>
-            <p className="text-sm text-blue-600">
+            <p className="text-xs sm:text-sm text-blue-600">
               {t('company_details.loading.description')}
             </p>
           </div>
         </div>
       ) : (
         <Form.Item className="flex justify-end">
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" className="w-full sm:w-auto">
             {t('common.search')}
           </Button>
         </Form.Item>
