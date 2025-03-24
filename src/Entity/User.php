@@ -29,6 +29,9 @@ class User
     #[ORM\OneToMany(targetEntity: CompanyInvestment::class, mappedBy: 'user')]
     private Collection $investments;
 
+    #[ORM\OneToMany(targetEntity: UserGroup::class, mappedBy: 'owner')]
+    private Collection $ownedGroups;
+
     #[ORM\Column(type: 'datetime')]
     private \DateTime $createdAt;
 
@@ -38,6 +41,7 @@ class User
     public function __construct()
     {
         $this->investments = new ArrayCollection();
+        $this->ownedGroups = new ArrayCollection();
         $this->createdAt = new \DateTime();
     }
 
@@ -116,6 +120,36 @@ class User
     public function setUserGroup(?UserGroup $userGroup): self
     {
         $this->userGroup = $userGroup;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserGroup>
+     */
+    public function getOwnedGroups(): Collection
+    {
+        return $this->ownedGroups;
+    }
+
+    public function addOwnedGroup(UserGroup $group): self
+    {
+        if (!$this->ownedGroups->contains($group)) {
+            $this->ownedGroups->add($group);
+            $group->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOwnedGroup(UserGroup $group): self
+    {
+        if ($this->ownedGroups->removeElement($group)) {
+            // set the owning side to null (unless already changed)
+            if ($group->getOwner() === $this) {
+                $group->setOwner(null);
+            }
+        }
+
         return $this;
     }
 }

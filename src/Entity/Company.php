@@ -50,11 +50,15 @@ class Company
     #[ORM\OneToMany(mappedBy: 'company', targetEntity: CompanyInvestment::class)]
     private Collection $investments;
 
+    #[ORM\OneToMany(targetEntity: KpiData::class, mappedBy: 'company')]
+    private Collection $kpiData;
+
     public function __construct()
     {
         $this->representatives = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->deletedAt = null;
+        $this->kpiData = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -217,6 +221,36 @@ class Company
     public function setSector(?string $sector): self
     {
         $this->sector = $sector;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, KpiData>
+     */
+    public function getKpiData(): Collection
+    {
+        return $this->kpiData;
+    }
+
+    public function addKpiData(KpiData $kpiData): self
+    {
+        if (!$this->kpiData->contains($kpiData)) {
+            $this->kpiData->add($kpiData);
+            $kpiData->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeKpiData(KpiData $kpiData): self
+    {
+        if ($this->kpiData->removeElement($kpiData)) {
+            // set the owning side to null (unless already changed)
+            if ($kpiData->getCompany() === $this) {
+                $kpiData->setCompany(null);
+            }
+        }
+
         return $this;
     }
 }

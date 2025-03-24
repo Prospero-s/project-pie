@@ -16,7 +16,7 @@ class UploadDocument
     #[ORM\JoinColumn(nullable: false)]
     private User $user;
 
-    #[ORM\ManyToOne(targetEntity: KpiData::class)]
+    #[ORM\ManyToOne(targetEntity: KpiData::class, inversedBy: 'uploadDocuments')]
     #[ORM\JoinColumn(nullable: false)]
     private KpiData $kpiData;
 

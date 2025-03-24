@@ -37,7 +37,7 @@ class KpiData
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $deletedAt = null;
 
-    #[ORM\OneToMany(mappedBy: 'kpiData', targetEntity: UploadDocument::class)]
+    #[ORM\OneToMany(targetEntity: UploadDocument::class, mappedBy: 'kpiData')]
     private Collection $uploadDocuments;
 
     public function __construct()
@@ -152,9 +152,9 @@ class KpiData
     public function removeUploadDocument(UploadDocument $uploadDocument): self
     {
         if ($this->uploadDocuments->removeElement($uploadDocument)) {
-            // Ne pas mettre à null si la relation est non-nullable
+            // set the owning side to null (unless already changed)
             if ($uploadDocument->getKpiData() === $this) {
-                $uploadDocument->setKpiData($this);
+                $uploadDocument->setKpiData(null);
             }
         }
 
