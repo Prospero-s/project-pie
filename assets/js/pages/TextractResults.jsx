@@ -48,18 +48,19 @@ const TextractResults = ({ i18n }) => {
       const prompt = `
         Je suis un document financier ou business plan contenant potentiellement les KPIs suivants. 
         Extrais et formate ces KPIs à partir de mon contenu. Si un KPI n'est pas présent, indique "N.A".
+        Prends en compte à la fois les termes français et anglais (indiqués entre parenthèses).
         
         KPIs à extraire:
-        - Chiffre d'affaire
-        - Marge brute
-        - Coût d'acquisition du client
-        - Valeur à vie client
-        - Nombre employé
-        - Argent brulé
-        - Ebitda
-        - Revenu Annuel Récurrent
-        - Revenu Mensuel Récurrent
-        - Montant levé
+        - Chiffre d'affaire (Revenue, Sales, Turnover)
+        - Marge brute (Gross Margin, Gross Profit)
+        - Coût d'acquisition du client (CAC, Cost of Acquisition, CAC Ratio)
+        - Valeur à vie client (Lifetime Value, LTV)
+        - Nombre employé (Headcount, Employees)
+        - Argent brulé (Burn, Cash Burn, Burn Rate)
+        - Ebitda (EBITDA)
+        - Revenu Annuel Récurrent (ARR, Annual Recurring Revenue)
+        - Revenu Mensuel Récurrent (MRR, Monthly Recurring Revenue)
+        - Montant levé (Funding, Raised)
         
         Document:
         ${textContent.join('\n')}
