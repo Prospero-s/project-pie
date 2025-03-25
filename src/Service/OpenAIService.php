@@ -75,14 +75,29 @@ class OpenAIService
                     throw new \Exception('Invalid JSON response');
                 }
                 
+                // Extract reconstructed table data if available
+                $reconstructedTable = null;
+                if (isset($kpiData['reconstructed_table']) && is_array($kpiData['reconstructed_table'])) {
+                    $reconstructedTable = $kpiData['reconstructed_table'];
+                    // Remove from KPI data to avoid it being processed as a KPI
+                    unset($kpiData['reconstructed_table']);
+                }
+                
                 // Standardize KPI fields to ensure all required fields exist
                 $standardizedKpis = $this->standardizeKpiFields($kpiData);
                 
-                return [
+                $response = [
                     'success' => true,
                     'result' => $standardizedKpis,
                     'documentId' => $documentId
                 ];
+                
+                // Add reconstructed table if available
+                if ($reconstructedTable !== null) {
+                    $response['result']['reconstructed_table'] = $reconstructedTable;
+                }
+                
+                return $response;
             } catch (\Exception $e) {
                 return [
                     'success' => false,
