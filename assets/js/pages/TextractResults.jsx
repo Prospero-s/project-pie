@@ -126,13 +126,13 @@ const TextractResults = ({ i18n }) => {
             <Alert
               message={
                 verificationResults.verified
-                  ? 'Vérification OpenAI : Texte validé'
-                  : 'Vérification OpenAI : Corrections suggérées'
+                  ? t('textract.verification.verified')
+                  : t('textract.verification.notVerified')
               }
               description={
                 <div>
                   <div>
-                    Niveau de confiance:{' '}
+                    {t('textract.verification.confidence')}:{' '}
                     {Math.round(verificationResults.confidence * 100)}%
                   </div>
                   {verificationResults.corrections &&
@@ -161,7 +161,7 @@ const TextractResults = ({ i18n }) => {
                                   )
                                 }
                               >
-                                Appliquer
+                                {t('textract.verification.apply')}
                               </Button>,
                             ]}
                           >

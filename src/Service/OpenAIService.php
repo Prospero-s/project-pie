@@ -116,7 +116,7 @@ class OpenAIService
             return [
                 'verified' => $aiResponse['verified'] ?? false,
                 'corrections' => $aiResponse['corrections'] ?? [],
-                'confidence' => $aiResponse['confidence'] ?? 0,
+                'confidence' => $this->calculateAdjustedConfidence($aiResponse),
                 'textractData' => $textractData
             ];
             
@@ -127,5 +127,37 @@ class OpenAIService
                 'textractData' => $textractData
             ];
         }
+    }
+    
+    /**
+     * Calculate an adjusted confidence level based on various factors
+     * 
+     * @param array<string, mixed> $aiResponse The response from OpenAI
+     * @return float The adjusted confidence level (0-1)
+     */
+    private function calculateAdjustedConfidence(array $aiResponse): float
+    {
+        // Get base confidence from AI response, default to 0.5 if not provided
+        $baseConfidence = $aiResponse['confidence'] ?? 0.5;
+        
+        // If the AI says the text is verified and there are no corrections
+        if (($aiResponse['verified'] ?? false) && empty($aiResponse['corrections'] ?? [])) {
+            // High confidence for perfect documents: 99%
+            return 0.99;
+        }
+        
+        // If there are corrections, adjust confidence based on number of corrections
+        $corrections = $aiResponse['corrections'] ?? [];
+        $correctionCount = count($corrections);
+        
+        if ($correctionCount > 0) {
+            // Reduce confidence based on number of corrections
+            // More corrections = lower confidence
+            $confidenceReduction = min(0.7, $correctionCount * 0.1);
+            return max(0.3, $baseConfidence - $confidenceReduction);
+        }
+        
+        // Default fallback
+        return $baseConfidence;
     }
 } 

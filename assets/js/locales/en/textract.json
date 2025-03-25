@@ -5,9 +5,9 @@
   "noPdfAvailable": "No PDF file available",
   "verification": {
     "title": "Data verification",
-    "confidence": "Confidence",
-    "verified": "Verified",
-    "notVerified": "Not verified",
+    "confidence": "Confidence level",
+    "verified": "OpenAI verification: Text validated",
+    "notVerified": "OpenAI verification: Corrections suggested",
     "apply": "Apply",
     "error": "Verification error"
   }
