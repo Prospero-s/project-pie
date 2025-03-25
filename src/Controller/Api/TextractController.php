@@ -152,6 +152,10 @@ class TextractController extends AbstractController
 
     /**
      * Creates a prompt for KPI extraction using pre-extracted data and document content as reference
+     * 
+     * @param string $textContent The text content of the document
+     * @param array<string, mixed>|null $extractedData Pre-extracted data from TextExtract
+     * @return string The prompt for OpenAI
      */
     private function getKpiExtractionPromptWithExtractedData(string $textContent, ?array $extractedData = null): string
     {
@@ -174,7 +178,7 @@ class TextractController extends AbstractController
         ";
         
         // If we have pre-extracted data, instruct the model to use it primarily
-        if ($extractedData && is_array($extractedData)) {
+        if ($extractedData) {
             $extractedDataJson = json_encode($extractedData, JSON_PRETTY_PRINT);
             return "{$basePrompt}
             
