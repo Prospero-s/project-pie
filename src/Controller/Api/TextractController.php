@@ -94,11 +94,12 @@ class TextractController extends AbstractController
             if (isset($textractResult['text']['content']) && is_array($textractResult['text']['content'])) {
                 $textContent = implode("\n", $textractResult['text']['content']);
                 
-                // Use the frontend-provided prompt or a simple reference
-                $documentId = $fileName; // Using filename as document ID
-                $kpiAnalysis = $this->openAIService->analyzeKpis($textContent, $documentId);
+                // Get KPI extraction prompt
+                $prompt = $this->getKpiExtractionPrompt($textContent);
                 
-                if (isset($kpiAnalysis['success']) && $kpiAnalysis['success'] && isset($kpiAnalysis['result'])) {
+                $kpiAnalysis = $this->openAIService->analyzeKpis($prompt, $fileName);
+                
+                if ($kpiAnalysis['success'] && isset($kpiAnalysis['result'])) {
                     $verificationResult['aiAnalysis'] = $kpiAnalysis['result'];
                 }
             }
@@ -107,5 +108,72 @@ class TextractController extends AbstractController
         } catch (\RuntimeException $e) {
             return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    #[Route('/textract/analyze-text', name: 'app_textract_analyze_text', methods: ['POST'])]
+    public function analyzeTextContent(Request $request): JsonResponse
+    {
+        try {
+            $cognitoId = $request->headers->get('X-Cognito-Id');
+            if (!$cognitoId) {
+                throw new \Exception('Utilisateur non authentifié');
+            }
+
+            $data = json_decode($request->getContent(), true);
+            
+            if (!isset($data['textContent']) || !is_array($data['textContent'])) {
+                return new JsonResponse(['error' => 'Contenu textuel invalide ou manquant'], JsonResponse::HTTP_BAD_REQUEST);
+            }
+            
+            $documentId = $data['documentId'] ?? 'unknown';
+            $textContent = implode("\n", $data['textContent']);
+            
+            // Get KPI extraction prompt
+            $prompt = $this->getKpiExtractionPrompt($textContent);
+            
+            $kpiAnalysis = $this->openAIService->analyzeKpis($prompt, $documentId);
+            
+            return new JsonResponse($kpiAnalysis);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false, 
+                'message' => 'Erreur lors de l\'analyse du texte avec OpenAI: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Creates a prompt for KPI extraction from document content
+     */
+    private function getKpiExtractionPrompt(string $textContent): string
+    {
+        return "
+        Je suis un document financier ou business plan contenant potentiellement les KPIs suivants. 
+        Extrais et formate ces KPIs à partir de mon contenu. Si un KPI n'est pas présent, indique \"N.A\".
+        Prends en compte à la fois les termes français et anglais (indiqués entre parenthèses).
+        
+        KPIs à extraire:
+        - Chiffre d'affaire (Revenue, Sales, Turnover)
+        - Marge brute (Gross Margin, Gross Profit)
+        - Coût d'acquisition du client (CAC, Cost of Acquisition, CAC Ratio)
+        - Valeur à vie client (Lifetime Value, LTV)
+        - Nombre employé (Headcount, Employees)
+        - Argent brulé (Burn, Cash Burn, Burn Rate)
+        - Ebitda (EBITDA)
+        - Revenu Annuel Récurrent (ARR, Annual Recurring Revenue)
+        - Revenu Mensuel Récurrent (MRR, Monthly Recurring Revenue)
+        - Montant levé (Funding, Raised)
+        
+        Document:
+        {$textContent}
+        
+        Réponds uniquement avec un objet JSON contenant les valeurs extraites, par exemple:
+        {
+          \"chiffre_affaire\": \"1000000€\",
+          \"marge_brute\": \"500000€\",
+          \"cout_acquisition\": \"200€\",
+          ...
+        }
+        ";
     }
 }

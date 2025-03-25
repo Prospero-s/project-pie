@@ -33,50 +33,21 @@ const TextractResults = ({ i18n }) => {
 
   // Function to validate TextExtract data with OpenAI
   const validateWithOpenAI = async () => {
-    if (!analyzedData || !analyzedData.textractData) {
-      message.error('Aucune donnée à valider.');
+    if (!analyzedData?.textractData?.text?.content) {
+      message.error(
+        'Aucun contenu textuel à analyser. Veuillez réessayer avec un autre document.',
+      );
       return;
     }
 
-    setValidatingWithAI(true);
-
     try {
-      // Extract text content from the TextExtract result
-      const textContent = analyzedData?.textractData?.text?.content || [];
+      setValidatingWithAI(true);
 
-      // Build prompt for OpenAI to extract KPIs from the document
-      const prompt = `
-        Je suis un document financier ou business plan contenant potentiellement les KPIs suivants. 
-        Extrais et formate ces KPIs à partir de mon contenu. Si un KPI n'est pas présent, indique "N.A".
-        Prends en compte à la fois les termes français et anglais (indiqués entre parenthèses).
-        
-        KPIs à extraire:
-        - Chiffre d'affaire (Revenue, Sales, Turnover)
-        - Marge brute (Gross Margin, Gross Profit)
-        - Coût d'acquisition du client (CAC, Cost of Acquisition, CAC Ratio)
-        - Valeur à vie client (Lifetime Value, LTV)
-        - Nombre employé (Headcount, Employees)
-        - Argent brulé (Burn, Cash Burn, Burn Rate)
-        - Ebitda (EBITDA)
-        - Revenu Annuel Récurrent (ARR, Annual Recurring Revenue)
-        - Revenu Mensuel Récurrent (MRR, Monthly Recurring Revenue)
-        - Montant levé (Funding, Raised)
-        
-        Document:
-        ${textContent.join('\n')}
-        
-        Réponds uniquement avec un objet JSON contenant les valeurs extraites, par exemple:
-        {
-          "chiffre_affaire": "1000000€",
-          "marge_brute": "500000€",
-          "cout_acquisition": "200€",
-          ...
-        }
-      `;
+      const textContent = analyzedData.textractData.text.content;
 
-      // Call your backend API that will communicate with OpenAI
-      const response = await axios.post('/api/openai/analyze', {
-        prompt,
+      // Call your backend API with just the text content
+      const response = await axios.post('/api/textract/analyze-text', {
+        textContent,
         documentId: analyzedData.id || 'unknown',
       });
 
