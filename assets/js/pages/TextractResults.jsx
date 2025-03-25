@@ -112,58 +112,208 @@ const TextractResults = ({ i18n }) => {
 
   // Update KPI table with AI analysis data
   const updateKpiTable = aiAnalysis => {
-    setKpiData([
-      {
-        key: 'chiffre_affaire',
-        label: "Chiffre d'affaire",
-        value: aiAnalysis?.chiffre_affaire || 'N.A',
-      },
-      {
-        key: 'marge_brute',
-        label: 'Marge brute',
-        value: aiAnalysis?.marge_brute || 'N.A',
-      },
-      {
-        key: 'cout_acquisition',
-        label: "Coût d'acquisition du client",
-        value: aiAnalysis?.cout_acquisition || 'N.A',
-      },
-      {
-        key: 'valeur_vie_client',
-        label: 'Valeur à vie client',
-        value: aiAnalysis?.valeur_vie_client || 'N.A',
-      },
-      {
-        key: 'nombre_employe',
-        label: 'Nombre employé',
-        value: aiAnalysis?.nombre_employe || 'N.A',
-      },
-      {
-        key: 'argent_brule',
-        label: 'Argent brulé',
-        value: aiAnalysis?.argent_brule || 'N.A',
-      },
-      {
-        key: 'ebitda',
-        label: 'Ebitda',
-        value: aiAnalysis?.ebitda || 'N.A',
-      },
-      {
-        key: 'revenu_annuel',
-        label: 'Revenu Annuel Récurrent',
-        value: aiAnalysis?.revenu_annuel || 'N.A',
-      },
-      {
-        key: 'revenu_mensuel',
-        label: 'Revenu Mensuel Récurrent',
-        value: aiAnalysis?.revenu_mensuel || 'N.A',
-      },
-      {
-        key: 'montant_leve',
-        label: 'Montant levé',
-        value: aiAnalysis?.montant_leve || 'N.A',
-      },
-    ]);
+    // Use reconstructedTable data if available instead of direct AI values
+    if (
+      aiAnalysis?.reconstructed_table &&
+      Array.isArray(aiAnalysis.reconstructed_table)
+    ) {
+      const table = aiAnalysis.reconstructed_table;
+
+      // Extract data from reconstructed table
+      // Create a helper function to find relevant values in the table
+      const findValueInTable = searchTerms => {
+        if (table.length < 2) return 'N.A';
+
+        const headers = table[0] || [];
+        const dataRows = table.slice(1) || [];
+        let values = [];
+
+        // Search through rows and columns for matching terms
+        for (let row of dataRows) {
+          for (let i = 0; i < headers.length; i++) {
+            const header = headers[i]?.toString().toLowerCase() || '';
+            const cellValue = row[i]?.toString() || '';
+
+            // Check if header or first column contains any of the search terms
+            if (
+              searchTerms.some(term => header.includes(term.toLowerCase())) ||
+              (row[0] &&
+                searchTerms.some(term =>
+                  row[0].toString().toLowerCase().includes(term.toLowerCase()),
+                ))
+            ) {
+              // If it's a number, add it to our values array for averaging
+              const numValue = parseFloat(cellValue.replace(/[^\d.-]/g, ''));
+              if (!isNaN(numValue)) {
+                values.push(numValue);
+              }
+            }
+          }
+        }
+
+        // Calculate average if we found values, otherwise return N.A
+        if (values.length > 0) {
+          const average =
+            values.reduce((sum, val) => sum + val, 0) / values.length;
+          // Format as currency if it looks like money
+          if (
+            searchTerms.some(term =>
+              [
+                'chiffre',
+                'revenu',
+                'montant',
+                'argent',
+                'ebitda',
+                'marge',
+                'coût',
+                'valeur',
+              ].includes(term.toLowerCase()),
+            )
+          ) {
+            return new Intl.NumberFormat('fr-FR', {
+              style: 'currency',
+              currency: 'EUR',
+            }).format(average);
+          }
+          // Otherwise just return the number formatted
+          return average.toLocaleString('fr-FR');
+        }
+
+        return 'N.A';
+      };
+
+      setKpiData([
+        {
+          key: 'chiffre_affaire',
+          label: "Chiffre d'affaire",
+          value: findValueInTable([
+            "chiffre d'affaire",
+            'ca',
+            "chiffre d'affaires",
+            'revenu',
+            'revenus',
+          ]),
+        },
+        {
+          key: 'marge_brute',
+          label: 'Marge brute',
+          value: findValueInTable(['marge brute', 'marge']),
+        },
+        {
+          key: 'cout_acquisition',
+          label: "Coût d'acquisition du client",
+          value: findValueInTable([
+            "coût d'acquisition",
+            'cac',
+            'coût client',
+            "coût d'acquisition client",
+          ]),
+        },
+        {
+          key: 'valeur_vie_client',
+          label: 'Valeur à vie client',
+          value: findValueInTable([
+            'valeur vie client',
+            'ltv',
+            'lifetime value',
+            'valeur client',
+          ]),
+        },
+        {
+          key: 'nombre_employe',
+          label: 'Nombre employé',
+          value: findValueInTable([
+            'nombre employé',
+            'effectif',
+            'employés',
+            'salariés',
+          ]),
+        },
+        {
+          key: 'argent_brule',
+          label: 'Argent brulé',
+          value: findValueInTable(['argent brulé', 'burn rate', 'cash burn']),
+        },
+        {
+          key: 'ebitda',
+          label: 'Ebitda',
+          value: findValueInTable(['ebitda']),
+        },
+        {
+          key: 'revenu_annuel',
+          label: 'Revenu Annuel Récurrent',
+          value: findValueInTable(['revenu annuel', 'arr', 'chiffre annuel']),
+        },
+        {
+          key: 'revenu_mensuel',
+          label: 'Revenu Mensuel Récurrent',
+          value: findValueInTable(['revenu mensuel', 'mrr', 'chiffre mensuel']),
+        },
+        {
+          key: 'montant_leve',
+          label: 'Montant levé',
+          value: findValueInTable([
+            'montant levé',
+            'levée de fonds',
+            'capital levé',
+          ]),
+        },
+      ]);
+    } else {
+      // Fallback to direct AI values if reconstructed table is not available
+      setKpiData([
+        {
+          key: 'chiffre_affaire',
+          label: "Chiffre d'affaire",
+          value: aiAnalysis?.chiffre_affaire || 'N.A',
+        },
+        {
+          key: 'marge_brute',
+          label: 'Marge brute',
+          value: aiAnalysis?.marge_brute || 'N.A',
+        },
+        {
+          key: 'cout_acquisition',
+          label: "Coût d'acquisition du client",
+          value: aiAnalysis?.cout_acquisition || 'N.A',
+        },
+        {
+          key: 'valeur_vie_client',
+          label: 'Valeur à vie client',
+          value: aiAnalysis?.valeur_vie_client || 'N.A',
+        },
+        {
+          key: 'nombre_employe',
+          label: 'Nombre employé',
+          value: aiAnalysis?.nombre_employe || 'N.A',
+        },
+        {
+          key: 'argent_brule',
+          label: 'Argent brulé',
+          value: aiAnalysis?.argent_brule || 'N.A',
+        },
+        {
+          key: 'ebitda',
+          label: 'Ebitda',
+          value: aiAnalysis?.ebitda || 'N.A',
+        },
+        {
+          key: 'revenu_annuel',
+          label: 'Revenu Annuel Récurrent',
+          value: aiAnalysis?.revenu_annuel || 'N.A',
+        },
+        {
+          key: 'revenu_mensuel',
+          label: 'Revenu Mensuel Récurrent',
+          value: aiAnalysis?.revenu_mensuel || 'N.A',
+        },
+        {
+          key: 'montant_leve',
+          label: 'Montant levé',
+          value: aiAnalysis?.montant_leve || 'N.A',
+        },
+      ]);
+    }
 
     // Also set reconstructed table if available
     if (
