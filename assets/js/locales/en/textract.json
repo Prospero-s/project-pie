@@ -9,6 +9,7 @@
     "verified": "OpenAI verification: Text validated",
     "notVerified": "OpenAI verification: Corrections suggested",
     "apply": "Apply",
-    "error": "Verification error"
+    "error": "Verification error",
+    "disclaimer": "Although AI has analyzed this document, we recommend manually verifying critical data (amounts, dates, and financial information) highlighted in color to ensure optimal accuracy."
   }
 } 

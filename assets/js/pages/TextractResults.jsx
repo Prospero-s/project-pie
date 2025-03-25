@@ -23,7 +23,7 @@ const { TextArea } = Input;
 const TextractResults = ({ i18n }) => {
   const navigate = useNavigate();
   const { analyzedData } = useUser();
-  const { t } = useTranslation('documents', { i18n });
+  const { t } = useTranslation(['documents', 'textract'], { i18n });
   const company = analyzedData?.company || null;
   const [editedText, setEditedText] = useState('');
   const [loading, setLoading] = useState(true);
@@ -109,8 +109,8 @@ const TextractResults = ({ i18n }) => {
     <>
       {!analyzedData ? (
         <div style={{ padding: 20 }}>
-          <Title level={4}>{t('textract.noResults')}</Title>
-          <Button onClick={() => navigate(-1)}>{t('textract.back')}</Button>
+          <Title level={4}>{t('textract:noResults')}</Title>
+          <Button onClick={() => navigate(-1)}>{t('textract:back')}</Button>
         </div>
       ) : (
         <div style={{ padding: 20 }}>
@@ -125,22 +125,34 @@ const TextractResults = ({ i18n }) => {
           {verificationResults && (
             <Alert
               message={
-                verificationResults.verified
-                  ? t('textract.verification.verified')
-                  : t('textract.verification.notVerified')
+                <>
+                  {verificationResults.verified
+                    ? t('textract:verification.verified')
+                    : t('textract:verification.notVerified')}
+                </>
               }
               description={
                 <div>
                   <div>
-                    {t('textract.verification.confidence')}:{' '}
+                    {t('textract:verification.confidence')}:{' '}
                     {Math.round(verificationResults.confidence * 100)}%
+                  </div>
+                  <div
+                    style={{
+                      marginTop: '8px',
+                      fontStyle: 'italic',
+                      fontSize: '0.9em',
+                      color: '#888',
+                    }}
+                  >
+                    {t('textract:verification.disclaimer')}
                   </div>
                   {verificationResults.corrections &&
                     verificationResults.corrections.length > 0 && (
                       <List
                         size="small"
                         header={
-                          <div>{t('textract.suggestedCorrections')}:</div>
+                          <div>{t('textract:suggestedCorrections')}:</div>
                         }
                         bordered
                         dataSource={verificationResults.corrections}
@@ -161,7 +173,7 @@ const TextractResults = ({ i18n }) => {
                                   )
                                 }
                               >
-                                {t('textract.verification.apply')}
+                                {t('textract:verification.apply')}
                               </Button>,
                             ]}
                           >
@@ -224,7 +236,7 @@ const TextractResults = ({ i18n }) => {
                     style={{ width: '100%', height: '500px', border: 'none' }}
                   />
                 ) : (
-                  <Text>{t('textract.noPdfAvailable')}</Text>
+                  <Text>{t('textract:noPdfAvailable')}</Text>
                 )}
               </div>
             </Col>
