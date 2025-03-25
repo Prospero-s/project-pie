@@ -9,6 +9,10 @@
   "kpiAnalysisTitle": "Analyse et vérification des KPIs par OpenAI",
   "kpiAnalysisDesc": "Les données extraites par TextExtract ont été vérifiées et corrigées si nécessaire par OpenAI.",
   "verificationInProgress": "Vérification par OpenAI en cours...",
+  "kpiTab": "Analyse KPI",
+  "reconstructedTableTab": "Tableau Reconstruit",
+  "noTableReconstruction": "Aucun tableau n'a pu être reconstruit à partir du document",
+  "tableReconstructionDesc": "Voici une reconstruction de la structure du tableau détectée dans le document par OpenAI, basée sur les données extraites ligne par ligne par TextExtract.",
   "verification": {
     "title": "Vérification des données",
     "confidence": "Niveau de confiance",

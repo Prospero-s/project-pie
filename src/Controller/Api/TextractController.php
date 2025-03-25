@@ -185,7 +185,16 @@ class TextractController extends AbstractController
             IMPORTANT: DO NOT extract new data from the document. The document has already been processed by TextExtract with the following data:
             {$extractedDataJson}
             
-            YOUR TASK: Use ONLY this pre-extracted data as your source of information. The document content below should ONLY be used as a reference to understand context and determine where each value belongs in the table:
+            UNDERSTAND HOW TEXTEXTRACT WORKS: TextExtract processes the document line by line in reading order. When it encounters tabular data, it extracts each line sequentially. It processes each cell within a row before moving to the next row. When no data is available in subsequent cells, it moves to the next line. This means the data structure may not reflect the original table structure but represents a sequential reading of the content.
+            
+            The content is arranged as a sequence of lines, where each line corresponds to what TextExtract identified as a logical line in the document. Adjacent cells in tables are presented as consecutive lines, which may not represent the original table structure.
+            
+            YOUR TASK: 
+            1. Use the pre-extracted data as your primary source of information
+            2. Understand the sequential line-by-line nature of the extraction
+            3. Attempt to reconstruct the original table structure where applicable
+            4. Match KPI labels with their corresponding values even if they appear on separate lines
+            5. The document content below should be used as a reference to understand context and determine the correct table structure
             
             Document (REFERENCE ONLY - DO NOT EXTRACT FROM THIS):
             {$textContent}
@@ -195,25 +204,51 @@ class TextractController extends AbstractController
               \"chiffre_affaire\": \"1000000€\",
               \"marge_brute\": \"500000€\",
               \"cout_acquisition\": \"200€\",
-              ...
+              \"valeur_vie_client\": \"2000€\",
+              \"nombre_employe\": \"250\",
+              \"argent_brule\": \"50000€/month\",
+              \"ebitda\": \"100000€\",
+              \"revenu_annuel\": \"1.2M€\",
+              \"revenu_mensuel\": \"100000€\",
+              \"montant_leve\": \"3M€\"
             }
+            
+            Additionally, include a key called 'reconstructed_table' that contains an array representation of the table structure you've interpreted from the document, if any tabular data is present. Each row should be an array of cells.
             
             Use the French field names in the JSON response regardless of document language.
             ";
         }
         
-        // If no pre-extracted data, use the original prompt
+        // If no pre-extracted data, use the original prompt with table reconstruction guidance
         return "{$basePrompt}
+        
+        UNDERSTAND HOW TEXTEXTRACT WORKS: TextExtract processes the document line by line in reading order. When it encounters tabular data, it extracts each line sequentially. It processes each cell within a row before moving to the next row. When no data is available in subsequent cells, it moves to the next line. This means that tables in the document are flattened into a sequence of lines.
+        
+        When analyzing the document content below, pay attention to:
+        1. Lines that appear to be headers or labels (they might be followed by their values on subsequent lines)
+        2. Numeric values that follow label patterns
+        3. Column alignments and patterns that might indicate tabular data
+        4. Q1, Q2, Q3, Q4 designations that likely indicate quarterly data
+        5. Rows and columns that together form a coherent table structure
         
         Document:
         {$textContent}
         
-        Respond only with a JSON object containing the extracted values, for example:
+        Respond with a JSON object containing:
+        1. The extracted KPI values in the standard format
+        2. A key called 'reconstructed_table' that contains an array representation of any table you can reconstruct from the text
+        
+        Example response format:
         {
           \"chiffre_affaire\": \"1000000€\",
           \"marge_brute\": \"500000€\",
           \"cout_acquisition\": \"200€\",
-          ...
+          // ... other KPIs ...
+          \"reconstructed_table\": [
+            [\"KPI\", \"Q1\", \"Q2\", \"Q3\", \"Q4\", \"YTD\"],
+            [\"Revenue\", \"250K\", \"300K\", \"350K\", \"400K\", \"1.3M\"],
+            // ... other rows ...
+          ]
         }
         
         Use the French field names in the JSON response regardless of document language.
@@ -242,15 +277,48 @@ class TextractController extends AbstractController
         - Monthly Recurring Revenue / Revenu Mensuel Récurrent (Also: MRR)
         - Funding Amount / Montant levé (Also: Raised)
         
+        IMPORTANT TEXTEXTRACT LOGIC: The document was processed by TextExtract, which works line by line in reading order. When processing tables, TextExtract extracts values sequentially, cell by cell, row by row. This means that what appears as a table in the original document is represented as a flat sequence of text lines. Labels and their corresponding values might appear on consecutive lines rather than in the same line.
+        
+        For example, a table that looks like:
+        | KPI | Q1 | Q2 | Q3 | Q4 |
+        | Revenue | 100 | 200 | 300 | 400 |
+        
+        Might be extracted as:
+        KPI
+        Q1
+        Q2
+        Q3
+        Q4
+        Revenue
+        100
+        200
+        300
+        400
+        
+        When analyzing, look for patterns like:
+        1. Headers or labels followed by values on subsequent lines
+        2. Numeric sequences that form columns in an implied table
+        3. Keywords like 'Q1', 'Q2', 'YTD' that indicate tabular structure
+        4. Consistent spacing or formatting that suggests table alignment
+        
         Document:
         {$textContent}
         
-        Respond only with a JSON object containing the extracted values, for example:
+        Respond with a JSON object containing:
+        1. The extracted KPI values in the standard format
+        2. A 'reconstructed_table' key containing an array representation of any table you can reconstruct from the text
+        
+        Example response:
         {
           \"chiffre_affaire\": \"1000000€\",
           \"marge_brute\": \"500000€\",
           \"cout_acquisition\": \"200€\",
-          ...
+          // ... other KPIs ...
+          \"reconstructed_table\": [
+            [\"KPI\", \"Q1\", \"Q2\", \"Q3\", \"Q4\", \"YTD\"],
+            [\"Revenue\", \"250K\", \"300K\", \"350K\", \"400K\", \"1.3M\"],
+            // ... other rows ...
+          ]
         }
         
         Use the French field names in the JSON response regardless of document language.
