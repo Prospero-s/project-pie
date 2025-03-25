@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Service\AwsTextractService;
+use App\Service\OpenAIService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,10 +14,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class TextractController extends AbstractController
 {
     private AwsTextractService $textractService;
+    private OpenAIService $openAIService;
 
-    public function __construct(AwsTextractService $textractService)
+    public function __construct(AwsTextractService $textractService, OpenAIService $openAIService)
     {
         $this->textractService = $textractService;
+        $this->openAIService = $openAIService;
     }
 
     #[Route('/textract/analyze', name: 'app_textract_analyze', methods: ['POST'])]
@@ -49,12 +52,16 @@ class TextractController extends AbstractController
             $filePath = $uploadDir . '/' . $fileName;
             $file->move($uploadDir, $fileName);
 
-            $result = $this->textractService->analyzeDocument($filePath);
-
+            $textractResult = $this->textractService->analyzeDocument($filePath);
+            
+            // Perform OpenAI verification on the extracted text
+            $verificationResult = $this->openAIService->verifyTextractData($textractResult);
+            
+            // Add PDF URL to the result
             $pdfUrl = '/uploads/' . $fileName;
-            $result['pdfUrl'] = $pdfUrl;
+            $verificationResult['pdfUrl'] = $pdfUrl;
 
-            return new JsonResponse($result);
+            return new JsonResponse($verificationResult);
         } catch (\RuntimeException $e) {
             return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }

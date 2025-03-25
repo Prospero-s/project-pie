@@ -1,0 +1,14 @@
+{
+  "noResults": "Aucun résultat disponible",
+  "back": "Retour",
+  "suggestedCorrections": "Corrections suggérées",
+  "noPdfAvailable": "Aucun fichier PDF disponible",
+  "verification": {
+    "title": "Vérification des données",
+    "confidence": "Confiance",
+    "verified": "Vérifié",
+    "notVerified": "Non vérifié",
+    "apply": "Appliquer",
+    "error": "Erreur de vérification"
+  }
+} 

@@ -5,11 +5,18 @@ export const saveAsDraft = async (analyzedData, editedText, companyId) => {
   try {
     const session = await Auth.currentSession();
     const cognitoId = session.getIdToken().payload.sub;
+
+    // Extract the textract data from the verification result
+    const textractData = analyzedData.textractData || analyzedData;
+
     const updatedData = {
-      ...analyzedData,
+      ...textractData,
       text: editedText.split('\n'),
       companyId: companyId,
       status: 'draft',
+      // Include verification data if available
+      verified: analyzedData.verified,
+      verificationConfidence: analyzedData.confidence,
     };
 
     await axios.post('/api/kpi/draft', updatedData, {
@@ -31,10 +38,17 @@ export const submitData = async (analyzedData, editedText, companyId) => {
   try {
     const session = await Auth.currentSession();
     const cognitoId = session.getIdToken().payload.sub;
+
+    // Extract the textract data from the verification result
+    const textractData = analyzedData.textractData || analyzedData;
+
     const updatedData = {
-      ...analyzedData,
+      ...textractData,
       text: editedText.split('\n'),
       companyId: companyId,
+      // Include verification data if available
+      verified: analyzedData.verified,
+      verificationConfidence: analyzedData.confidence,
     };
 
     await axios.post('/api/kpi/save', updatedData, {

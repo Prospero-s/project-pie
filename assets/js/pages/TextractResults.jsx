@@ -1,9 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Button, Typography, Col, Row, Divider, message, Input } from 'antd';
+import {
+  Button,
+  Typography,
+  Col,
+  Row,
+  Divider,
+  message,
+  Input,
+  Alert,
+  List,
+  Tag,
+  Spin,
+} from 'antd';
 import { useUser } from '@/context/userContext';
-import { saveAsDraft, submitData } from '@/services/textract/textractService'; // Import du service
+import { saveAsDraft, submitData } from '@/services/textract/textractService';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -13,14 +25,38 @@ const TextractResults = ({ i18n }) => {
   const { analyzedData } = useUser();
   const { t } = useTranslation('documents', { i18n });
   const company = analyzedData?.company || null;
-  const [editedText, setEditedText] = useState(
-    analyzedData?.text?.content && Array.isArray(analyzedData.text.content) 
-      ? analyzedData.text.content.join("\n") 
-      : ""
-  );
+  const [editedText, setEditedText] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [verificationResults, setVerificationResults] = useState(null);
+
+  useEffect(() => {
+    if (analyzedData) {
+      // Extract the original text from textractData if available
+      const originalContent =
+        analyzedData?.textractData?.text?.content &&
+        Array.isArray(analyzedData.textractData.text.content)
+          ? analyzedData.textractData.text.content.join('\n')
+          : '';
+
+      setEditedText(originalContent);
+
+      // Set verification results
+      setVerificationResults({
+        verified: analyzedData.verified,
+        corrections: analyzedData.corrections || [],
+        confidence: analyzedData.confidence || 0,
+      });
+
+      setLoading(false);
+    }
+  }, [analyzedData]);
 
   const handleTextChange = e => {
     setEditedText(e.target.value);
+  };
+
+  const applyCorrection = (original, corrected) => {
+    setEditedText(prevText => prevText.replace(original, corrected));
   };
 
   const handleSaveAsDraft = async () => {
@@ -54,12 +90,27 @@ const TextractResults = ({ i18n }) => {
     }
   };
 
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '400px',
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
+
   return (
     <>
       {!analyzedData ? (
         <div style={{ padding: 20 }}>
-          <Title level={4}>Aucun résultat disponible</Title>
-          <Button onClick={() => navigate(-1)}>Retour</Button>
+          <Title level={4}>{t('textract.noResults')}</Title>
+          <Button onClick={() => navigate(-1)}>{t('textract.back')}</Button>
         </div>
       ) : (
         <div style={{ padding: 20 }}>
@@ -69,6 +120,67 @@ const TextractResults = ({ i18n }) => {
             </Title>
           )}
           <Divider />
+
+          {/* Verification Alert */}
+          {verificationResults && (
+            <Alert
+              message={
+                verificationResults.verified
+                  ? 'Vérification OpenAI : Texte validé'
+                  : 'Vérification OpenAI : Corrections suggérées'
+              }
+              description={
+                <div>
+                  <div>
+                    Niveau de confiance:{' '}
+                    {Math.round(verificationResults.confidence * 100)}%
+                  </div>
+                  {verificationResults.corrections &&
+                    verificationResults.corrections.length > 0 && (
+                      <List
+                        size="small"
+                        header={
+                          <div>{t('textract.suggestedCorrections')}:</div>
+                        }
+                        bordered
+                        dataSource={verificationResults.corrections}
+                        renderItem={correction => (
+                          <List.Item
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                            }}
+                            actions={[
+                              <Button
+                                key={`correction-${correction.original}`}
+                                type="link"
+                                onClick={() =>
+                                  applyCorrection(
+                                    correction.original,
+                                    correction.corrected,
+                                  )
+                                }
+                              >
+                                Appliquer
+                              </Button>,
+                            ]}
+                          >
+                            <div>
+                              <Tag color="red">{correction.original}</Tag> →
+                              <Tag color="green">{correction.corrected}</Tag>
+                            </div>
+                          </List.Item>
+                        )}
+                      />
+                    )}
+                </div>
+              }
+              type={verificationResults.verified ? 'success' : 'warning'}
+              showIcon
+              style={{ marginBottom: 16 }}
+            />
+          )}
+
           <Row gutter={20}>
             <Col span={12}>
               <div
@@ -112,7 +224,7 @@ const TextractResults = ({ i18n }) => {
                     style={{ width: '100%', height: '500px', border: 'none' }}
                   />
                 ) : (
-                  <Text>Aucun fichier PDF disponible.</Text>
+                  <Text>{t('textract.noPdfAvailable')}</Text>
                 )}
               </div>
             </Col>
