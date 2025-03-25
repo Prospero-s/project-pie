@@ -14,11 +14,13 @@ export const saveAsDraft = async (analyzedData, editedText, companyId) => {
       text: editedText.split('\n'),
       companyId: companyId,
       status: 'draft',
-      // Include verification data if available
+      // Preserve original TextExtract data as the source of extraction
+      textractOriginalData: textractData.extractedKpis || {},
+      // Include verification status
       verified: analyzedData.verified || true, // Set to true as OpenAI has verified
-      verificationConfidence: analyzedData.confidence || 1.0, // High confidence with OpenAI verification
-      // Use only the OpenAI analyzed and verified data
-      // TextExtract data is used internally but not exposed to the user
+      verificationConfidence: analyzedData.confidence || 1.0,
+      // These are the TextExtract values validated and formatted by GPT
+      // GPT does NOT extract from PDF but uses TextExtract data and PDF as reference
       verifiedData: analyzedData.aiAnalysis || {},
     };
 
@@ -49,11 +51,13 @@ export const submitData = async (analyzedData, editedText, companyId) => {
       ...textractData,
       text: editedText.split('\n'),
       companyId: companyId,
-      // Include verification data if available
+      // Preserve original TextExtract data as the source of extraction
+      textractOriginalData: textractData.extractedKpis || {},
+      // Include verification status
       verified: analyzedData.verified || true, // Set to true as OpenAI has verified
-      verificationConfidence: analyzedData.confidence || 1.0, // High confidence with OpenAI verification
-      // Use only the OpenAI analyzed and verified data
-      // TextExtract data is used internally but not exposed to the user
+      verificationConfidence: analyzedData.confidence || 1.0,
+      // These are the TextExtract values validated and formatted by GPT
+      // GPT does NOT extract from PDF but uses TextExtract data and PDF as reference
       verifiedData: analyzedData.aiAnalysis || {},
     };
 

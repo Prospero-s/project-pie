@@ -40,14 +40,26 @@ const TextractResults = ({ i18n }) => {
       return;
     }
 
+    // Get the TextExtract extracted data to send to API
+    const extractedData = analyzedData.textractData?.extractedKpis || {};
+
+    // Vérifier que TextExtract a extrait des données
+    if (!extractedData || Object.keys(extractedData).length === 0) {
+      message.warning(
+        'Aucune donnée pré-extraite par TextExtract trouvée. La vérification pourrait être moins précise.',
+      );
+      // On continue, mais les résultats seront moins fiables
+    }
+
     try {
       setValidatingWithAI(true);
 
       const textContent = analyzedData.textractData.text.content;
 
-      // Call your backend API with just the text content
+      // Call your backend API with text content and pre-extracted data
       const response = await axios.post('/api/textract/analyze-text', {
         textContent,
+        extractedData, // Pass the pre-extracted data
         documentId: analyzedData.id || 'unknown',
       });
 
