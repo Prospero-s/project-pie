@@ -94,39 +94,11 @@ class TextractController extends AbstractController
             if (isset($textractResult['text']['content']) && is_array($textractResult['text']['content'])) {
                 $textContent = implode("\n", $textractResult['text']['content']);
                 
-                // Build prompt for KPI extraction
-                $prompt = "
-                Je suis un document financier ou business plan contenant potentiellement les KPIs suivants. 
-                Extrais et formate ces KPIs à partir de mon contenu. Si un KPI n'est pas présent, indique \"N.A\".
-                Prends en compte à la fois les termes français et anglais (indiqués entre parenthèses).
+                // Use the frontend-provided prompt or a simple reference
+                $documentId = $fileName; // Using filename as document ID
+                $kpiAnalysis = $this->openAIService->analyzeKpis($textContent, $documentId);
                 
-                KPIs à extraire:
-                - Chiffre d'affaire (Revenue, Sales, Turnover)
-                - Marge brute (Gross Margin, Gross Profit)
-                - Coût d'acquisition du client (CAC, Cost of Acquisition, CAC Ratio)
-                - Valeur à vie client (Lifetime Value, LTV)
-                - Nombre employé (Headcount, Employees)
-                - Argent brulé (Burn, Cash Burn, Burn Rate)
-                - Ebitda (EBITDA)
-                - Revenu Annuel Récurrent (ARR, Annual Recurring Revenue)
-                - Revenu Mensuel Récurrent (MRR, Monthly Recurring Revenue)
-                - Montant levé (Funding, Raised)
-                
-                Document:
-                {$textContent}
-                
-                Réponds uniquement avec un objet JSON contenant les valeurs extraites, par exemple:
-                {
-                  \"chiffre_affaire\": \"1000000€\",
-                  \"marge_brute\": \"500000€\",
-                  \"cout_acquisition\": \"200€\",
-                  ...
-                }
-                ";
-                
-                $kpiAnalysis = $this->openAIService->analyzeKpis($prompt, $fileName);
-                
-                if ($kpiAnalysis['success'] && isset($kpiAnalysis['result'])) {
+                if (isset($kpiAnalysis['success']) && $kpiAnalysis['success'] && isset($kpiAnalysis['result'])) {
                     $verificationResult['aiAnalysis'] = $kpiAnalysis['result'];
                 }
             }
