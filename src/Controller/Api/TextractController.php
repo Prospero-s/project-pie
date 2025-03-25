@@ -22,6 +22,35 @@ class TextractController extends AbstractController
         $this->openAIService = $openAIService;
     }
 
+    #[Route('/openai/analyze', name: 'openai_analyze', methods: ['POST'])]
+    public function analyzeWithOpenAI(Request $request): JsonResponse
+    {
+        try {
+            $cognitoId = $request->headers->get('X-Cognito-Id');
+            if (!$cognitoId) {
+                throw new \Exception('Utilisateur non authentifié');
+            }
+
+            $data = json_decode($request->getContent(), true);
+            
+            if (!isset($data['prompt']) || !is_string($data['prompt'])) {
+                return new JsonResponse(['error' => 'Prompt invalide ou manquant'], JsonResponse::HTTP_BAD_REQUEST);
+            }
+            
+            $documentId = $data['documentId'] ?? 'unknown';
+            
+            // Call OpenAI service to analyze the document and extract KPIs
+            $analysisResult = $this->openAIService->analyzeKpis($data['prompt'], $documentId);
+            
+            return new JsonResponse($analysisResult);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false, 
+                'message' => 'Erreur lors de l\'analyse avec OpenAI: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     #[Route('/textract/analyze', name: 'app_textract_analyze', methods: ['POST'])]
     public function uploadFileKpi(Request $request): JsonResponse
     {
@@ -60,6 +89,46 @@ class TextractController extends AbstractController
             // Add PDF URL to the result
             $pdfUrl = '/uploads/' . $fileName;
             $verificationResult['pdfUrl'] = $pdfUrl;
+
+            // Also perform OpenAI KPI analysis if text content is available
+            if (isset($textractResult['text']['content']) && is_array($textractResult['text']['content'])) {
+                $textContent = implode("\n", $textractResult['text']['content']);
+                
+                // Build prompt for KPI extraction
+                $prompt = "
+                Je suis un document financier ou business plan contenant potentiellement les KPIs suivants. 
+                Extrais et formate ces KPIs à partir de mon contenu. Si un KPI n'est pas présent, indique \"N.A\".
+                
+                KPIs à extraire:
+                - Chiffre d'affaire
+                - Marge brute
+                - Coût d'acquisition du client
+                - Valeur à vie client
+                - Nombre employé
+                - Argent brulé
+                - Ebitda
+                - Revenu Annuel Récurrent
+                - Revenu Mensuel Récurrent
+                - Montant levé
+                
+                Document:
+                {$textContent}
+                
+                Réponds uniquement avec un objet JSON contenant les valeurs extraites, par exemple:
+                {
+                  \"chiffre_affaire\": \"1000000€\",
+                  \"marge_brute\": \"500000€\",
+                  \"cout_acquisition\": \"200€\",
+                  ...
+                }
+                ";
+                
+                $kpiAnalysis = $this->openAIService->analyzeKpis($prompt, $fileName);
+                
+                if ($kpiAnalysis['success'] && isset($kpiAnalysis['result'])) {
+                    $verificationResult['aiAnalysis'] = $kpiAnalysis['result'];
+                }
+            }
 
             return new JsonResponse($verificationResult);
         } catch (\RuntimeException $e) {

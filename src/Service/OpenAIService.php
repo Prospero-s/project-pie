@@ -18,6 +18,144 @@ class OpenAIService
     }
 
     /**
+     * Analyze document content to extract specific KPIs
+     * 
+     * @param string $prompt The user prompt with document content
+     * @param string $documentId Optional document identifier for logging
+     * @return array<string, mixed> The extracted KPIs and analysis
+     */
+    public function analyzeKpis(string $prompt, string $documentId = 'unknown'): array
+    {
+        try {
+            // Call OpenAI API
+            $response = $this->httpClient->request('POST', 'https://api.openai.com/v1/chat/completions', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->apiKey,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'model' => $this->model,
+                    'messages' => [
+                        [
+                            'role' => 'system',
+                            'content' => 'Tu es un expert en analyse financière qui extrait avec précision les KPIs des documents financiers et business plans. Tu détectes les données comme le chiffre d\'affaire, la marge brute, les coûts d\'acquisition, etc. Réponds uniquement au format JSON structuré.'
+                        ],
+                        [
+                            'role' => 'user',
+                            'content' => $prompt
+                        ]
+                    ],
+                    'temperature' => 0.2,
+                    'response_format' => ['type' => 'json_object'],
+                ],
+            ]);
+            
+            $statusCode = $response->getStatusCode();
+            
+            if ($statusCode !== 200) {
+                // Get more detailed error information
+                $errorData = $response->toArray(false);
+                $errorMessage = isset($errorData['error']['message']) ? $errorData['error']['message'] : 'Unknown error';
+                
+                return [
+                    'success' => false,
+                    'message' => 'OpenAI API error: ' . $statusCode . ' - ' . $errorMessage,
+                    'documentId' => $documentId
+                ];
+            }
+            
+            $result = $response->toArray();
+            $content = $result['choices'][0]['message']['content'] ?? '{}';
+            
+            // Parse JSON response
+            try {
+                $kpiData = json_decode($content, true);
+                
+                if (!is_array($kpiData)) {
+                    throw new \Exception('Invalid JSON response');
+                }
+                
+                // Standardize KPI fields to ensure all required fields exist
+                $standardizedKpis = $this->standardizeKpiFields($kpiData);
+                
+                return [
+                    'success' => true,
+                    'result' => $standardizedKpis,
+                    'documentId' => $documentId
+                ];
+            } catch (\Exception $e) {
+                return [
+                    'success' => false,
+                    'message' => 'Error parsing KPI data: ' . $e->getMessage(),
+                    'documentId' => $documentId
+                ];
+            }
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Error during KPI analysis: ' . $e->getMessage(),
+                'documentId' => $documentId
+            ];
+        }
+    }
+
+    /**
+     * Ensure all required KPI fields exist in the data
+     * 
+     * @param array<string, mixed> $kpiData The raw KPI data from OpenAI
+     * @return array<string, string> The standardized KPI data
+     */
+    private function standardizeKpiFields(array $kpiData): array
+    {
+        $requiredFields = [
+            'chiffre_affaire',
+            'marge_brute',
+            'cout_acquisition',
+            'valeur_vie_client',
+            'nombre_employe',
+            'argent_brule',
+            'ebitda',
+            'revenu_annuel',
+            'revenu_mensuel',
+            'montant_leve'
+        ];
+        
+        $standardized = [];
+        
+        foreach ($requiredFields as $field) {
+            // Handle different possible field names
+            $value = null;
+            
+            // Check for direct match
+            if (isset($kpiData[$field])) {
+                $value = $kpiData[$field];
+            } 
+            // Check for camelCase variation
+            elseif (isset($kpiData[lcfirst(str_replace('_', '', ucwords($field, '_')))])) {
+                $value = $kpiData[lcfirst(str_replace('_', '', ucwords($field, '_')))];
+            }
+            // Handle specific field variations
+            elseif ($field === 'chiffre_affaire' && isset($kpiData['chiffre_d_affaire'])) {
+                $value = $kpiData['chiffre_d_affaire'];
+            } elseif ($field === 'revenu_annuel' && isset($kpiData['revenu_annuel_recurrent'])) {
+                $value = $kpiData['revenu_annuel_recurrent'];
+            } elseif ($field === 'revenu_mensuel' && isset($kpiData['revenu_mensuel_recurrent'])) {
+                $value = $kpiData['revenu_mensuel_recurrent'];
+            }
+            
+            // Standardize the value
+            if ($value !== null) {
+                // Ensure it's a string
+                $standardized[$field] = (string)$value;
+            } else {
+                $standardized[$field] = 'N.A';
+            }
+        }
+        
+        return $standardized;
+    }
+
+    /**
      * Verify the accuracy of text extracted by AWS Textract
      * 
      * @param array<string, mixed> $textractData The data extracted by AWS Textract

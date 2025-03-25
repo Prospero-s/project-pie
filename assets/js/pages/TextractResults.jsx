@@ -9,25 +9,166 @@ import {
   Divider,
   message,
   Input,
-  Alert,
-  List,
-  Tag,
+  Table,
   Spin,
+  Card,
+  Space,
 } from 'antd';
 import { useUser } from '@/context/userContext';
 import { saveAsDraft, submitData } from '@/services/textract/textractService';
+import axios from 'axios';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
 const TextractResults = ({ i18n }) => {
   const navigate = useNavigate();
-  const { analyzedData } = useUser();
+  const { analyzedData, setAnalyzedData } = useUser();
   const { t } = useTranslation(['documents', 'textract'], { i18n });
   const company = analyzedData?.company || null;
   const [editedText, setEditedText] = useState('');
   const [loading, setLoading] = useState(true);
-  const [verificationResults, setVerificationResults] = useState(null);
+  const [kpiData, setKpiData] = useState([]);
+  const [validatingWithAI, setValidatingWithAI] = useState(false);
+
+  // Function to validate TextExtract data with OpenAI
+  const validateWithOpenAI = async () => {
+    if (!analyzedData || !analyzedData.textractData) {
+      message.error('Aucune donnée à valider.');
+      return;
+    }
+
+    setValidatingWithAI(true);
+
+    try {
+      // Extract text content from the TextExtract result
+      const textContent = analyzedData?.textractData?.text?.content || [];
+
+      // Build prompt for OpenAI to extract KPIs from the document
+      const prompt = `
+        Je suis un document financier ou business plan contenant potentiellement les KPIs suivants. 
+        Extrais et formate ces KPIs à partir de mon contenu. Si un KPI n'est pas présent, indique "N.A".
+        
+        KPIs à extraire:
+        - Chiffre d'affaire
+        - Marge brute
+        - Coût d'acquisition du client
+        - Valeur à vie client
+        - Nombre employé
+        - Argent brulé
+        - Ebitda
+        - Revenu Annuel Récurrent
+        - Revenu Mensuel Récurrent
+        - Montant levé
+        
+        Document:
+        ${textContent.join('\n')}
+        
+        Réponds uniquement avec un objet JSON contenant les valeurs extraites, par exemple:
+        {
+          "chiffre_affaire": "1000000€",
+          "marge_brute": "500000€",
+          "cout_acquisition": "200€",
+          ...
+        }
+      `;
+
+      // Call your backend API that will communicate with OpenAI
+      const response = await axios.post('/api/openai/analyze', {
+        prompt,
+        documentId: analyzedData.id || 'unknown',
+      });
+
+      // Update analyzedData with OpenAI verification results
+      if (response.data && response.data.success) {
+        const aiAnalysis = response.data.result;
+
+        // Update the local state and userContext
+        const updatedData = {
+          ...analyzedData,
+          aiAnalysis,
+          verified: true,
+        };
+
+        setAnalyzedData(updatedData);
+
+        // Update the KPI data table
+        updateKpiTable(aiAnalysis);
+
+        message.success(
+          'Vérification et validation par OpenAI terminée avec succès!',
+        );
+      } else {
+        message.error(
+          'Erreur lors de la vérification avec OpenAI: ' +
+            (response.data?.message || 'Erreur inconnue'),
+        );
+      }
+    } catch (error) {
+      console.error('Erreur OpenAI:', error);
+      message.error(
+        'Erreur lors de la communication avec OpenAI: ' + error.message,
+      );
+    } finally {
+      setValidatingWithAI(false);
+    }
+  };
+
+  // Update KPI table with AI analysis data
+  const updateKpiTable = aiAnalysis => {
+    setKpiData([
+      {
+        key: 'chiffre_affaire',
+        label: "Chiffre d'affaire",
+        value: aiAnalysis?.chiffre_affaire || 'N.A',
+      },
+      {
+        key: 'marge_brute',
+        label: 'Marge brute',
+        value: aiAnalysis?.marge_brute || 'N.A',
+      },
+      {
+        key: 'cout_acquisition',
+        label: "Coût d'acquisition du client",
+        value: aiAnalysis?.cout_acquisition || 'N.A',
+      },
+      {
+        key: 'valeur_vie_client',
+        label: 'Valeur à vie client',
+        value: aiAnalysis?.valeur_vie_client || 'N.A',
+      },
+      {
+        key: 'nombre_employe',
+        label: 'Nombre employé',
+        value: aiAnalysis?.nombre_employe || 'N.A',
+      },
+      {
+        key: 'argent_brule',
+        label: 'Argent brulé',
+        value: aiAnalysis?.argent_brule || 'N.A',
+      },
+      {
+        key: 'ebitda',
+        label: 'Ebitda',
+        value: aiAnalysis?.ebitda || 'N.A',
+      },
+      {
+        key: 'revenu_annuel',
+        label: 'Revenu Annuel Récurrent',
+        value: aiAnalysis?.revenu_annuel || 'N.A',
+      },
+      {
+        key: 'revenu_mensuel',
+        label: 'Revenu Mensuel Récurrent',
+        value: aiAnalysis?.revenu_mensuel || 'N.A',
+      },
+      {
+        key: 'montant_leve',
+        label: 'Montant levé',
+        value: aiAnalysis?.montant_leve || 'N.A',
+      },
+    ]);
+  };
 
   useEffect(() => {
     if (analyzedData) {
@@ -40,12 +181,13 @@ const TextractResults = ({ i18n }) => {
 
       setEditedText(originalContent);
 
-      // Set verification results
-      setVerificationResults({
-        verified: analyzedData.verified,
-        corrections: analyzedData.corrections || [],
-        confidence: analyzedData.confidence || 0,
-      });
+      // Check if we already have AI analysis data
+      if (analyzedData.aiAnalysis) {
+        updateKpiTable(analyzedData.aiAnalysis);
+      } else {
+        // Start OpenAI validation if not already done
+        validateWithOpenAI();
+      }
 
       setLoading(false);
     }
@@ -53,10 +195,6 @@ const TextractResults = ({ i18n }) => {
 
   const handleTextChange = e => {
     setEditedText(e.target.value);
-  };
-
-  const applyCorrection = (original, corrected) => {
-    setEditedText(prevText => prevText.replace(original, corrected));
   };
 
   const handleSaveAsDraft = async () => {
@@ -90,6 +228,31 @@ const TextractResults = ({ i18n }) => {
     }
   };
 
+  const kpiColumns = [
+    {
+      title: t('textract:kpi'),
+      dataIndex: 'label',
+      key: 'label',
+      width: '50%',
+    },
+    {
+      title: t('textract:valueVerifiedByOpenAI'),
+      dataIndex: 'value',
+      key: 'value',
+      width: '50%',
+      render: text => (
+        <div
+          style={{
+            color: text === 'N.A' ? '#999' : '#52c41a',
+            fontWeight: text === 'N.A' ? 'normal' : 'bold',
+          }}
+        >
+          {text}
+        </div>
+      ),
+    },
+  ];
+
   if (loading) {
     return (
       <div
@@ -113,153 +276,124 @@ const TextractResults = ({ i18n }) => {
           <Button onClick={() => navigate(-1)}>{t('textract:back')}</Button>
         </div>
       ) : (
-        <div style={{ padding: 20 }}>
-          {company && (
-            <Title level={3} style={{ color: '#1890ff' }}>
-              {t('analyze.company')} : {company.denomination}
-            </Title>
-          )}
-          <Divider />
+        <div className="rounded-md h-full">
+          <Card
+            bordered={false}
+            style={{
+              boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+              borderRadius: 8,
+              marginBottom: 20,
+            }}
+            title={
+              company && (
+                <Title level={3} style={{ color: '#1890ff', margin: 0 }}>
+                  {t('analyze.company')} : {company.denomination}
+                </Title>
+              )
+            }
+          >
+            <Space direction="vertical" size="large" style={{ width: '100%' }}>
+              {/* KPI Analysis Section */}
+              <div>
+                <Title level={4} style={{ marginTop: 0 }}>
+                  {t('textract:kpiAnalysisTitle')}
+                </Title>
+                <Paragraph>{t('textract:kpiAnalysisDesc')}</Paragraph>
 
-          {/* Verification Alert */}
-          {verificationResults && (
-            <Alert
-              message={
-                <>
-                  {verificationResults.verified
-                    ? t('textract:verification.verified')
-                    : t('textract:verification.notVerified')}
-                </>
-              }
-              description={
-                <div>
-                  <div>
-                    {t('textract:verification.confidence')}:{' '}
-                    {Math.round(verificationResults.confidence * 100)}%
+                {validatingWithAI ? (
+                  <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                    <Spin tip={t('textract:verificationInProgress')} />
                   </div>
-                  <div
-                    style={{
-                      marginTop: '8px',
-                      fontStyle: 'italic',
-                      fontSize: '0.9em',
-                      color: '#888',
-                    }}
-                  >
-                    {t('textract:verification.disclaimer')}
-                  </div>
-                  {verificationResults.corrections &&
-                    verificationResults.corrections.length > 0 && (
-                      <List
-                        size="small"
-                        header={
-                          <div>{t('textract:suggestedCorrections')}:</div>
-                        }
-                        bordered
-                        dataSource={verificationResults.corrections}
-                        renderItem={correction => (
-                          <List.Item
-                            style={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                            }}
-                            actions={[
-                              <Button
-                                key={`correction-${correction.original}`}
-                                type="link"
-                                onClick={() =>
-                                  applyCorrection(
-                                    correction.original,
-                                    correction.corrected,
-                                  )
-                                }
-                              >
-                                {t('textract:verification.apply')}
-                              </Button>,
-                            ]}
-                          >
-                            <div>
-                              <Tag color="red">{correction.original}</Tag> →
-                              <Tag color="green">{correction.corrected}</Tag>
-                            </div>
-                          </List.Item>
-                        )}
-                      />
-                    )}
-                </div>
-              }
-              type={verificationResults.verified ? 'success' : 'warning'}
-              showIcon
-              style={{ marginBottom: 16 }}
-            />
-          )}
-
-          <Row gutter={20}>
-            <Col span={12}>
-              <div
-                style={{
-                  padding: '10px',
-                  border: '1px solid #d9d9d9',
-                  borderRadius: '5px',
-                }}
-              >
-                <Title level={4}>{t('analyze.data_extract')} :</Title>
-                <TextArea
-                  rows={10}
-                  value={editedText}
-                  onChange={handleTextChange}
-                  autoSize={{ minRows: 3, maxRows: 20 }}
-                  style={{
-                    width: '100%',
-                    fontFamily: 'monospace',
-                    fontSize: '14px',
-                    backgroundColor: '#f5f5f5',
-                    borderRadius: '5px',
-                  }}
-                />
-              </div>
-            </Col>
-
-            <Col span={12}>
-              <div
-                style={{
-                  padding: '10px',
-                  border: '1px solid #d9d9d9',
-                  borderRadius: '5px',
-                  textAlign: 'center',
-                }}
-              >
-                <Title level={4}>{t('analyze.file_preview')}</Title>
-                {analyzedData.pdfUrl ? (
-                  <iframe
-                    src={`http://localhost:80${analyzedData.pdfUrl}`}
-                    title="Prévisualisation du PDF"
-                    style={{ width: '100%', height: '500px', border: 'none' }}
-                  />
                 ) : (
-                  <Text>{t('textract:noPdfAvailable')}</Text>
+                  <>
+                    <Table
+                      columns={kpiColumns}
+                      dataSource={kpiData}
+                      pagination={false}
+                      bordered
+                      size="middle"
+                      style={{ marginBottom: 10 }}
+                    />
+                    <Paragraph
+                      type="secondary"
+                      style={{
+                        fontStyle: 'italic',
+                        fontSize: '0.9em',
+                        marginTop: 8,
+                      }}
+                    >
+                      {t('textract:verification.disclaimer')}
+                    </Paragraph>
+                  </>
                 )}
               </div>
-            </Col>
-          </Row>
 
-          <Divider />
-          <Row justify="center" gutter={20}>
-            <Col>
-              <Button type="primary" onClick={handleSubmit}>
-                {t('analyze.confirm')}
-              </Button>
-            </Col>
-            <Col>
-              <Button onClick={() => navigate(-1)}>
-                {t('analyze.cancel')}
-              </Button>
-            </Col>
-            <Col>
-              <Button type="default" onClick={handleSaveAsDraft}>
-                {t('analyze.save_draft')}
-              </Button>
-            </Col>
-          </Row>
+              <Divider style={{ margin: '12px 0' }} />
+
+              {/* Document Preview Section */}
+              <Row gutter={24}>
+                <Col xs={24} md={12}>
+                  <Card
+                    title={t('analyze.data_extract')}
+                    size="small"
+                    bordered
+                    style={{ height: '100%' }}
+                  >
+                    <TextArea
+                      rows={10}
+                      value={editedText}
+                      onChange={handleTextChange}
+                      autoSize={{ minRows: 3, maxRows: 20 }}
+                      style={{
+                        width: '100%',
+                        fontFamily: 'monospace',
+                        fontSize: '14px',
+                        backgroundColor: '#f5f5f5',
+                        borderRadius: '5px',
+                      }}
+                    />
+                  </Card>
+                </Col>
+
+                <Col xs={24} md={12}>
+                  <Card
+                    title={t('analyze.file_preview')}
+                    size="small"
+                    bordered
+                    style={{ height: '100%', textAlign: 'center' }}
+                  >
+                    {analyzedData.pdfUrl ? (
+                      <iframe
+                        src={`http://localhost:80${analyzedData.pdfUrl}`}
+                        title={t('textract:pdfPreview')}
+                        style={{
+                          width: '100%',
+                          height: '400px',
+                          border: 'none',
+                        }}
+                      />
+                    ) : (
+                      <Text>{t('textract:noPdfAvailable')}</Text>
+                    )}
+                  </Card>
+                </Col>
+              </Row>
+
+              <div style={{ marginTop: 20, textAlign: 'center' }}>
+                <Space>
+                  <Button type="primary" onClick={handleSubmit}>
+                    {t('analyze.confirm')}
+                  </Button>
+                  <Button onClick={() => navigate(-1)}>
+                    {t('analyze.cancel')}
+                  </Button>
+                  <Button type="default" onClick={handleSaveAsDraft}>
+                    {t('analyze.save_draft')}
+                  </Button>
+                </Space>
+              </div>
+            </Space>
+          </Card>
         </div>
       )}
     </>
