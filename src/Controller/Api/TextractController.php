@@ -148,32 +148,34 @@ class TextractController extends AbstractController
     private function getKpiExtractionPrompt(string $textContent): string
     {
         return "
-        Je suis un document financier ou business plan contenant potentiellement les KPIs suivants. 
-        Extrais et formate ces KPIs à partir de mon contenu. Si un KPI n'est pas présent, indique \"N.A\".
-        Prends en compte à la fois les termes français et anglais (indiqués entre parenthèses).
+        I am a financial document or business plan that may contain the following KPIs.
+        First, determine if I am written in English or French, then extract and format these KPIs from my content.
+        If a KPI is not present, indicate \"N.A\".
         
-        KPIs à extraire:
-        - Chiffre d'affaire (Revenue, Sales, Turnover)
-        - Marge brute (Gross Margin, Gross Profit)
-        - Coût d'acquisition du client (CAC, Cost of Acquisition, CAC Ratio)
-        - Valeur à vie client (Lifetime Value, LTV)
-        - Nombre employé (Headcount, Employees)
-        - Argent brulé (Burn, Cash Burn, Burn Rate)
-        - Ebitda (EBITDA)
-        - Revenu Annuel Récurrent (ARR, Annual Recurring Revenue)
-        - Revenu Mensuel Récurrent (MRR, Monthly Recurring Revenue)
-        - Montant levé (Funding, Raised)
+        KPIs to extract (English / French):
+        - Revenue / Chiffre d'affaire (Also: Sales, Turnover)
+        - Gross Margin / Marge brute (Also: Gross Profit)
+        - Customer Acquisition Cost / Coût d'acquisition du client (Also: CAC, CAC Ratio)
+        - Customer Lifetime Value / Valeur à vie client (Also: LTV)
+        - Employee Count / Nombre employé (Also: Headcount)
+        - Cash Burn / Argent brulé (Also: Burn Rate)
+        - EBITDA / EBITDA
+        - Annual Recurring Revenue / Revenu Annuel Récurrent (Also: ARR)
+        - Monthly Recurring Revenue / Revenu Mensuel Récurrent (Also: MRR)
+        - Funding Amount / Montant levé (Also: Raised)
         
         Document:
         {$textContent}
         
-        Réponds uniquement avec un objet JSON contenant les valeurs extraites, par exemple:
+        Respond only with a JSON object containing the extracted values, for example:
         {
           \"chiffre_affaire\": \"1000000€\",
           \"marge_brute\": \"500000€\",
           \"cout_acquisition\": \"200€\",
           ...
         }
+        
+        Use the French field names in the JSON response regardless of document language.
         ";
     }
 }

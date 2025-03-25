@@ -38,7 +38,7 @@ class OpenAIService
                     'messages' => [
                         [
                             'role' => 'system',
-                            'content' => 'Tu es un expert en analyse financière qui extrait avec précision les KPIs des documents financiers et business plans. Tu détectes les données comme le chiffre d\'affaire, la marge brute, les coûts d\'acquisition, etc. Réponds uniquement au format JSON structuré.'
+                            'content' => 'You are a financial analysis expert who precisely extracts KPIs from financial documents and business plans in both French and English. First determine the document language, then extract data like revenue/chiffre d\'affaire, gross margin/marge brute, acquisition costs/coûts d\'acquisition, etc. Respond only with structured JSON format. For English documents, use English KPI terms; for French documents, use French KPI terms.'
                         ],
                         [
                             'role' => 'user',
@@ -134,13 +134,67 @@ class OpenAIService
             elseif (isset($kpiData[lcfirst(str_replace('_', '', ucwords($field, '_')))])) {
                 $value = $kpiData[lcfirst(str_replace('_', '', ucwords($field, '_')))];
             }
-            // Handle specific field variations
-            elseif ($field === 'chiffre_affaire' && isset($kpiData['chiffre_d_affaire'])) {
-                $value = $kpiData['chiffre_d_affaire'];
-            } elseif ($field === 'revenu_annuel' && isset($kpiData['revenu_annuel_recurrent'])) {
-                $value = $kpiData['revenu_annuel_recurrent'];
-            } elseif ($field === 'revenu_mensuel' && isset($kpiData['revenu_mensuel_recurrent'])) {
-                $value = $kpiData['revenu_mensuel_recurrent'];
+            
+            // Handle English variations and specific field mappings
+            switch ($field) {
+                case 'chiffre_affaire':
+                    if (isset($kpiData['chiffre_d_affaire'])) $value = $kpiData['chiffre_d_affaire'];
+                    elseif (isset($kpiData['revenue'])) $value = $kpiData['revenue'];
+                    elseif (isset($kpiData['sales'])) $value = $kpiData['sales'];
+                    elseif (isset($kpiData['turnover'])) $value = $kpiData['turnover'];
+                    break;
+                case 'marge_brute':
+                    if (isset($kpiData['grossMargin'])) $value = $kpiData['grossMargin'];
+                    elseif (isset($kpiData['gross_margin'])) $value = $kpiData['gross_margin'];
+                    elseif (isset($kpiData['grossProfit'])) $value = $kpiData['grossProfit'];
+                    elseif (isset($kpiData['gross_profit'])) $value = $kpiData['gross_profit'];
+                    break;
+                case 'cout_acquisition':
+                    if (isset($kpiData['cac'])) $value = $kpiData['cac'];
+                    elseif (isset($kpiData['costOfAcquisition'])) $value = $kpiData['costOfAcquisition'];
+                    elseif (isset($kpiData['cost_of_acquisition'])) $value = $kpiData['cost_of_acquisition'];
+                    elseif (isset($kpiData['acquisitionCost'])) $value = $kpiData['acquisitionCost'];
+                    elseif (isset($kpiData['acquisition_cost'])) $value = $kpiData['acquisition_cost'];
+                    elseif (isset($kpiData['customer_acquisition_cost'])) $value = $kpiData['customer_acquisition_cost'];
+                    break;
+                case 'valeur_vie_client':
+                    if (isset($kpiData['ltv'])) $value = $kpiData['ltv'];
+                    elseif (isset($kpiData['lifetimeValue'])) $value = $kpiData['lifetimeValue'];
+                    elseif (isset($kpiData['lifetime_value'])) $value = $kpiData['lifetime_value'];
+                    elseif (isset($kpiData['customerLifetimeValue'])) $value = $kpiData['customerLifetimeValue'];
+                    elseif (isset($kpiData['customer_lifetime_value'])) $value = $kpiData['customer_lifetime_value'];
+                    break;
+                case 'nombre_employe':
+                    if (isset($kpiData['headcount'])) $value = $kpiData['headcount'];
+                    elseif (isset($kpiData['employeeCount'])) $value = $kpiData['employeeCount'];
+                    elseif (isset($kpiData['employee_count'])) $value = $kpiData['employee_count'];
+                    elseif (isset($kpiData['employees'])) $value = $kpiData['employees'];
+                    break;
+                case 'argent_brule':
+                    if (isset($kpiData['burn'])) $value = $kpiData['burn'];
+                    elseif (isset($kpiData['burnRate'])) $value = $kpiData['burnRate'];
+                    elseif (isset($kpiData['burn_rate'])) $value = $kpiData['burn_rate'];
+                    elseif (isset($kpiData['cashBurn'])) $value = $kpiData['cashBurn'];
+                    elseif (isset($kpiData['cash_burn'])) $value = $kpiData['cash_burn'];
+                    break;
+                case 'revenu_annuel':
+                    if (isset($kpiData['revenu_annuel_recurrent'])) $value = $kpiData['revenu_annuel_recurrent'];
+                    elseif (isset($kpiData['arr'])) $value = $kpiData['arr'];
+                    elseif (isset($kpiData['annualRecurringRevenue'])) $value = $kpiData['annualRecurringRevenue'];
+                    elseif (isset($kpiData['annual_recurring_revenue'])) $value = $kpiData['annual_recurring_revenue'];
+                    break;
+                case 'revenu_mensuel':
+                    if (isset($kpiData['revenu_mensuel_recurrent'])) $value = $kpiData['revenu_mensuel_recurrent'];
+                    elseif (isset($kpiData['mrr'])) $value = $kpiData['mrr'];
+                    elseif (isset($kpiData['monthlyRecurringRevenue'])) $value = $kpiData['monthlyRecurringRevenue'];
+                    elseif (isset($kpiData['monthly_recurring_revenue'])) $value = $kpiData['monthly_recurring_revenue'];
+                    break;
+                case 'montant_leve':
+                    if (isset($kpiData['funding'])) $value = $kpiData['funding'];
+                    elseif (isset($kpiData['fundingAmount'])) $value = $kpiData['fundingAmount'];
+                    elseif (isset($kpiData['funding_amount'])) $value = $kpiData['funding_amount'];
+                    elseif (isset($kpiData['raised'])) $value = $kpiData['raised'];
+                    break;
             }
             
             // Standardize the value
@@ -183,7 +237,7 @@ class OpenAIService
             $textContent = implode("\n", $content);
             
             // Prepare prompt for OpenAI
-            $prompt = "You are an expert financial document validator. Review this text extracted from a financial PDF document and verify its accuracy. The document likely contains financial data, numbers, and economic information that must be precise:\n\n";
+            $prompt = "You are an expert financial document validator assistant that helps verify text extracted from PDFs in both English and French. First determine the document language, then verify the accuracy of financial data, numbers, and terms in that language.\n\n";
             $prompt .= $textContent;
             $prompt .= "\n\nPlease identify any potential errors, especially with numbers, dates, and financial terms. For each potential error, provide the likely correction. If no errors are found, state that the extraction appears accurate. Format your response as JSON with 'verified' (boolean), 'corrections' (array of objects with 'original' and 'corrected' fields), and 'confidence' (number from 0-1).";
             
@@ -198,7 +252,7 @@ class OpenAIService
                     'messages' => [
                         [
                             'role' => 'system',
-                            'content' => 'You are an expert financial document validator assistant that helps verify text extracted from PDFs.'
+                            'content' => 'You are an expert financial document validator assistant that helps verify text extracted from PDFs in both English and French. First determine the document language, then verify the accuracy of financial data, numbers, and terms in that language.'
                         ],
                         [
                             'role' => 'user',
