@@ -13,6 +13,8 @@ const Investments = ({ i18n }) => {
     searchParams.get('modal') === 'add',
   );
 
+  const [isTableEmpty, setIsTableEmpty] = useState(false); // nouvel état pour suivre la table
+
   useEffect(() => {
     i18n.changeLanguage(lng);
   }, [lng, i18n]);
@@ -21,15 +23,20 @@ const Investments = ({ i18n }) => {
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap justify-between items-center gap-4">
         <Breadcrumb pageName={t('my_portfolio')} />
-        <Button type="primary" onClick={() => setIsModalOpen(true)}>
-          {t('common.add')}
-        </Button>
+
+        {!isTableEmpty && (
+          <Button type="primary" onClick={() => setIsModalOpen(true)}>
+            {t('common.add')}
+          </Button>
+        )}
       </div>
+
       <div className="flex flex-col gap-4">
         <TableInvestments
           i18n={i18n}
           isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
+          onEmptyStateChange={setIsTableEmpty} // 👈 Passe la fonction ici
         />
       </div>
     </div>
@@ -37,3 +44,4 @@ const Investments = ({ i18n }) => {
 };
 
 export default Investments;
+
