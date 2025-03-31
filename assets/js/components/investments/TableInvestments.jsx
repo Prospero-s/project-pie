@@ -14,6 +14,7 @@ const TableInvestments = ({
   isModalOpen,
   setIsModalOpen,
   onAddClick,
+  onEmptyStateChange,
 }) => {
   const { t } = useTranslation('investments', { i18n });
   const lng = i18n.language;
@@ -45,6 +46,16 @@ const TableInvestments = ({
       sortOrder: 'desc',
     });
   }, []);
+
+  useEffect(() => {
+    const isEmpty =
+      investments.length === 0 &&
+      !Object.values(activeFilters).some(filter => filter.length > 0);
+      
+    if (typeof onEmptyStateChange === 'function') {
+      onEmptyStateChange(isEmpty);
+    }
+  }, [investments, activeFilters, onEmptyStateChange]);
 
   const loadInvestments = async (params = {}) => {
     try {
