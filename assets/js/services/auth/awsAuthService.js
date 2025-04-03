@@ -3,11 +3,9 @@ import { CognitoHostedUIIdentityProvider } from '@aws-amplify/auth';
 import { openNotificationWithIcon } from '@/components/common/notification/NotifAlert';
 import axios from 'axios';
 
-const API_URL = '/api';
-
 export const requestVerificationCode = async (email, fullName) => {
   try {
-    await axios.post(`${API_URL}/auth/send-verification-code`, {
+    await axios.post(`/api/auth/send-verification-code`, {
       email,
       fullName,
     });
@@ -21,21 +19,16 @@ export const requestVerificationCode = async (email, fullName) => {
 const handleUnverifiedUser = async (email, fullName = 'Utilisateur', t) => {
   try {
     const response = await axios.get(
-      `${API_URL}/auth/check-verification-code/${email}`,
+      `/api/auth/check-verification-code/${email}?fullName=${encodeURIComponent(fullName)}&autoSend=true`,
     );
 
-    if (!response.data.hasValidCode) {
-      await axios.post(`${API_URL}/auth/send-verification-code`, {
-        email,
-        fullName,
-      });
-
+    if (response.data.codeSent) {
       openNotificationWithIcon(
         'info',
         t('verification_code_sent'),
         t('verification_email_sent'),
       );
-    } else {
+    } else if (response.data.hasValidCode) {
       openNotificationWithIcon(
         'info',
         t('verification_pending'),
@@ -60,7 +53,7 @@ const handleUnverifiedUser = async (email, fullName = 'Utilisateur', t) => {
 
 const verifyCode = async (email, code) => {
   try {
-    const response = await axios.post(`${API_URL}/auth/verify-code`, {
+    const response = await axios.post(`/api/auth/verify-code`, {
       email,
       code,
     });
@@ -73,7 +66,7 @@ const verifyCode = async (email, code) => {
 
 const requestPasswordReset = async email => {
   try {
-    await axios.post(`${API_URL}/auth/send-reset-password`, {
+    await axios.post(`/api/auth/send-reset-password`, {
       email,
     });
     return { success: true };
@@ -369,7 +362,7 @@ export const confirmResetPassword = async (email, code, newPassword, t) => {
       return { success: false };
     }
 
-    const response = await axios.post(`${API_URL}/auth/update-password`, {
+    const response = await axios.post(`/api/auth/update-password`, {
       email,
       code,
       newPassword,

@@ -50,7 +50,6 @@ const GroupRedirect = () => {
         const lang = location.pathname.split('/')[1] || 'fr';
 
         if (!hasGroup) {
-          setIsCheckingRedirect(true);
           navigate(`/${lang}/group-selection`, { replace: true });
           return;
         }
@@ -63,7 +62,6 @@ const GroupRedirect = () => {
         const lang = location.pathname.split('/')[1] || 'fr';
 
         if (hasGroup) {
-          setIsCheckingRedirect(true);
           navigate(`/${lang}/dashboard`, { replace: true });
           return;
         }
@@ -81,7 +79,6 @@ const GroupRedirect = () => {
         !location.pathname.includes('/auth')
       ) {
         const lang = location.pathname.split('/')[1] || 'fr';
-        setIsCheckingRedirect(true);
         navigate(`/${lang}/auth/signin`, { replace: true });
       }
     } finally {
@@ -97,6 +94,7 @@ const GroupRedirect = () => {
   ]);
 
   useEffect(() => {
+    setIsCheckingRedirect(true);
     setupAuthHeaders();
   }, [setupAuthHeaders]);
 

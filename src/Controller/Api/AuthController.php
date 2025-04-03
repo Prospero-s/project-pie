@@ -33,7 +33,10 @@ class AuthController extends AbstractController
         $data = json_decode($request->getContent(), true);
         
         if (!isset($data['email']) || !isset($data['fullName'])) {
-            return $this->json(['error' => 'Données manquantes'], 400);
+            return $this->json([
+                'error' => 'Données manquantes',
+                'details' => 'Les champs email et fullName sont requis'
+            ], 400);
         }
         
         try {
@@ -49,9 +52,12 @@ class AuthController extends AbstractController
                 $verificationCode->getCode()
             );
             
-            return $this->json(['success' => true]);
+            return $this->json(['success' => true], 201);
         } catch (\Exception $e) {
-            return $this->json(['error' => 'Erreur lors de l\'envoi de l\'email: ' . $e->getMessage()], 500);
+            return $this->json([
+                'error' => 'Erreur lors de l\'envoi de l\'email',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -61,7 +67,10 @@ class AuthController extends AbstractController
         $data = json_decode($request->getContent(), true);
         
         if (!isset($data['email']) || !isset($data['code'])) {
-            return $this->json(['error' => 'Données manquantes'], 400);
+            return $this->json([
+                'error' => 'Données manquantes',
+                'details' => 'Les champs email et code sont requis'
+            ], 400);
         }
         
         try {
@@ -72,7 +81,9 @@ class AuthController extends AbstractController
             );
             
             if (!$verificationCode) {
-                return $this->json(['error' => 'Code invalide ou expiré'], 400);
+                return $this->json([
+                    'error' => 'Code invalide ou expiré'
+                ], 422);
             }
             
             $email = $verificationCode->getEmail();
@@ -88,9 +99,12 @@ class AuthController extends AbstractController
                 error_log('Erreur lors de l\'envoi de l\'email de bienvenue: ' . $emailError->getMessage());
             }
             
-            return $this->json(['success' => true]);
+            return $this->json(['success' => true], 200);
         } catch (\Exception $e) {
-            return $this->json(['error' => 'Erreur lors de la vérification: ' . $e->getMessage()], 500);
+            return $this->json([
+                'error' => 'Erreur lors de la vérification',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -100,7 +114,10 @@ class AuthController extends AbstractController
         $data = json_decode($request->getContent(), true);
         
         if (!isset($data['email']) || !isset($data['fullName'])) {
-            return $this->json(['error' => 'Données manquantes'], 400);
+            return $this->json([
+                'error' => 'Données manquantes',
+                'details' => 'Les champs email et fullName sont requis'
+            ], 400);
         }
         
         try {
@@ -113,12 +130,19 @@ class AuthController extends AbstractController
                     $data['email'],
                     $data['fullName']
                 );
-                return $this->json(['success' => true, 'emailSent' => true]);
+                return $this->json(['success' => true, 'emailSent' => true], 200);
             }
             
-            return $this->json(['success' => true, 'emailSent' => false, 'reason' => 'Utilisateur existant']);
+            return $this->json([
+                'success' => true, 
+                'emailSent' => false, 
+                'reason' => 'Utilisateur existant'
+            ], 200);
         } catch (\Exception $e) {
-            return $this->json(['error' => 'Erreur lors de l\'envoi de l\'email: ' . $e->getMessage()], 500);
+            return $this->json([
+                'error' => 'Erreur lors de l\'envoi de l\'email',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -128,7 +152,10 @@ class AuthController extends AbstractController
         $data = json_decode($request->getContent(), true);
         
         if (!isset($data['email'])) {
-            return $this->json(['error' => 'Données manquantes'], 400);
+            return $this->json([
+                'error' => 'Données manquantes',
+                'details' => 'Le champ email est requis'
+            ], 400);
         }
         
         try {
@@ -150,21 +177,53 @@ class AuthController extends AbstractController
                 $verificationCode->getCode()
             );
             
-            return $this->json(['success' => true]);
+            return $this->json(['success' => true], 201);
         } catch (\Exception $e) {
-            return $this->json(['error' => 'Erreur lors de l\'envoi de l\'email: ' . $e->getMessage()], 500);
+            return $this->json([
+                'error' => 'Erreur lors de l\'envoi de l\'email',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
     #[Route('/auth/check-verification-code/{email}', name: 'check_verification_code', methods: ['GET'])]
-    public function checkVerificationCode(string $email): JsonResponse
+    public function checkVerificationCode(string $email, Request $request): JsonResponse
     {
         try {
+            $fullName = $request->query->get('fullName', 'Utilisateur');
+            $autoSend = $request->query->get('autoSend', 'false') === 'true';
+            
             $hasValidCode = $this->verificationCodeRepository->hasValidCode($email, 'SIGNUP');
             
-            return $this->json(['hasValidCode' => $hasValidCode]);
+            if (!$hasValidCode && $autoSend) {
+                $verificationCode = $this->verificationCodeRepository->createVerificationCode(
+                    $email,
+                    $fullName,
+                    'SIGNUP'
+                );
+                
+                $this->mailService->sendVerificationEmail(
+                    $email,
+                    $fullName,
+                    $verificationCode->getCode()
+                );
+                
+                return $this->json([
+                    'hasValidCode' => true,
+                    'codeSent' => true,
+                    'message' => 'Nouveau code de vérification envoyé'
+                ], 201);
+            }
+            
+            return $this->json([
+                'hasValidCode' => $hasValidCode,
+                'codeSent' => false
+            ], 200);
         } catch (\Exception $e) {
-            return $this->json(['error' => 'Erreur lors de la vérification: ' . $e->getMessage()], 500);
+            return $this->json([
+                'error' => 'Erreur lors de la vérification', 
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -172,6 +231,13 @@ class AuthController extends AbstractController
     public function updatePassword(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
+        
+        if (!isset($data['email']) || !isset($data['code']) || !isset($data['newPassword'])) {
+            return $this->json([
+                'error' => 'Données manquantes',
+                'details' => 'Les champs email, code et newPassword sont requis'
+            ], 400);
+        }
         
         $email = $data['email'];
         $code = $data['code'];
@@ -185,7 +251,9 @@ class AuthController extends AbstractController
             );
             
             if (!$verificationCode) {
-                return $this->json(['error' => 'Code invalide ou expiré'], 400);
+                return $this->json([
+                    'error' => 'Code invalide ou expiré'
+                ], 422);
             }
             
             $verificationCode->setIsUsed(true);
@@ -194,14 +262,18 @@ class AuthController extends AbstractController
             try {
                 $this->cognitoService->setUserPassword($email, $newPassword);
                 
-                return $this->json(['success' => true]);
+                return $this->json(['success' => true], 200);
             } catch (\Exception $e) {
                 return $this->json([
-                    'error' => 'Erreur lors de la mise à jour du mot de passe: ' . $e->getMessage()
+                    'error' => 'Erreur lors de la mise à jour du mot de passe',
+                    'message' => $e->getMessage()
                 ], 500);
             }
         } catch (\Exception $e) {
-            return $this->json(['error' => 'Erreur lors de la réinitialisation: ' . $e->getMessage()], 500);
+            return $this->json([
+                'error' => 'Erreur lors de la réinitialisation',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 } 
