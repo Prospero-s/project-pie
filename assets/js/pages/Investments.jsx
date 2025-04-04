@@ -44,4 +44,3 @@ const Investments = ({ i18n }) => {
 };
 
 export default Investments;
-
