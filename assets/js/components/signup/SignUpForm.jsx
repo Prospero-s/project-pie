@@ -14,7 +14,6 @@ const SignUpForm = ({
   confirmPassword,
   passwordMatch,
   handleConfirmPasswordChange,
-  errors = {},
 }) => (
   <div className="space-y-4">
     <div className="space-y-1.5">
@@ -25,14 +24,8 @@ const SignUpForm = ({
         value={fullName}
         onChange={e => setFullName(e.target.value)}
         placeholder={t('enter_full_name')}
-        className={`w-full h-10 rounded-lg border ${
-          errors.fullName ? 'border-rose-500' : 'border-gray-300'
-        } bg-white px-3 text-gray-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm`}
-        status={errors.fullName ? 'error' : ''}
+        className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-gray-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm"
       />
-      {errors.fullName && (
-        <p className="text-sm text-rose-500 mt-1">{errors.fullName}</p>
-      )}
     </div>
     <div className="space-y-1.5">
       <label className="block text-sm font-medium text-gray-700">
@@ -42,32 +35,19 @@ const SignUpForm = ({
         value={email}
         onChange={e => setEmail(e.target.value)}
         placeholder={t('enter_email')}
-        className={`w-full h-10 rounded-lg border ${
-          errors.email ? 'border-rose-500' : 'border-gray-300'
-        } bg-white px-3 text-gray-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm`}
-        status={errors.email ? 'error' : ''}
+        className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-gray-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm"
       />
-      {errors.email && (
-        <p className="text-sm text-rose-500 mt-1">{errors.email}</p>
-      )}
     </div>
     <div className="space-y-1.5">
       <label className="block text-sm font-medium text-gray-700">
         {t('password')}
       </label>
       <PasswordStrengthField
-        t={t}
         value={password}
         onChange={e => setPassword(e.target.value)}
         placeholder={t('enter_password')}
-        className={`w-full h-10 rounded-lg border ${
-          errors.password ? 'border-rose-500' : 'border-gray-300'
-        } bg-white px-3 text-gray-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm`}
-        status={errors.password ? 'error' : ''}
+        className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-gray-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm"
       />
-      {errors.password && (
-        <p className="text-sm text-rose-500 mt-1">{errors.password}</p>
-      )}
     </div>
     <div className="space-y-1.5">
       <label className="block text-sm font-medium text-gray-700">
@@ -82,7 +62,6 @@ const SignUpForm = ({
             ? 'border-rose-500'
             : 'border-gray-300'
         } bg-white px-3 text-gray-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm`}
-        status={!passwordMatch && confirmPassword ? 'error' : ''}
       />
       {!passwordMatch && confirmPassword && (
         <p className="text-sm text-rose-500 mt-1">{t('password_mismatch')}</p>

@@ -20,7 +20,7 @@ services:
       - caddy_data:/data
       - caddy_config:/config
       - ./app:/app
-      - ./public/uploads:/var/www/html/public/uploads # Monte le dossier d'uploads
+            - ./public/uploads:/var/www/html/public/uploads  # Monte le dossier d'uploads
     ports:
       # HTTP
       - target: 80
@@ -35,38 +35,38 @@ services:
         published: ${HTTP3_PORT:-443}
         protocol: udp
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:80/health']
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
       interval: 10s
       timeout: 5s
       retries: 3
       start_period: 30s
-
+  
   vite:
     image: node:20
     container_name: vite_container
     working_dir: /app
     command: npm run dev
     volumes:
-      - .:/app # Montera le répertoire de votre projet dans le conteneur
+      - .:/app  # Montera le répertoire de votre projet dans le conteneur
     ports:
-      - '5173:5173' # Expose le port de Vite
+      - "5173:5173"  # Expose le port de Vite
     environment:
-      - VITE_SERVER_HOST=0.0.0.0 # Permet d'écouter toutes les connexions
+      - VITE_SERVER_HOST=0.0.0.0  # Permet d'écouter toutes les connexions
     depends_on:
-      - php # Assure que Symfony démarre avant Vite
+      - php  # Assure que Symfony démarre avant Vite
     networks:
       - symfony-vite-network
 
-  # Mercure is installed as a Caddy module, prevent the Flex recipe from installing another service
-  ###> symfony/mercure-bundle ###
-  ###< symfony/mercure-bundle ###
+# Mercure is installed as a Caddy module, prevent the Flex recipe from installing another service
+###> symfony/mercure-bundle ###
+###< symfony/mercure-bundle ###
 
-  ###> doctrine/doctrine-bundle ###
+###> doctrine/doctrine-bundle ###
   postgres:
     image: postgres:15
     restart: always
     ports:
-      - '5432:5432'
+      - "5432:5432"
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
@@ -75,7 +75,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres -d postgres']
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -83,7 +83,7 @@ services:
     image: dpage/pgadmin4
     restart: always
     ports:
-      - '5050:80'
+      - "5050:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@pgadmin.com
       PGADMIN_DEFAULT_PASSWORD: mypgadminpass
@@ -94,23 +94,13 @@ services:
     depends_on:
       - postgres
 
-  ###> symfony/mailer ###
-  mailer:
-    image: axllent/mailpit
-    ports:
-      - '1025'
-      - '8025'
-    environment:
-      MP_SMTP_AUTH_ACCEPT_ANY: 1
-      MP_SMTP_AUTH_ALLOW_INSECURE: 1
-  ###< symfony/mailer ###
 
 volumes:
   caddy_data:
   caddy_config:
-  ###> symfony/mercure-bundle ###
+###> symfony/mercure-bundle ###
 
-  ###> doctrine/doctrine-bundle ###
+###> doctrine/doctrine-bundle ###
   postgres_data:
   pgadmin_data:
 ###< doctrine/doctrine-bundle ###

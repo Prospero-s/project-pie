@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useState,
-  useEffect,
-} from 'react';
+import React, { createContext, ReactNode, useContext, useState, useEffect } from 'react';
 import { Auth, Hub } from 'aws-amplify';
 
 interface UserMetadata {
@@ -29,7 +23,7 @@ interface UserContextType {
   setUser: (user: FormattedUser | null) => void;
   loading: boolean;
   analyzedData: any | null;
-  setAnalyzedData: (data: any | null) => void;
+  setAnalyzedData: (data:any | null) => void; 
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -40,9 +34,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   return (
-    <UserContext.Provider
-      value={{ user, setUser, loading, analyzedData, setAnalyzedData }}
-    >
+    <UserContext.Provider value={{ user, setUser, loading, analyzedData, setAnalyzedData }}>
       <UserAuthListener setUser={setUser} setLoading={setLoading} />
       {children}
     </UserContext.Provider>
@@ -50,13 +42,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 };
 
 // Nouveau composant pour gérer l'authentification
-const UserAuthListener = ({
-  setUser,
-  setLoading,
-}: {
-  setUser: (user: FormattedUser | null) => void;
-  setLoading: (loading: boolean) => void;
-}) => {
+const UserAuthListener = ({ setUser, setLoading }: { setUser: (user: FormattedUser | null) => void, setLoading: (loading: boolean) => void }) => {
   useEffect(() => {
     checkUser();
     const listener = Hub.listen('auth', ({ payload: { event, data } }) => {
@@ -78,10 +64,10 @@ const UserAuthListener = ({
       const cognitoUser = await Auth.currentAuthenticatedUser();
       if (cognitoUser) {
         const { idToken, accessToken } = cognitoUser.signInUserSession;
-
+        
         // Utiliser le sub comme ID Cognito
         const userId = idToken.payload.sub;
-
+        
         const userData = {
           id: userId,
           email: idToken.payload.email,
@@ -91,8 +77,8 @@ const UserAuthListener = ({
             email_verified: idToken.payload.email_verified === true,
           },
           app_metadata: {
-            roles: accessToken.payload['cognito:groups'] || [],
-          },
+            roles: accessToken.payload['cognito:groups'] || []
+          }
         };
         setUser(userData);
       }

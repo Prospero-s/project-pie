@@ -105,7 +105,6 @@ const ForgotPasswordModal = ({
           <Form layout="vertical">
             <Form.Item label={t('forgot_password.new_password')}>
               <PasswordStrengthField
-                t={t}
                 value={newPassword}
                 onChange={e => setNewPassword(e.target.value)}
                 placeholder={t('forgot_password.enter_new_password')}

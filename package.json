@@ -32,7 +32,6 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.0.0",
-    "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "@aws-amplify/auth": "^5.0.0",
     "@aws-amplify/core": "^5.0.0",
     "@radix-ui/react-slot": "^1.1.1",

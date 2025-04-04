@@ -59,25 +59,12 @@ const SignIn = ({ i18n }) => {
       lng,
     );
     setShowVerificationModal(result.showVerificationModal);
-
-    // Stocker temporairement le mot de passe si l'utilisateur n'est pas confirmé
-    if (result.showVerificationModal) {
-      try {
-        sessionStorage.setItem('temp_password', password);
-      } catch (e) {
-        console.error('Erreur lors du stockage temporaire du mot de passe:', e);
-      }
-    }
-
     setLoading(false);
   };
 
   const handleResendVerificationEmail = async () => {
     setLoading(true);
-    const result = await resendVerificationEmail(email, t);
-    if (result.success) {
-      // La notification est déjà gérée dans le service
-    }
+    await resendVerificationEmail(email, t);
     setLoading(false);
   };
 
@@ -87,80 +74,32 @@ const SignIn = ({ i18n }) => {
   };
 
   const handleForgotPasswordSubmit = async email => {
-    const result = await resetPassword(email, t);
-    return result.success;
+    return await resetPassword(email, t);
   };
 
   const handleConfirmCode = async () => {
     setLoading(true);
-
-    // Récupérer le mot de passe temporaire
-    let tempPassword = '';
-    try {
-      tempPassword = sessionStorage.getItem('temp_password') || '';
-      // Ne pas supprimer le mot de passe maintenant au cas où il y aurait une erreur
-    } catch (e) {
-      console.error(
-        'Erreur lors de la récupération du mot de passe temporaire:',
-        e,
-      );
+    const success = await confirmSignUp(
+      email,
+      verificationCode,
+      t,
+      navigate,
+      lng,
+    );
+    if (success) {
+      await signInWithEmail(email, password, t, setUser, navigate, lng);
+      setShowVerificationModal(false);
     }
-
-    try {
-      const result = await confirmSignUp(email, verificationCode, t);
-
-      if (result.success) {
-        // Supprimer le mot de passe temporaire une fois la vérification réussie
-        try {
-          sessionStorage.removeItem('temp_password');
-        } catch (e) {
-          console.error(
-            'Erreur lors de la suppression du mot de passe temporaire:',
-            e,
-          );
-        }
-
-        // Si on a un mot de passe temporaire, on tente de se connecter
-        if (tempPassword) {
-          console.error('Tentative de connexion après confirmation...');
-          const loginResult = await signInWithEmail(
-            email,
-            tempPassword,
-            t,
-            setUser,
-            navigate,
-            lng,
-          );
-
-          if (!loginResult.showVerificationModal) {
-            // La connexion a réussi
-            setShowVerificationModal(false);
-          } else {
-            // Si la connexion a échoué, rediriger vers la page de connexion
-            console.error('Échec de connexion automatique après confirmation');
-            navigate(`/${lng}/auth/signin`);
-          }
-        } else {
-          // Sinon on redirige simplement vers la page de connexion avec un message de succès
-          navigate(`/${lng}/auth/signin`);
-        }
-      }
-    } catch (error) {
-      console.error('Erreur lors de la confirmation du code:', error);
-      // La notification est déjà gérée dans le service
-    } finally {
-      setLoading(false);
-    }
+    setLoading(false);
   };
 
   const handleConfirmPasswordReset = async (code, newPassword) => {
-    const result = await confirmResetPassword(
+    return await confirmResetPassword(
       forgotPasswordEmail,
       code,
       newPassword,
       t,
     );
-    return result.success;
   };
 
   return (

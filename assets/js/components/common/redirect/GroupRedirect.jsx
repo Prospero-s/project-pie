@@ -24,6 +24,7 @@ const GroupRedirect = () => {
     }
 
     try {
+      setIsCheckingRedirect(true);
       if (retryCount > 0) {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
@@ -40,31 +41,19 @@ const GroupRedirect = () => {
 
       axios.defaults.headers.common = headers;
 
-      if (
-        !location.pathname.includes('/group-selection') &&
+      const response = await axios.get('/api/user-groups', { headers });
+      const hasGroup = response.data.groups && response.data.groups.length > 0;
+      const isOnGroupSelection = location.pathname.includes('/group-selection');
+      const lang = location.pathname.split('/')[1] || 'fr';
+
+      if (hasGroup && isOnGroupSelection) {
+        navigate(`/${lang}/dashboard`, { replace: true });
+      } else if (
+        !hasGroup &&
+        !isOnGroupSelection &&
         !location.pathname.includes('/auth')
       ) {
-        const response = await axios.get('/api/user-groups', { headers });
-        const hasGroup =
-          response.data.groups && response.data.groups.length > 0;
-        const lang = location.pathname.split('/')[1] || 'fr';
-
-        if (!hasGroup) {
-          navigate(`/${lang}/group-selection`, { replace: true });
-          return;
-        }
-      }
-
-      if (location.pathname.includes('/group-selection')) {
-        const response = await axios.get('/api/user-groups', { headers });
-        const hasGroup =
-          response.data.groups && response.data.groups.length > 0;
-        const lang = location.pathname.split('/')[1] || 'fr';
-
-        if (hasGroup) {
-          navigate(`/${lang}/dashboard`, { replace: true });
-          return;
-        }
+        navigate(`/${lang}/group-selection`, { replace: true });
       }
 
       setLastCheckedPath(location.pathname);
@@ -94,7 +83,6 @@ const GroupRedirect = () => {
   ]);
 
   useEffect(() => {
-    setIsCheckingRedirect(true);
     setupAuthHeaders();
   }, [setupAuthHeaders]);
 
