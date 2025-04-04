@@ -2,12 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import gsap from 'gsap';
-import { signUpWithEmail } from '@/services/auth/awsAuthService';
+import {
+  signUpWithEmail,
+  resendVerificationEmail,
+  confirmSignUp,
+} from '@/services/auth/awsAuthService';
 import SignUpForm from '@/components/signup/SignUpForm';
 import SignUpButton from '@/components/signup/SignUpButton';
 import SignUpLink from '@/components/signup/SignUpLink';
 import ConfirmationCodeModal from '@/components/signup/ConfirmationCodeModal';
-import { confirmSignUp } from '@/services/auth/awsAuthService';
+import { openNotificationWithIcon } from '@/components/common/notification/NotifAlert';
 
 const SignUp = ({ i18n }) => {
   const { t } = useTranslation('signup', { i18n });
@@ -23,6 +27,13 @@ const SignUp = ({ i18n }) => {
   const [verificationCode, setVerificationCode] = useState('');
   const [registeredEmail, setRegisteredEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [verifyLoading, setVerifyLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState({
+    email: '',
+    password: '',
+    fullName: '',
+  });
 
   useEffect(() => {
     i18n.changeLanguage(lng);
@@ -36,16 +47,61 @@ const SignUp = ({ i18n }) => {
     );
   }, []);
 
+  const validateForm = () => {
+    let valid = true;
+    const errors = {
+      email: '',
+      password: '',
+      fullName: '',
+    };
+
+    // Vérification de l'email
+    if (!email.trim()) {
+      errors.email = t('email_required');
+      valid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      errors.email = t('email_invalid');
+      valid = false;
+    }
+
+    // Vérification du nom complet
+    if (!fullName.trim()) {
+      errors.fullName = t('fullname_required');
+      valid = false;
+    }
+
+    // Vérification du mot de passe
+    if (!password.trim()) {
+      errors.password = t('password_required');
+      valid = false;
+    } else if (password.length < 8) {
+      errors.password = t('password_length_error');
+      valid = false;
+    }
+
+    // Vérification de la correspondance des mots de passe
+    if (password !== confirmPassword) {
+      setPasswordMatch(false);
+      valid = false;
+    } else {
+      setPasswordMatch(true);
+    }
+
+    setFormErrors(errors);
+    return valid;
+  };
+
   const handleConfirmPasswordChange = e => {
     const confirmPass = e.target.value;
     setConfirmPassword(confirmPass);
-    setPasswordMatch(confirmPass === password);
+    setPasswordMatch(confirmPass === password || confirmPass === '');
   };
 
   const isFormValid = () => {
     return (
       email.trim() !== '' &&
       password.trim() !== '' &&
+      password.length >= 8 &&
       confirmPassword.trim() !== '' &&
       fullName.trim() !== '' &&
       password === confirmPassword
@@ -54,29 +110,90 @@ const SignUp = ({ i18n }) => {
 
   const handleSignUp = async e => {
     e.preventDefault();
-    if (isFormValid()) {
-      setLoading(true);
-      const success = await signUpWithEmail(
-        email,
-        password,
-        fullName,
-        t,
-        navigate,
-        lng,
-      );
-      if (success) {
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await signUpWithEmail(email, password, fullName, t);
+
+      if (result.success) {
         setRegisteredEmail(email);
         setShowConfirmationModal(true);
+
+        // Afficher la notification ici pour éviter les doublons
+        openNotificationWithIcon(
+          'success',
+          t('registration_successful'),
+          t('verification_email_sent'),
+        );
       }
+    } catch (err) {
+      openNotificationWithIcon(
+        'error',
+        t('registration_error_title'),
+        `${t('registration_error_message')} ${err.message || ''}`,
+      );
+    } finally {
       setLoading(false);
     }
   };
 
+  const handleResendCode = async () => {
+    setResendLoading(true);
+    try {
+      const result = await resendVerificationEmail(registeredEmail || email, t);
+      if (result.success) {
+        openNotificationWithIcon(
+          'success',
+          t('resend_success'),
+          t('verification_code_resent'),
+        );
+      }
+    } catch (err) {
+      openNotificationWithIcon(
+        'error',
+        t('resend_error'),
+        `${t('resend_error_message')} ${err.message || ''}`,
+      );
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   const handleConfirmCode = async () => {
-    setLoading(true);
-    await confirmSignUp(registeredEmail, verificationCode, t);
-    setLoading(false);
-    navigate(`/${lng}/signin`);
+    if (!verificationCode.trim()) {
+      openNotificationWithIcon(
+        'warning',
+        t('verification_warning'),
+        t('verification_code_required'),
+      );
+      return;
+    }
+
+    setVerifyLoading(true);
+    try {
+      const result = await confirmSignUp(registeredEmail, verificationCode, t);
+
+      if (result.success) {
+        openNotificationWithIcon(
+          'success',
+          t('verification_successful'),
+          t('account_verified'),
+        );
+        setShowConfirmationModal(false);
+        navigate(`/${lng}/auth/signin`);
+      }
+    } catch (err) {
+      openNotificationWithIcon(
+        'error',
+        t('verification_error'),
+        `${t('verification_error_message')} ${err.message || ''}`,
+      );
+    } finally {
+      setVerifyLoading(false);
+    }
   };
 
   return (
@@ -98,11 +215,11 @@ const SignUp = ({ i18n }) => {
             password={password}
             setPassword={setPassword}
             confirmPassword={confirmPassword}
-            setConfirmPassword={setConfirmPassword}
             passwordMatch={passwordMatch}
             handleConfirmPasswordChange={handleConfirmPasswordChange}
+            errors={formErrors}
           />
-          <SignUpButton t={t} isFormValid={isFormValid} />
+          <SignUpButton t={t} isFormValid={isFormValid} loading={loading} />
           <SignUpLink t={t} lng={lng} />
         </form>
       </div>
@@ -111,9 +228,11 @@ const SignUp = ({ i18n }) => {
         visible={showConfirmationModal}
         onClose={() => setShowConfirmationModal(false)}
         onConfirm={handleConfirmCode}
+        onResend={handleResendCode}
         code={verificationCode}
         setCode={setVerificationCode}
-        loading={loading}
+        loading={verifyLoading}
+        resendLoading={resendLoading}
       />
     </>
   );

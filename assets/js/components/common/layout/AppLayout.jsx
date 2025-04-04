@@ -29,50 +29,47 @@ export default function AppLayout({ i18n, children }) {
     return () => clearTimeout(timer);
   }, []);
 
-  return (
-    <>
-      {initialLoading && (
-        <div className="h-screen w-screen flex flex-col items-center justify-center gap-8 fixed top-0 left-0 bg-white z-50">
-          <img
-            src={logoProspero}
-            alt="Prospero"
-            className="w-24 h-24 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-          />
-          <Spin
-            indicator={
-              <LoadingOutlined
-                style={{ fontSize: 180, color: '#000000' }}
-                spin
-              />
-            }
-            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-          />
-        </div>
-      )}
-      <Layout
-        style={{ minHeight: '100vh', height: '100vh', overflow: 'hidden' }}
-      >
-        <Sidebar
-          sidebarOpen={sidebarOpen}
-          setSidebarOpen={setSidebarOpen}
-          i18n={i18n}
+  // Afficher uniquement l'écran de chargement initial, pas à chaque redirection
+  if (initialLoading) {
+    return (
+      <div className="h-screen w-screen flex flex-col items-center justify-center gap-8 fixed top-0 left-0 bg-white z-50">
+        <img
+          src={logoProspero}
+          alt="Prospero"
+          className="w-24 h-24 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
         />
-        <Layout className="site-layout">
-          <AppHeader user={user} setUser={setUser} i18n={i18n} />
-          <Content
-            style={{
-              margin: '16px 16px',
-              overflow: 'auto',
-              height: 'calc(100vh - 64px - 69px)',
-            }}
-          >
-            <div className="rounded-md h-full" style={{ padding: 24 }}>
-              {children}
-            </div>
-          </Content>
-          <FooterLayout i18n={i18n} isDashboard={true} />
-        </Layout>
+        <Spin
+          indicator={
+            <LoadingOutlined style={{ fontSize: 180, color: '#000000' }} spin />
+          }
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <Layout style={{ minHeight: '100vh', height: '100vh', overflow: 'hidden' }}>
+      <Sidebar
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        i18n={i18n}
+      />
+      <Layout className="site-layout">
+        <AppHeader user={user} setUser={setUser} i18n={i18n} />
+        <Content
+          style={{
+            margin: '16px 16px',
+            overflow: 'auto',
+            height: 'calc(100vh - 64px - 69px)',
+          }}
+        >
+          <div className="rounded-md h-full" style={{ padding: 24 }}>
+            {children}
+          </div>
+        </Content>
+        <FooterLayout i18n={i18n} isDashboard={true} />
       </Layout>
-    </>
+    </Layout>
   );
 }
