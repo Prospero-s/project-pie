@@ -39,5 +39,7 @@
     "delete_success": "Document supprimé avec succès !",
     "delete_error": "Erreur lors de la suppression du document.",
     "loading_error": "Erreur lors du chargement des documents"
-  }
+  },
+  "no_documents": "Aucun fichier PDF disponible",
+  "back": "Retour"
 }

@@ -39,5 +39,7 @@
     "delete_success": "Document successfully deleted!",
     "delete_error": "Error while deleting document.",
     "loading_error": "Error while loading documents"
-  }
+  },
+  "no_documents": "No PDF files available",
+  "back": "Back"
 }

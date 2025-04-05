@@ -53,6 +53,7 @@ Ce projet combine **Symfony** pour la partie backend et **React** pour la partie
      ```
 
 4. **Installer les certificats** :
+   - Cette partie n'est pas obligatoire, mais si vous avez des erreurs SSL, suivre toute la procédure du certificat.
    - Installer mkcert :
       MacOS
       ```bash
@@ -103,9 +104,7 @@ Ce projet combine **Symfony** pour la partie backend et **React** pour la partie
       sudo update-ca-certificates
       ```
 
-   - Windows : Double-cliquez sur le certificat racine (rootCA.pem), puis cliquez sur Installer le certificat et sélectionnez     Autorités de certification racines de confiance.
-
-   - Sinon, Windows : Étapes pour installer un certificat racine (.pem) sur Windows :
+   - **Windows** : Étapes pour installer un certificat racine (.pem) sur Windows :
       Double-cliquez sur le fichier .pem : Lorsque vous double-cliquez sur un fichier .pem, il devrait vous demander quel programme l'ouvrir. Si vous ne voyez pas "Certificate Manager" ou "CertMgr.msc" dans la liste, vous pouvez essayer d'ouvrir le fichier directement avec Gestionnaire de certificats Windows.
 
       Si ce n'est pas le cas, vous pouvez également essayer de lancer le gestionnaire de certificats via la commande certmgr.msc.
@@ -148,7 +147,8 @@ Ce projet combine **Symfony** pour la partie backend et **React** pour la partie
       ```
 
 6. **Accéder au projet** :
-   - http://localhost
+   - http://localhost : Web App
+   - http://localhost:5050/ : PgAdmin
 
 ## Structure du Projet
 
@@ -156,15 +156,18 @@ Ce projet combine **Symfony** pour la partie backend et **React** pour la partie
 .
 ├── .env                    # Fichier de configuration
 ├── Dockerfile              # Dockerfile pour le projet
-├── certs/                  # Les certificats HTTPS
+├── frankenphp/certs/       # Les certificats HTTPS
+├── pgadmin/                # Les configurations de pgadmin
+├── scripts/                # Les scripts
+├── config/                 # Configuration Symfony
 ├── src/                    # Code Symfony
 │   ├── Controller/         # Code Controller Symfony
-│   ├── Entity                # Fichier de configuration
-│   └── Dockerfile          # Dockerfile pour PHP
-├── Assets/                 # Code React
-│   ├── src/                # Code source frontend
-│   ├── .env                # Fichier de configuration
-│   └── Dockerfile          # Dockerfile pour Node.js
+│   ├── Entity/             # Fichier de configuration
+│   └── Services/           # Code Service Symfony
+├── assets/                 # Code React
+│   ├── js/                 # Fichiers de page et composants
+│   └── css/                # Fichier de styles
+│   └── img/                # Images
 ├── docker-compose.yml      # Configuration Docker Compose
 └── README.md               # Ce fichier
 ```
