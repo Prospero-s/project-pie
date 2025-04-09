@@ -102,7 +102,6 @@ const GlobalMetrics = () => {
 
   return (
     <>
-      <style>{chartContainerClass}</style>
       <div className="mb-4">
         <GridControls />
       </div>

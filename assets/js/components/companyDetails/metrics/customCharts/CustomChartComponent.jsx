@@ -32,8 +32,84 @@ const CustomChartComponent = ({ chartId }) => {
   
   // Fonction pour générer un graphique selon le type
   const renderChart = () => {
+    // Détecter si nous avons un format particulier de données (comme des données pivotées)
+    const isPivotedData = data.length > 0 && Object.keys(data[0]).some(key => key.includes('_'));
+    
+    // Pour les données pivotées, créer un graphique spécial
+    if (isPivotedData && type === 'bar') {
+      const pivotKeys = Object.keys(data[0]).filter(key => key.includes('_'));
+      const baseKeys = Object.keys(data[0]).filter(key => !key.includes('_'));
+      
+      // Trouver une clé à utiliser comme nom pour l'axe X
+      const nameKey = baseKeys.length > 0 ? baseKeys[0] : 'index';
+      
+      return (
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey={nameKey} angle={-45} textAnchor="end" height={60} />
+            <YAxis 
+              tickFormatter={(value) => 
+                value >= 1000000 
+                  ? `${(value/1000000).toFixed(1)}M€` 
+                  : `${(value/1000).toFixed(0)}k€`
+              } 
+            />
+            <Tooltip 
+              formatter={(value) => 
+                typeof value === 'number' 
+                  ? [`${(value/1000).toFixed(0)}k€`, ''] 
+                  : [value, '']
+              }
+            />
+            <Legend />
+            {pivotKeys.map((key, index) => (
+              <Bar 
+                key={key} 
+                dataKey={key} 
+                name={key.split('_')[0]} 
+                fill={COLORS[index % COLORS.length]}
+              />
+            ))}
+          </BarChart>
+        </ResponsiveContainer>
+      );
+    }
+    
+    // Si les données sont dans un format spécial avec des valeurs calculées
+    // (comme celles produites par nos colonnes calculées)
+    const hasCalculatedValues = data.length > 0 && 
+      Object.keys(data[0]).some(key => !['name', 'label', 'month', 'year', 'quarter', 'category'].includes(key));
+    
     switch (type) {
       case 'bar':
+        // Si les données utilisent la structure simplifiée (name, value) créée pour total_investment
+        if (data.length > 0 && 'value' in data[0] && keys.includes('value')) {
+          return (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" angle={0} textAnchor="middle" height={40} />
+                <YAxis 
+                  tickFormatter={(value) => 
+                    value >= 1000000 
+                      ? `${(value/1000000).toFixed(1)}M€` 
+                      : `${(value/1000).toFixed(0)}k€`
+                  } 
+                />
+                <Tooltip 
+                  formatter={(value) => 
+                    [`${(value/1000000).toFixed(2)}M€`, "Montant"]
+                  }
+                />
+                <Legend />
+                <Bar dataKey="value" fill="#0088FE" name="Montant" />
+              </BarChart>
+            </ResponsiveContainer>
+          );
+        }
+        
+        // Graphique en barres standard pour les autres données
         return (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>

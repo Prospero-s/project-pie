@@ -3,13 +3,13 @@ import axios from 'axios';
 import { openNotificationWithIcon } from '@/components/common/notification/NotifAlert';
 
 // Indicateur pour activer la simulation de données
-const USE_SIMULATED_DATA = true;
+const USE_SIMULATED_DATA = false;
 
 /**
  * Exécute une requête SQL personnalisée dans la base de données
- * @param {string} query - La requête SQL à exécuter
+ * @param {string} query - La requête à exécuter (identifiant interne de la requête côté backend)
  * @param {string} companyId - L'identifiant de l'entreprise 
- * @param {string} queryId - Identifiant de la requête prédéfinie (optionnel)
+ * @param {string} queryId - Identifiant de la requête prédéfinie (pour l'UI)
  * @returns {Promise<Array>} - Les résultats de la requête
  */
 export const executeCustomQuery = async (query, companyId, queryId = null) => {
@@ -111,11 +111,29 @@ export const executeCustomQuery = async (query, companyId, queryId = null) => {
       ];
     }
     
-    // Récupérer le token d'authentification
+    // Récupérer les informations d'authentification
     let token;
+    let cognitoId;
+    
     try {
+      // Vérifier la session active et récupérer le token
       const session = await Auth.currentSession();
+      if (!session) {
+        openNotificationWithIcon('error', 'Erreur d\'authentification', 'Votre session a expiré. Veuillez vous reconnecter.');
+        return [];
+      }
+      
       token = session.getIdToken().getJwtToken();
+      
+      // Récupérer l'ID Cognito
+      const user = await Auth.currentAuthenticatedUser();
+      if (!user || !user.username) {
+        openNotificationWithIcon('error', 'Erreur d\'authentification', 'Utilisateur non identifié. Veuillez vous reconnecter.');
+        return [];
+      }
+      
+      cognitoId = user.username;
+      
     } catch (authError) {
       console.error('Authentication error:', authError);
       openNotificationWithIcon('error', 'Erreur d\'authentification', 'Vous devez être connecté pour exécuter des requêtes');
@@ -124,14 +142,16 @@ export const executeCustomQuery = async (query, companyId, queryId = null) => {
     
     // Appel à l'API pour exécuter la requête
     try {
+      console.log('Envoi de la requête avec queryId:', query); // Log pour le débogage
+      
       const response = await axios.post('/api/query/execute', {
-        query,
-        companyId,
-        queryId
+        queryId: query, // Utiliser le nom de la requête comme queryId côté backend
+        companyId
       }, {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'x-cognito-id': cognitoId
         }
       });
       
@@ -190,48 +210,67 @@ export const getPredefinedQueries = async () => {
           id: '1', 
           name: 'Revenus mensuels', 
           description: 'Affiche les revenus mensuels de l\'entreprise au cours des 12 derniers mois',
-          query: 'SELECT to_char(k.created_at, \'YYYY-MM\') as month, SUM((k.kpi->>\'revenue\')::numeric) as revenue FROM kpi_data k WHERE k.company_id = {companyId} AND k.deleted_at IS NULL GROUP BY month ORDER BY month DESC LIMIT 12'
+          query: 'monthly_revenue'
         },
         { 
           id: '2', 
           name: 'Clients par secteur', 
           description: 'Répartition des clients par secteur d\'activité',
-          query: 'SELECT c.sector, COUNT(*) as client_count FROM company c WHERE c.id IN (SELECT company_id FROM company_investment WHERE company_id = {companyId}) AND c.deleted_at IS NULL GROUP BY c.sector ORDER BY client_count DESC'
+          query: 'clients_by_sector'
         },
         { 
           id: '3', 
           name: 'Croissance ARR', 
           description: 'Évolution de l\'ARR (Annual Recurring Revenue) par trimestre',
-          query: 'SELECT quarter, year, arr_value FROM metrics WHERE company_id = {companyId} AND metric_type = "ARR" ORDER BY year DESC, quarter DESC LIMIT 8'
+          query: 'arr_growth'
         },
         { 
           id: '4', 
           name: 'Top 10 clients', 
           description: 'Liste des 10 plus grands clients par valeur',
-          query: 'SELECT client_name, annual_value FROM clients WHERE company_id = {companyId} ORDER BY annual_value DESC LIMIT 10'
+          query: 'top_clients'
         },
         { 
           id: '5', 
           name: 'Évolution des effectifs', 
           description: 'Nombre d\'employés par trimestre',
-          query: 'SELECT quarter, year, headcount FROM company_stats WHERE company_id = {companyId} ORDER BY year DESC, quarter DESC LIMIT 8'
+          query: 'headcount'
         },
         { 
           id: '6', 
           name: 'Investissements', 
           description: 'Valeur des investissements par trimestre',
-          query: 'SELECT to_char(ci.created_at, \'YYYY-Q\') as quarter, EXTRACT(YEAR FROM ci.created_at) as year, SUM(ci.amount) as investment_value FROM company_investment ci WHERE ci.company_id = {companyId} GROUP BY year, quarter ORDER BY year DESC, quarter DESC LIMIT 8'
+          query: 'quarterly_investments'
         }
       ];
     }
     
-    // Récupérer le token d'authentification
+    // Récupérer les informations d'authentification
     let token;
+    let cognitoId;
+    
     try {
+      // Vérifier la session active et récupérer le token
       const session = await Auth.currentSession();
+      if (!session) {
+        openNotificationWithIcon('error', 'Erreur d\'authentification', 'Votre session a expiré. Veuillez vous reconnecter.');
+        return [];
+      }
+      
       token = session.getIdToken().getJwtToken();
+      
+      // Récupérer l'ID Cognito
+      const user = await Auth.currentAuthenticatedUser();
+      if (!user || !user.username) {
+        openNotificationWithIcon('error', 'Erreur d\'authentification', 'Utilisateur non identifié. Veuillez vous reconnecter.');
+        return [];
+      }
+      
+      cognitoId = user.username;
+      
     } catch (authError) {
       console.error('Authentication error:', authError);
+      openNotificationWithIcon('error', 'Erreur d\'authentification', 'Vous devez être connecté pour exécuter des requêtes');
       return [];
     }
     
@@ -239,7 +278,8 @@ export const getPredefinedQueries = async () => {
     try {
       const response = await axios.get('/api/query/predefined', {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'x-cognito-id': cognitoId
         }
       });
       
@@ -273,4 +313,22 @@ export const getPredefinedQueries = async () => {
     console.error('Error in getPredefinedQueries:', error);
     return []; // Toujours retourner un tableau vide en cas d'erreur
   }
-}; 
+};
+
+/**
+ * Récupère l'identifiant Cognito de l'utilisateur connecté
+ * @returns {Promise<string>} - L'identifiant Cognito
+ */
+async function getCognitoId() {
+  try {
+    const user = await Auth.currentAuthenticatedUser();
+    if (!user || !user.username) {
+      throw new Error('Utilisateur non authentifié');
+    }
+    return user.username;
+  } catch (error) {
+    console.error('Error getting Cognito ID:', error);
+    openNotificationWithIcon('error', 'Erreur d\'authentification', 'Vous devez être connecté pour exécuter des requêtes');
+    throw new Error('Utilisateur non authentifié');
+  }
+} 

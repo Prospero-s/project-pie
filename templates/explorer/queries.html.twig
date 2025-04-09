@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Explorateur de données - Requêtes{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Explorateur de données</h1>
+    <p class="lead">Sélectionnez une requête prédéfinie pour visualiser les données</p>
+    
+    <form id="queryForm" class="mb-4">
+        <div class="mb-3">
+            <label for="companyId" class="form-label">Entreprise</label>
+            <select id="companyId" name="companyId" class="form-select" required>
+                <option value="">Sélectionnez une entreprise</option>
+                {# Cette liste sera remplie dynamiquement par JavaScript #}
+            </select>
+        </div>
+        
+        <div class="mb-3">
+            <label for="queryName" class="form-label">Requête</label>
+            <select id="queryName" name="queryName" class="form-select" required>
+                <option value="">Sélectionnez une requête</option>
+                {% for query in queries %}
+                    <option value="{{ query.query }}">{{ query.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Exécuter</button>
+    </form>
+    
+    <div class="card">
+        <div class="card-header">
+            Requêtes disponibles
+        </div>
+        <div class="card-body">
+            <div class="list-group">
+                {% for query in queries %}
+                    <div class="list-group-item">
+                        <h5 class="mb-1">{{ query.name }}</h5>
+                        <p class="mb-1">{{ query.description }}</p>
+                        <small class="text-muted">ID: {{ query.id }}</small>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Liste des requêtes pour utilisation JavaScript
+    window.predefinedQueries = {{ queries|json_encode|raw }};
+    
+    // Récupérer la liste des entreprises
+    async function loadCompanies() {
+        try {
+            const response = await fetch('/api/companies', {
+                headers: {
+                    'Accept': 'application/json',
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Erreur lors de la récupération des entreprises');
+            }
+            
+            const data = await response.json();
+            const selectElement = document.getElementById('companyId');
+            
+            if (data && Array.isArray(data)) {
+                data.forEach(company => {
+                    const option = document.createElement('option');
+                    option.value = company.id;
+                    option.textContent = company.denomination;
+                    selectElement.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+        }
+    }
+    
+    // Gestion du formulaire
+    document.getElementById('queryForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const companyId = document.getElementById('companyId').value;
+        const queryName = document.getElementById('queryName').value;
+        
+        if (companyId && queryName) {
+            window.location.href = `/explorer/data/${companyId}/${queryName}`;
+        }
+    });
+    
+    // Charger les entreprises au chargement de la page
+    document.addEventListener('DOMContentLoaded', loadCompanies);
+</script>
+{% endblock %} 
