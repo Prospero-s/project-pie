@@ -34,7 +34,7 @@ export const layoutSlice = createSlice({
       }
     },
     addCustomChart: (state, action) => {
-      const { companyId, chartId, chartData, chartType, title } = action.payload;
+      const { companyId, chartId, chartData, chartType, title, columnsMetadata } = action.payload;
       
       // Store chart data
       if (!state.customCharts[companyId]) {
@@ -44,7 +44,8 @@ export const layoutSlice = createSlice({
       state.customCharts[companyId][chartId] = {
         data: chartData,
         type: chartType,
-        title: title
+        title: title,
+        columnsMetadata: columnsMetadata || {}
       };
       
       // Add to layout

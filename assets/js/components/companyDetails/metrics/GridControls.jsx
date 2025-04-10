@@ -15,6 +15,11 @@ import {
   PlusOutlined, EyeInvisibleOutlined, TableOutlined,
   SortAscendingOutlined, SortDescendingOutlined
 } from '@ant-design/icons';
+import {
+  BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis,
+  XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer
+} from 'recharts';
+import { getAllCompanies } from '@/services/company/companyService';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -137,6 +142,9 @@ const PREDEFINED_QUERIES = [
 // Constante pour décider si on utilise l'appel fetch direct ou les données statiques
 const USE_DIRECT_FETCH = true;
 
+// Palettes de couleurs pour les graphiques
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A259FF'];
+
 const GridControls = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -163,16 +171,50 @@ const GridControls = () => {
   const [newCalculation, setNewCalculation] = useState({
     name: '',
     expression: '',
-    format: 'default'
+    format: 'default',
+    externalSource: false,
+    externalCompanyId: null
   });
   const [displayData, setDisplayData] = useState([]);
   const [tableColumns, setTableColumns] = useState([]);
+  
+  // Nouveaux états pour la personnalisation du graphique
+  const [selectedXAxis, setSelectedXAxis] = useState('');
+  const [selectedYAxes, setSelectedYAxes] = useState([]);
+  const [previewData, setPreviewData] = useState([]);
+  
+  // Nouveaux états pour la gestion des entreprises externes
+  const [companies, setCompanies] = useState([]);
+  const [loadingCompanies, setLoadingCompanies] = useState(false);
+  const [externalData, setExternalData] = useState({});
   
   // Effet pour définir selectedQuery quand selectedQueryId change
   useEffect(() => {
     const query = PREDEFINED_QUERIES.find(q => q.id === selectedQueryId);
     setSelectedQuery(query);
   }, [selectedQueryId]);
+
+  // Effet pour charger la liste des entreprises
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        setLoadingCompanies(true);
+        const data = await getAllCompanies();
+        // Filtrer pour ne pas inclure l'entreprise courante
+        const filteredCompanies = data.filter(company => company.id !== parseInt(id));
+        setCompanies(filteredCompanies);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des entreprises:', error);
+      } finally {
+        setLoadingCompanies(false);
+      }
+    };
+
+    // Charger les entreprises uniquement lorsque le modal est ouvert
+    if (isCalculationModalVisible) {
+      fetchCompanies();
+    }
+  }, [isCalculationModalVisible, id]);
 
   // Colonnes pour les résultats (détectées dynamiquement à partir des résultats)
   const generateColumns = (results) => {
@@ -333,40 +375,118 @@ const GridControls = () => {
     setIframeUrl('');
   };
   
+  // Fonction pour déterminer les colonnes numériques pour l'axe Y
+  const getNumericColumns = (data) => {
+    if (!data || data.length === 0) return [];
+    
+    const result = [];
+    const firstItem = data[0];
+    
+    Object.keys(firstItem).forEach(key => {
+      // Vérifier si c'est une colonne numérique
+      const isNumeric = typeof firstItem[key] === 'number' || 
+                        (typeof firstItem[key] === 'string' && !isNaN(parseFloat(firstItem[key])));
+      
+      if (isNumeric) {
+        result.push(key);
+      }
+    });
+    
+    return result;
+  };
+  
+  // Fonction pour déterminer les colonnes potentielles pour l'axe X
+  const getNonNumericColumns = (data) => {
+    if (!data || data.length === 0) return [];
+    
+    const result = [];
+    const firstItem = data[0];
+    
+    Object.keys(firstItem).forEach(key => {
+      // Ajouter toutes les colonnes comme potentielles colonnes X (même numériques)
+      // car on peut vouloir un axe X numérique
+      result.push(key);
+    });
+    
+    return result;
+  };
+  
+  // Effet pour mettre à jour la prévisualisation quand les paramètres changent
+  useEffect(() => {
+    if (displayData && displayData.length > 0 && selectedXAxis && selectedYAxes.length > 0) {
+      // Préparer les données pour la prévisualisation
+      const formattedData = displayData.map(item => {
+        const newItem = { name: item[selectedXAxis] };
+        
+        selectedYAxes.forEach(yAxis => {
+          if (item[yAxis] !== undefined) {
+            newItem[yAxis] = parseFloat(item[yAxis]) || 0;
+          }
+        });
+        
+        return newItem;
+      });
+      
+      setPreviewData(formattedData);
+    }
+  }, [displayData, selectedXAxis, selectedYAxes, chartType]);
+  
+  // Effet pour définir les axes par défaut quand les données changent
+  useEffect(() => {
+    if (displayData && displayData.length > 0) {
+      const nonNumericCols = getNonNumericColumns(displayData);
+      const numericCols = getNumericColumns(displayData);
+      
+      // Définir l'axe X par défaut (priorité aux colonnes non numériques)
+      if (nonNumericCols.length > 0) {
+        // Chercher d'abord des colonnes qui sont généralement utilisées comme axe X
+        const commonXColumns = ['month', 'year', 'quarter', 'name', 'sector', 'client_name', 'category'];
+        const defaultX = nonNumericCols.find(col => commonXColumns.some(name => col.includes(name))) || nonNumericCols[0];
+        setSelectedXAxis(defaultX);
+      }
+      
+      // Définir l'axe Y par défaut (première colonne numérique)
+      if (numericCols.length > 0) {
+        setSelectedYAxes([numericCols[0]]);
+      }
+    }
+  }, [displayData]);
+  
   // Fonction pour ajouter un graphique
   const addGraph = (graphData) => {
     try {
       // Générer un ID unique pour le graphique
       const chartId = `custom_${Date.now()}`;
       
-      // Transformer les données pour le graphique selon le type de requête
-      let chartData = graphData.data;
-      
-      // Si c'est la requête "Total investi", alors adapter les données
-      if (graphData.query === 'total_investment') {
-        chartData = graphData.data.map(item => ({
-          name: item.category,
-          value: parseFloat(item.total_amount) || 0
-        }));
+      // S'assurer que la structure de données correspond exactement à celle utilisée dans la prévisualisation
+      // et inclut uniquement les colonnes sélectionnées pour X et Y
+      const finalChartData = graphData.data.map(item => {
+        const newItem = {};
+        // Conserver la propriété "name" qui est utilisée pour l'axe X
+        newItem.name = item.name;
         
-        // Forcer le type de graphique en barre pour cette requête
-        dispatch(addCustomChart({
-          companyId: id,
-          chartId,
-          chartData: chartData,
-          chartType: 'bar',
-          title: chartTitle || graphData.title
-        }));
-      } else {
-        // Pour les autres requêtes, utiliser le type de graphique sélectionné
-        dispatch(addCustomChart({
-          companyId: id,
-          chartId,
-          chartData: chartData,
-          chartType,
-          title: chartTitle || graphData.title
-        }));
-      }
+        // N'inclure que les colonnes Y sélectionnées
+        selectedYAxes.forEach(yAxis => {
+          if (item[yAxis] !== undefined) {
+            newItem[yAxis] = item[yAxis];
+          }
+        });
+        
+        return newItem;
+      });
+      
+      // Transmettre les données avec le type spécifié, en conservant exactement le même format
+      dispatch(addCustomChart({
+        companyId: id,
+        chartId,
+        chartData: finalChartData,
+        chartType: graphData.type || chartType,
+        title: chartTitle || graphData.title,
+        columnsMetadata: graphData.columnsMetadata || {}, // Ajouter les métadonnées des colonnes
+        // Ajouter des informations supplémentaires pour garantir la cohérence
+        xAxisKey: selectedXAxis,
+        yAxisKeys: selectedYAxes
+      }));
       
       message.success(t('metrics.success.chart_added'));
       closeDrawer();
@@ -439,51 +559,117 @@ const GridControls = () => {
   // Fonction pour ajouter un graphique basé sur les données actuelles
   const addGraphFromCurrentData = () => {
     if (USE_DIRECT_FETCH) {
-      if (displayData && displayData.length > 0) {
-        // Filtrer les colonnes cachées des données avant de les envoyer au graphique
-        const cleanData = displayData.map(item => {
-          const cleanItem = { ...item };
-          hiddenColumns.forEach(col => {
-            delete cleanItem[col];
+      if (displayData && displayData.length > 0 && selectedXAxis && selectedYAxes.length > 0) {
+        // Préparer les données pour le graphique avec les axes sélectionnés
+        const chartData = displayData.map(item => {
+          const newItem = { name: item[selectedXAxis] };
+          
+          selectedYAxes.forEach(yAxis => {
+            if (item[yAxis] !== undefined) {
+              newItem[yAxis] = parseFloat(item[yAxis]) || 0;
+            }
           });
-          return cleanItem;
+          
+          return newItem;
+        });
+        
+        // Créer un objet metadata pour identifier les colonnes calculées
+        const columnsMetadata = {};
+        
+        // Identifier les colonnes calculées sélectionnées
+        calculatedColumns.forEach(calc => {
+          if (selectedYAxes.includes(calc.name)) {
+            columnsMetadata[calc.name] = {
+              isCalculated: true,
+              format: calc.format,
+              expression: calc.expression
+            };
+          }
         });
         
         addGraph({
-          title: selectedQuery ? selectedQuery.name : 'Graphique personnalisé',
+          title: chartTitle || (selectedQuery ? selectedQuery.name : 'Graphique personnalisé'),
           description: selectedQuery ? selectedQuery.description || '' : '',
-          data: cleanData,
+          data: chartData,
           query: selectedQuery ? selectedQuery.query : 'custom',
+          columnsMetadata: columnsMetadata, // Ajouter les métadonnées des colonnes
+          type: chartType // Spécifier le type de graphique sélectionné
         });
         message.success(t('metrics.drawer.graph_added'));
       } else {
-        message.error(t('metrics.drawer.no_data'));
+        message.error(t('metrics.drawer.missing_axes'));
       }
     } else {
       // Mode données statiques
-      if (selectedQuery && selectedQuery.data && selectedQuery.data.length > 0) {
-        // Même pour les données statiques, on respecte les colonnes masquées
-        const cleanData = selectedQuery.data.map(item => {
-          const cleanItem = { ...item };
-          hiddenColumns.forEach(col => {
-            delete cleanItem[col];
+      if (selectedQuery && selectedQuery.data && selectedQuery.data.length > 0 && 
+          selectedXAxis && selectedYAxes.length > 0) {
+        
+        // Préparer les données pour le graphique avec les axes sélectionnés
+        const chartData = selectedQuery.data.map(item => {
+          const newItem = { name: item[selectedXAxis] };
+          
+          selectedYAxes.forEach(yAxis => {
+            if (item[yAxis] !== undefined) {
+              newItem[yAxis] = parseFloat(item[yAxis]) || 0;
+            }
           });
-          return cleanItem;
+          
+          return newItem;
+        });
+        
+        // Créer un objet metadata pour identifier les colonnes calculées
+        const columnsMetadata = {};
+        calculatedColumns.forEach(calc => {
+          if (selectedYAxes.includes(calc.name)) {
+            columnsMetadata[calc.name] = {
+              isCalculated: true,
+              format: calc.format,
+              expression: calc.expression
+            };
+          }
         });
         
         addGraph({
-          title: selectedQuery.name,
+          title: chartTitle || selectedQuery.name,
           description: selectedQuery.description || '',
-          data: cleanData,
+          data: chartData,
           query: selectedQuery.query,
+          columnsMetadata: columnsMetadata, // Ajouter les métadonnées des colonnes
+          type: chartType // Spécifier le type de graphique sélectionné
         });
         message.success(t('metrics.drawer.graph_added'));
       } else {
-        message.error(t('metrics.drawer.no_data'));
+        message.error(t('metrics.drawer.missing_axes'));
       }
     }
   };
-
+  
+  // Étendre les opérateurs de filtre pour les colonnes calculées
+  const addFilter = (column, operator, value) => {
+    // Vérifier si la colonne est une colonne calculée ou externe
+    const isCalculated = calculatedColumns.some(calc => calc.name === column);
+    
+    // Convertir la valeur en nombre si nécessaire et possible
+    let processedValue = value;
+    if (operator === 'greater' || operator === 'less' || operator === 'equals_number') {
+      processedValue = !isNaN(Number(value)) ? Number(value) : value;
+    }
+    
+    // Ajouter des métadonnées sur le type de colonne pour un filtrage optimal
+    setFilters([
+      ...filters, 
+      { 
+        column, 
+        operator, 
+        value: processedValue,
+        isCalculated: isCalculated,
+        columnType: isCalculated 
+          ? calculatedColumns.find(calc => calc.name === column)?.format || 'default'
+          : 'default'
+      }
+    ]);
+  };
+  
   // Appliquer les transformations (filtres, calculs, pivot) aux données
   useEffect(() => {
     if (queryResults && queryResults.length > 0) {
@@ -494,12 +680,71 @@ const GridControls = () => {
         processedData = processedData.filter(item => {
           return filters.every(filter => {
             const value = item[filter.column];
+            
+            // Si la valeur est undefined ou null, appliquer une logique spéciale
+            if (value === undefined || value === null) {
+              // Pour l'opérateur 'equals', true si la valeur du filtre est également vide
+              if (filter.operator === 'equals' && (filter.value === '' || filter.value === null)) {
+                return true;
+              }
+              // Pour les autres opérateurs, une valeur manquante ne correspond pas au filtre
+              return false;
+            }
+            
+            // Logique de filtrage améliorée
             switch (filter.operator) {
-              case 'equals': return value === filter.value;
-              case 'contains': return String(value).includes(filter.value);
-              case 'greater': return Number(value) > Number(filter.value);
-              case 'less': return Number(value) < Number(filter.value);
-              default: return true;
+              case 'equals':
+                // Si les deux valeurs sont numériques, comparer les nombres
+                if (typeof value === 'number' && !isNaN(Number(filter.value))) {
+                  return Number(value) === Number(filter.value);
+                }
+                // Sinon comparer les chaînes de caractères
+                return String(value).toLowerCase() === String(filter.value).toLowerCase();
+              
+              case 'equals_number':
+                return Number(value) === Number(filter.value);
+                
+              case 'not_equals':
+                // Si les deux valeurs sont numériques, comparer les nombres
+                if (typeof value === 'number' && !isNaN(Number(filter.value))) {
+                  return Number(value) !== Number(filter.value);
+                }
+                // Sinon comparer les chaînes de caractères
+                return String(value).toLowerCase() !== String(filter.value).toLowerCase();
+                
+              case 'contains':
+                return String(value).toLowerCase().includes(String(filter.value).toLowerCase());
+                
+              case 'not_contains':
+                return !String(value).toLowerCase().includes(String(filter.value).toLowerCase());
+                
+              case 'greater':
+                return Number(value) > Number(filter.value);
+                
+              case 'greater_equal':
+                return Number(value) >= Number(filter.value);
+                
+              case 'less':
+                return Number(value) < Number(filter.value);
+                
+              case 'less_equal':
+                return Number(value) <= Number(filter.value);
+                
+              case 'between':
+                if (Array.isArray(filter.value) && filter.value.length === 2) {
+                  const [min, max] = filter.value;
+                  return Number(value) >= Number(min) && Number(value) <= Number(max);
+                }
+                return true;
+                
+              case 'starts_with':
+                return String(value).toLowerCase().startsWith(String(filter.value).toLowerCase());
+                
+              case 'ends_with':
+                return String(value).toLowerCase().endsWith(String(filter.value).toLowerCase());
+                
+              default:
+                return true;
             }
           });
         });
@@ -507,29 +752,66 @@ const GridControls = () => {
       
       // Ajouter les colonnes calculées
       if (calculatedColumns.length > 0) {
-        processedData = processedData.map(item => {
+        processedData = processedData.map((item, index) => {
           const newItem = { ...item };
+          
           calculatedColumns.forEach(calc => {
             try {
-              // Simple évaluation basique pour la démo
-              // Dans un environnement réel, il faudrait utiliser une approche plus sécurisée
-              // comme une bibliothèque d'expressions mathématiques
-              const evalContext = { ...item };
-              // Fonction d'évaluation simplifiée qui utilise uniquement le contexte d'objet
-              const evalInContext = (expr) => {
-                // Remplacer les noms de colonnes par leur valeur
-                let processedExpr = expr;
+              if (calc.isExternal) {
+                // Pour les colonnes provenant de sources externes
+                // Récupérer la valeur correspondante dans les données externes
+                const externalDataEntry = calc.externalData && calc.externalData[index % calc.externalData.length];
+                
+                if (externalDataEntry) {
+                  // Choisir la première valeur numérique disponible dans l'objet de données externes
+                  const numericKeys = Object.keys(externalDataEntry).filter(key => 
+                    typeof externalDataEntry[key] === 'number' || 
+                    (typeof externalDataEntry[key] === 'string' && !isNaN(externalDataEntry[key]))
+                  );
+                  
+                  if (numericKeys.length > 0) {
+                    newItem[calc.name] = parseFloat(externalDataEntry[numericKeys[0]]);
+                  } else {
+                    newItem[calc.name] = 0;
+                  }
+                } else {
+                  newItem[calc.name] = 0;
+                }
+              } else {
+                // Code existant pour les colonnes calculées normales
+                const evalContext = { ...item };
+                
+                // Convertir les chaînes numériques en nombres pour le calcul
                 Object.keys(evalContext).forEach(key => {
-                  const regex = new RegExp(`\\b${key}\\b`, 'g');
-                  processedExpr = processedExpr.replace(regex, `evalContext["${key}"]`);
+                  if (typeof evalContext[key] === 'string' && !isNaN(evalContext[key])) {
+                    evalContext[key] = parseFloat(evalContext[key]);
+                  }
                 });
-                return new Function('evalContext', `return ${processedExpr}`)(evalContext);
-              };
-              
-              newItem[calc.name] = evalInContext(calc.expression);
+                
+                // Fonction d'évaluation simplifiée qui utilise uniquement le contexte d'objet
+                const evalInContext = (expr) => {
+                  // Remplacer les noms de colonnes par leur valeur
+                  let processedExpr = expr;
+                  Object.keys(evalContext).forEach(key => {
+                    const regex = new RegExp(`\\b${key}\\b`, 'g');
+                    processedExpr = processedExpr.replace(regex, `evalContext["${key}"]`);
+                  });
+                  
+                  try {
+                    const result = new Function('evalContext', `return ${processedExpr}`)(evalContext);
+                    // S'assurer que le résultat est un nombre valide
+                    return isNaN(result) ? 0 : result;
+                  } catch (error) {
+                    console.error("Erreur d'évaluation:", error);
+                    return 0;
+                  }
+                };
+                
+                newItem[calc.name] = evalInContext(calc.expression);
+              }
             } catch (error) {
               console.error(`Erreur dans le calcul de la colonne ${calc.name}:`, error);
-              newItem[calc.name] = 'Error';
+              newItem[calc.name] = 0; // Utiliser 0 au lieu de 'Error' pour garantir un nombre
             }
           });
           return newItem;
@@ -628,7 +910,7 @@ const GridControls = () => {
           return {
             title: (
               <div>
-                <span>{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+                <span>{t('data_explorer.column_header', { column: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) })}</span>
                 {isPivot && <TableOutlined style={{ marginLeft: 5, color: '#1890ff' }} />}
                 {isHidden && <EyeInvisibleOutlined style={{ marginLeft: 5, color: '#ff4d4f' }} />}
                 {calculatedColumn && <span style={{ marginLeft: 5, color: '#722ed1' }}>ƒ</span>}
@@ -641,15 +923,18 @@ const GridControls = () => {
             render: (text, record) => {
               // Formatage selon le type de colonne
               if (calculatedColumn) {
+                // S'assurer que la valeur est un nombre
+                const numValue = typeof text === 'number' ? text : parseFloat(text) || 0;
+                
                 switch (calculatedColumn.format) {
                   case 'percentage':
-                    return `${(text * 100).toFixed(2)}%`;
+                    return `${(numValue * 100).toFixed(2)}%`;
                   case 'currency':
-                    return text >= 1000000 
-                      ? `${(text/1000000).toFixed(2)} M€` 
-                      : `${(text/1000).toFixed(0)} €`;
+                    return numValue >= 1000000 
+                      ? `${(numValue/1000000).toFixed(2)} M€` 
+                      : `${(numValue/1000).toFixed(0)} €`;
                   default:
-                    return text;
+                    return typeof numValue === 'number' ? numValue : text;
                 }
               }
               
@@ -667,7 +952,7 @@ const GridControls = () => {
               return text;
             },
             onHeaderCell: column => ({
-              onClick: () => handleColumnHeaderClick(key)
+              onClick: () => handleColumnHeaderClick(column.dataIndex)
             }),
             hidden: isHidden
           };
@@ -701,21 +986,116 @@ const GridControls = () => {
     setIsCalculationModalVisible(true);
   };
   
-  // Sauvegarder la nouvelle colonne calculée
-  const handleSaveCalculation = () => {
-    if (!newCalculation.name.trim() || !newCalculation.expression.trim()) {
-      message.error('Le nom et l\'expression sont requis');
+  // Fonction pour charger les données d'une entreprise externe
+  const fetchExternalCompanyData = async (companyId, queryId) => {
+    if (!companyId || !queryId) return;
+    
+    try {
+      const url = `/explorer/data/${companyId}/${queryId}`;
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.error) {
+        console.error(data.error, data.details);
+        return null;
+      }
+      
+      // Stocker les données avec une clé unique pour pouvoir les réutiliser
+      const key = `company_${companyId}_query_${queryId}`;
+      setExternalData(prev => ({
+        ...prev,
+        [key]: data.results || []
+      }));
+      
+      return data.results || [];
+    } catch (error) {
+      console.error("Erreur lors du chargement des données externes:", error);
+      return null;
+    }
+  };
+
+  // Modifier handleSaveCalculation pour gérer les sources externes
+  const handleSaveCalculation = async () => {
+    if (!newCalculation.name.trim()) {
+      message.error(t('data_explorer.name_required'));
       return;
     }
     
-    setCalculatedColumns([
-      ...calculatedColumns, 
-      { ...newCalculation }
-    ]);
+    // Si c'est une source externe mais aucune entreprise n'est sélectionnée
+    if (newCalculation.externalSource && !newCalculation.externalCompanyId) {
+      message.error(t('data_explorer.company_required'));
+      return;
+    }
     
-    setIsCalculationModalVisible(false);
-    setNewCalculation({ name: '', expression: '', format: 'default' });
-    message.success('Colonne calculée ajoutée');
+    // Si c'est une source externe, charger les données
+    if (newCalculation.externalSource && newCalculation.externalCompanyId) {
+      try {
+        // Utiliser la même requête que celle sélectionnée actuellement
+        const queryId = selectedQuery ? selectedQuery.query : 'monthly_revenue';
+        const externalData = await fetchExternalCompanyData(newCalculation.externalCompanyId, queryId);
+        
+        if (!externalData || externalData.length === 0) {
+          message.error(t('data_explorer.no_external_data'));
+          return;
+        }
+        
+        // Ajouter une colonne calculée spéciale pour les données externes
+        setCalculatedColumns([
+          ...calculatedColumns, 
+          { 
+            name: newCalculation.name,
+            format: newCalculation.format,
+            isExternal: true,
+            externalCompanyId: newCalculation.externalCompanyId,
+            externalQuery: queryId,
+            externalData: externalData
+          }
+        ]);
+        
+        setIsCalculationModalVisible(false);
+        setNewCalculation({ 
+          name: '', 
+          expression: '', 
+          format: 'default',
+          externalSource: false,
+          externalCompanyId: null
+        });
+        message.success(t('data_explorer.column_added'));
+      } catch (error) {
+        console.error('Erreur lors de l\'ajout de la colonne externe:', error);
+        message.error(t('data_explorer.external_data_error'));
+      }
+    } else {
+      // Cas normal avec une expression à évaluer
+      if (!newCalculation.expression.trim()) {
+        message.error(t('data_explorer.expression_required'));
+        return;
+      }
+      
+      setCalculatedColumns([
+        ...calculatedColumns, 
+        { ...newCalculation, isExternal: false }
+      ]);
+      
+      setIsCalculationModalVisible(false);
+      setNewCalculation({ 
+        name: '', 
+        expression: '', 
+        format: 'default',
+        externalSource: false,
+        externalCompanyId: null
+      });
+      message.success(t('data_explorer.column_added'));
+    }
   };
   
   // Gérer l'affichage/masquage d'une colonne
@@ -736,11 +1116,6 @@ const GridControls = () => {
     }
   };
   
-  // Ajouter un filtre
-  const addFilter = (column, operator, value) => {
-    setFilters([...filters, { column, operator, value }]);
-  };
-  
   // Supprimer un filtre
   const removeFilter = (index) => {
     const newFilters = [...filters];
@@ -748,61 +1123,406 @@ const GridControls = () => {
     setFilters(newFilters);
   };
   
-  // Rendu du menu contextuel pour les colonnes
-  const getColumnMenu = (columnKey) => (
-    <Menu>
-      <Menu.Item 
-        key="toggle-visibility" 
-        icon={<EyeInvisibleOutlined />}
-        onClick={() => toggleColumnVisibility(columnKey)}
-      >
-        {hiddenColumns.includes(columnKey) 
-          ? 'Afficher dans la visualisation' 
-          : 'Masquer dans la visualisation'}
-      </Menu.Item>
-      <Menu.Item 
-        key="toggle-pivot" 
-        icon={<TableOutlined />}
-        onClick={() => toggleColumnPivot(columnKey)}
-      >
-        {pivotColumns.includes(columnKey) 
-          ? 'Supprimer le pivot' 
-          : 'Pivoter cette colonne'}
-      </Menu.Item>
-      <Menu.SubMenu key="filter" icon={<FilterOutlined />} title="Filtrer">
-        <Menu.Item key="filter-equals" onClick={() => {
-          const value = prompt(`Filtrer ${columnKey} égal à:`);
-          if (value !== null) addFilter(columnKey, 'equals', value);
-        }}>
-          Égal à...
+  // Améliorer le menu contextuel pour les colonnes
+  const getColumnMenu = (columnKey) => {
+    // Vérifier si c'est une colonne calculée
+    const isCalculated = calculatedColumns.some(calc => calc.name === columnKey);
+    // Déterminer si c'est une colonne numérique
+    const isNumeric = displayData && displayData.length > 0 && 
+      (typeof displayData[0][columnKey] === 'number' || 
+      !isNaN(Number(displayData[0][columnKey])));
+    
+    return (
+      <Menu>
+        <Menu.Item 
+          key="toggle-visibility" 
+          icon={<EyeInvisibleOutlined />}
+          onClick={() => toggleColumnVisibility(columnKey)}
+        >
+          {hiddenColumns.includes(columnKey) 
+            ? t('data_explorer.show_in_visualization') 
+            : t('data_explorer.hide_from_visualization')}
         </Menu.Item>
-        <Menu.Item key="filter-contains" onClick={() => {
-          const value = prompt(`Filtrer ${columnKey} contient:`);
-          if (value !== null) addFilter(columnKey, 'contains', value);
-        }}>
-          Contient...
+        
+        <Menu.Item 
+          key="toggle-pivot" 
+          icon={<TableOutlined />}
+          onClick={() => toggleColumnPivot(columnKey)}
+        >
+          {pivotColumns.includes(columnKey) 
+            ? t('data_explorer.remove_pivot') 
+            : t('data_explorer.add_pivot')}
         </Menu.Item>
-        <Menu.Item key="filter-greater" onClick={() => {
-          const value = prompt(`Filtrer ${columnKey} supérieur à:`);
-          if (value !== null) addFilter(columnKey, 'greater', value);
-        }}>
-          Supérieur à...
+        
+        <Menu.SubMenu key="filter" icon={<FilterOutlined />} title={t('data_explorer.filter')}>
+          {/* Filtres de texte (pour toutes les colonnes) */}
+          <Menu.Item key="filter-equals" onClick={() => {
+            const value = prompt(`${t('data_explorer.filter')} ${columnKey} ${t('data_explorer.equals')}`);
+            if (value !== null) addFilter(columnKey, 'equals', value);
+          }}>
+            {t('data_explorer.equals')}
+          </Menu.Item>
+          
+          <Menu.Item key="filter-not-equals" onClick={() => {
+            const value = prompt(`${t('data_explorer.filter')} ${columnKey} ${t('data_explorer.not_equals')}`);
+            if (value !== null) addFilter(columnKey, 'not_equals', value);
+          }}>
+            {t('data_explorer.not_equals')}
+          </Menu.Item>
+          
+          <Menu.Item key="filter-contains" onClick={() => {
+            const value = prompt(`${t('data_explorer.filter')} ${columnKey} ${t('data_explorer.contains')}`);
+            if (value !== null) addFilter(columnKey, 'contains', value);
+          }}>
+            {t('data_explorer.contains')}
+          </Menu.Item>
+          
+          <Menu.Item key="filter-not-contains" onClick={() => {
+            const value = prompt(`${t('data_explorer.filter')} ${columnKey} ${t('data_explorer.not_contains')}`);
+            if (value !== null) addFilter(columnKey, 'not_contains', value);
+          }}>
+            {t('data_explorer.not_contains')}
+          </Menu.Item>
+          
+          {/* Filtres spécifiques aux colonnes numériques */}
+          {isNumeric && (
+            <>
+              <Menu.Divider />
+              
+              <Menu.Item key="filter-equals-number" onClick={() => {
+                const value = prompt(`${t('data_explorer.filter')} ${columnKey} ${t('data_explorer.equals_number')}`);
+                if (value !== null && !isNaN(Number(value))) addFilter(columnKey, 'equals_number', Number(value));
+              }}>
+                {t('data_explorer.equals_number')}
+              </Menu.Item>
+              
+              <Menu.Item key="filter-greater" onClick={() => {
+                const value = prompt(`${t('data_explorer.filter')} ${columnKey} ${t('data_explorer.greater_than')}`);
+                if (value !== null && !isNaN(Number(value))) addFilter(columnKey, 'greater', Number(value));
+              }}>
+                {t('data_explorer.greater_than')}
+              </Menu.Item>
+              
+              <Menu.Item key="filter-greater-equal" onClick={() => {
+                const value = prompt(`${t('data_explorer.filter')} ${columnKey} ${t('data_explorer.greater_equal')}`);
+                if (value !== null && !isNaN(Number(value))) addFilter(columnKey, 'greater_equal', Number(value));
+              }}>
+                {t('data_explorer.greater_equal')}
+              </Menu.Item>
+              
+              <Menu.Item key="filter-less" onClick={() => {
+                const value = prompt(`${t('data_explorer.filter')} ${columnKey} ${t('data_explorer.less_than')}`);
+                if (value !== null && !isNaN(Number(value))) addFilter(columnKey, 'less', Number(value));
+              }}>
+                {t('data_explorer.less_than')}
+              </Menu.Item>
+              
+              <Menu.Item key="filter-less-equal" onClick={() => {
+                const value = prompt(`${t('data_explorer.filter')} ${columnKey} ${t('data_explorer.less_equal')}`);
+                if (value !== null && !isNaN(Number(value))) addFilter(columnKey, 'less_equal', Number(value));
+              }}>
+                {t('data_explorer.less_equal')}
+              </Menu.Item>
+              
+              <Menu.Item key="filter-between" onClick={() => {
+                const minValue = prompt(`${t('data_explorer.filter')} ${columnKey} ${t('data_explorer.between_min')}`);
+                if (minValue !== null && !isNaN(Number(minValue))) {
+                  const maxValue = prompt(`${t('data_explorer.filter')} ${columnKey} ${t('data_explorer.between_max')}`);
+                  if (maxValue !== null && !isNaN(Number(maxValue))) {
+                    addFilter(columnKey, 'between', [Number(minValue), Number(maxValue)]);
+                  }
+                }
+              }}>
+                {t('data_explorer.between')}
+              </Menu.Item>
+            </>
+          )}
+          
+          {/* Filtres spécifiques aux colonnes de texte */}
+          {!isNumeric && (
+            <>
+              <Menu.Divider />
+              
+              <Menu.Item key="filter-starts-with" onClick={() => {
+                const value = prompt(`${t('data_explorer.filter')} ${columnKey} ${t('data_explorer.starts_with')}`);
+                if (value !== null) addFilter(columnKey, 'starts_with', value);
+              }}>
+                {t('data_explorer.starts_with')}
+              </Menu.Item>
+              
+              <Menu.Item key="filter-ends-with" onClick={() => {
+                const value = prompt(`${t('data_explorer.filter')} ${columnKey} ${t('data_explorer.ends_with')}`);
+                if (value !== null) addFilter(columnKey, 'ends_with', value);
+              }}>
+                {t('data_explorer.ends_with')}
+              </Menu.Item>
+            </>
+          )}
+        </Menu.SubMenu>
+        
+        <Menu.Item key="sort-asc" icon={<SortAscendingOutlined />} onClick={() => setSortInfo({ column: columnKey, order: 'ascend' })}>
+          {t('data_explorer.sort_ascending')}
         </Menu.Item>
-        <Menu.Item key="filter-less" onClick={() => {
-          const value = prompt(`Filtrer ${columnKey} inférieur à:`);
-          if (value !== null) addFilter(columnKey, 'less', value);
-        }}>
-          Inférieur à...
+        
+        <Menu.Item key="sort-desc" icon={<SortDescendingOutlined />} onClick={() => setSortInfo({ column: columnKey, order: 'descend' })}>
+          {t('data_explorer.sort_descending')}
         </Menu.Item>
-      </Menu.SubMenu>
-      <Menu.Item key="sort-asc" icon={<SortAscendingOutlined />} onClick={() => setSortInfo({ column: columnKey, order: 'ascend' })}>
-        Trier croissant
-      </Menu.Item>
-      <Menu.Item key="sort-desc" icon={<SortDescendingOutlined />} onClick={() => setSortInfo({ column: columnKey, order: 'descend' })}>
-        Trier décroissant
-      </Menu.Item>
-    </Menu>
-  );
+      </Menu>
+    );
+  };
+
+  // Améliorer le rendu des filtres actifs dans la barre d'outils
+  const renderActiveFilters = () => {
+    if (filters.length === 0) return null;
+    
+    return (
+      <div className="active-filters mb-2 flex flex-wrap">
+        {filters.map((filter, index) => {
+          // Déterminer le texte à afficher pour l'opérateur
+          let operatorText = '';
+          switch(filter.operator) {
+            case 'equals': operatorText = '='; break;
+            case 'equals_number': operatorText = '='; break;
+            case 'not_equals': operatorText = '≠'; break;
+            case 'contains': operatorText = t('data_explorer.contains_short'); break;
+            case 'not_contains': operatorText = t('data_explorer.not_contains_short'); break;
+            case 'greater': operatorText = '>'; break;
+            case 'greater_equal': operatorText = '≥'; break;
+            case 'less': operatorText = '<'; break;
+            case 'less_equal': operatorText = '≤'; break;
+            case 'between': operatorText = t('data_explorer.between_short'); break;
+            case 'starts_with': operatorText = t('data_explorer.starts_with_short'); break;
+            case 'ends_with': operatorText = t('data_explorer.ends_with_short'); break;
+            default: operatorText = filter.operator;
+          }
+          
+          // Pour l'opérateur between, afficher les deux valeurs
+          let valueText = '';
+          if (filter.operator === 'between' && Array.isArray(filter.value) && filter.value.length === 2) {
+            valueText = `${filter.value[0]} - ${filter.value[1]}`;
+          } else {
+            valueText = filter.value;
+          }
+          
+          return (
+            <Tag 
+              key={index} 
+              color="purple" 
+              closable 
+              onClose={() => removeFilter(index)}
+              className="mr-1 mb-1"
+            >
+              <FilterOutlined /> <strong>{filter.column}</strong> {operatorText} "{valueText}"
+            </Tag>
+          );
+        })}
+        
+        {filters.length > 0 && (
+          <Button 
+            size="small" 
+            type="text" 
+            onClick={() => setFilters([])}
+            className="text-purple-600 hover:text-purple-800"
+          >
+            {t('data_explorer.clear_all_filters')}
+          </Button>
+        )}
+      </div>
+    );
+  };
+
+  // Fonction pour générer un aperçu du graphique
+  const renderChartPreview = () => {
+    if (!previewData || previewData.length === 0 || !selectedXAxis || selectedYAxes.length === 0) {
+      return (
+        <div className="flex items-center justify-center h-64 bg-gray-50 rounded border border-gray-200">
+          <p className="text-gray-400">{t('metrics.chart_preview.no_data')}</p>
+        </div>
+      );
+    }
+    
+    // Déterminer si les colonnes sont calculées pour leur appliquer un style spécial
+    const isCalculatedColumn = (columnName) => {
+      return calculatedColumns.some(calc => calc.name === columnName);
+    };
+    
+    // Obtenir le format d'une colonne calculée
+    const getCalculatedColumnFormat = (columnName) => {
+      const column = calculatedColumns.find(calc => calc.name === columnName);
+      return column ? column.format : 'default';
+    };
+    
+    // Formateur pour les tooltips
+    const tooltipFormatter = (value, name) => {
+      // Si c'est une colonne calculée, utiliser son format
+      if (isCalculatedColumn(name)) {
+        const format = getCalculatedColumnFormat(name);
+        switch (format) {
+          case 'percentage':
+            return [`${(value * 100).toFixed(2)}%`, name];
+          case 'currency':
+            return value >= 1000000 
+              ? [`${(value/1000000).toFixed(2)} M€`, name] 
+              : [`${(value/1000).toFixed(0)} k€`, name];
+          default:
+            return [value, name];
+        }
+      }
+      
+      // Formatage par défaut pour les valeurs monétaires
+      if (name.includes('revenue') || name.includes('value') || name.includes('amount')) {
+        return value >= 1000000 
+          ? [`${(value/1000000).toFixed(2)} M€`, name] 
+          : [`${(value/1000).toFixed(0)} k€`, name];
+      }
+      
+      return [value, name];
+    };
+    
+    switch (chartType) {
+      case 'bar':
+        return (
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={previewData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" angle={-45} textAnchor="end" height={60} />
+                <YAxis />
+                <RechartsTooltip formatter={tooltipFormatter} />
+                <Legend />
+                {selectedYAxes.map((key, index) => (
+                  <Bar 
+                    key={key} 
+                    dataKey={key} 
+                    fill={COLORS[index % COLORS.length]}
+                    // Ajouter un style spécial pour les colonnes calculées
+                    strokeDasharray={isCalculatedColumn(key) ? "3 3" : "0"}
+                    strokeWidth={isCalculatedColumn(key) ? 2 : 0}
+                  />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        );
+        
+      case 'line':
+        return (
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={previewData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" angle={-45} textAnchor="end" height={60} />
+                <YAxis />
+                <RechartsTooltip formatter={tooltipFormatter} />
+                <Legend />
+                {selectedYAxes.map((key, index) => (
+                  <Line 
+                    key={key} 
+                    type="monotone" 
+                    dataKey={key} 
+                    stroke={COLORS[index % COLORS.length]} 
+                    activeDot={{ r: 8 }}
+                    // Ajouter un style spécial pour les colonnes calculées
+                    strokeDasharray={isCalculatedColumn(key) ? "5 5" : "0"}
+                    strokeWidth={isCalculatedColumn(key) ? 2 : 1}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        );
+        
+      case 'area':
+        return (
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={previewData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" angle={-45} textAnchor="end" height={60} />
+                <YAxis />
+                <RechartsTooltip formatter={tooltipFormatter} />
+                <Legend />
+                {selectedYAxes.map((key, index) => (
+                  <Area 
+                    key={key} 
+                    type="monotone" 
+                    dataKey={key} 
+                    stackId="1"
+                    stroke={COLORS[index % COLORS.length]} 
+                    fill={COLORS[index % COLORS.length]}
+                    // Ajouter un style spécial pour les colonnes calculées
+                    strokeDasharray={isCalculatedColumn(key) ? "5 5" : "0"}
+                    strokeWidth={isCalculatedColumn(key) ? 2 : 1}
+                  />
+                ))}
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        );
+        
+      case 'pie':
+        // Pour un camembert, nous utilisons seulement la première colonne Y sélectionnée
+        if (selectedYAxes.length > 0) {
+          return (
+            <div className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={previewData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={true}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey={selectedYAxes[0]}
+                    nameKey="name"
+                    label={(entry) => entry.name}
+                  >
+                    {previewData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip formatter={tooltipFormatter} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          );
+        }
+        return null;
+        
+      case 'radar':
+        return (
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <RadarChart cx="50%" cy="50%" outerRadius={80} data={previewData}>
+                <PolarGrid />
+                <PolarAngleAxis dataKey="name" />
+                <RechartsTooltip formatter={tooltipFormatter} />
+                {selectedYAxes.map((key, index) => (
+                  <Radar 
+                    key={key} 
+                    name={key} 
+                    dataKey={key} 
+                    stroke={COLORS[index % COLORS.length]} 
+                    fill={COLORS[index % COLORS.length]} 
+                    fillOpacity={0.2}
+                  />
+                ))}
+                <Legend />
+              </RadarChart>
+            </ResponsiveContainer>
+          </div>
+        );
+        
+      default:
+        return (
+          <div className="flex items-center justify-center h-64 bg-gray-50 rounded border border-gray-200">
+            <p className="text-gray-400">{t('metrics.chart_preview.invalid_type')}</p>
+          </div>
+        );
+    }
+  };
 
   return (
     <div className="flex items-center space-x-4 mb-2">
@@ -899,7 +1619,7 @@ const GridControls = () => {
               
               {errorMessage ? (
                 <div className="error-message p-4 border border-red-300 rounded bg-red-50">
-                  <Text type="danger">{errorMessage}</Text>
+                  <Text type="danger">{t('errors.custom_error', { error: errorMessage })}</Text>
                 </div>
               ) : queryResults && queryResults.length > 0 ? (
                 <div>
@@ -914,7 +1634,7 @@ const GridControls = () => {
                         onClick={handleAddCalculatedColumn}
                         className="mr-2"
                       >
-                        Ajouter une colonne
+                        {t('data_explorer.add_column')}
                       </Button>
                       
                       <Dropdown 
@@ -934,7 +1654,7 @@ const GridControls = () => {
                           size="small"
                           className="mr-2"
                         >
-                          Pivot <DownOutlined />
+                          {t('data_explorer.pivot')} <DownOutlined />
                         </Button>
                       </Dropdown>
                       
@@ -954,7 +1674,7 @@ const GridControls = () => {
                           icon={<EyeInvisibleOutlined />}
                           size="small"
                         >
-                          Visibilité <DownOutlined />
+                          {t('data_explorer.visibility')} <DownOutlined />
                         </Button>
                       </Dropdown>
                     </div>
@@ -966,20 +1686,12 @@ const GridControls = () => {
                           closable 
                           onClose={() => setSortInfo(null)}
                         >
-                          <SortAscendingOutlined /> Tri: {sortInfo.column} ({sortInfo.order === 'ascend' ? '↑' : '↓'})
+                          <SortAscendingOutlined /> {t('data_explorer.sort')} {sortInfo.column} ({sortInfo.order === 'ascend' ? '↑' : '↓'})
                         </Tag>
                       )}
                       
-                      {filters.map((filter, index) => (
-                        <Tag 
-                          key={index} 
-                          color="purple" 
-                          closable 
-                          onClose={() => removeFilter(index)}
-                        >
-                          <FilterOutlined /> {filter.column} {filter.operator} "{filter.value}"
-                        </Tag>
-                      ))}
+                      {/* Utilisation du nouveau composant pour afficher les filtres actifs */}
+                      {renderActiveFilters()}
                     </div>
                   </div>
                   
@@ -1062,23 +1774,63 @@ const GridControls = () => {
             
             <div className="mb-4">
               <label className="block text-sm mb-1">{t('metrics.drawer.chart_type')}:</label>
-              {selectedQuery && selectedQuery.query === 'total_investment' ? (
-                <div>
-                  <Radio.Group value="bar" disabled>
-                    <Radio.Button value="bar">{t('metrics.chart_types.bar')}</Radio.Button>
-                  </Radio.Group>
-                  <Text type="secondary" className="ml-2 text-xs">
-                    {t('metrics.type_fixed_for_total_investment', 'Graphique en barres recommandé pour cette visualisation')}
-                  </Text>
-                </div>
-              ) : (
-                <Radio.Group onChange={(e) => setChartType(e.target.value)} value={chartType}>
-                  <Radio.Button value="bar">{t('metrics.chart_types.bar')}</Radio.Button>
-                  <Radio.Button value="line">{t('metrics.chart_types.line')}</Radio.Button>
-                  <Radio.Button value="area">{t('metrics.chart_types.area')}</Radio.Button>
-                  <Radio.Button value="pie">{t('metrics.chart_types.pie')}</Radio.Button>
-                </Radio.Group>
-              )}
+              <Radio.Group onChange={(e) => setChartType(e.target.value)} value={chartType}>
+                <Radio.Button value="bar">{t('metrics.chart_types.bar')}</Radio.Button>
+                <Radio.Button value="line">{t('metrics.chart_types.line')}</Radio.Button>
+                <Radio.Button value="area">{t('metrics.chart_types.area')}</Radio.Button>
+                <Radio.Button value="pie">{t('metrics.chart_types.pie')}</Radio.Button>
+                <Radio.Button value="radar">{t('metrics.chart_types.radar')}</Radio.Button>
+              </Radio.Group>
+            </div>
+            
+            {/* Nouvelle section pour la sélection des axes */}
+            <div className="mb-4 grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm mb-1">{t('metrics.drawer.x_axis')}:</label>
+                <Select
+                  style={{ width: '100%' }}
+                  value={selectedXAxis}
+                  onChange={setSelectedXAxis}
+                  placeholder={t('metrics.drawer.select_x_axis')}
+                >
+                  {displayData && displayData.length > 0 && 
+                    getNonNumericColumns(displayData).map(column => (
+                      <Option key={column} value={column}>{column}</Option>
+                    ))
+                  }
+                </Select>
+              </div>
+              
+              <div>
+                <label className="block text-sm mb-1">{t('metrics.drawer.y_axes')}:</label>
+                <Select
+                  mode="multiple"
+                  style={{ width: '100%' }}
+                  value={selectedYAxes}
+                  onChange={setSelectedYAxes}
+                  placeholder={t('metrics.drawer.select_y_axes')}
+                  maxTagCount={3}
+                >
+                  {displayData && displayData.length > 0 && 
+                    getNumericColumns(displayData).map(column => (
+                      <Option key={column} value={column}>
+                        {column} 
+                        {calculatedColumns.some(calc => calc.name === column) && 
+                          <span className="ml-1" style={{ color: '#722ed1' }}>ƒ</span>
+                        }
+                      </Option>
+                    ))
+                  }
+                </Select>
+              </div>
+            </div>
+            
+            {/* Section de prévisualisation du graphique */}
+            <div className="mb-4">
+              <label className="block text-sm mb-1">{t('metrics.drawer.chart_preview')}:</label>
+              <div className="border border-gray-200 rounded p-2 bg-white">
+                {renderChartPreview()}
+              </div>
             </div>
             
             <Button type="primary" onClick={addGraphFromCurrentData}>
@@ -1090,7 +1842,7 @@ const GridControls = () => {
 
       {/* Ajouter la modale pour les colonnes calculées */}
       <Modal
-        title="Créer une colonne calculée"
+        title={t('data_explorer.create_calculated_column')}
         visible={isCalculationModalVisible}
         onOk={handleSaveCalculation}
         onCancel={() => setIsCalculationModalVisible(false)}
@@ -1099,57 +1851,104 @@ const GridControls = () => {
       >
         <Form layout="vertical">
           <Form.Item 
-            label="Nom de la colonne" 
+            label={t('data_explorer.column_name')}
             required
-            tooltip="Ce nom sera utilisé comme en-tête de colonne"
+            tooltip={t('data_explorer.column_name_placeholder')}
           >
             <Input 
               value={newCalculation.name}
               onChange={e => setNewCalculation({...newCalculation, name: e.target.value})}
-              placeholder="ex: Marge brute"
+              placeholder={t('data_explorer.column_name_placeholder')}
             />
           </Form.Item>
           
-          <Form.Item 
-            label="Expression" 
-            required
-            tooltip="Vous pouvez utiliser les noms des autres colonnes comme variables"
-          >
-            <Input.TextArea 
-              value={newCalculation.expression}
-              onChange={e => setNewCalculation({...newCalculation, expression: e.target.value})}
-              placeholder="ex: revenue * 0.7"
-              rows={4}
+          {/* Ajouter un switch pour choisir entre expression et source externe */}
+          <Form.Item label={t('data_explorer.data_source')}>
+            <Switch
+              checked={newCalculation.externalSource}
+              onChange={checked => setNewCalculation({...newCalculation, externalSource: checked})}
+              checkedChildren={t('data_explorer.external_company')}
+              unCheckedChildren={t('data_explorer.formula')}
             />
+            <span className="ml-2 text-xs text-gray-500">
+              {newCalculation.externalSource ? 
+                t('data_explorer.external_company_help') : 
+                t('data_explorer.formula_help')}
+            </span>
           </Form.Item>
           
-          <Form.Item label="Format d'affichage">
+          {newCalculation.externalSource ? (
+            <Form.Item 
+              label={t('data_explorer.select_company')}
+              required
+              tooltip={t('data_explorer.select_company_help')}
+            >
+              <Select
+                placeholder={t('data_explorer.select_company_placeholder')}
+                value={newCalculation.externalCompanyId}
+                onChange={value => setNewCalculation({...newCalculation, externalCompanyId: value})}
+                loading={loadingCompanies}
+                showSearch
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                }
+              >
+                {companies.map(company => (
+                  <Option key={company.id} value={company.id}>
+                    {company.denomination || company.name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          ) : (
+            <Form.Item 
+              label={t('data_explorer.expression')}
+              required={!newCalculation.externalSource}
+              tooltip={t('data_explorer.expression_placeholder')}
+            >
+              <Input.TextArea 
+                value={newCalculation.expression}
+                onChange={e => setNewCalculation({...newCalculation, expression: e.target.value})}
+                placeholder={t('data_explorer.expression_placeholder')}
+                rows={4}
+                disabled={newCalculation.externalSource}
+              />
+            </Form.Item>
+          )}
+          
+          <Form.Item label={t('data_explorer.display_format')}>
             <Select
               value={newCalculation.format}
               onChange={value => setNewCalculation({...newCalculation, format: value})}
             >
-              <Option value="default">Par défaut</Option>
-              <Option value="percentage">Pourcentage</Option>
-              <Option value="currency">Devise (€)</Option>
+              <Option value="default">{t('data_explorer.format_default')}</Option>
+              <Option value="percentage">{t('data_explorer.format_percentage')}</Option>
+              <Option value="currency">{t('data_explorer.format_currency')}</Option>
             </Select>
           </Form.Item>
           
-          <div className="text-xs text-gray-500 mb-4">
-            <p className="font-medium mb-1">Colonnes disponibles:</p>
-            <div className="grid grid-cols-3 gap-2">
-              {queryResults && queryResults.length > 0 && 
-                Object.keys(queryResults[0]).map(key => (
-                  <Tag key={key} color="blue" onClick={() => {
-                    const expr = newCalculation.expression + ` ${key}`;
-                    setNewCalculation({...newCalculation, expression: expr});
-                  }} className="cursor-pointer">
-                    {key}
-                  </Tag>
-                ))
-              }
+          {!newCalculation.externalSource && (
+            <div className="text-xs text-gray-500 mb-4">
+              <p className="font-medium mb-1">{t('data_explorer.available_columns')}:</p>
+              <div className="grid grid-cols-3 gap-2">
+                {queryResults && queryResults.length > 0 && 
+                  Object.keys(queryResults[0]).map(key => (
+                    <Tag key={key} color="blue" onClick={() => {
+                      // Ajouter le nom de colonne avec un espace avant s'il n'y en a pas déjà un
+                      const currentExpr = newCalculation.expression;
+                      const expr = currentExpr.endsWith(' ') ? 
+                        `${currentExpr}${key}` : 
+                        `${currentExpr} ${key}`.trim();
+                      setNewCalculation({...newCalculation, expression: expr});
+                    }} className="cursor-pointer">
+                      {key}
+                    </Tag>
+                  ))
+                }
+              </div>
+              <p className="mt-2">{t('data_explorer.operators')}</p>
             </div>
-            <p className="mt-2">Opérateurs: +, -, *, /, {'>'}, {'<'}, ==, !=, &&, ||, ?</p>
-          </div>
+          )}
         </Form>
       </Modal>
     </div>

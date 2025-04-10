@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell,
+  BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 
@@ -25,101 +25,65 @@ const CustomChartComponent = ({ chartId }) => {
   }
   
   const chartInfo = customCharts[id][chartId];
-  const { data, type } = chartInfo;
+  const { data, type, columnsMetadata = {}, xAxisKey, yAxisKeys } = chartInfo;
   
-  // Déterminer les clés à utiliser pour le graphique
-  const keys = data.length > 0 ? Object.keys(data[0]).filter(key => key !== 'name' && key !== 'label') : [];
+  // Utiliser les axes transmis s'ils existent, sinon déterminer dynamiquement
+  const yAxes = yAxisKeys || Object.keys(data[0] || {}).filter(key => key !== 'name' && key !== 'label');
+  
+  // Formateur pour les tooltips
+  const tooltipFormatter = (value, name) => {
+    // Si c'est une colonne calculée, utiliser son format
+    if (columnsMetadata[name] && columnsMetadata[name].isCalculated) {
+      const format = columnsMetadata[name].format;
+      switch (format) {
+        case 'percentage':
+          return [`${(value * 100).toFixed(2)}%`, name];
+        case 'currency':
+          return value >= 1000000 
+            ? [`${(value/1000000).toFixed(2)} M€`, name] 
+            : [`${(value/1000).toFixed(0)} k€`, name];
+        default:
+          return [value, name];
+      }
+    }
+    
+    // Formatage par défaut pour les valeurs monétaires
+    if (name.includes('revenue') || name.includes('value') || name.includes('amount')) {
+      return value >= 1000000 
+        ? [`${(value/1000000).toFixed(2)} M€`, name] 
+        : [`${(value/1000).toFixed(0)} k€`, name];
+    }
+    
+    return [value, name];
+  };
   
   // Fonction pour générer un graphique selon le type
   const renderChart = () => {
-    // Détecter si nous avons un format particulier de données (comme des données pivotées)
-    const isPivotedData = data.length > 0 && Object.keys(data[0]).some(key => key.includes('_'));
-    
-    // Pour les données pivotées, créer un graphique spécial
-    if (isPivotedData && type === 'bar') {
-      const pivotKeys = Object.keys(data[0]).filter(key => key.includes('_'));
-      const baseKeys = Object.keys(data[0]).filter(key => !key.includes('_'));
-      
-      // Trouver une clé à utiliser comme nom pour l'axe X
-      const nameKey = baseKeys.length > 0 ? baseKeys[0] : 'index';
-      
-      return (
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey={nameKey} angle={-45} textAnchor="end" height={60} />
-            <YAxis 
-              tickFormatter={(value) => 
-                value >= 1000000 
-                  ? `${(value/1000000).toFixed(1)}M€` 
-                  : `${(value/1000).toFixed(0)}k€`
-              } 
-            />
-            <Tooltip 
-              formatter={(value) => 
-                typeof value === 'number' 
-                  ? [`${(value/1000).toFixed(0)}k€`, ''] 
-                  : [value, '']
-              }
-            />
-            <Legend />
-            {pivotKeys.map((key, index) => (
-              <Bar 
-                key={key} 
-                dataKey={key} 
-                name={key.split('_')[0]} 
-                fill={COLORS[index % COLORS.length]}
-              />
-            ))}
-          </BarChart>
-        </ResponsiveContainer>
-      );
-    }
-    
-    // Si les données sont dans un format spécial avec des valeurs calculées
-    // (comme celles produites par nos colonnes calculées)
-    const hasCalculatedValues = data.length > 0 && 
-      Object.keys(data[0]).some(key => !['name', 'label', 'month', 'year', 'quarter', 'category'].includes(key));
-    
     switch (type) {
       case 'bar':
-        // Si les données utilisent la structure simplifiée (name, value) créée pour total_investment
-        if (data.length > 0 && 'value' in data[0] && keys.includes('value')) {
-          return (
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" angle={0} textAnchor="middle" height={40} />
-                <YAxis 
-                  tickFormatter={(value) => 
-                    value >= 1000000 
-                      ? `${(value/1000000).toFixed(1)}M€` 
-                      : `${(value/1000).toFixed(0)}k€`
-                  } 
-                />
-                <Tooltip 
-                  formatter={(value) => 
-                    [`${(value/1000000).toFixed(2)}M€`, "Montant"]
-                  }
-                />
-                <Legend />
-                <Bar dataKey="value" fill="#0088FE" name="Montant" />
-              </BarChart>
-            </ResponsiveContainer>
-          );
-        }
-        
-        // Graphique en barres standard pour les autres données
         return (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" angle={-45} textAnchor="end" height={60} />
-              <YAxis />
-              <Tooltip />
+              <YAxis 
+                tickFormatter={(value) => 
+                  value >= 1000000 
+                    ? `${(value/1000000).toFixed(1)}M€` 
+                    : `${(value/1000).toFixed(0)}k€`
+                } 
+              />
+              <Tooltip formatter={tooltipFormatter} />
               <Legend />
-              {keys.map((key, index) => (
-                <Bar key={key} dataKey={key} fill={COLORS[index % COLORS.length]} />
+              {yAxes.map((key, index) => (
+                <Bar 
+                  key={key} 
+                  dataKey={key} 
+                  fill={COLORS[index % COLORS.length]}
+                  // Ajouter un style spécial pour les colonnes calculées
+                  strokeDasharray={columnsMetadata[key] && columnsMetadata[key].isCalculated ? "3 3" : "0"}
+                  strokeWidth={columnsMetadata[key] && columnsMetadata[key].isCalculated ? 2 : 0}
+                />
               ))}
             </BarChart>
           </ResponsiveContainer>
@@ -132,15 +96,18 @@ const CustomChartComponent = ({ chartId }) => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" angle={-45} textAnchor="end" height={60} />
               <YAxis />
-              <Tooltip />
+              <Tooltip formatter={tooltipFormatter} />
               <Legend />
-              {keys.map((key, index) => (
+              {yAxes.map((key, index) => (
                 <Line 
                   key={key} 
                   type="monotone" 
                   dataKey={key} 
                   stroke={COLORS[index % COLORS.length]} 
-                  activeDot={{ r: 8 }} 
+                  activeDot={{ r: 8 }}
+                  // Ajouter un style spécial pour les colonnes calculées
+                  strokeDasharray={columnsMetadata[key] && columnsMetadata[key].isCalculated ? "5 5" : "0"}
+                  strokeWidth={columnsMetadata[key] && columnsMetadata[key].isCalculated ? 2 : 1}
                 />
               ))}
             </LineChart>
@@ -154,16 +121,19 @@ const CustomChartComponent = ({ chartId }) => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" angle={-45} textAnchor="end" height={60} />
               <YAxis />
-              <Tooltip />
+              <Tooltip formatter={tooltipFormatter} />
               <Legend />
-              {keys.map((key, index) => (
+              {yAxes.map((key, index) => (
                 <Area 
                   key={key} 
                   type="monotone" 
                   dataKey={key} 
                   stackId="1"
                   stroke={COLORS[index % COLORS.length]} 
-                  fill={COLORS[index % COLORS.length]} 
+                  fill={COLORS[index % COLORS.length]}
+                  // Ajouter un style spécial pour les colonnes calculées
+                  strokeDasharray={columnsMetadata[key] && columnsMetadata[key].isCalculated ? "5 5" : "0"}
+                  strokeWidth={columnsMetadata[key] && columnsMetadata[key].isCalculated ? 2 : 1}
                 />
               ))}
             </AreaChart>
@@ -171,27 +141,53 @@ const CustomChartComponent = ({ chartId }) => {
         );
         
       case 'pie':
+        // Pour un camembert, nous utilisons la première colonne Y sélectionnée
+        if (yAxes.length > 0) {
+          return (
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={true}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey={yAxes[0]}
+                  nameKey="name"
+                  label={(entry) => entry.name}
+                >
+                  {data.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={tooltipFormatter} />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          );
+        }
+        return null;
+        
+      case 'radar':
         return (
           <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={data}
-                cx="50%"
-                cy="50%"
-                labelLine={true}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey={keys[0]}
-                nameKey="name"
-                label={(entry) => entry.name}
-              >
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
+            <RadarChart cx="50%" cy="50%" outerRadius={80} data={data}>
+              <PolarGrid />
+              <PolarAngleAxis dataKey="name" />
+              <Tooltip formatter={tooltipFormatter} />
+              {yAxes.map((key, index) => (
+                <Radar 
+                  key={key} 
+                  name={key} 
+                  dataKey={key} 
+                  stroke={COLORS[index % COLORS.length]} 
+                  fill={COLORS[index % COLORS.length]} 
+                  fillOpacity={0.2}
+                />
+              ))}
               <Legend />
-            </PieChart>
+            </RadarChart>
           </ResponsiveContainer>
         );
         
