@@ -20,7 +20,8 @@ services:
       - caddy_data:/data
       - caddy_config:/config
       - ./app:/app
-      - ./public/uploads:/var/www/html/public/uploads # Monte le dossier d'uploads
+      - ./public:/app/public
+      - ./storage/processed:/app/public/processed_images
     ports:
       # HTTP
       - target: 80
@@ -105,6 +106,23 @@ services:
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
   ###< symfony/mailer ###
 
+  pdf_processor:
+    build:
+      context: ./pdf_processor
+      dockerfile: Dockerfile
+    volumes:
+      - ./pdf_processor:/app
+      - ./storage/uploads:/app/uploads
+      - ./storage/processed:/app/processed
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      - php
+    ports:
+      - '5000:5000'
+    networks:
+      - symfony-vite-network
+
 volumes:
   caddy_data:
   caddy_config:
@@ -115,6 +133,9 @@ volumes:
   pgadmin_data:
 ###< doctrine/doctrine-bundle ###
 ###< symfony/mercure-bundle ###
+
+  storage_uploads:
+  storage_processed:
 
 networks:
   symfony-vite-network:

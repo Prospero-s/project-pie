@@ -26,6 +26,10 @@ import enDocuments from './locales/en/documents.json';
 import frDocuments from './locales/fr/documents.json';
 import enMetrics from './locales/en/metrics.json';
 import frMetrics from './locales/fr/metrics.json';
+import enBoardPack from './locales/en/board_pack.json';
+import frBoardPack from './locales/fr/board_pack.json';
+import enCommon from './locales/en/common.json';
+import frCommon from './locales/fr/common.json';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -42,6 +46,8 @@ i18n.use(initReactI18next).init({
       charts: frCharts,
       documents: frDocuments,
       metrics: frMetrics,
+      board_pack: frBoardPack,
+      common: frCommon,
     },
     en: {
       signin: enSignIn,
@@ -56,6 +62,8 @@ i18n.use(initReactI18next).init({
       charts: enCharts,
       documents: enDocuments,
       metrics: enMetrics,
+      board_pack: enBoardPack,
+      common: enCommon,
     },
   },
   lng: 'fr',
