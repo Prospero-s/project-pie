@@ -39,5 +39,114 @@
     "delete_success": "Document supprimé avec succès !",
     "delete_error": "Erreur lors de la suppression du document.",
     "loading_error": "Erreur lors du chargement des documents"
+  },
+  "textract_results": {
+    "edit": "Modifier",
+    "save": "Sauvegarder",
+    "cancel": "Annuler",
+    "document_source": "Document source",
+    "pdf_available": "PDF disponible",
+    "kpi_table": "Tableau de KPI",
+    "ai_validated": "Validé par IA",
+    "save_changes": "Sauvegarder les modifications",
+    "no_modifications": "Aucune modification à sauvegarder.",
+    "modifications_saved": "Modifications sauvegardées",
+    "modifications_success": "Toutes vos modifications ont été enregistrées avec succès.",
+    "periodicity_info": {
+      "quarterly": "Trimestrielle",
+      "half_yearly": "Semestrielle",
+      "year": "Année",
+      "periodicity": "Périodicité",
+      "periods_detected": "périodes détectées"
+    },
+    "validation": {
+      "error_title": "Erreur de validation",
+      "form_failed": "La validation du formulaire a échoué"
+    },
+    "extracted_document": "Document extrait",
+    "no_periods": "Aucune période détectée",
+    "no_data": "Aucune donnée KPI trouvée",
+    "alerts": {
+      "values_auto_filled": "Les valeurs ont été remplies automatiquement. Merci de vérifier et corriger si nécessaire.",
+      "values_modified": "Valeur modifiée manuellement",
+      "verification_in_progress": "Analyse en cours avec intelligence artificielle..."
+    },
+    "kpi_tooltips": {
+      "revenue": "Revenu total généré par l'entreprise",
+      "net_bookings": "Valeur totale des produits et services vendus",
+      "gross_margin": "Chiffre d'affaires moins le coût des marchandises vendues",
+      "customer_acquisition_cost": "Coût moyen pour acquérir un nouveau client",
+      "cac_ratio": "Ratio du coût d'acquisition client par rapport à la valeur à vie client",
+      "customer_lifetime_value": "Revenu total généré par un client pendant toute sa relation avec l'entreprise",
+      "headcount": "Nombre total d'employés dans l'entreprise",
+      "cash_burn": "Montant d'argent dépensé mensuellement",
+      "cash_balance": "Trésorerie disponible actuelle",
+      "ebitda": "Bénéfice avant intérêts, impôts, dépréciation et amortissement",
+      "arr": "Total des abonnements annualisés",
+      "net_arr": "Revenu Annuel Récurrent net du churn",
+      "arr_base": "Revenu Annuel Récurrent de base",
+      "organic_arr_growth": "Croissance du ARR des clients existants",
+      "enterprise_nrr": "Rétention Nette de Revenu pour les clients entreprise",
+      "churn": "Taux auquel les clients cessent de s'abonner",
+      "mrr": "Total des abonnements mensuels",
+      "funding_amount": "Montant total levé lors des tours de financement"
+    },
+    "tag_labels": {
+      "not_available": "N.A"
+    },
+    "openai_validation": {
+      "no_content": "Aucun contenu textuel à analyser. Veuillez réessayer avec un autre document.",
+      "no_extracted_data": "Aucune donnée pré-extraite par TextExtract trouvée. La vérification pourrait être moins précise.",
+      "success": "Vérification et validation par OpenAI terminée avec succès!",
+      "error": "Erreur lors de la vérification avec OpenAI",
+      "communication_error": "Erreur lors de la communication avec OpenAI"
+    }
+  },
+  "upload": {
+    "file_size_error": "La taille du fichier dépasse la limite de 5MB.",
+    "file_selected": "Fichier {name} sélectionné.",
+    "file_removed": "Fichier retiré.",
+    "select_kpis": "Sélectionnez les KPI à extraire:",
+    "select_kpis_placeholder": "Sélectionnez les KPI",
+    "select_all_kpis": "Sélectionner tous les KPI",
+    "select_periodicity": "Périodicité du bilan:",
+    "quarterly": "Trimestriel (Q)",
+    "half_yearly": "Semestriel (H)",
+    "select_year": "Année du bilan:",
+    "select_year_placeholder": "Sélectionnez l'année",
+    "analyze": "Analyser",
+    "kpi_labels": {
+      "chiffre_affaire": "Chiffre d'affaire",
+      "marge_brute": "Marge brute",
+      "cout_acquisition": "Coût d'acquisition du client",
+      "valeur_vie_client": "Valeur à vie client",
+      "nombre_employe": "Nombre employé",
+      "argent_brule": "Argent brûlé",
+      "ebitda": "EBITDA",
+      "revenu_annuel": "Revenu Annuel Récurrent (ARR)",
+      "revenu_mensuel": "Revenu Mensuel Récurrent (MRR)",
+      "montant_leve": "Montant levé"
+    },
+    "tooltips": {
+      "revenue": "Revenu total généré par l'entreprise",
+      "gross_margin": "Chiffre d'affaires moins le coût des marchandises vendues",
+      "customer_acquisition_cost": "Coût moyen pour acquérir un nouveau client",
+      "customer_lifetime_value": "Revenu total généré par un client pendant toute la durée de sa relation avec l'entreprise",
+      "headcount": "Nombre total d'employés dans l'entreprise",
+      "cash_burn": "Montant d'argent dépensé mensuellement",
+      "ebitda": "Bénéfice avant intérêts, impôts, dépréciation et amortissement",
+      "arr": "Total des abonnements annualisés",
+      "mrr": "Total des abonnements mensuels",
+      "funding_amount": "Montant total levé lors des tours de financement"
+    },
+    "errors": {
+      "no_file": "Veuillez sélectionner un fichier avant de l'envoyer.",
+      "no_kpi": "Veuillez sélectionner au moins un KPI à analyser.",
+      "auth_error": "Utilisateur non authentifié",
+      "analysis_error": "Erreur lors de l'analyse du fichier. Veuillez réessayer.",
+      "no_response": "La requête a été envoyée, mais aucune réponse n'a été reçue.",
+      "no_data": "Analyse échouée. Aucune donnée reçue du serveur."
+    },
+    "success": "Analyse réussie !"
   }
 }

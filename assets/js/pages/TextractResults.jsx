@@ -6,7 +6,6 @@ import {
   Typography,
   Col,
   Row,
-  Divider,
   message,
   Input,
   Table,
@@ -14,7 +13,22 @@ import {
   Card,
   Space,
   Tabs,
+  Tag,
+  Tooltip,
+  Skeleton,
+  Alert,
+  Empty,
+  Form,
+  notification,
 } from 'antd';
+import {
+  InfoCircleOutlined,
+  EditOutlined,
+  SaveOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  RobotOutlined,
+} from '@ant-design/icons';
 import { useUser } from '@/context/userContext';
 import { saveAsDraft, submitData } from '@/services/textract/textractService';
 import axios from 'axios';
@@ -30,16 +44,24 @@ const TextractResults = ({ i18n }) => {
   const company = analyzedData?.company || null;
   const [editedText, setEditedText] = useState('');
   const [loading, setLoading] = useState(true);
-  const [kpiData, setKpiData] = useState([]);
   const [validatingWithAI, setValidatingWithAI] = useState(false);
   const [activeTab, setActiveTab] = useState('1');
-  const [reconstructedTable, setReconstructedTable] = useState([]);
+  const [periodsFound, setPeriodsFound] = useState([]);
+  const [periodTableColumns, setPeriodTableColumns] = useState([]);
+  const [periodTableData, setPeriodTableData] = useState([]);
+  const [editingKey, setEditingKey] = useState('');
+  const [editedValues, setEditedValues] = useState({});
+  const [form] = Form.useForm();
+
+  const selectedKpis = analyzedData?.selectedKpis || [];
+  const periodicity = analyzedData?.periodicity || 'Q';
+  const selectedYear = analyzedData?.year || new Date().getFullYear();
 
   // Function to validate TextExtract data with OpenAI
   const validateWithOpenAI = async () => {
     if (!analyzedData?.textractData?.text?.content) {
       message.error(
-        'Aucun contenu textuel à analyser. Veuillez réessayer avec un autre document.',
+        t('documents:textract_results.openai_validation.no_content'),
       );
       return;
     }
@@ -50,7 +72,7 @@ const TextractResults = ({ i18n }) => {
     // Vérifier que TextExtract a extrait des données
     if (!extractedData || Object.keys(extractedData).length === 0) {
       message.warning(
-        'Aucune donnée pré-extraite par TextExtract trouvée. La vérification pourrait être moins précise.',
+        t('documents:textract_results.openai_validation.no_extracted_data'),
       );
       // On continue, mais les résultats seront moins fiables
     }
@@ -60,11 +82,15 @@ const TextractResults = ({ i18n }) => {
 
       const textContent = analyzedData.textractData.text.content;
 
-      // Call your backend API with text content and pre-extracted data
+      // Call your backend API with text content, pre-extracted data, and new parameters
       const response = await axios.post('/api/textract/analyze-text', {
         textContent,
-        extractedData, // Pass the pre-extracted data
+        extractedData,
         documentId: analyzedData.id || 'unknown',
+        kpis: selectedKpis,
+        periodicity: periodicity,
+        year: selectedYear,
+        pdfUrl: analyzedData.pdfUrl,
       });
 
       // Update analyzedData with OpenAI verification results
@@ -80,248 +106,236 @@ const TextractResults = ({ i18n }) => {
 
         setAnalyzedData(updatedData);
 
-        // Update the KPI data table
-        updateKpiTable(aiAnalysis);
-
-        // Set reconstructed table if available
-        if (
-          aiAnalysis.reconstructed_table &&
-          Array.isArray(aiAnalysis.reconstructed_table)
-        ) {
-          setReconstructedTable(aiAnalysis.reconstructed_table);
-        }
+        // Process periods data
+        processPeriodsData(aiAnalysis);
 
         message.success(
-          'Vérification et validation par OpenAI terminée avec succès!',
+          t('documents:textract_results.openai_validation.success'),
         );
       } else {
         message.error(
-          'Erreur lors de la vérification avec OpenAI: ' +
+          t('documents:textract_results.openai_validation.error') +
+            ': ' +
             (response.data?.message || 'Erreur inconnue'),
         );
       }
     } catch (error) {
       console.error('Erreur OpenAI:', error);
       message.error(
-        'Erreur lors de la communication avec OpenAI: ' + error.message,
+        t('documents:textract_results.openai_validation.communication_error') +
+          ': ' +
+          error.message,
       );
     } finally {
       setValidatingWithAI(false);
     }
   };
 
-  // Update KPI table with AI analysis data
-  const updateKpiTable = aiAnalysis => {
-    // Use reconstructedTable data if available instead of direct AI values
-    if (
-      aiAnalysis?.reconstructed_table &&
-      Array.isArray(aiAnalysis.reconstructed_table)
-    ) {
-      const table = aiAnalysis.reconstructed_table;
+  // Process multi-period data
+  const processPeriodsData = aiAnalysis => {
+    if (!aiAnalysis) return;
 
-      // Extract data from reconstructed table
-      // Create a helper function to find relevant values in the table
-      const findValueInTable = searchTerms => {
-        if (table.length < 2) return 'N.A';
+    // Extract periods from aiAnalysis
+    const periods = aiAnalysis.periods || [];
+    setPeriodsFound(periods);
 
-        const headers = table[0] || [];
-        const dataRows = table.slice(1) || [];
-        let values = [];
+    // Create columns for period table
+    const columns = [
+      {
+        title: 'KPI',
+        dataIndex: 'kpi',
+        key: 'kpi',
+        width: 250,
+        fixed: 'left',
+        render: (text, record) => (
+          <Space>
+            {text}
+            {record.tooltip && (
+              <Tooltip title={record.tooltip}>
+                <InfoCircleOutlined style={{ color: '#1890ff' }} />
+              </Tooltip>
+            )}
+          </Space>
+        ),
+      },
+      ...periods.map(period => ({
+        title: `${period} ${selectedYear}`,
+        dataIndex: period,
+        key: period,
+        editable: true,
+        render: (text, record) => {
+          const editable = isEditing(record);
+          return editable ? (
+            <Form.Item
+              name={`${record.key}_${period}`}
+              style={{ margin: 0 }}
+              rules={[
+                {
+                  required: false,
+                  message: 'Veuillez saisir une valeur',
+                },
+              ]}
+            >
+              <Input
+                defaultValue={text !== 'N.A' ? text : ''}
+                placeholder={t(
+                  'documents:textract_results.tag_labels.not_available',
+                )}
+              />
+            </Form.Item>
+          ) : (
+            <div
+              className="editable-cell-value-wrap"
+              style={{ paddingRight: 24 }}
+            >
+              {!text || text === 'N.A' ? (
+                <Tag color="default">
+                  {t('documents:textract_results.tag_labels.not_available')}
+                </Tag>
+              ) : text.toString().includes('+') ? (
+                <Tag color="green">{text}</Tag>
+              ) : text.toString().includes('-') ||
+                text.toString().includes('(') ? (
+                <Tag color="red">{text}</Tag>
+              ) : (
+                <Tag color="blue">{text}</Tag>
+              )}
+              {record.modified && record.modified[period] && (
+                <Tooltip
+                  title={t('documents:textract_results.alerts.values_modified')}
+                >
+                  <CheckCircleOutlined
+                    style={{ color: '#52c41a', marginLeft: 8 }}
+                  />
+                </Tooltip>
+              )}
+            </div>
+          );
+        },
+      })),
+    ];
 
-        // Search through rows and columns for matching terms
-        for (let row of dataRows) {
-          for (let i = 0; i < headers.length; i++) {
-            const header = headers[i]?.toString().toLowerCase() || '';
-            const cellValue = row[i]?.toString() || '';
+    // Ajouter colonne d'actions
+    columns.push({
+      title: 'Actions',
+      dataIndex: 'actions',
+      fixed: 'right',
+      width: 120,
+      render: (_, record) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => saveEdit(record.key)}
+              icon={<SaveOutlined />}
+              size="small"
+            >
+              {t('documents:textract_results.save')}
+            </Button>
+            <Button onClick={cancelEdit} size="small">
+              {t('documents:textract_results.cancel')}
+            </Button>
+          </Space>
+        ) : (
+          <Button
+            type="text"
+            icon={<EditOutlined />}
+            disabled={editingKey !== ''}
+            onClick={() => edit(record)}
+          >
+            {t('documents:textract_results.edit')}
+          </Button>
+        );
+      },
+    });
 
-            // Check if header or first column contains any of the search terms
-            if (
-              searchTerms.some(term => header.includes(term.toLowerCase())) ||
-              (row[0] &&
-                searchTerms.some(term =>
-                  row[0].toString().toLowerCase().includes(term.toLowerCase()),
-                ))
-            ) {
-              // If it's a number, add it to our values array for averaging
-              const numValue = parseFloat(cellValue.replace(/[^\d.-]/g, ''));
-              if (!isNaN(numValue)) {
-                values.push(numValue);
-              }
-            }
-          }
-        }
+    setPeriodTableColumns(columns);
 
-        // Calculate average if we found values, otherwise return N.A
-        if (values.length > 0) {
-          const average =
-            values.reduce((sum, val) => sum + val, 0) / values.length;
-          // Format as currency if it looks like money
-          if (
-            searchTerms.some(term =>
-              [
-                'chiffre',
-                'revenu',
-                'montant',
-                'argent',
-                'ebitda',
-                'marge',
-                'coût',
-                'valeur',
-              ].includes(term.toLowerCase()),
-            )
-          ) {
-            return new Intl.NumberFormat('fr-FR', {
-              style: 'currency',
-              currency: 'EUR',
-            }).format(average);
-          }
-          // Otherwise just return the number formatted
-          return average.toLocaleString('fr-FR');
-        }
+    // Get KPI data from aiAnalysis
+    const kpiData = aiAnalysis.kpi || {};
 
-        return 'N.A';
+    // Create tooltip mapping for KPIs
+    const kpiTooltipMapping = {
+      "Chiffre d'affaire": t('documents:textract_results.kpi_tooltips.revenue'),
+      Revenue: t('documents:textract_results.kpi_tooltips.revenue'),
+      'Net Bookings': t('documents:textract_results.kpi_tooltips.net_bookings'),
+      'Marge brute': t('documents:textract_results.kpi_tooltips.gross_margin'),
+      'Gross Margin': t('documents:textract_results.kpi_tooltips.gross_margin'),
+      "Coût d'acquisition du client": t(
+        'documents:textract_results.kpi_tooltips.customer_acquisition_cost',
+      ),
+      'Customer Acquisition Cost (CAC)': t(
+        'documents:textract_results.kpi_tooltips.customer_acquisition_cost',
+      ),
+      'CAC Ratio': t('documents:textract_results.kpi_tooltips.cac_ratio'),
+      'Valeur à vie client': t(
+        'documents:textract_results.kpi_tooltips.customer_lifetime_value',
+      ),
+      'Customer Lifetime Value (LTV)': t(
+        'documents:textract_results.kpi_tooltips.customer_lifetime_value',
+      ),
+      "Nombre d'employés": t(
+        'documents:textract_results.kpi_tooltips.headcount',
+      ),
+      Headcount: t('documents:textract_results.kpi_tooltips.headcount'),
+      'Argent brûlé': t('documents:textract_results.kpi_tooltips.cash_burn'),
+      'Cash Burn': t('documents:textract_results.kpi_tooltips.cash_burn'),
+      'Cash Balance': t('documents:textract_results.kpi_tooltips.cash_balance'),
+      EBITDA: t('documents:textract_results.kpi_tooltips.ebitda'),
+      'Revenu Annuel Récurrent (ARR)': t(
+        'documents:textract_results.kpi_tooltips.arr',
+      ),
+      'Annual Recurring Revenue (ARR)': t(
+        'documents:textract_results.kpi_tooltips.arr',
+      ),
+      'Net ARR': t('documents:textract_results.kpi_tooltips.net_arr'),
+      'ARR base': t('documents:textract_results.kpi_tooltips.arr_base'),
+      'Organic ARR growth': t(
+        'documents:textract_results.kpi_tooltips.organic_arr_growth',
+      ),
+      'Enterprise NRR': t(
+        'documents:textract_results.kpi_tooltips.enterprise_nrr',
+      ),
+      Churn: t('documents:textract_results.kpi_tooltips.churn'),
+      'Revenu Mensuel Récurrent (MRR)': t(
+        'documents:textract_results.kpi_tooltips.mrr',
+      ),
+      'Monthly Recurring Revenue (MRR)': t(
+        'documents:textract_results.kpi_tooltips.mrr',
+      ),
+      'Montant levé': t(
+        'documents:textract_results.kpi_tooltips.funding_amount',
+      ),
+      'Funding Amount': t(
+        'documents:textract_results.kpi_tooltips.funding_amount',
+      ),
+    };
+
+    // Create data rows from KPI data
+    const dataRows = Object.entries(kpiData).map(([kpiName, periodValues]) => {
+      const row = {
+        key: kpiName,
+        kpi: kpiName,
+        tooltip: kpiTooltipMapping[kpiName] || '',
+        modified: {},
       };
 
-      setKpiData([
-        {
-          key: 'chiffre_affaire',
-          label: "Chiffre d'affaire",
-          value: findValueInTable([
-            "chiffre d'affaire",
-            'ca',
-            "chiffre d'affaires",
-            'revenu',
-            'revenus',
-          ]),
-        },
-        {
-          key: 'marge_brute',
-          label: 'Marge brute',
-          value: findValueInTable(['marge brute', 'marge']),
-        },
-        {
-          key: 'cout_acquisition',
-          label: "Coût d'acquisition du client",
-          value: findValueInTable([
-            "coût d'acquisition",
-            'cac',
-            'coût client',
-            "coût d'acquisition client",
-          ]),
-        },
-        {
-          key: 'valeur_vie_client',
-          label: 'Valeur à vie client',
-          value: findValueInTable([
-            'valeur vie client',
-            'ltv',
-            'lifetime value',
-            'valeur client',
-          ]),
-        },
-        {
-          key: 'nombre_employe',
-          label: 'Nombre employé',
-          value: findValueInTable([
-            'nombre employé',
-            'effectif',
-            'employés',
-            'salariés',
-          ]),
-        },
-        {
-          key: 'argent_brule',
-          label: 'Argent brulé',
-          value: findValueInTable(['argent brulé', 'burn rate', 'cash burn']),
-        },
-        {
-          key: 'ebitda',
-          label: 'Ebitda',
-          value: findValueInTable(['ebitda']),
-        },
-        {
-          key: 'revenu_annuel',
-          label: 'Revenu Annuel Récurrent',
-          value: findValueInTable(['revenu annuel', 'arr', 'chiffre annuel']),
-        },
-        {
-          key: 'revenu_mensuel',
-          label: 'Revenu Mensuel Récurrent',
-          value: findValueInTable(['revenu mensuel', 'mrr', 'chiffre mensuel']),
-        },
-        {
-          key: 'montant_leve',
-          label: 'Montant levé',
-          value: findValueInTable([
-            'montant levé',
-            'levée de fonds',
-            'capital levé',
-          ]),
-        },
-      ]);
-    } else {
-      // Fallback to direct AI values if reconstructed table is not available
-      setKpiData([
-        {
-          key: 'chiffre_affaire',
-          label: "Chiffre d'affaire",
-          value: aiAnalysis?.chiffre_affaire || 'N.A',
-        },
-        {
-          key: 'marge_brute',
-          label: 'Marge brute',
-          value: aiAnalysis?.marge_brute || 'N.A',
-        },
-        {
-          key: 'cout_acquisition',
-          label: "Coût d'acquisition du client",
-          value: aiAnalysis?.cout_acquisition || 'N.A',
-        },
-        {
-          key: 'valeur_vie_client',
-          label: 'Valeur à vie client',
-          value: aiAnalysis?.valeur_vie_client || 'N.A',
-        },
-        {
-          key: 'nombre_employe',
-          label: 'Nombre employé',
-          value: aiAnalysis?.nombre_employe || 'N.A',
-        },
-        {
-          key: 'argent_brule',
-          label: 'Argent brulé',
-          value: aiAnalysis?.argent_brule || 'N.A',
-        },
-        {
-          key: 'ebitda',
-          label: 'Ebitda',
-          value: aiAnalysis?.ebitda || 'N.A',
-        },
-        {
-          key: 'revenu_annuel',
-          label: 'Revenu Annuel Récurrent',
-          value: aiAnalysis?.revenu_annuel || 'N.A',
-        },
-        {
-          key: 'revenu_mensuel',
-          label: 'Revenu Mensuel Récurrent',
-          value: aiAnalysis?.revenu_mensuel || 'N.A',
-        },
-        {
-          key: 'montant_leve',
-          label: 'Montant levé',
-          value: aiAnalysis?.montant_leve || 'N.A',
-        },
-      ]);
-    }
+      // Add value for each period
+      periods.forEach(period => {
+        row[period] = periodValues[period] || 'N.A';
+      });
 
-    // Also set reconstructed table if available
-    if (
-      aiAnalysis?.reconstructed_table &&
-      Array.isArray(aiAnalysis.reconstructed_table)
-    ) {
-      setReconstructedTable(aiAnalysis.reconstructed_table);
-    }
+      return row;
+    });
+
+    setPeriodTableData(dataRows);
+    setEditedValues(
+      dataRows.reduce((acc, row) => {
+        acc[row.key] = { ...row };
+        return acc;
+      }, {}),
+    );
   };
 
   useEffect(() => {
@@ -337,20 +351,14 @@ const TextractResults = ({ i18n }) => {
 
       // Check if we already have AI analysis data
       if (analyzedData.aiAnalysis) {
-        updateKpiTable(analyzedData.aiAnalysis);
-
-        // Set reconstructed table if available
-        if (
-          analyzedData.aiAnalysis.reconstructed_table &&
-          Array.isArray(analyzedData.aiAnalysis.reconstructed_table)
-        ) {
-          setReconstructedTable(analyzedData.aiAnalysis.reconstructed_table);
-        }
+        processPeriodsData(analyzedData.aiAnalysis);
       } else {
         // Start OpenAI validation if not already done
         validateWithOpenAI();
       }
 
+      setLoading(false);
+    } else {
       setLoading(false);
     }
   }, [analyzedData]);
@@ -390,84 +398,96 @@ const TextractResults = ({ i18n }) => {
     }
   };
 
-  const kpiColumns = [
-    {
-      title: t('textract:kpi'),
-      dataIndex: 'label',
-      key: 'label',
-      width: '50%',
-    },
-    {
-      title: t('textract:valueVerifiedByOpenAI'),
-      dataIndex: 'value',
-      key: 'value',
-      width: '50%',
-      render: text => (
-        <div
-          style={{
-            color: text === 'N.A' ? '#999' : '#52c41a',
-            fontWeight: text === 'N.A' ? 'normal' : 'bold',
-          }}
-        >
-          {text}
-        </div>
-      ),
-    },
-  ];
+  const isEditing = record => record.key === editingKey;
 
-  // Render reconstructed table from the AI analysis
-  const renderReconstructedTable = () => {
-    if (!reconstructedTable || reconstructedTable.length === 0) {
-      return (
-        <div style={{ textAlign: 'center', padding: '20px' }}>
-          <Text type="secondary">{t('textract:noTableReconstruction')}</Text>
-        </div>
-      );
+  const edit = record => {
+    form.setFieldsValue({
+      ...record,
+    });
+    setEditingKey(record.key);
+  };
+
+  const cancelEdit = () => {
+    setEditingKey('');
+  };
+
+  const saveEdit = async key => {
+    try {
+      const row = await form.validateFields();
+      const newData = [...periodTableData];
+      const index = newData.findIndex(item => key === item.key);
+
+      if (index > -1) {
+        const item = newData[index];
+        const modified = { ...item.modified };
+        const periods = periodsFound;
+
+        // Pour chaque période, vérifier si la valeur a été modifiée
+        periods.forEach(period => {
+          const fieldName = `${key}_${period}`;
+          if (row[fieldName] !== undefined) {
+            const newValue = row[fieldName] || 'N.A';
+            if (item[period] !== newValue) {
+              item[period] = newValue;
+              modified[period] = true;
+            }
+          }
+        });
+
+        // Marquer les valeurs modifiées
+        item.modified = modified;
+
+        newData.splice(index, 1, { ...item });
+        setPeriodTableData(newData);
+        setEditedValues({ ...editedValues, [key]: true });
+        setEditingKey('');
+      } else {
+        setEditingKey('');
+      }
+    } catch (error) {
+      // Log error quietly in case of validation failure
+      console.error('Erreur de validation:', error);
+      notification.error({
+        message: t('documents:textract_results.validation.error_title'),
+        description: `${t('documents:textract_results.validation.form_failed')}: ${error.message}`,
+      });
+    }
+  };
+
+  const saveAllChanges = () => {
+    if (Object.keys(editedValues).length === 0) {
+      message.info(t('documents:textract_results.no_modifications'));
+      return;
     }
 
-    // Extract headers from the first row of the reconstructed table
-    const headers = reconstructedTable[0] || [];
-    const dataSource = (reconstructedTable.slice(1) || []).map((row, index) => {
-      const rowData = { key: index };
-      headers.forEach((header, i) => {
-        rowData[header.toString()] = row[i] || '';
-      });
-      return rowData;
+    // Ici, vous pourriez envoyer toutes les modifications au backend
+    notification.success({
+      message: t('documents:textract_results.modifications_saved'),
+      description: t('documents:textract_results.modifications_success'),
+      placement: 'topRight',
     });
+  };
 
-    const columns = headers.map(header => ({
-      title: header,
-      dataIndex: header.toString(),
-      key: header.toString(),
-      render: text => (
-        <div
-          style={{
-            fontWeight:
-              typeof text === 'number' ||
-              (typeof text === 'string' &&
-                !isNaN(parseFloat(text.replace(/[^\d.-]/g, ''))))
-                ? 'bold'
-                : 'normal',
-          }}
-        >
-          {text}
-        </div>
-      ),
-    }));
-
+  const renderPeriodicityInfo = () => {
+    const periodicityLabel =
+      periodicity === 'Q'
+        ? t('documents:textract_results.periodicity_info.quarterly')
+        : t('documents:textract_results.periodicity_info.half_yearly');
     return (
-      <div>
-        <Paragraph style={{ marginBottom: 16 }}>
-          {t('textract:tableReconstructionDesc')}
-        </Paragraph>
-        <Table
-          dataSource={dataSource}
-          columns={columns}
-          pagination={false}
-          bordered
-          size="middle"
-        />
-      </div>
+      <Alert
+        message={
+          <Space>
+            <Tag color="processing">{`${t('documents:textract_results.periodicity_info.year')}: ${selectedYear}`}</Tag>
+            <Tag color="processing">{`${t('documents:textract_results.periodicity_info.periodicity')}: ${periodicityLabel}`}</Tag>
+            <Tag icon={<ClockCircleOutlined />} color="warning">
+              {`${periodsFound.length} ${t('documents:textract_results.periodicity_info.periods_detected')}: ${periodsFound.join(', ')} ${selectedYear}`}
+            </Tag>
+          </Space>
+        }
+        type="info"
+        showIcon
+        style={{ marginBottom: 16 }}
+      />
     );
   };
 
@@ -511,38 +531,190 @@ const TextractResults = ({ i18n }) => {
             }
           >
             <Space direction="vertical" size="large" style={{ width: '100%' }}>
-              {/* KPI Analysis Section */}
+              {/* KPI Analysis Section with side by side layout */}
               <div>
                 <Title level={4} style={{ marginTop: 0 }}>
                   {t('textract:kpiAnalysisTitle')}
                 </Title>
-                <Paragraph>{t('textract:kpiAnalysisDesc')}</Paragraph>
 
                 {validatingWithAI ? (
-                  <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                    <Spin tip={t('textract:verificationInProgress')} />
+                  <div style={{ textAlign: 'center', padding: '40px 0' }}>
+                    <Spin
+                      indicator={
+                        <RobotOutlined spin style={{ fontSize: 28 }} />
+                      }
+                      tip={t('textract:verificationInProgress')}
+                      size="large"
+                    />
+                    <Paragraph style={{ marginTop: 20 }}>
+                      {t(
+                        'documents:textract_results.alerts.verification_in_progress',
+                      )}
+                    </Paragraph>
                   </div>
                 ) : (
                   <>
+                    <Alert
+                      message={t(
+                        'documents:textract_results.alerts.values_auto_filled',
+                      )}
+                      type="warning"
+                      style={{ marginBottom: 16 }}
+                    />
+
+                    <Row gutter={16} style={{ height: '650px' }}>
+                      {/* Document source column */}
+                      <Col xs={24} lg={12} style={{ height: '100%' }}>
+                        <Card
+                          title={
+                            <Space>
+                              <span>
+                                {t(
+                                  'documents:textract_results.document_source',
+                                )}
+                              </span>
+                              {analyzedData.pdfUrl && (
+                                <Tag color="success">
+                                  {t(
+                                    'documents:textract_results.pdf_available',
+                                  )}
+                                </Tag>
+                              )}
+                            </Space>
+                          }
+                          bordered
+                          style={{
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                          }}
+                          bodyStyle={{
+                            flex: 1,
+                            overflow: 'hidden',
+                            padding: 0,
+                          }}
+                        >
+                          {analyzedData.pdfUrl ? (
+                            <iframe
+                              src={`${analyzedData.pdfUrl}`}
+                              title={t('textract:pdfPreview')}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                border: 'none',
+                              }}
+                            />
+                          ) : (
+                            <div
+                              style={{
+                                padding: 16,
+                                height: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              <Empty
+                                description={t('textract:noPdfAvailable')}
+                                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                              />
+                            </div>
+                          )}
+                        </Card>
+                      </Col>
+
+                      {/* KPI table column */}
+                      <Col xs={24} lg={12} style={{ height: '100%' }}>
+                        <Card
+                          title={
+                            <Space>
+                              <span>
+                                {t('documents:textract_results.kpi_table')}
+                              </span>
+                              <Tag
+                                icon={<CheckCircleOutlined />}
+                                color="success"
+                              >
+                                {t('documents:textract_results.ai_validated')}
+                              </Tag>
+                            </Space>
+                          }
+                          bordered
+                          style={{
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                          }}
+                          bodyStyle={{ flex: 1, overflow: 'auto' }}
+                          extra={
+                            <Button
+                              type="primary"
+                              onClick={saveAllChanges}
+                              disabled={Object.keys(editedValues).length === 0}
+                            >
+                              {t('documents:textract_results.save_changes')}
+                            </Button>
+                          }
+                        >
+                          {periodsFound.length > 0 ? (
+                            <>
+                              {renderPeriodicityInfo()}
+                              <Form form={form}>
+                                <Table
+                                  columns={periodTableColumns}
+                                  dataSource={periodTableData}
+                                  pagination={false}
+                                  bordered
+                                  size="middle"
+                                  scroll={{ x: 'max-content', y: '450px' }}
+                                  style={{ marginBottom: 10 }}
+                                  locale={{
+                                    emptyText: (
+                                      <Empty
+                                        description={t(
+                                          'documents:textract_results.no_data',
+                                        )}
+                                        image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                      />
+                                    ),
+                                  }}
+                                />
+                              </Form>
+                            </>
+                          ) : (
+                            <div style={{ textAlign: 'center', padding: 20 }}>
+                              <Skeleton active />
+                              <Text>
+                                {t('documents:textract_results.no_periods')}
+                              </Text>
+                            </div>
+                          )}
+                        </Card>
+                      </Col>
+                    </Row>
+
                     <Tabs
                       activeKey={activeTab}
                       onChange={key => setActiveTab(key)}
+                      style={{ marginTop: 16 }}
                     >
-                      <TabPane tab={t('textract:kpiTab')} key="1">
-                        <Table
-                          columns={kpiColumns}
-                          dataSource={kpiData}
-                          pagination={false}
-                          bordered
-                          size="middle"
-                          style={{ marginBottom: 10 }}
-                        />
-                      </TabPane>
                       <TabPane
-                        tab={t('textract:reconstructedTableTab')}
-                        key="2"
+                        tab={t('documents:textract_results.extracted_document')}
+                        key="1"
                       >
-                        {renderReconstructedTable()}
+                        <TextArea
+                          rows={10}
+                          value={editedText}
+                          onChange={handleTextChange}
+                          autoSize={{ minRows: 3, maxRows: 20 }}
+                          style={{
+                            width: '100%',
+                            fontFamily: 'monospace',
+                            fontSize: '14px',
+                            backgroundColor: '#f5f5f5',
+                            borderRadius: '5px',
+                          }}
+                        />
                       </TabPane>
                     </Tabs>
                     <Paragraph
@@ -558,57 +730,6 @@ const TextractResults = ({ i18n }) => {
                   </>
                 )}
               </div>
-
-              <Divider style={{ margin: '12px 0' }} />
-
-              {/* Document Preview Section */}
-              <Row gutter={24}>
-                <Col xs={24} md={12}>
-                  <Card
-                    title={t('analyze.data_extract')}
-                    size="small"
-                    bordered
-                    style={{ height: '100%' }}
-                  >
-                    <TextArea
-                      rows={10}
-                      value={editedText}
-                      onChange={handleTextChange}
-                      autoSize={{ minRows: 3, maxRows: 20 }}
-                      style={{
-                        width: '100%',
-                        fontFamily: 'monospace',
-                        fontSize: '14px',
-                        backgroundColor: '#f5f5f5',
-                        borderRadius: '5px',
-                      }}
-                    />
-                  </Card>
-                </Col>
-
-                <Col xs={24} md={12}>
-                  <Card
-                    title={t('analyze.file_preview')}
-                    size="small"
-                    bordered
-                    style={{ height: '100%', textAlign: 'center' }}
-                  >
-                    {analyzedData.pdfUrl ? (
-                      <iframe
-                        src={`http://localhost:80${analyzedData.pdfUrl}`}
-                        title={t('textract:pdfPreview')}
-                        style={{
-                          width: '100%',
-                          height: '400px',
-                          border: 'none',
-                        }}
-                      />
-                    ) : (
-                      <Text>{t('textract:noPdfAvailable')}</Text>
-                    )}
-                  </Card>
-                </Col>
-              </Row>
 
               <div style={{ marginTop: 20, textAlign: 'center' }}>
                 <Space>

@@ -65,6 +65,16 @@ class TextractController extends AbstractController
                 return new JsonResponse(['error' => 'No file uploaded'], JsonResponse::HTTP_BAD_REQUEST);
             }
 
+            // Get KPIs to analyze, periodicity and year
+            $kpis = $request->request->get('kpis');
+            $periodicity = $request->request->get('periodicity', 'Q');
+            $year = $request->request->get('year', date('Y'));
+            
+            // Decode JSON if needed
+            if (is_string($kpis)) {
+                $kpis = json_decode($kpis, true);
+            }
+
             $projectDir = $this->getParameter('kernel.project_dir');
 
             if (!is_string($projectDir)) {
@@ -81,28 +91,46 @@ class TextractController extends AbstractController
             $filePath = $uploadDir . '/' . $fileName;
             $file->move($uploadDir, $fileName);
 
+            // Extract text with Textract
             $textractResult = $this->textractService->analyzeDocument($filePath);
             
-            // Perform OpenAI verification on the extracted text
-            $verificationResult = $this->openAIService->verifyTextractData($textractResult);
+            // Generate image for OpenAI Vision if possible
+            $imageBase64 = null;
+            if ($file->getClientOriginalExtension() === 'pdf') {
+                $imageBase64 = $this->generateImageFromPdf($filePath);
+            }
             
             // Add PDF URL to the result
             $pdfUrl = '/uploads/' . $fileName;
-            $verificationResult['pdfUrl'] = $pdfUrl;
 
             // Also perform OpenAI KPI analysis if text content is available
             if (isset($textractResult['text']['content']) && is_array($textractResult['text']['content'])) {
                 $textContent = implode("\n", $textractResult['text']['content']);
                 
-                // Get KPI extraction prompt
-                $prompt = $this->getKpiExtractionPrompt($textContent);
+                // Get KPI extraction prompt with periodicity, selected KPIs and year
+                $prompt = $this->getKpiExtractionPrompt(
+                    $textContent, 
+                    (string)$periodicity, 
+                    $kpis, 
+                    (string)$year, 
+                    $imageBase64, 
+                    $pdfUrl
+                );
                 
-                $kpiAnalysis = $this->openAIService->analyzeKpis($prompt, $fileName);
+                $kpiAnalysis = $this->openAIService->analyzeKpisWithVision($prompt, $fileName, $imageBase64);
                 
                 if ($kpiAnalysis['success'] && isset($kpiAnalysis['result'])) {
-                    $verificationResult['aiAnalysis'] = $kpiAnalysis['result'];
+                    return new JsonResponse([
+                        'textractData' => $textractResult,
+                        'aiAnalysis' => $kpiAnalysis['result'],
+                        'pdfUrl' => $pdfUrl
+                    ]);
                 }
             }
+            
+            // Fallback to basic verification if OpenAI analysis fails
+            $verificationResult = $this->openAIService->verifyTextractData($textractResult);
+            $verificationResult['pdfUrl'] = $pdfUrl;
 
             return new JsonResponse($verificationResult);
         } catch (\RuntimeException $e) {
@@ -126,6 +154,11 @@ class TextractController extends AbstractController
             }
             
             $documentId = $data['documentId'] ?? 'unknown';
+            $kpis = $data['kpis'] ?? [];
+            $periodicity = $data['periodicity'] ?? 'Q';
+            $year = $data['year'] ?? date('Y');
+            $imageBase64 = $data['imageBase64'] ?? null;
+            $pdfUrl = $data['pdfUrl'] ?? null;
             
             // Convert to string if it's an array, otherwise use as is
             $textContent = is_array($data['textContent']) 
@@ -136,10 +169,14 @@ class TextractController extends AbstractController
             $extractedData = $data['extractedData'] ?? null;
             
             // Generate prompt using PDF as reference but with TextExtract data as input
-            $prompt = $this->getKpiExtractionPromptWithExtractedData($textContent, $extractedData);
+            $prompt = $this->getKpiExtractionPromptWithExtractedData($textContent, $extractedData, $periodicity, $kpis, $year, $imageBase64);
             
-            // Analyze using OpenAI
+            // Analyze using OpenAI with vision if image is available
+            if ($imageBase64) {
+                $kpiAnalysis = $this->openAIService->analyzeKpisWithVision($prompt, $documentId, $imageBase64);
+            } else {
             $kpiAnalysis = $this->openAIService->analyzeKpis($prompt, $documentId);
+            }
             
             return new JsonResponse($kpiAnalysis);
         } catch (\Exception $e) {
@@ -151,177 +188,182 @@ class TextractController extends AbstractController
     }
 
     /**
-     * Creates a prompt for KPI extraction using pre-extracted data and document content as reference
+     * Generate base64 image from PDF for OpenAI Vision
+     *
+     * @param string $pdfPath
+     * @return string|null
+     */
+    private function generateImageFromPdf(string $pdfPath): ?string
+    {
+        try {
+            // Vérifier si Imagick est disponible
+            if (!extension_loaded('imagick')) {
+                return null;
+            }
+            
+            // Créer une instance Imagick
+            $imagick = new \Imagick();
+            
+            // Lire la première page du PDF
+            $imagick->readImage($pdfPath . '[0]');
+            
+            // Convertir en PNG
+            $imagick->setImageFormat('png');
+            
+            // Optimiser pour la vision (résolution, qualité)
+            $imagick->resizeImage(1500, 0, \Imagick::FILTER_LANCZOS, 1);
+            
+            // Obtenir l'image en base64
+            $base64 = base64_encode($imagick->getImageBlob());
+            
+            return $base64;
+        } catch (\Exception $e) {
+            // En cas d'erreur, retourner null
+            return null;
+        }
+    }
+
+    /**
+     * Creates a prompt for KPI extraction with pre-extracted data and document content as reference
      * 
      * @param string $textContent The text content of the document
      * @param array<string, mixed>|null $extractedData Pre-extracted data from TextExtract
+     * @param string $periodicity Periodicity type ('Q' for quarterly, 'H' for half-yearly)
+     * @param array<string>|null $selectedKpis List of KPIs to extract
+     * @param string $year The year selected by the user
+     * @param string|null $imageBase64 Base64 encoded image of the document (optional)
      * @return string The prompt for OpenAI
      */
-    private function getKpiExtractionPromptWithExtractedData(string $textContent, ?array $extractedData = null): string
-    {
-        $basePrompt = "
-        I am a financial document or business plan that may contain the following KPIs.
-        First, determine if I am written in English or French, then validate and format these KPIs from the pre-extracted data.
-        If a KPI is not present, indicate \"N.A\".
+    private function getKpiExtractionPromptWithExtractedData(
+        string $textContent, 
+        ?array $extractedData = null, 
+        string $periodicity = 'Q', 
+        ?array $selectedKpis = null, 
+        string $year = '2023',
+        ?string $imageBase64 = null
+    ): string {
+        $kpiMappings = [
+            'chiffre_affaire' => ["Chiffre d'affaire", "Revenue", "Sales", "Turnover", "Net Bookings"],
+            'marge_brute' => ["Marge brute", "Gross Margin", "Gross Profit"],
+            'cout_acquisition' => ["Coût d'acquisition du client", "Customer Acquisition Cost", "CAC", "CAC Ratio", "Cost of Acquisition"],
+            'valeur_vie_client' => ["Valeur à vie client", "Customer Lifetime Value", "LTV"],
+            'nombre_employe' => ["Nombre employé", "Employee Count", "Headcount", "Staff"],
+            'argent_brule' => ["Argent brûlé", "Cash Burn", "Burn Rate"],
+            'ebitda' => ["EBITDA"],
+            'revenu_annuel' => ["Revenu Annuel Récurrent", "Annual Recurring Revenue", "ARR", "Net ARR", "ARR base"],
+            'revenu_mensuel' => ["Revenu Mensuel Récurrent", "Monthly Recurring Revenue", "MRR"],
+            'montant_leve' => ["Montant levé", "Funding Amount", "Raised", "Funds Raised"],
+        ];
         
-        KPIs to validate and format (English / French):
-        - Revenue / Chiffre d'affaire (Also: Sales, Turnover)
-        - Gross Margin / Marge brute (Also: Gross Profit)
-        - Customer Acquisition Cost / Coût d'acquisition du client (Also: CAC, CAC Ratio)
-        - Customer Lifetime Value / Valeur à vie client (Also: LTV)
-        - Employee Count / Nombre employé (Also: Headcount)
-        - Cash Burn / Argent brulé (Also: Burn Rate)
-        - EBITDA / EBITDA
-        - Annual Recurring Revenue / Revenu Annuel Récurrent (Also: ARR)
-        - Monthly Recurring Revenue / Revenu Mensuel Récurrent (Also: MRR)
-        - Funding Amount / Montant levé (Also: Raised)
+        // Filter to only include selected KPIs if specified
+        if ($selectedKpis && !empty($selectedKpis)) {
+            $filteredKpiMappings = [];
+            foreach ($selectedKpis as $kpiKey) {
+                if (isset($kpiMappings[$kpiKey])) {
+                    $filteredKpiMappings[$kpiKey] = $kpiMappings[$kpiKey];
+                }
+            }
+            $kpiMappings = $filteredKpiMappings;
+        }
+        
+        // Build the KPIs list for the prompt
+        $kpiList = "";
+        foreach ($kpiMappings as $key => $labels) {
+            $kpiList .= "- " . implode(" / ", $labels) . "\n";
+        }
+        
+        $periodsToDetect = $periodicity === 'Q' 
+            ? '["Q1", "Q2", "Q3", "Q4"]' 
+            : '["H1", "H2"]';
+        
+        $basePrompt = "
+        Tu es un assistant financier intelligent spécialisé dans l'extraction de données depuis des bilans d'entreprise.
+
+        📄 Tu vas recevoir un document contenant un tableau de KPI financiers trimestriels ou semestriels. Ta mission est de reconstruire un tableau structuré par KPI et période, en nettoyant les colonnes non pertinentes et en mappant les noms anglais/français vers des libellés standards.
+
+        🧩 KPI à extraire si disponibles :
+        $kpiList
+
+        🗓 L'année du bilan est : $year  
+        🗂 IMPORTANT: Ignorer TOUTES les colonnes suivantes : \"Fcst\", \"Forecast\", \"Better/Worse\", \"B/W\", \"YTD\", \"Budget\", \"Var\", \"Variation\", ou autres comparateurs.
+        🔍 NE PRENDRE EN COMPTE QUE les colonnes qui correspondent aux périodes demandées : $periodsToDetect.
+
+        🎯 Résultat attendu :
+        - Un tableau structuré avec :
+          - lignes = KPI
+          - colonnes = périodes ($periodsToDetect)
+          - valeurs = montant + unité (ex. \"0.4m EUR\")
+        - Si une valeur est manquante ou introuvable : `\"N.A\"`
+
+        🧠 Règles importantes :
+        - Le tableau peut être en anglais ou en français
+        - Les KPI peuvent être mal orthographiés ou avec des symboles, sois tolérant
+        - NE JAMAIS inventer de valeur
+        - NE JAMAIS ajouter un signe '+' ou '-' si absent du document original
+        - S'assurer que chaque valeur est correctement alignée avec sa période
+        - Ne pas recopier une valeur d'une colonne à une autre si manquante
+        - NE JAMAIS prendre des valeurs dans des colonnes non demandées (Fcst, Budget, etc.)
+
+        🔁 Format de réponse JSON attendu :
+        {
+          \"year\": \"$year\",
+          \"language\": \"fr\" | \"en\",
+          \"periodicity\": \"$periodicity\",
+          \"periods\": $periodsToDetect,
+          \"kpi\": {
+            \"EBITDA\": {
+              \"" . $periodicity . "1\": \"-2.1m EUR\",
+              \"" . $periodicity . "2\": \"-1.1m EUR\",
+              \"" . $periodicity . "3\": \"0.4m EUR\",
+              \"" . $periodicity . "4\": \"0.1m EUR\"
+            },
+            \"Revenu Annuel Récurrent (ARR)\": {
+              \"" . $periodicity . "1\": \"4.8m EUR\",
+              \"" . $periodicity . "2\": \"2.7m EUR\",
+              \"" . $periodicity . "3\": \"1.2m EUR\",
+              \"" . $periodicity . "4\": \"N.A\"
+            }
+          }
+        }
         ";
         
-        // If we have pre-extracted data, instruct the model to use it primarily
+        // If we have pre-extracted data, include it
         if ($extractedData) {
             $extractedDataJson = json_encode($extractedData, JSON_PRETTY_PRINT);
-            return "{$basePrompt}
-            
-            IMPORTANT: DO NOT extract new data from the document. The document has already been processed by TextExtract with the following data:
+            $basePrompt .= "
+            \n\nVoici les données pré-extraites par Textract, qui peuvent contenir des erreurs d'alignement ou d'interprétation:
             {$extractedDataJson}
-            
-            UNDERSTAND HOW TEXTEXTRACT WORKS: TextExtract processes the document line by line in reading order. When it encounters tabular data, it extracts each line sequentially. It processes each cell within a row before moving to the next row. When no data is available in subsequent cells, it moves to the next line. This means the data structure may not reflect the original table structure but represents a sequential reading of the content.
-            
-            The content is arranged as a sequence of lines, where each line corresponds to what TextExtract identified as a logical line in the document. Adjacent cells in tables are presented as consecutive lines, which may not represent the original table structure.
-            
-            YOUR TASK: 
-            1. Use the pre-extracted data as your primary source of information
-            2. Understand the sequential line-by-line nature of the extraction
-            3. Attempt to reconstruct the original table structure where applicable
-            4. Match KPI labels with their corresponding values even if they appear on separate lines
-            5. The document content below should be used as a reference to understand context and determine the correct table structure
-            
-            Document (REFERENCE ONLY - DO NOT EXTRACT FROM THIS):
-            {$textContent}
-            
-            Respond only with a JSON object containing the validated and formatted values from the pre-extracted data, for example:
-            {
-              \"chiffre_affaire\": \"1000000€\",
-              \"marge_brute\": \"500000€\",
-              \"cout_acquisition\": \"200€\",
-              \"valeur_vie_client\": \"2000€\",
-              \"nombre_employe\": \"250\",
-              \"argent_brule\": \"50000€/month\",
-              \"ebitda\": \"100000€\",
-              \"revenu_annuel\": \"1.2M€\",
-              \"revenu_mensuel\": \"100000€\",
-              \"montant_leve\": \"3M€\"
-            }
-            
-            Additionally, include a key called 'reconstructed_table' that contains an array representation of the table structure you've interpreted from the document, if any tabular data is present. Each row should be an array of cells.
-            
-            Use the French field names in the JSON response regardless of document language.
             ";
         }
         
-        // If no pre-extracted data, use the original prompt with table reconstruction guidance
-        return "{$basePrompt}
-        
-        UNDERSTAND HOW TEXTEXTRACT WORKS: TextExtract processes the document line by line in reading order. When it encounters tabular data, it extracts each line sequentially. It processes each cell within a row before moving to the next row. When no data is available in subsequent cells, it moves to the next line. This means that tables in the document are flattened into a sequence of lines.
-        
-        When analyzing the document content below, pay attention to:
-        1. Lines that appear to be headers or labels (they might be followed by their values on subsequent lines)
-        2. Numeric values that follow label patterns
-        3. Column alignments and patterns that might indicate tabular data
-        4. Q1, Q2, Q3, Q4 designations that likely indicate quarterly data
-        5. Rows and columns that together form a coherent table structure
-        
-        Document:
+        // Add the textract content
+        $basePrompt .= "
+        \n\nVoici le texte brut extrait du document (peut contenir des erreurs d'alignement):
         {$textContent}
-        
-        Respond with a JSON object containing:
-        1. The extracted KPI values in the standard format
-        2. A key called 'reconstructed_table' that contains an array representation of any table you can reconstruct from the text
-        
-        Example response format:
-        {
-          \"chiffre_affaire\": \"1000000€\",
-          \"marge_brute\": \"500000€\",
-          \"cout_acquisition\": \"200€\",
-          // ... other KPIs ...
-          \"reconstructed_table\": [
-            [\"KPI\", \"Q1\", \"Q2\", \"Q3\", \"Q4\", \"YTD\"],
-            [\"Revenue\", \"250K\", \"300K\", \"350K\", \"400K\", \"1.3M\"],
-            // ... other rows ...
-          ]
-        }
-        
-        Use the French field names in the JSON response regardless of document language.
         ";
+        
+        return $basePrompt;
     }
 
     /**
      * Creates a prompt for KPI extraction from document content
+     * 
+     * @param string $textContent The text content of the document
+     * @param string $periodicity Periodicity type ('Q' for quarterly, 'H' for half-yearly)
+     * @param array<string>|null $selectedKpis List of KPIs to extract
+     * @param string $year The year selected by the user
+     * @param string|null $imageBase64 Base64 encoded image of the document (optional)
+     * @param string|null $pdfUrl URL of the PDF document (optional)
+     * @return string The prompt for OpenAI
      */
-    private function getKpiExtractionPrompt(string $textContent): string
-    {
-        return "
-        I am a financial document or business plan that may contain the following KPIs.
-        First, determine if I am written in English or French, then extract and format these KPIs from my content.
-        If a KPI is not present, indicate \"N.A\".
-        
-        KPIs to extract (English / French):
-        - Revenue / Chiffre d'affaire (Also: Sales, Turnover)
-        - Gross Margin / Marge brute (Also: Gross Profit)
-        - Customer Acquisition Cost / Coût d'acquisition du client (Also: CAC, CAC Ratio)
-        - Customer Lifetime Value / Valeur à vie client (Also: LTV)
-        - Employee Count / Nombre employé (Also: Headcount)
-        - Cash Burn / Argent brulé (Also: Burn Rate)
-        - EBITDA / EBITDA
-        - Annual Recurring Revenue / Revenu Annuel Récurrent (Also: ARR)
-        - Monthly Recurring Revenue / Revenu Mensuel Récurrent (Also: MRR)
-        - Funding Amount / Montant levé (Also: Raised)
-        
-        IMPORTANT TEXTEXTRACT LOGIC: The document was processed by TextExtract, which works line by line in reading order. When processing tables, TextExtract extracts values sequentially, cell by cell, row by row. This means that what appears as a table in the original document is represented as a flat sequence of text lines. Labels and their corresponding values might appear on consecutive lines rather than in the same line.
-        
-        For example, a table that looks like:
-        | KPI | Q1 | Q2 | Q3 | Q4 |
-        | Revenue | 100 | 200 | 300 | 400 |
-        
-        Might be extracted as:
-        KPI
-        Q1
-        Q2
-        Q3
-        Q4
-        Revenue
-        100
-        200
-        300
-        400
-        
-        When analyzing, look for patterns like:
-        1. Headers or labels followed by values on subsequent lines
-        2. Numeric sequences that form columns in an implied table
-        3. Keywords like 'Q1', 'Q2', 'YTD' that indicate tabular structure
-        4. Consistent spacing or formatting that suggests table alignment
-        
-        Document:
-        {$textContent}
-        
-        Respond with a JSON object containing:
-        1. The extracted KPI values in the standard format
-        2. A 'reconstructed_table' key containing an array representation of any table you can reconstruct from the text
-        
-        Example response:
-        {
-          \"chiffre_affaire\": \"1000000€\",
-          \"marge_brute\": \"500000€\",
-          \"cout_acquisition\": \"200€\",
-          // ... other KPIs ...
-          \"reconstructed_table\": [
-            [\"KPI\", \"Q1\", \"Q2\", \"Q3\", \"Q4\", \"YTD\"],
-            [\"Revenue\", \"250K\", \"300K\", \"350K\", \"400K\", \"1.3M\"],
-            // ... other rows ...
-          ]
-        }
-        
-        Use the French field names in the JSON response regardless of document language.
-        ";
+    private function getKpiExtractionPrompt(
+        string $textContent, 
+        string $periodicity = 'Q', 
+        ?array $selectedKpis = null, 
+        string $year = '2023',
+        ?string $imageBase64 = null,
+        ?string $pdfUrl = null
+    ): string {
+        return $this->getKpiExtractionPromptWithExtractedData($textContent, null, $periodicity, $selectedKpis, $year, $imageBase64);
     }
 }
