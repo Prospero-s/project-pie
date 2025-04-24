@@ -1,9 +1,8 @@
 {
   "title": "Documents",
   "modal": {
-    "upload_title": "Upload document",
-    "select_file": "Select a file",
-    "validate": "Upload and analyze"
+    "upload_title": "Analyze a financial document",
+    "select_file": "Select a PDF file"
   },
   "analyze": {
     "title": "PDF Preview",
@@ -40,6 +39,116 @@
     "delete_error": "Error while deleting document.",
     "loading_error": "Error while loading documents"
   },
-  "no_documents": "No PDF files available",
-  "back": "Back"
+  "textract_results": {
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "document_source": "Document source",
+    "pdf_available": "PDF available",
+    "kpi_table": "KPI table",
+    "ai_validated": "AI validated",
+    "save_changes": "Save changes",
+    "no_modifications": "No modifications to save",
+    "modifications_saved": "Modifications saved",
+    "modifications_success": "Your modifications have been saved successfully",
+    "periodicity_info": {
+      "year": "Year",
+      "periodicity": "Periodicity",
+      "quarterly": "Quarterly",
+      "half_yearly": "Half-yearly",
+      "periods_detected": "periods detected"
+    },
+    "validation": {
+      "error_title": "Validation error",
+      "form_failed": "Error validating the form"
+    },
+    "extracted_document": "Extracted document",
+    "no_periods": "No periods detected",
+    "no_data": "No KPI data found",
+    "alerts": {
+      "values_auto_filled": "Values have been automatically extracted. You can modify them if needed.",
+      "values_modified": "Value modified",
+      "verification_in_progress": "Data verification in progress...",
+      "validation_failed": "Data validation failed"
+    },
+    "kpi_tooltips": {
+      "revenue": "Company revenue",
+      "net_bookings": "Net bookings",
+      "gross_margin": "Gross margin (revenue - direct costs)",
+      "customer_acquisition_cost": "Average cost to acquire a new customer",
+      "cac_ratio": "Acquisition cost to customer value ratio",
+      "customer_lifetime_value": "Total value of a customer over their lifetime",
+      "headcount": "Total number of employees",
+      "cash_burn": "Rate of cash consumption",
+      "cash_balance": "Cash balance",
+      "ebitda": "Earnings before interest, taxes, depreciation, and amortization",
+      "arr": "Annual recurring revenue",
+      "net_arr": "Net annual recurring revenue",
+      "arr_base": "Annual recurring revenue base",
+      "organic_arr_growth": "Organic ARR growth",
+      "enterprise_nrr": "Net revenue retention rate for enterprises",
+      "churn": "Customer attrition rate",
+      "mrr": "Monthly recurring revenue",
+      "funding_amount": "Total amount of funds raised"
+    },
+    "tag_labels": {
+      "not_available": "N/A"
+    },
+    "openai_validation": {
+      "no_content": "No text content to validate",
+      "no_extracted_data": "No extracted data to validate",
+      "success": "OpenAI validation successful",
+      "error": "Error during OpenAI validation",
+      "communication_error": "Communication error with OpenAI"
+    }
+  },
+  "upload": {
+    "title": "Upload a document",
+    "description": "Upload documents to automatically extract financial data",
+    "select_kpis": "Select KPIs to extract",
+    "select_all_kpis": "Select all",
+    "select_kpis_placeholder": "Select one or more KPIs",
+    "select_periodicity": "Select periodicity",
+    "quarterly": "Quarterly",
+    "half_yearly": "Half-yearly",
+    "select_year": "Select year",
+    "select_year_placeholder": "Year to analyze",
+    "analyze": "Analyze document",
+    "kpi_labels": {
+      "chiffre_affaire": "Revenue",
+      "marge_brute": "Gross margin",
+      "cout_acquisition": "Customer acquisition cost",
+      "valeur_vie_client": "Customer lifetime value",
+      "nombre_employe": "Headcount",
+      "argent_brule": "Cash burn",
+      "ebitda": "EBITDA",
+      "revenu_annuel": "Annual recurring revenue (ARR)",
+      "revenu_mensuel": "Monthly recurring revenue (MRR)",
+      "montant_leve": "Funding amount"
+    },
+    "tooltips": {
+      "revenue": "Revenue generated from sales",
+      "gross_margin": "Profit after direct costs deduction",
+      "customer_acquisition_cost": "Average cost to acquire a new customer",
+      "customer_lifetime_value": "Total value of a customer over their lifetime",
+      "headcount": "Total number of employees in the company",
+      "cash_burn": "Rate at which the company spends its capital",
+      "ebitda": "Earnings before interest, taxes, depreciation, and amortization",
+      "arr": "Annualized recurring revenue",
+      "mrr": "Monthly recurring revenue",
+      "funding_amount": "Total amount of capital raised"
+    },
+    "errors": {
+      "no_file": "Please select a file to analyze",
+      "no_kpi": "Please select at least one KPI to extract",
+      "file_size_error": "File is too large. Maximum size: 5MB",
+      "auth_error": "Authentication error",
+      "no_data": "No data could be extracted",
+      "analysis_error": "Error analyzing the document",
+      "no_response": "Server did not respond. Please try again"
+    },
+    "file_selected": "File selected: {name}",
+    "file_removed": "File removed",
+    "success": "Document analyzed successfully"
+  }
 }

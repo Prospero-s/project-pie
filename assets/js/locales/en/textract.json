@@ -1,0 +1,25 @@
+{
+  "noResults": "No results available",
+  "back": "Back",
+  "suggestedCorrections": "Suggested corrections",
+  "noPdfAvailable": "No PDF available",
+  "pdfPreview": "PDF Preview",
+  "kpi": "KPI",
+  "valueVerifiedByOpenAI": "Value verified by OpenAI",
+  "kpiAnalysisTitle": "Analysis and verification of KPIs by OpenAI",
+  "kpiAnalysisDesc": "Data extracted by TextExtract has been verified and corrected if necessary by OpenAI.",
+  "verificationInProgress": "OpenAI verification in progress...",
+  "kpiTab": "KPI Analysis",
+  "reconstructedTableTab": "Reconstructed Table",
+  "noTableReconstruction": "No table could be reconstructed from the document",
+  "tableReconstructionDesc": "This is a reconstruction of the table structure detected in the document by OpenAI, based on the line-by-line data extracted by TextExtract.",
+  "verification": {
+    "title": "Data verification",
+    "confidence": "Confidence level",
+    "verified": "OpenAI verification: Text validated",
+    "notVerified": "OpenAI verification: Suggested corrections",
+    "apply": "Apply",
+    "error": "Verification error",
+    "disclaimer": "Although AI has analyzed this document, we recommend manually verifying critical data (amounts, dates, and financial information) highlighted in color to ensure optimal accuracy."
+  }
+} 

@@ -6,7 +6,6 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   FolderOpenOutlined,
-  BarChartOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Divider } from 'antd';
 import { Link } from 'react-router-dom';
@@ -54,15 +53,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, i18n }) => {
       key: 'documents',
       icon: <FolderOpenOutlined className="!text-2xl lg:text-xl" />,
       label: <Link to={`/${lng}/documents`}>{t('documents')}</Link>,
-    },
-    {
-      key: 'financial-extraction',
-      icon: <BarChartOutlined className="!text-2xl lg:text-xl" />,
-      label: (
-        <Link to={`/${lng}/financial-extraction`}>
-          {t('financial_extraction')}
-        </Link>
-      ),
     },
   ];
 
