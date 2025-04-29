@@ -24,16 +24,14 @@ import {
 import {
   InfoCircleOutlined,
   EditOutlined,
-  SaveOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
-  RobotOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
 import { useUser } from '@/context/userContext';
 import axios from 'axios';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 
 const TextractResults = ({ i18n }) => {
   const navigate = useNavigate();
@@ -41,15 +39,16 @@ const TextractResults = ({ i18n }) => {
   const { t } = useTranslation(['documents', 'textract'], { i18n });
   const company = analyzedData?.company || null;
   const [loading, setLoading] = useState(true);
-  const [validatingWithAI, setValidatingWithAI] = useState(false);
   const [periodsFound, setPeriodsFound] = useState([]);
   const [periodTableColumns, setPeriodTableColumns] = useState([]);
   const [periodTableData, setPeriodTableData] = useState([]);
-  const [editingKey, setEditingKey] = useState('');
   const [editedValues, setEditedValues] = useState({});
-  const [form] = Form.useForm();
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [newKpiForm] = Form.useForm();
+
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [editingKpiData, setEditingKpiData] = useState(null);
+  const [editKpiForm] = Form.useForm();
 
   const periodicity = analyzedData?.periodicity || 'Q';
   const selectedYear =
@@ -58,7 +57,6 @@ const TextractResults = ({ i18n }) => {
       : new Date().getFullYear();
   const processingId = analyzedData?.processingId || null;
 
-  // Afficher les données reçues pour le débogage
   useEffect(() => {
     console.warn('Données analysées reçues :', analyzedData);
     if (analyzedData?.data?.kpi) {
@@ -70,7 +68,6 @@ const TextractResults = ({ i18n }) => {
     }
   }, [analyzedData]);
 
-  // Cleanup function for the PDF processor
   const cleanupProcessingResources = async () => {
     if (processingId) {
       try {
@@ -81,14 +78,12 @@ const TextractResults = ({ i18n }) => {
     }
   };
 
-  // Cleanup on component unmount
   useEffect(() => {
     return () => {
       cleanupProcessingResources();
     };
   }, [processingId]);
 
-  // Process data from the PDF processor
   const processKpiData = useCallback(
     data => {
       if (!data) {
@@ -96,11 +91,10 @@ const TextractResults = ({ i18n }) => {
         return;
       }
 
-      console.error('Données à traiter:', data); // Utiliser console.error pour contourner le linter
+      console.error('Données à traiter:', data);
 
       let periods = [];
 
-      // Déterminer les périodes disponibles
       if (
         data.periods &&
         Array.isArray(data.periods) &&
@@ -116,11 +110,9 @@ const TextractResults = ({ i18n }) => {
         periods = data.data.periods;
         console.warn('Périodes trouvées dans data.data.periods:', periods);
       } else if (periodicity === 'Y') {
-        // For Yearly periodicity, the period might just be the year or a single label
         periods = selectedYear ? [selectedYear.toString()] : ['Yearly'];
         console.warn('Yearly period determined:', periods);
       } else {
-        // Générer les périodes en fonction de la périodicité sélectionnée
         const periodsCount = periodicity === 'Q' ? 4 : 2;
         periods = Array.from(
           { length: periodsCount },
@@ -131,7 +123,6 @@ const TextractResults = ({ i18n }) => {
 
       setPeriodsFound(periods);
 
-      // Configurer les colonnes pour le tableau
       const columnsConfig = [
         {
           title: 'KPI',
@@ -154,28 +145,8 @@ const TextractResults = ({ i18n }) => {
           title: selectedYear === null ? period : `${period} ${selectedYear}`,
           dataIndex: period,
           key: period,
-          editable: true,
           render: (text, record) => {
-            const editable = isEditing(record);
-            return editable ? (
-              <Form.Item
-                name={`${record.key}_${period}`}
-                style={{ margin: 0 }}
-                rules={[
-                  {
-                    required: false,
-                    message: 'Veuillez saisir une valeur',
-                  },
-                ]}
-              >
-                <Input
-                  defaultValue={text !== 'N.A' ? text : ''}
-                  placeholder={t(
-                    'documents:textract_results.tag_labels.not_available',
-                  )}
-                />
-              </Form.Item>
-            ) : (
+            return (
               <div
                 className="editable-cell-value-wrap"
                 style={{ paddingRight: 24 }}
@@ -192,50 +163,34 @@ const TextractResults = ({ i18n }) => {
                 ) : (
                   <Tag color="blue">{text}</Tag>
                 )}
-                {record.modified && record.modified[period] && (
-                  <Tooltip
-                    title={t(
-                      'documents:textract_results.alerts.values_modified',
-                    )}
-                  >
-                    <CheckCircleOutlined
-                      style={{ color: '#52c41a', marginLeft: 8 }}
-                    />
-                  </Tooltip>
-                )}
+                {record.modified &&
+                  Object.values(record.modified).some(val => val === true) && (
+                    <Tooltip
+                      title={t(
+                        'documents:textract_results.alerts.values_modified',
+                      )}
+                    >
+                      <CheckCircleOutlined
+                        style={{ color: '#52c41a', marginLeft: 8 }}
+                      />
+                    </Tooltip>
+                  )}
               </div>
             );
           },
         })),
       ];
 
-      // Ajouter colonne d'actions
       columnsConfig.push({
         title: 'Actions',
         dataIndex: 'actions',
         fixed: 'right',
         width: 120,
         render: (_, record) => {
-          const editable = isEditing(record);
-          return editable ? (
-            <Space>
-              <Button
-                type="primary"
-                onClick={() => saveEdit(record.key)}
-                icon={<SaveOutlined />}
-                size="small"
-              >
-                {t('documents:textract_results.save')}
-              </Button>
-              <Button onClick={cancelEdit} size="small">
-                {t('documents:textract_results.cancel')}
-              </Button>
-            </Space>
-          ) : (
+          return (
             <Button
               type="text"
               icon={<EditOutlined />}
-              disabled={editingKey !== ''}
               onClick={() => edit(record)}
             >
               {t('documents:textract_results.edit')}
@@ -246,10 +201,8 @@ const TextractResults = ({ i18n }) => {
 
       setPeriodTableColumns(columnsConfig);
 
-      // Extraire les données KPI
       let kpiData = {};
 
-      // Exploration de toutes les propriétés possibles pour trouver les données KPI
       if (data.data?.kpi && typeof data.data.kpi === 'object') {
         kpiData = data.data.kpi;
         console.warn('KPI trouvés dans data.data.kpi');
@@ -284,7 +237,6 @@ const TextractResults = ({ i18n }) => {
           'data.data?.kpis': data.data?.kpis,
         });
 
-        // Créer des données de test pour visualiser l'interface
         kpiData = {
           "Chiffre d'affaire": {
             Q1: '125K€',
@@ -302,7 +254,6 @@ const TextractResults = ({ i18n }) => {
         console.warn('Données de test créées pour visualisation');
       }
 
-      // Créer le mapping des tooltips KPI
       const kpiTooltipMapping = {
         "Chiffre d'affaire": t(
           'documents:textract_results.kpi_tooltips.revenue',
@@ -369,7 +320,6 @@ const TextractResults = ({ i18n }) => {
         ),
       };
 
-      // Créer les lignes de données
       const dataRows = Object.entries(kpiData).map(
         ([kpiName, periodValues]) => {
           const row = {
@@ -379,14 +329,11 @@ const TextractResults = ({ i18n }) => {
             modified: {},
           };
 
-          // Valeurs pour chaque période
           if (typeof periodValues === 'object') {
-            // Format multi-période où periodValues est un objet avec périodes comme clés
             periods.forEach(period => {
               row[period] = periodValues[period] || 'N.A';
             });
           } else {
-            // Format simple valeur
             row[periods[0]] = periodValues || 'N.A';
           }
 
@@ -407,7 +354,6 @@ const TextractResults = ({ i18n }) => {
 
   useEffect(() => {
     if (analyzedData) {
-      // Process KPI data from PDF processor
       processKpiData(analyzedData);
       setLoading(false);
     } else {
@@ -415,7 +361,6 @@ const TextractResults = ({ i18n }) => {
     }
   }, [analyzedData, processKpiData]);
 
-  // Ajouter un useEffect pour le débogage des URLs
   useEffect(() => {
     if (analyzedData) {
       console.warn('Données PDF/Images disponibles:', {
@@ -426,72 +371,153 @@ const TextractResults = ({ i18n }) => {
     }
   }, [analyzedData]);
 
-  const isEditing = record => record.key === editingKey;
-
   const edit = record => {
-    form.setFieldsValue({
-      ...record,
+    console.warn('[EDIT] Record data:', record);
+    console.warn('[EDIT] Periods found:', periodsFound);
+    setEditingKpiData(record);
+    const initialValues = { kpiName: record.kpi };
+
+    // Get all period keys from the record (excluding common fields)
+    const recordPeriodKeys = Object.keys(record).filter(
+      key => !['key', 'kpi', 'tooltip', 'modified', 'actions'].includes(key),
+    );
+    console.warn('[EDIT] Record period keys:', recordPeriodKeys);
+
+    // Match period keys with record keys
+    recordPeriodKeys.forEach(periodKey => {
+      initialValues[periodKey] =
+        record[periodKey] === 'N.A' ? '' : record[periodKey];
     });
-    setEditingKey(record.key);
+
+    console.warn('[EDIT] Setting initial form values:', initialValues);
+    editKpiForm.setFieldsValue(initialValues);
+    setIsEditModalVisible(true);
   };
 
-  const cancelEdit = () => {
-    setEditingKey('');
+  const handleAddCancel = () => {
+    setIsAddModalVisible(false);
+    newKpiForm.resetFields();
   };
 
-  const handleSubmit = async () => {
+  const handleAddOk = async () => {
     try {
-      await verifyDataWithOpenAI();
+      const values = await newKpiForm.validateFields();
+      const newKpiName = values.kpiName;
 
-      message.success(t('documents:textract_results.data_submitted'));
-      navigate('/documents');
-    } catch (error) {
-      console.error('Erreur lors de la soumission:', error);
-      message.error(t('documents:textract_results.submission_failed'));
+      if (periodTableData.some(item => item.key === newKpiName)) {
+        notification.error({
+          message: t('documents:textract_results.add_kpi.duplicate_error'),
+        });
+        return;
+      }
+
+      const newRow = {
+        key: newKpiName,
+        kpi: newKpiName,
+        tooltip: '',
+        modified: {},
+      };
+
+      periodsFound.forEach(period => {
+        newRow[period] = values[period] || 'N.A';
+        newRow.modified[period] = true;
+      });
+
+      setPeriodTableData([...periodTableData, newRow]);
+      setEditedValues({ ...editedValues, [newKpiName]: { ...newRow } });
+
+      setIsAddModalVisible(false);
+      newKpiForm.resetFields();
+      message.success(
+        t('documents:textract_results.add_kpi.success', {
+          kpiName: newKpiName,
+        }),
+      );
+    } catch (errorInfo) {
+      console.error('Failed:', errorInfo);
+      notification.error({
+        message: t('documents:textract_results.add_kpi.validation_error'),
+      });
     }
   };
 
-  const saveEdit = async key => {
+  const handleEditCancel = () => {
+    setIsEditModalVisible(false);
+    setEditingKpiData(null);
+  };
+
+  const handleEditOk = async () => {
     try {
-      const row = await form.validateFields();
+      const values = await editKpiForm.validateFields();
+      const originalKey = editingKpiData.key;
+      const newKpiName = values.kpiName;
+
+      if (
+        newKpiName !== originalKey &&
+        periodTableData.some(item => item.key === newKpiName)
+      ) {
+        notification.error({
+          message: t('documents:textract_results.add_kpi.duplicate_error'),
+        });
+        return;
+      }
+
       const newData = [...periodTableData];
-      const index = newData.findIndex(item => key === item.key);
+      const index = newData.findIndex(item => item.key === originalKey);
 
       if (index > -1) {
         const item = newData[index];
-        const modified = { ...item.modified };
-        const periods = periodsFound;
+        const modifiedPeriods = { ...item.modified };
 
-        // Pour chaque période, vérifier si la valeur a été modifiée
-        periods.forEach(period => {
-          const fieldName = `${key}_${period}`;
-          if (row[fieldName] !== undefined) {
-            const newValue = row[fieldName] || 'N.A';
-            if (item[period] !== newValue) {
-              item[period] = newValue;
-              modified[period] = true;
-            }
+        const updatedItem = {
+          ...item,
+          key: newKpiName,
+          kpi: newKpiName,
+        };
+
+        periodsFound.forEach(period => {
+          const newValue = values[period] || 'N.A';
+          if (item[period] !== newValue) {
+            updatedItem[period] = newValue;
+            modifiedPeriods[period] = true;
+          } else {
+            modifiedPeriods[period] = item.modified?.[period] || false;
           }
         });
 
-        // Marquer les valeurs modifiées
-        item.modified = modified;
+        updatedItem.modified = modifiedPeriods;
 
-        newData.splice(index, 1, { ...item });
+        newData.splice(index, 1, updatedItem);
         setPeriodTableData(newData);
-        setEditedValues({ ...editedValues, [key]: true });
-        setEditingKey('');
+
+        setEditedValues({ ...editedValues, [newKpiName]: updatedItem });
+        if (newKpiName !== originalKey && editedValues[originalKey]) {
+          delete editedValues[originalKey];
+        }
+
+        setIsEditModalVisible(false);
+        setEditingKpiData(null);
+        message.success(t('documents:textract_results.modifications_saved'));
       } else {
-        setEditingKey('');
+        notification.error({ message: 'Error finding KPI to update.' });
+        setIsEditModalVisible(false);
+        setEditingKpiData(null);
       }
-    } catch (error) {
-      // Log error quietly in case of validation failure
-      console.error('Erreur de validation:', error);
+    } catch (errorInfo) {
+      console.error('Edit validation Failed:', errorInfo);
       notification.error({
         message: t('documents:textract_results.validation.error_title'),
-        description: `${t('documents:textract_results.validation.form_failed')}: ${error.message}`,
+        description: t('documents:textract_results.validation.form_failed'),
       });
     }
+  };
+
+  const handleSubmit = async () => {
+    console.warn('Submitting Data:', periodTableData);
+    message.info(
+      'Submit logic needs implementation based on modified data handling.',
+    );
+    navigate('/documents');
   };
 
   const renderPeriodicityInfo = () => {
@@ -508,7 +534,7 @@ const TextractResults = ({ i18n }) => {
       periodicityLabel = t(
         'documents:textract_results.periodicity_info.yearly',
         'Yearly',
-      ); // Add translation
+      );
     }
 
     const yearLabel =
@@ -541,76 +567,8 @@ const TextractResults = ({ i18n }) => {
     );
   };
 
-  // Function to verify the data with OpenAI
-  const verifyDataWithOpenAI = async () => {
-    try {
-      setValidatingWithAI(true);
-
-      // Rest of the OpenAI verification logic
-      // ...
-
-      // When verification is complete
-      setValidatingWithAI(false);
-    } catch (error) {
-      console.error('Error validating data with OpenAI:', error);
-      setValidatingWithAI(false);
-      notification.error({
-        message: t('documents:textract_results.alerts.validation_failed'),
-        description: error.message,
-      });
-    }
-  };
-
   const showAddModal = () => {
     setIsAddModalVisible(true);
-  };
-
-  const handleAddCancel = () => {
-    setIsAddModalVisible(false);
-    newKpiForm.resetFields();
-  };
-
-  const handleAddOk = async () => {
-    try {
-      const values = await newKpiForm.validateFields();
-      const newKpiName = values.kpiName;
-
-      // Check if KPI name already exists
-      if (periodTableData.some(item => item.key === newKpiName)) {
-        notification.error({
-          message: t('documents:textract_results.add_kpi.duplicate_error'),
-        });
-        return;
-      }
-
-      const newRow = {
-        key: newKpiName,
-        kpi: newKpiName,
-        tooltip: '', // Add tooltip logic if needed
-        modified: {},
-      };
-
-      periodsFound.forEach(period => {
-        newRow[period] = values[period] || 'N.A';
-        newRow.modified[period] = true; // Mark as modified initially
-      });
-
-      setPeriodTableData([...periodTableData, newRow]);
-      setEditedValues({ ...editedValues, [newKpiName]: { ...newRow } }); // Add to edited values if needed for submission logic
-
-      setIsAddModalVisible(false);
-      newKpiForm.resetFields();
-      message.success(
-        t('documents:textract_results.add_kpi.success', {
-          kpiName: newKpiName,
-        }),
-      );
-    } catch (errorInfo) {
-      console.error('Failed:', errorInfo);
-      notification.error({
-        message: t('documents:textract_results.add_kpi.validation_error'),
-      });
-    }
   };
 
   if (loading) {
@@ -653,303 +611,248 @@ const TextractResults = ({ i18n }) => {
             }
           >
             <Space direction="vertical" size="large" style={{ width: '100%' }}>
-              {/* KPI Analysis Section with side by side layout */}
               <div>
                 <Title level={4} style={{ marginTop: 0 }}>
                   {t('textract:kpiAnalysisTitle')}
                 </Title>
 
-                {validatingWithAI ? (
-                  <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                    <Spin
-                      indicator={
-                        <RobotOutlined spin style={{ fontSize: 28 }} />
+                <Row gutter={16} style={{ height: '650px' }}>
+                  <Col xs={24} lg={12} style={{ height: '100%' }}>
+                    <Card
+                      title={
+                        <Space>
+                          <span>
+                            {t('documents:textract_results.document_source')}
+                          </span>
+                          {analyzedData.pdfUrl && (
+                            <Tag color="success">
+                              {t('documents:textract_results.pdf_available')}
+                            </Tag>
+                          )}
+                        </Space>
                       }
-                      tip={t('textract:verificationInProgress')}
-                      size="large"
-                    />
-                    <Paragraph style={{ marginTop: 20 }}>
-                      {t(
-                        'documents:textract_results.alerts.verification_in_progress',
-                      )}
-                    </Paragraph>
-                  </div>
-                ) : (
-                  <>
-                    <Alert
-                      message={t(
-                        'documents:textract_results.alerts.values_auto_filled',
-                      )}
-                      type="warning"
-                      style={{ marginBottom: 16 }}
-                    />
-
-                    <Row gutter={16} style={{ height: '650px' }}>
-                      {/* Document source column */}
-                      <Col xs={24} lg={12} style={{ height: '100%' }}>
-                        <Card
-                          title={
-                            <Space>
-                              <span>
-                                {t(
-                                  'documents:textract_results.document_source',
-                                )}
-                              </span>
-                              {analyzedData.pdfUrl && (
-                                <Tag color="success">
-                                  {t(
-                                    'documents:textract_results.pdf_available',
-                                  )}
-                                </Tag>
-                              )}
-                            </Space>
-                          }
-                          bordered
+                      bordered
+                      style={{
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }}
+                      bodyStyle={{
+                        flex: 1,
+                        overflow: 'hidden',
+                        padding: 0,
+                      }}
+                    >
+                      {analyzedData.pdfUrl ? (
+                        <div
                           style={{
-                            height: '100%',
                             display: 'flex',
                             flexDirection: 'column',
-                          }}
-                          bodyStyle={{
-                            flex: 1,
-                            overflow: 'hidden',
-                            padding: 0,
+                            height: '100%',
                           }}
                         >
-                          {analyzedData.pdfUrl ? (
-                            <div
-                              style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                height: '100%',
-                              }}
-                            >
-                              <iframe
-                                src={analyzedData.pdfUrl}
-                                title={t('textract:pdfPreview')}
+                          <iframe
+                            src={analyzedData.pdfUrl}
+                            title={t('textract:pdfPreview')}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              border: 'none',
+                              display: 'block',
+                              margin: 0,
+                            }}
+                            onLoad={e =>
+                              console.warn('PDF iframe chargé:', e.target.src)
+                            }
+                            onError={e => {
+                              console.error(
+                                "Erreur de chargement du PDF dans l'iframe:",
+                                e,
+                              );
+                            }}
+                          />
+
+                          <object
+                            data={analyzedData.pdfUrl}
+                            type="application/pdf"
+                            width="100%"
+                            height="100%"
+                            style={{
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              opacity: 0,
+                              zIndex: -1,
+                            }}
+                            onLoad={e => {
+                              console.warn('PDF object chargé');
+                              e.target.style.opacity = 1;
+                              e.target.style.zIndex = 1;
+                            }}
+                          >
+                            <embed
+                              src={analyzedData.pdfUrl}
+                              type="application/pdf"
+                              width="100%"
+                              height="100%"
+                            />
+                          </object>
+                        </div>
+                      ) : analyzedData.imageUrls &&
+                        analyzedData.imageUrls.length > 0 ? (
+                        <div
+                          style={{
+                            height: '100%',
+                            overflow: 'auto',
+                            padding: '16px',
+                          }}
+                        >
+                          <div
+                            style={{
+                              padding: '0 0 10px 0',
+                              textAlign: 'center',
+                              background: '#f9f9f9',
+                              marginBottom: '10px',
+                            }}
+                          >
+                            <Text>
+                              {analyzedData.imageUrls.length}{' '}
+                              {t('textract:imagesAvailable')}
+                            </Text>
+                          </div>
+                          {analyzedData.imageUrls.map((url, index) => (
+                            <div key={index} style={{ marginBottom: '20px' }}>
+                              <div style={{ marginBottom: '5px' }}>
+                                <Space>
+                                  <Text strong>Page {index + 1}</Text>
+                                  <Button
+                                    type="link"
+                                    size="small"
+                                    onClick={() => window.open(url, '_blank')}
+                                  >
+                                    Ouvrir
+                                  </Button>
+                                </Space>
+                              </div>
+                              <img
+                                src={url}
+                                alt={`Page ${index + 1}`}
                                 style={{
                                   width: '100%',
-                                  height: '100%',
-                                  border: 'none',
+                                  border: '1px solid #eee',
                                   display: 'block',
-                                  margin: 0,
                                 }}
-                                onLoad={e =>
+                                onLoad={() =>
                                   console.warn(
-                                    'PDF iframe chargé:',
-                                    e.target.src,
+                                    `Image ${index + 1} chargée:`,
+                                    url,
                                   )
                                 }
                                 onError={e => {
                                   console.error(
-                                    "Erreur de chargement du PDF dans l'iframe:",
+                                    `Erreur de chargement de l'image ${index + 1}:`,
                                     e,
                                   );
-                                  // Si l'iframe échoue, on peut afficher le PDF via object/embed comme solution de secours
+                                  e.target.style.display = 'none';
+                                  const errorDiv =
+                                    document.createElement('div');
+                                  errorDiv.innerText = `Erreur de chargement de l'image: ${url}`;
+                                  errorDiv.style.padding = '20px';
+                                  errorDiv.style.textAlign = 'center';
+                                  errorDiv.style.color = 'red';
+                                  errorDiv.style.border = '1px solid #eee';
+                                  e.target.parentNode.appendChild(errorDiv);
                                 }}
                               />
-
-                              {/* Solution de secours si l'iframe ne fonctionne pas */}
-                              <object
-                                data={analyzedData.pdfUrl}
-                                type="application/pdf"
-                                width="100%"
-                                height="100%"
-                                style={{
-                                  position: 'absolute',
-                                  top: 0,
-                                  left: 0,
-                                  opacity: 0, // Caché par défaut
-                                  zIndex: -1, // Derrière l'iframe
-                                }}
-                                onLoad={e => {
-                                  console.warn('PDF object chargé');
-                                  // Si l'iframe a échoué mais que l'object fonctionne, on le montre
-                                  e.target.style.opacity = 1;
-                                  e.target.style.zIndex = 1;
-                                }}
-                              >
-                                <embed
-                                  src={analyzedData.pdfUrl}
-                                  type="application/pdf"
-                                  width="100%"
-                                  height="100%"
-                                />
-                              </object>
                             </div>
-                          ) : analyzedData.imageUrls &&
-                            analyzedData.imageUrls.length > 0 ? (
-                            <div
-                              style={{
-                                height: '100%',
-                                overflow: 'auto',
-                                padding: '16px',
-                              }}
-                            >
-                              <div
-                                style={{
-                                  padding: '0 0 10px 0',
-                                  textAlign: 'center',
-                                  background: '#f9f9f9',
-                                  marginBottom: '10px',
-                                }}
-                              >
-                                <Text>
-                                  {analyzedData.imageUrls.length}{' '}
-                                  {t('textract:imagesAvailable')}
-                                </Text>
-                              </div>
-                              {analyzedData.imageUrls.map((url, index) => (
-                                <div
-                                  key={index}
-                                  style={{ marginBottom: '20px' }}
-                                >
-                                  <div style={{ marginBottom: '5px' }}>
-                                    <Space>
-                                      <Text strong>Page {index + 1}</Text>
-                                      <Button
-                                        type="link"
-                                        size="small"
-                                        onClick={() =>
-                                          window.open(url, '_blank')
-                                        }
-                                      >
-                                        Ouvrir
-                                      </Button>
-                                    </Space>
-                                  </div>
-                                  <img
-                                    src={url}
-                                    alt={`Page ${index + 1}`}
-                                    style={{
-                                      width: '100%',
-                                      border: '1px solid #eee',
-                                      display: 'block',
-                                    }}
-                                    onLoad={() =>
-                                      console.warn(
-                                        `Image ${index + 1} chargée:`,
-                                        url,
-                                      )
-                                    }
-                                    onError={e => {
-                                      console.error(
-                                        `Erreur de chargement de l'image ${index + 1}:`,
-                                        e,
-                                      );
-                                      // Afficher un message d'erreur à la place de l'image
-                                      e.target.style.display = 'none';
-                                      const errorDiv =
-                                        document.createElement('div');
-                                      errorDiv.innerText = `Erreur de chargement de l'image: ${url}`;
-                                      errorDiv.style.padding = '20px';
-                                      errorDiv.style.textAlign = 'center';
-                                      errorDiv.style.color = 'red';
-                                      errorDiv.style.border = '1px solid #eee';
-                                      e.target.parentNode.appendChild(errorDiv);
-                                    }}
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <div
-                              style={{
-                                padding: 16,
-                                height: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                              }}
-                            >
-                              <Empty
-                                description={t('textract:noPdfAvailable')}
-                                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                              />
-                            </div>
-                          )}
-                        </Card>
-                      </Col>
-
-                      {/* KPI table column */}
-                      <Col xs={24} lg={12} style={{ height: '100%' }}>
-                        <Card
-                          title={
-                            <Space>
-                              <span>
-                                {t('documents:textract_results.kpi_table')}
-                              </span>
-                              <Tag
-                                icon={<CheckCircleOutlined />}
-                                color="success"
-                              >
-                                {t('documents:textract_results.ai_validated')}
-                              </Tag>
-                            </Space>
-                          }
-                          bordered
+                          ))}
+                        </div>
+                      ) : (
+                        <div
                           style={{
+                            padding: 16,
                             height: '100%',
                             display: 'flex',
-                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                           }}
-                          bodyStyle={{ flex: 1, overflow: 'auto' }}
-                          extra={
-                            <Button
-                              type="primary"
-                              onClick={handleSubmit}
-                              disabled={Object.keys(editedValues).length === 0}
-                            >
-                              {t('analyze.confirm')}
-                            </Button>
-                          }
                         >
-                          {periodsFound.length > 0 ? (
-                            <>
-                              {renderPeriodicityInfo()}
-                              <Form form={form}>
-                                <Table
-                                  columns={periodTableColumns}
-                                  dataSource={periodTableData}
-                                  pagination={false}
-                                  bordered
-                                  size="middle"
-                                  scroll={{ x: 'max-content', y: '450px' }}
-                                  style={{ marginBottom: 10 }}
-                                  locale={{
-                                    emptyText: (
-                                      <Empty
-                                        description={t(
-                                          'documents:textract_results.no_data',
-                                        )}
-                                        image={Empty.PRESENTED_IMAGE_SIMPLE}
-                                      />
-                                    ),
-                                  }}
+                          <Empty
+                            description={t('textract:noPdfAvailable')}
+                            image={Empty.PRESENTED_IMAGE_SIMPLE}
+                          />
+                        </div>
+                      )}
+                    </Card>
+                  </Col>
+
+                  <Col xs={24} lg={12} style={{ height: '100%' }}>
+                    <Card
+                      title={
+                        <Space>
+                          <span>
+                            {t('documents:textract_results.kpi_table')}
+                          </span>
+                          <Tag icon={<CheckCircleOutlined />} color="success">
+                            {t('documents:textract_results.ai_validated')}
+                          </Tag>
+                        </Space>
+                      }
+                      bordered
+                      style={{
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }}
+                      bodyStyle={{ flex: 1, overflow: 'auto' }}
+                      extra={
+                        <Button type="primary" onClick={handleSubmit}>
+                          {t('analyze.confirm')}
+                        </Button>
+                      }
+                    >
+                      {periodsFound.length > 0 ? (
+                        <>
+                          {renderPeriodicityInfo()}
+                          <Table
+                            columns={periodTableColumns}
+                            dataSource={periodTableData}
+                            pagination={false}
+                            bordered
+                            size="middle"
+                            scroll={{ x: 'max-content', y: '450px' }}
+                            style={{ marginBottom: 10 }}
+                            locale={{
+                              emptyText: (
+                                <Empty
+                                  description={t(
+                                    'documents:textract_results.no_data',
+                                  )}
+                                  image={Empty.PRESENTED_IMAGE_SIMPLE}
                                 />
-                              </Form>
-                              <Button
-                                type="dashed"
-                                onClick={showAddModal}
-                                icon={<PlusOutlined />}
-                                style={{ width: '100%', marginTop: 10 }}
-                              >
-                                {t('documents:textract_results.add_kpi.button')}
-                              </Button>
-                            </>
-                          ) : (
-                            <div style={{ textAlign: 'center', padding: 20 }}>
-                              <Skeleton active />
-                              <Text>
-                                {t('documents:textract_results.no_periods')}
-                              </Text>
-                            </div>
-                          )}
-                        </Card>
-                      </Col>
-                    </Row>
-                  </>
-                )}
+                              ),
+                            }}
+                          />
+                          <Button
+                            type="dashed"
+                            onClick={showAddModal}
+                            icon={<PlusOutlined />}
+                            style={{ width: '100%', marginTop: 10 }}
+                          >
+                            {t('documents:textract_results.add_kpi.button')}
+                          </Button>
+                        </>
+                      ) : (
+                        <div style={{ textAlign: 'center', padding: 20 }}>
+                          <Skeleton active />
+                          <Text>
+                            {t('documents:textract_results.no_periods')}
+                          </Text>
+                        </div>
+                      )}
+                    </Card>
+                  </Col>
+                </Row>
               </div>
 
               <div style={{ marginTop: 20, textAlign: 'center' }}>
@@ -964,7 +867,6 @@ const TextractResults = ({ i18n }) => {
         </div>
       )}
 
-      {/* Add KPI Modal */}
       <Modal
         title={t('documents:textract_results.add_kpi.modal_title')}
         open={isAddModalVisible}
@@ -995,7 +897,7 @@ const TextractResults = ({ i18n }) => {
           <Row gutter={16}>
             {periodsFound.map(period => (
               <Col
-                span={Math.max(6, Math.floor(24 / periodsFound.length))} // Adjust span based on number of periods, ensure min span
+                span={Math.max(6, Math.floor(24 / periodsFound.length))}
                 key={period}
               >
                 <Form.Item
@@ -1003,7 +905,6 @@ const TextractResults = ({ i18n }) => {
                   label={
                     selectedYear === null ? period : `${period} ${selectedYear}`
                   }
-                  // No required rule, allow empty/N.A.
                 >
                   <Input
                     placeholder={t(
@@ -1013,6 +914,78 @@ const TextractResults = ({ i18n }) => {
                 </Form.Item>
               </Col>
             ))}
+          </Row>
+        </Form>
+      </Modal>
+
+      <Modal
+        title={t('documents:textract_results.edit_kpi.modal_title', 'Edit KPI')}
+        open={isEditModalVisible}
+        onOk={handleEditOk}
+        onCancel={handleEditCancel}
+        okText={t('documents:textract_results.save')}
+        cancelText={t('documents:textract_results.cancel')}
+        destroyOnClose
+      >
+        <Form form={editKpiForm} layout="vertical" name="edit_kpi_form">
+          <Form.Item
+            name="kpiName"
+            label={t('documents:textract_results.add_kpi.kpi_name_label')}
+            rules={[
+              {
+                required: true,
+                message: t(
+                  'documents:textract_results.add_kpi.kpi_name_required',
+                ),
+              },
+            ]}
+          >
+            <Input
+              disabled
+              placeholder={t(
+                'documents:textract_results.add_kpi.kpi_name_placeholder',
+              )}
+            />
+          </Form.Item>
+
+          <Row gutter={16}>
+            {editingKpiData &&
+              Object.keys(editingKpiData)
+                .filter(
+                  key =>
+                    !['key', 'kpi', 'tooltip', 'modified', 'actions'].includes(
+                      key,
+                    ),
+                )
+                .map(period => (
+                  <Col
+                    span={Math.max(
+                      6,
+                      Math.floor(
+                        24 /
+                          Object.keys(editingKpiData).filter(
+                            k =>
+                              ![
+                                'key',
+                                'kpi',
+                                'tooltip',
+                                'modified',
+                                'actions',
+                              ].includes(k),
+                          ).length,
+                      ),
+                    )}
+                    key={period}
+                  >
+                    <Form.Item name={period} label={period}>
+                      <Input
+                        placeholder={t(
+                          'documents:textract_results.tag_labels.not_available',
+                        )}
+                      />
+                    </Form.Item>
+                  </Col>
+                ))}
           </Row>
         </Form>
       </Modal>
