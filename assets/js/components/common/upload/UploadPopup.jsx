@@ -36,7 +36,7 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
   const [error, setError] = useState(null);
   const [selectedKpis, setSelectedKpis] = useState([]);
   const [periodicity, setPeriodicity] = useState('Q');
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState(null);
   const { setAnalyzedData } = useUser();
   const navigate = useNavigate();
 
@@ -158,7 +158,9 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
     formData.append('companyId', company?.id || '');
     formData.append('periodicity', periodicity);
     formData.append('kpis', JSON.stringify(selectedKpis));
-    formData.append('year', selectedYear);
+    if (selectedYear !== null && selectedYear !== 'all') {
+      formData.append('year', selectedYear);
+    }
     formData.append('language', i18n.language);
 
     try {
@@ -348,6 +350,9 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
           <Radio.Button value="H">
             {t('documents:upload.half_yearly')}
           </Radio.Button>
+          <Radio.Button value="Y">
+            {t('documents:upload.yearly', 'Yearly')}
+          </Radio.Button>
         </Radio.Group>
       </div>
 
@@ -359,6 +364,9 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
           onChange={handleYearChange}
           value={selectedYear}
         >
+          <Option key="all" value={null}>
+            {t('documents:upload.all_years', 'All Years')}
+          </Option>
           {yearOptions.map(year => (
             <Option key={year} value={year}>
               {year}

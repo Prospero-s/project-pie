@@ -213,6 +213,8 @@ def get_periods_from_periodicity(periodicity: str, year: str) -> List[str]:
         return [f"Q1 {year}", f"Q2 {year}", f"Q3 {year}", f"Q4 {year}"]
     elif periodicity == 'H':
         return [f"H1 {year}", f"H2 {year}"]
+    elif periodicity == 'Y':
+        return [f"{year}"]
     else:
         return []
 
@@ -305,6 +307,9 @@ def analyze_images_with_gpt(
         elif periodicity == 'H':
             expected_periods = ["H1", "H2"]
             period_description = "half-yearly periods (H1, H2)"
+        elif periodicity == 'Y':
+            expected_periods = [f"{year}"]
+            period_description = "annual period"
             
         # Préparer la liste des KPIs à rechercher avec leurs différentes désignations possibles
         kpi_targets = []
@@ -368,8 +373,8 @@ def analyze_images_with_gpt(
           "periods": {json.dumps(expected_periods)},
           "kpi": {{
             "KPI Name 1": {{  
-              "Q1": "value with unit",  
-              "Q2": "value with unit",
+              "{expected_periods[0] if expected_periods else 'Period'}": "value with unit", 
+              // Add other periods if applicable (e.g., Q2, Q3, H2)
               // Only include periods with actual visible values
             }},
             // Only include KPIs actually found in the document
@@ -459,7 +464,13 @@ def analyze_images_with_gpt(
         logger.error(f"Erreur inattendue lors de l'analyse des images avec GPT: {e}")
         return {"error": f"Unexpected error during image analysis: {e}", "periods": expected_periods, "kpi": {}}
 
-def clean_kpi_data(extracted_data: Dict[str, Any], selected_kpis: List[str] = None, periodicity: str = 'Q', requested_language: str = 'fr') -> Dict[str, Any]:
+def clean_kpi_data(
+    extracted_data: Dict[str, Any], 
+    selected_kpis: List[str] = None, 
+    periodicity: str = 'Q', 
+    requested_language: str = 'fr',
+    year: str = '2023'
+) -> Dict[str, Any]:
     """
     Nettoie et vérifie les données KPI extraites pour s'assurer qu'elles correspondent au format attendu.
     Filtre également pour ne garder que les KPI sélectionnés.
@@ -488,8 +499,12 @@ def clean_kpi_data(extracted_data: Dict[str, Any], selected_kpis: List[str] = No
             # Créer les périodes en fonction de la périodicité
             if periodicity == 'Q':
                 periods = ["Q1", "Q2", "Q3", "Q4"]
-            else:  # H ou autre
+            elif periodicity == 'H':
                 periods = ["H1", "H2"]
+            elif periodicity == 'Y':
+                periods = [f"{year}"]
+            else:
+                periods = []
         else:
             periods = extracted_data["periods"]
             
@@ -509,6 +524,10 @@ def clean_kpi_data(extracted_data: Dict[str, Any], selected_kpis: List[str] = No
                 for h in ["H1", "H2"]:
                     if key.startswith(h):
                         return h
+            elif periodicity == 'Y':
+                for y in [f"{year}"]:
+                    if key.startswith(y):
+                        return y
             return key
             
         # Créer un dictionnaire de correspondance KPI anglais/français pour une recherche plus efficace
@@ -658,6 +677,8 @@ def process_pdf(
         expected_periods = ["Q1", "Q2", "Q3", "Q4"]
     elif periodicity == 'H':
         expected_periods = ["H1", "H2"]
+    elif periodicity == 'Y':
+        expected_periods = [f"{year}"]
     
     result_data = {
         "error": "Initialization error", 
@@ -700,7 +721,7 @@ def process_pdf(
             logger.error(f"Erreur détectée lors de l'analyse: {extracted_data['error']}")
             
         # Étape 3: Nettoyer et vérifier les données extraites
-        cleaned_data = clean_kpi_data(extracted_data, selected_kpis, periodicity, requested_language)
+        cleaned_data = clean_kpi_data(extracted_data, selected_kpis, periodicity, requested_language, year)
         
         # Si une erreur a été détectée lors du nettoyage, la propager
         if "error" in cleaned_data and "error" not in extracted_data:

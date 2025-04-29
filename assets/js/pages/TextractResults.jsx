@@ -48,7 +48,10 @@ const TextractResults = ({ i18n }) => {
   const [form] = Form.useForm();
 
   const periodicity = analyzedData?.periodicity || 'Q';
-  const selectedYear = analyzedData?.year || new Date().getFullYear();
+  const selectedYear =
+    analyzedData && Object.prototype.hasOwnProperty.call(analyzedData, 'year')
+      ? analyzedData.year
+      : new Date().getFullYear();
   const processingId = analyzedData?.processingId || null;
 
   // Afficher les données reçues pour le débogage
@@ -108,6 +111,10 @@ const TextractResults = ({ i18n }) => {
       ) {
         periods = data.data.periods;
         console.warn('Périodes trouvées dans data.data.periods:', periods);
+      } else if (periodicity === 'Y') {
+        // For Yearly periodicity, the period might just be the year or a single label
+        periods = selectedYear ? [selectedYear.toString()] : ['Yearly'];
+        console.warn('Yearly period determined:', periods);
       } else {
         // Générer les périodes en fonction de la périodicité sélectionnée
         const periodsCount = periodicity === 'Q' ? 4 : 2;
@@ -140,7 +147,7 @@ const TextractResults = ({ i18n }) => {
           ),
         },
         ...periods.map(period => ({
-          title: `${period} ${selectedYear}`,
+          title: selectedYear === null ? period : `${period} ${selectedYear}`,
           dataIndex: period,
           key: period,
           editable: true,
@@ -484,18 +491,42 @@ const TextractResults = ({ i18n }) => {
   };
 
   const renderPeriodicityInfo = () => {
-    const periodicityLabel =
-      periodicity === 'Q'
-        ? t('documents:textract_results.periodicity_info.quarterly')
-        : t('documents:textract_results.periodicity_info.half_yearly');
+    let periodicityLabel = '';
+    if (periodicity === 'Q') {
+      periodicityLabel = t(
+        'documents:textract_results.periodicity_info.quarterly',
+      );
+    } else if (periodicity === 'H') {
+      periodicityLabel = t(
+        'documents:textract_results.periodicity_info.half_yearly',
+      );
+    } else if (periodicity === 'Y') {
+      periodicityLabel = t(
+        'documents:textract_results.periodicity_info.yearly',
+        'Yearly',
+      ); // Add translation
+    }
+
+    const yearLabel =
+      selectedYear === null
+        ? t(
+            'documents:textract_results.periodicity_info.all_years',
+            'All Years',
+          )
+        : selectedYear;
+    const periodsLabel =
+      selectedYear === null
+        ? periodsFound.join(', ')
+        : periodsFound.map(p => `${p} ${selectedYear}`).join(', ');
+
     return (
       <Alert
         message={
           <Space>
-            <Tag color="processing">{`${t('documents:textract_results.periodicity_info.year')}: ${selectedYear}`}</Tag>
+            <Tag color="processing">{`${t('documents:textract_results.periodicity_info.year')}: ${yearLabel}`}</Tag>
             <Tag color="processing">{`${t('documents:textract_results.periodicity_info.periodicity')}: ${periodicityLabel}`}</Tag>
             <Tag icon={<ClockCircleOutlined />} color="warning">
-              {`${periodsFound.length} ${t('documents:textract_results.periodicity_info.periods_detected')}: ${periodsFound.join(', ')} ${selectedYear}`}
+              {`${periodsFound.length} ${t('documents:textract_results.periodicity_info.periods_detected')}: ${periodsLabel}`}
             </Tag>
           </Space>
         }

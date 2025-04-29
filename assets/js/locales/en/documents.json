@@ -56,6 +56,8 @@
       "periodicity": "Periodicity",
       "quarterly": "Quarterly",
       "half_yearly": "Half-yearly",
+      "yearly": "Yearly",
+      "all_years": "All Years",
       "periods_detected": "periods detected"
     },
     "validation": {
@@ -92,7 +94,10 @@
       "funding_amount": "Total amount of funds raised"
     },
     "tag_labels": {
-      "not_available": "N/A"
+      "not_available": "N/A",
+      "modified": "Modified",
+      "auto_filled": "Auto-filled",
+      "verified": "Verified"
     },
     "openai_validation": {
       "no_content": "No text content to validate",
@@ -111,6 +116,7 @@
     "select_periodicity": "Select periodicity",
     "quarterly": "Quarterly",
     "half_yearly": "Half-yearly",
+    "yearly": "Yearly",
     "select_year": "Select year",
     "select_year_placeholder": "Year to analyze",
     "analyze": "Analyze document",
