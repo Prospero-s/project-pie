@@ -218,53 +218,55 @@ def get_periods_from_periodicity(periodicity: str, year: str) -> List[str]:
     else:
         return []
 
-def get_kpi_mapping(kpi_code: str, language: str) -> str:
+def get_kpi_mapping(kpi_code: str, language: str) -> List[str]:
     """
-    Mappe un code KPI à son nom complet dans la langue spécifiée.
+    Mappe un code KPI à son nom complet dans la langue spécifiée, incluant des synonymes courants.
     """
     mappings = {
         'chiffre_affaire': {
-            'fr': ["Chiffre d'affaires", "Revenu", "CA"],
-            'en': ["Revenue", "Sales", "Turnover"]
+            'fr': ["Chiffre d'affaires", "Revenu", "CA", "Ventes", "Recettes"],
+            'en': ["Revenue", "Sales", "Turnover", "Net Sales", "Income"]
         },
         'marge_brute': {
-            'fr': ["Marge brute", "Marge"],
+            'fr': ["Marge brute", "Marge", "Bénéfice brut"],
             'en': ["Gross Margin", "Margin", "Gross Profit"]
         },
         'cout_acquisition': {
-            'fr': ["Coût d'acquisition client", "CAC"],
-            'en': ["Customer Acquisition Cost", "CAC", "Acquisition Cost"]
+            'fr': ["Coût d'acquisition client", "CAC", "Coût acquisition"],
+            'en': ["Customer Acquisition Cost", "CAC", "Acquisition Cost", "Cost per Acquisition"]
         },
         'valeur_vie_client': {
-            'fr': ["Valeur à vie client", "LTV"],
-            'en': ["Customer Lifetime Value", "LTV", "CLV"]
+            'fr': ["Valeur à vie client", "LTV", "CLV", "Valeur vie client"],
+            'en': ["Customer Lifetime Value", "LTV", "CLV", "Lifetime Value"]
         },
         'nombre_employe': {
-            'fr': ["Nombre d'employés", "Effectifs"],
-            'en': ["Headcount", "Employee Count", "Employees"]
+            'fr': ["Nombre d'employés", "Effectifs", "Taille équipe", "Employés"],
+            'en': ["Headcount", "Employee Count", "Employees", "Team Size", "Staff"]
         },
         'argent_brule': {
-            'fr': ["Argent brûlé", "Cash Burn"],
-            'en': ["Cash Burn", "Burn Rate"]
+            'fr': ["Argent brûlé", "Cash Burn", "Brûlage de trésorerie", "Dépenses nettes"],
+            'en': ["Cash Burn", "Burn Rate", "Net Burn"]
         },
         'ebitda': {
-            'fr': ["EBITDA"],
-            'en': ["EBITDA"]
+            'fr': ["EBITDA", "BAIIA"],
+            'en': ["EBITDA", "Earnings Before Interest Taxes Depreciation Amortization"]
         },
         'revenu_annuel': {
-            'fr': ["Revenu Annuel Récurrent", "ARR"],
+            'fr': ["Revenu Annuel Récurrent", "ARR", "Revenu récurrent annuel"],
             'en': ["Annual Recurring Revenue", "ARR"]
         },
         'revenu_mensuel': {
-            'fr': ["Revenu Mensuel Récurrent", "MRR"],
+            'fr': ["Revenu Mensuel Récurrent", "MRR", "Revenu récurrent mensuel"],
             'en': ["Monthly Recurring Revenue", "MRR"]
         },
         'montant_leve': {
-            'fr': ["Montant levé", "Levée de fonds"],
-            'en': ["Funding Amount", "Funds Raised"]
+            'fr': ["Montant levé", "Levée de fonds", "Financement", "Capital levé"],
+            'en': ["Funding Amount", "Funds Raised", "Financing", "Capital Raised", "Investment"]
         }
+        # Ajoutez d'autres KPI et leurs synonymes ici si nécessaire
     }
     
+    # Retourne la liste pour la langue demandée, ou une liste avec le code KPI si non trouvé
     lang = 'fr' if language == 'fr' else 'en'
     return mappings.get(kpi_code, {}).get(lang, [f"{kpi_code}"])
 
