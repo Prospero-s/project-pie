@@ -27,6 +27,7 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   PlusOutlined,
+  WarningOutlined,
 } from '@ant-design/icons';
 import { useUser } from '@/context/userContext';
 import axios from 'axios';
@@ -163,18 +164,17 @@ const TextractResults = ({ i18n }) => {
                 ) : (
                   <Tag color="blue">{text}</Tag>
                 )}
-                {record.modified &&
-                  Object.values(record.modified).some(val => val === true) && (
-                    <Tooltip
-                      title={t(
-                        'documents:textract_results.alerts.values_modified',
-                      )}
-                    >
-                      <CheckCircleOutlined
-                        style={{ color: '#52c41a', marginLeft: 8 }}
-                      />
-                    </Tooltip>
-                  )}
+                {record.modified && record.modified[period] && (
+                  <Tooltip
+                    title={t(
+                      'documents:textract_results.alerts.values_modified',
+                    )}
+                  >
+                    <WarningOutlined
+                      style={{ color: '#faad14', marginLeft: 8 }}
+                    />
+                  </Tooltip>
+                )}
               </div>
             );
           },
