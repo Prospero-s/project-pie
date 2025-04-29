@@ -105,6 +105,17 @@
       "success": "OpenAI validation successful",
       "error": "Error during OpenAI validation",
       "communication_error": "Communication error with OpenAI"
+    },
+    "add_kpi": {
+      "button": "Add KPI",
+      "modal_title": "Add a new KPI",
+      "kpi_name_label": "KPI Name",
+      "kpi_name_placeholder": "Enter the name of the new KPI",
+      "kpi_name_required": "KPI name is required",
+      "add_button": "Add",
+      "duplicate_error": "A KPI with this name already exists.",
+      "success": "KPI '{kpiName}' added successfully.",
+      "validation_error": "Validation error. Check the fields."
     }
   },
   "upload": {

@@ -19,6 +19,7 @@ import {
   Empty,
   Form,
   notification,
+  Modal,
 } from 'antd';
 import {
   InfoCircleOutlined,
@@ -27,6 +28,7 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   RobotOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
 import { useUser } from '@/context/userContext';
 import axios from 'axios';
@@ -46,6 +48,8 @@ const TextractResults = ({ i18n }) => {
   const [editingKey, setEditingKey] = useState('');
   const [editedValues, setEditedValues] = useState({});
   const [form] = Form.useForm();
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [newKpiForm] = Form.useForm();
 
   const periodicity = analyzedData?.periodicity || 'Q';
   const selectedYear =
@@ -557,6 +561,58 @@ const TextractResults = ({ i18n }) => {
     }
   };
 
+  const showAddModal = () => {
+    setIsAddModalVisible(true);
+  };
+
+  const handleAddCancel = () => {
+    setIsAddModalVisible(false);
+    newKpiForm.resetFields();
+  };
+
+  const handleAddOk = async () => {
+    try {
+      const values = await newKpiForm.validateFields();
+      const newKpiName = values.kpiName;
+
+      // Check if KPI name already exists
+      if (periodTableData.some(item => item.key === newKpiName)) {
+        notification.error({
+          message: t('documents:textract_results.add_kpi.duplicate_error'),
+        });
+        return;
+      }
+
+      const newRow = {
+        key: newKpiName,
+        kpi: newKpiName,
+        tooltip: '', // Add tooltip logic if needed
+        modified: {},
+      };
+
+      periodsFound.forEach(period => {
+        newRow[period] = values[period] || 'N.A';
+        newRow.modified[period] = true; // Mark as modified initially
+      });
+
+      setPeriodTableData([...periodTableData, newRow]);
+      setEditedValues({ ...editedValues, [newKpiName]: { ...newRow } }); // Add to edited values if needed for submission logic
+
+      setIsAddModalVisible(false);
+      newKpiForm.resetFields();
+      message.success(
+        t('documents:textract_results.add_kpi.success', {
+          kpiName: newKpiName,
+        }),
+      );
+    } catch (errorInfo) {
+      console.error('Failed:', errorInfo);
+      notification.error({
+        message: t('documents:textract_results.add_kpi.validation_error'),
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div
@@ -872,6 +928,14 @@ const TextractResults = ({ i18n }) => {
                                   }}
                                 />
                               </Form>
+                              <Button
+                                type="dashed"
+                                onClick={showAddModal}
+                                icon={<PlusOutlined />}
+                                style={{ width: '100%', marginTop: 10 }}
+                              >
+                                {t('documents:textract_results.add_kpi.button')}
+                              </Button>
                             </>
                           ) : (
                             <div style={{ textAlign: 'center', padding: 20 }}>
@@ -899,6 +963,59 @@ const TextractResults = ({ i18n }) => {
           </Card>
         </div>
       )}
+
+      {/* Add KPI Modal */}
+      <Modal
+        title={t('documents:textract_results.add_kpi.modal_title')}
+        open={isAddModalVisible}
+        onOk={handleAddOk}
+        onCancel={handleAddCancel}
+        okText={t('documents:textract_results.add_kpi.add_button')}
+        cancelText={t('documents:textract_results.cancel')}
+      >
+        <Form form={newKpiForm} layout="vertical" name="add_kpi_form">
+          <Form.Item
+            name="kpiName"
+            label={t('documents:textract_results.add_kpi.kpi_name_label')}
+            rules={[
+              {
+                required: true,
+                message: t(
+                  'documents:textract_results.add_kpi.kpi_name_required',
+                ),
+              },
+            ]}
+          >
+            <Input
+              placeholder={t(
+                'documents:textract_results.add_kpi.kpi_name_placeholder',
+              )}
+            />
+          </Form.Item>
+          <Row gutter={16}>
+            {periodsFound.map(period => (
+              <Col
+                span={Math.max(6, Math.floor(24 / periodsFound.length))} // Adjust span based on number of periods, ensure min span
+                key={period}
+              >
+                <Form.Item
+                  name={period}
+                  label={
+                    selectedYear === null ? period : `${period} ${selectedYear}`
+                  }
+                  // No required rule, allow empty/N.A.
+                >
+                  <Input
+                    placeholder={t(
+                      'documents:textract_results.tag_labels.not_available',
+                    )}
+                  />
+                </Form.Item>
+              </Col>
+            ))}
+          </Row>
+        </Form>
+      </Modal>
     </>
   );
 };
