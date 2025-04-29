@@ -220,36 +220,37 @@ def get_periods_from_periodicity(periodicity: str, year: str) -> List[str]:
 
 def get_kpi_mapping(kpi_code: str, language: str) -> List[str]:
     """
-    Mappe un code KPI à son nom complet dans la langue spécifiée, incluant des synonymes courants.
+    Mappe un code KPI à son nom complet et ses synonymes dans la langue spécifiée.
+    Retourne une liste de noms possibles.
     """
     mappings = {
         'chiffre_affaire': {
-            'fr': ["Chiffre d'affaires", "Revenu", "CA", "Ventes", "Recettes"],
-            'en': ["Revenue", "Sales", "Turnover", "Net Sales", "Income"]
+            'fr': ["Chiffre d'affaires", "Revenu", "CA", "Ventes", "Recettes", "Net Bookings"],
+            'en': ["Revenue", "Sales", "Turnover", "Net Bookings", "Income"]
         },
         'marge_brute': {
-            'fr': ["Marge brute", "Marge", "Bénéfice brut"],
+            'fr': ["Marge brute", "Marge", "Résultat brut"],
             'en': ["Gross Margin", "Margin", "Gross Profit"]
         },
         'cout_acquisition': {
-            'fr': ["Coût d'acquisition client", "CAC", "Coût acquisition"],
-            'en': ["Customer Acquisition Cost", "CAC", "Acquisition Cost", "Cost per Acquisition"]
+            'fr': ["Coût d'acquisition client", "CAC", "Coût d'acquisition"],
+            'en': ["Customer Acquisition Cost", "CAC", "Acquisition Cost"]
         },
         'valeur_vie_client': {
             'fr': ["Valeur à vie client", "LTV", "CLV", "Valeur vie client"],
-            'en': ["Customer Lifetime Value", "LTV", "CLV", "Lifetime Value"]
+            'en': ["Customer Lifetime Value", "LTV", "CLV"]
         },
         'nombre_employe': {
-            'fr': ["Nombre d'employés", "Effectifs", "Taille équipe", "Employés"],
-            'en': ["Headcount", "Employee Count", "Employees", "Team Size", "Staff"]
+            'fr': ["Nombre d'employés", "Effectifs", "Taille de l'équipe", "Employés", "ETP"],
+            'en': ["Headcount", "Employee Count", "Employees", "Team Size", "FTE"]
         },
         'argent_brule': {
-            'fr': ["Argent brûlé", "Cash Burn", "Brûlage de trésorerie", "Dépenses nettes"],
-            'en': ["Cash Burn", "Burn Rate", "Net Burn"]
+            'fr': ["Argent brûlé", "Cash Burn", "Brûlage de trésorerie", "Flux de trésorerie net"],
+            'en': ["Cash Burn", "Burn Rate", "Net Cash Flow"]
         },
         'ebitda': {
-            'fr': ["EBITDA", "BAIIA"],
-            'en': ["EBITDA", "Earnings Before Interest Taxes Depreciation Amortization"]
+            'fr': ["EBITDA", "BAIIA", "Excédent Brut d'Exploitation", "EBE"],
+            'en': ["EBITDA", "Earnings Before Interest, Taxes, Depreciation, and Amortization"]
         },
         'revenu_annuel': {
             'fr': ["Revenu Annuel Récurrent", "ARR", "Revenu récurrent annuel"],
@@ -260,15 +261,15 @@ def get_kpi_mapping(kpi_code: str, language: str) -> List[str]:
             'en': ["Monthly Recurring Revenue", "MRR"]
         },
         'montant_leve': {
-            'fr': ["Montant levé", "Levée de fonds", "Financement", "Capital levé"],
-            'en': ["Funding Amount", "Funds Raised", "Financing", "Capital Raised", "Investment"]
+            'fr': ["Montant levé", "Levée de fonds", "Financement obtenu", "Capital levé"],
+            'en': ["Funding Amount", "Funds Raised", "Capital Raised"]
         }
-        # Ajoutez d'autres KPI et leurs synonymes ici si nécessaire
+        # Ajouter d'autres KPI et leurs synonymes ici si nécessaire
     }
     
-    # Retourne la liste pour la langue demandée, ou une liste avec le code KPI si non trouvé
     lang = 'fr' if language == 'fr' else 'en'
-    return mappings.get(kpi_code, {}).get(lang, [f"{kpi_code}"])
+    # Retourner la liste des noms possibles, ou le code KPI comme fallback
+    return mappings.get(kpi_code, {}).get(lang, [kpi_code])
 
 def analyze_images_with_gpt(
     image_paths: List[str], 
@@ -321,17 +322,28 @@ def analyze_images_with_gpt(
                 kpi_targets.extend(kpi_names)
         
         kpi_list_formatted = ", ".join([f'"{k}"' for k in kpi_targets]) if kpi_targets else "all financial KPIs in the document"
+        kpi_primary_names = {}
+        if selected_kpis:
+            for kpi_code in selected_kpis:
+                kpi_names_fr = get_kpi_mapping(kpi_code, 'fr')
+                if kpi_names_fr:
+                    kpi_primary_names[kpi_code] = kpi_names_fr[0] # Use first French name as primary
 
         system_prompt = f"""
         You are an expert financial data analyst specializing in extracting precise KPI data from financial reports and tables.
         Your task is to carefully examine financial tables in the provided images and extract ONLY the specific KPIs and periods requested.
+        Recognize common financial synonyms and variations for the requested KPIs, and map them to the primary KPI name provided in the output.
+        
+        Example Synonyms Mapping:
+        - If asked for 'Chiffre d\'affaires', also recognize 'Revenue', 'Sales', 'Turnover', 'Net Bookings', 'Ventes', 'Recettes' and report the data under 'Chiffre d\'affaires'.
+        - If asked for 'Nombre d\'employés', also recognize 'Headcount', 'Effectifs', 'Team Size', 'Employees' and report the data under 'Nombre d\'employés'.
         
         Follow these core principles:
-        1. Be extremely precise about column identification and alignment
-        2. Never substitute missing data with data from other columns
-        3. Rely on visual layout and alignment to determine which value belongs to which period
-        4. Produce JSON output containing only verified, visually confirmed data
-        5. Avoid all speculation or estimation
+        1. Be extremely precise about column identification and alignment.
+        2. Never substitute missing data with data from other columns.
+        3. Rely on visual layout and alignment to determine which value belongs to which period.
+        4. Produce JSON output containing only verified, visually confirmed data, mapped to the primary KPI names.
+        5. Avoid all speculation or estimation.
         
         You should work in {output_language} for any text output.
         """
@@ -340,51 +352,59 @@ def analyze_images_with_gpt(
         user_prompt = f"""
         # DATA EXTRACTION TASK
         
-        I need you to extract financial KPIs from the attached document images for the year {year}, specifically looking for {kpi_list_formatted}.
+        I need you to extract financial KPIs from the attached document images for the year {year}.
+        Specifically look for the following KPIs (and their common synonyms): {kpi_list_formatted}.
+        
+        Map any found synonyms to the corresponding primary KPI name as shown below:
+        Primary KPI Names: {json.dumps(kpi_primary_names, ensure_ascii=False)}
         
         ## TABLE STRUCTURE UNDERSTANDING
         
         The document contains tables with {period_description} for {year}. You MUST:
         
         1. Carefully identify the EXACT headers and columns for: {', '.join(expected_periods)}
-        2. IGNORE all other columns, especially "Total", "YTD", or any similar summary columns
-        3. PAY CLOSE ATTENTION TO VISUAL ALIGNMENT - trace an imaginary vertical line from each column header down to the data cells
-        4. For each KPI row, ONLY extract values that appear directly under the correct period column headers
+        2. IGNORE all other columns, especially "Total", "YTD", or any similar summary columns.
+        3. PAY CLOSE ATTENTION TO VISUAL ALIGNMENT - trace an imaginary vertical line from each column header down to the data cells.
+        4. For each KPI row (identified by its name or a synonym), ONLY extract values that appear directly under the correct period column headers.
         
         ## EXTRACTION RULES
         
-        - POSITION MATTERS: Only extract data that visually appears directly below a specific period header
-        - MISSING VALUES: If a value doesn't appear for a period, mark it as missing rather than take values from adjacent columns
-        - PRESERVE FORMAT: Maintain exact formatting including units (€, $, M, K, %, etc.) and symbols
-        - NEVER GUESS: Do not attempt to derive, calculate, or estimate missing values
-        - COLUMN DISCIPLINE: Values from YTD, Total, or other non-period columns must NEVER be included
+        - POSITION MATTERS: Only extract data that visually appears directly below a specific period header.
+        - SYNONYM MAPPING: If you find data for a synonym, report it under the corresponding primary KPI name provided above.
+        - MISSING VALUES: If a value doesn't appear for a period, mark it as missing rather than take values from adjacent columns.
+        - PRESERVE FORMAT: Maintain exact formatting including units (€, $, M, K, %, etc.) and symbols.
+        - NEVER GUESS: Do not attempt to derive, calculate, or estimate missing values.
+        - COLUMN DISCIPLINE: Values from YTD, Total, or other non-period columns must NEVER be included.
         
         ## HOW TO APPROACH THE TASK
         
-        1. First, carefully analyze the layout and structure of the tables in the images
-        2. Identify the PRECISE column headers corresponding to each period ({', '.join(expected_periods)})
-        3. For each row containing a KPI of interest, follow the row horizontally and locate values EXACTLY aligned with each period column
-        4. For each KPI and each period, verify alignment by visually tracing a straight line from the column header to the data cell
-        5. If a period's column appears empty for a KPI, report it as missing
+        1. First, carefully analyze the layout and structure of the tables in the images.
+        2. Identify the PRECISE column headers corresponding to each period ({', '.join(expected_periods)}).
+        3. For each row containing a KPI of interest (using its primary name or a known synonym), follow the row horizontally and locate values EXACTLY aligned with each period column.
+        4. For each KPI and each period, verify alignment by visually tracing a straight line from the column header to the data cell.
+        5. If a period's column appears empty for a KPI, report it as missing.
         
         ## RESPONSE FORMAT
         
-        Return a JSON object structured like this:
+        Return a JSON object structured like this, using the PRIMARY KPI names as keys:
         ```json
         {{
           "periods": {json.dumps(expected_periods)},
           "kpi": {{
-            "KPI Name 1": {{  
+            "Primary KPI Name 1": {{  // e.g., "Chiffre d'affaires"
               "{expected_periods[0] if expected_periods else 'Period'}": "value with unit", 
               // Add other periods if applicable (e.g., Q2, Q3, H2)
               // Only include periods with actual visible values
             }},
-            // Only include KPIs actually found in the document
+            "Primary KPI Name 2": {{ // e.g., "Nombre d'employés"
+               // ... period data ...
+            }}
+            // Only include PRIMARY KPIs actually found (directly or via synonym) in the document
           }}
         }}
         ```
         
-        IMPORTANT: If a KPI is missing from the document, completely exclude it from the output rather than returning empty values.
+        IMPORTANT: If a requested KPI (or any of its synonyms) is missing from the document, completely exclude it from the output rather than returning empty values.
         """
         
         # Construction du message pour l'API Vision
