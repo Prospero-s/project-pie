@@ -344,6 +344,7 @@ def analyze_images_with_gpt(
         3. Rely on visual layout and alignment to determine which value belongs to which period.
         4. Produce JSON output containing only verified, visually confirmed data, mapped to the primary KPI names.
         5. Avoid all speculation or estimation.
+        6. PRESERVE THE EXACT NUMERIC FORMAT as seen in the document, including units, symbols, and decimal separators.
         
         You should work in {output_language} for any text output.
         """
@@ -375,6 +376,7 @@ def analyze_images_with_gpt(
         - PRESERVE FORMAT: Maintain exact formatting including units (€, $, M, K, %, etc.) and symbols.
         - NEVER GUESS: Do not attempt to derive, calculate, or estimate missing values.
         - COLUMN DISCIPLINE: Values from YTD, Total, or other non-period columns must NEVER be included.
+        - PRESERVE NUMERIC FORMAT: Extract numbers exactly as they appear, keeping the same decimal separators (. or ,) and units.
         
         ## HOW TO APPROACH THE TASK
         
@@ -406,7 +408,7 @@ def analyze_images_with_gpt(
         
         IMPORTANT: If a requested KPI (or any of its synonyms) is missing from the document, completely exclude it from the output rather than returning empty values.
         """
-        
+
         # Construction du message pour l'API Vision
         messages = [
             {
@@ -460,12 +462,12 @@ def analyze_images_with_gpt(
             # S'assurer que "periods" est présent dans le résultat, sinon ajouter les périodes attendues
             if "periods" not in result:
                 result["periods"] = expected_periods
-                
-            # Vérifier que le format des données KPI est correct
-            if "kpi" not in result or not isinstance(result["kpi"], dict):
-                result["kpi"] = {}
-                result["error"] = "Aucune donnée KPI n'a pu être extraite des images"
-                
+
+                # Vérifier que le format des données KPI est correct
+                if "kpi" not in result or not isinstance(result["kpi"], dict):
+                    result["kpi"] = {}
+                    result["error"] = "Aucune donnée KPI n'a pu être extraite des images"
+
             return result
             
         except json.JSONDecodeError:
@@ -486,6 +488,155 @@ def analyze_images_with_gpt(
         logger.error(f"Erreur inattendue lors de l'analyse des images avec GPT: {e}")
         return {"error": f"Unexpected error during image analysis: {e}", "periods": expected_periods, "kpi": {}}
 
+def extract_numeric_value(value_str: str) -> Dict[str, Any]:
+    """
+    Extrait la valeur numérique d'une chaîne et conserve l'unité.
+    Retourne un dictionnaire avec la valeur numérique et les métadonnées.
+    
+    Args:
+        value_str: Chaîne contenant une valeur (ex: "125K€", "-3.2M$", "12%")
+        
+    Returns:
+        Dictionnaire avec les clés:
+        - value: Valeur numérique (float ou int)
+        - display: Valeur formatée pour affichage
+        - unit: Unité extraite
+        - is_numeric: True si la conversion a réussi
+    """
+    if not value_str or value_str == 'N.A':
+        return {
+            "value": None,
+            "display": "N.A",
+            "unit": "",
+            "is_numeric": False
+        }
+    
+    original_value = value_str
+    value_str = str(value_str).strip()
+    
+    # Traiter les valeurs négatives avec parenthèses (ex: "(123)" -> "-123")
+    is_negative = False
+    if value_str.startswith('(') and value_str.endswith(')'):
+        value_str = value_str[1:-1]
+        is_negative = True
+    
+    # Remplacer certaines expressions pour faciliter l'extraction
+    value_str = value_str.replace('−', '-')  # Remplacer le signe moins unicode par un tiret
+    
+    # Gérer explicitement les signes négatifs
+    if value_str.startswith('-'):
+        is_negative = True
+        value_str = value_str[1:]
+    
+    # Extraire le nombre et l'unité avec des expressions régulières
+    import re
+    
+    # Expressions régulières pour différents formats
+    # Formats courants en finance: 12,3 M€, 45K$, 1,234.56€, -78%, (90), etc.
+    patterns = [
+        # Pourcentages: 12% ou 12.3%
+        r'^([\d\s]+[.,]?\d*)\s*(%)',
+        
+        # Devises avec suffixe: 12K€, 5.3M$, etc.
+        r'^([\d\s]+[.,]?\d*)\s*([KkMBG])?\s*([€$£¥])',
+        
+        # Devises avec préfixe: €12K, $5.3M, etc.
+        r'^([€$£¥])\s*([\d\s]+[.,]?\d*)\s*([KkMBG])?',
+        
+        # Multiplicateurs sans devise: 12K, 5.3M, etc.
+        r'^([\d\s]+[.,]?\d*)\s*([KkMBG])',
+        
+        # Nombres simples avec unités potentielles: 123, 456, 789, etc.
+        r'^([\d\s]+[.,]?\d*)(.*)'
+    ]
+    
+    # Tester chaque pattern
+    match = None
+    matched_pattern = None
+    
+    for i, pattern in enumerate(patterns):
+        match = re.match(pattern, value_str, re.IGNORECASE)
+        if match:
+            matched_pattern = i
+            break
+    
+    if not match:
+        return {
+            "value": None,
+            "display": original_value,
+            "unit": "",
+            "is_numeric": False
+        }
+    
+    # Extraire la valeur numérique en fonction du pattern utilisé
+    num_str = None
+    unit = ""
+    
+    if matched_pattern == 0:  # Pourcentages
+        num_str = match.group(1)
+        unit = match.group(2)
+    elif matched_pattern == 1:  # Devises avec suffixe
+        num_str = match.group(1)
+        multiplier = match.group(2) if match.group(2) else ""
+        currency = match.group(3) if match.group(3) else ""
+        unit = multiplier + currency
+    elif matched_pattern == 2:  # Devises avec préfixe
+        currency = match.group(1)
+        num_str = match.group(2)
+        multiplier = match.group(3) if match.group(3) else ""
+        unit = currency + multiplier
+    elif matched_pattern == 3:  # Multiplicateurs sans devise
+        num_str = match.group(1)
+        unit = match.group(2)
+    else:  # Nombres simples avec unités potentielles
+        num_str = match.group(1)
+        unit = match.group(2).strip() if match.group(2) else ""
+    
+    # Nettoyer la chaîne numérique
+    if num_str:
+        # Supprimer les espaces et remplacer la virgule par un point
+        num_str = num_str.replace(' ', '').replace(',', '.')
+    
+    try:
+        # Convertir en nombre
+        num_value = float(num_str)
+        
+        # Appliquer le signe négatif si nécessaire
+        if is_negative:
+            num_value = -num_value
+        
+        # Traitement spécial pour les pourcentages
+        if '%' in unit:
+            # Laisser tel quel (pourcentage)
+            pass
+        else:
+            # Appliquer les multiplicateurs basés sur l'unité
+            if 'K' in unit or 'k' in unit:
+                num_value *= 1000
+            elif 'M' in unit or 'm' in unit:
+                num_value *= 1000000
+            elif 'B' in unit or 'G' in unit or 'b' in unit or 'g' in unit:
+                num_value *= 1000000000
+        
+        # Convertir en entier si c'est un nombre sans décimales
+        if num_value == int(num_value):
+            num_value = int(num_value)
+        
+        return {
+            "value": num_value,
+            "display": original_value,
+            "unit": unit,
+            "is_numeric": True
+        }
+    except (ValueError, TypeError) as e:
+        logger.warning(f"Impossible de convertir '{num_str}' en nombre: {e}")
+        return {
+            "value": None,
+            "display": original_value,
+            "unit": "",
+            "is_numeric": False
+        }
+
 def clean_kpi_data(
     extracted_data: Dict[str, Any], 
     selected_kpis: List[str] = None, 
@@ -496,15 +647,17 @@ def clean_kpi_data(
     """
     Nettoie et vérifie les données KPI extraites pour s'assurer qu'elles correspondent au format attendu.
     Filtre également pour ne garder que les KPI sélectionnés.
+    Convertit les valeurs numériques en nombres tout en conservant les unités.
     
     Args:
         extracted_data: Données extraites par OpenAI
         selected_kpis: Liste des codes KPI demandés
         periodicity: Périodicité des données ('Q' pour trimestriel, 'H' pour semestriel)
         requested_language: Langue demandée (fr ou en)
+        year: Année des données financières
     
     Returns:
-        Données KPI nettoyées avec uniquement les KPI sélectionnés
+        Données KPI nettoyées avec uniquement les KPI sélectionnés et les valeurs numériques convertis
     """
     try:
         # Vérifier que les données ont la structure attendue
@@ -532,6 +685,7 @@ def clean_kpi_data(
             
         # Extraire et nettoyer les données KPI
         clean_kpi = {}
+        numeric_kpi = {}  # Dictionnaire séparé pour les valeurs numériques
         kpi_data = extracted_data.get("kpi", {})
         
         # Normaliser les clés de période si nécessaire
@@ -632,6 +786,8 @@ def clean_kpi_data(
                 
             # Créer une entrée propre pour ce KPI avec normalisation des clés de période
             clean_values = {}
+            numeric_values = {}  # Pour stocker les valeurs numériques séparément
+            
             for orig_period, value in periods_data.items():
                 period = normalize_period_key(orig_period)
                 
@@ -640,17 +796,32 @@ def clean_kpi_data(
                     # Normaliser la valeur (enlever les espaces superflus, etc.)
                     clean_value = str(value).strip()
                     clean_values[period] = clean_value
+                    
+                    # Extraire la valeur numérique mais la stocker séparément
+                    numeric_result = extract_numeric_value(clean_value)
+                    numeric_values[period] = numeric_result
+                    
+                    # Logging détaillé des valeurs extraites
+                    logger.info(f"KPI {fr_kpi_name}, période {period}: valeur={clean_value}, valeur numérique={numeric_result}")
             
             # N'ajouter le KPI que s'il a des valeurs
             if clean_values:
                 clean_kpi[fr_kpi_name] = clean_values
+                numeric_kpi[fr_kpi_name] = numeric_values
         
         logger.info(f"Données KPI nettoyées: {len(clean_kpi)} KPIs trouvés")
+        
+        # Logging détaillé des KPIs numériques
+        for kpi_name, periods_data in numeric_kpi.items():
+            logger.info(f"KPI numérique: {kpi_name}")
+            for period, value_data in periods_data.items():
+                logger.info(f"  - {period}: {value_data.get('value')}, unité: {value_data.get('unit')}")
         
         # Conserver d'autres données potentiellement utiles du résultat original
         result = {
             "kpi": clean_kpi,
-            "periods": periods
+            "periods": periods,
+            "numeric_kpi": numeric_kpi  # Ajouter les valeurs numériques dans un champ séparé
         }
         
         # Récupérer le texte extrait s'il existe
@@ -729,7 +900,7 @@ def process_pdf(
             selected_kpis,
             year
         )
-        
+
         if not extracted_data or not isinstance(extracted_data, dict):
             logger.error("Résultat d'analyse invalide")
             return {
@@ -751,6 +922,9 @@ def process_pdf(
         
         # Ajouter les données nettoyées
         extracted_data["kpi"] = cleaned_data.get("kpi", {})
+        
+        # S'assurer que les valeurs numériques sont incluses
+        extracted_data["numeric_kpi"] = cleaned_data.get("numeric_kpi", {})
         
         # Conserver l'avertissement s'il existe
         if "warning" in cleaned_data:

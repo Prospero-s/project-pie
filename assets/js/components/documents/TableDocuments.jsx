@@ -84,30 +84,43 @@ const TableDocuments = ({ t }) => {
     },
     {
       title: t('table.filename'),
-      dataIndex: 'pdfUrl',
-      key: 'pdfUrl',
-      render: text =>
-        loading ? <Skeleton.Input block active size="small" /> : text,
+      dataIndex: 'filename',
+      key: 'filename',
+      render: (text, record) =>
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : (
+          text || record.pdfUrl || t('table.unknown_filename')
+        ),
     },
     {
       title: t('table.company'),
       dataIndex: 'company',
       key: 'company',
-      render: text =>
-        loading ? <Skeleton.Input block active size="small" /> : text,
+      render: company =>
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : company && company.denomination ? (
+          company.denomination
+        ) : (
+          t('table.unknown_company')
+        ),
     },
     {
       title: t('table.last_update'),
-      dataIndex: 'createdAt',
-      key: 'createdAt',
+      dataIndex: 'addDate',
+      key: 'addDate',
       render: date =>
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : (
+          date &&
           new Date(date).toLocaleDateString('fr-FR', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
           })
         ),
     },

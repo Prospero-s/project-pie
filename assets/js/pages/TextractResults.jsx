@@ -28,9 +28,11 @@ import {
   ClockCircleOutlined,
   PlusOutlined,
   WarningOutlined,
+  SaveOutlined,
 } from '@ant-design/icons';
 import { useUser } from '@/context/userContext';
 import axios from 'axios';
+import documentsService from '@/services/documents/documentsService';
 
 const { Title, Text } = Typography;
 
@@ -58,6 +60,8 @@ const TextractResults = ({ i18n }) => {
       : new Date().getFullYear();
   const processingId = analyzedData?.processingId || null;
 
+  const [savingDocument, setSavingDocument] = useState(false);
+
   useEffect(() => {
     console.warn('Données analysées reçues :', analyzedData);
     if (analyzedData?.data?.kpi) {
@@ -66,6 +70,18 @@ const TextractResults = ({ i18n }) => {
       console.warn('Données KPI reçues :', analyzedData.kpi);
     } else {
       console.warn('Aucune donnée KPI trouvée dans analyzedData');
+    }
+
+    // Afficher les données numériques si elles existent
+    if (analyzedData?.data?.numeric_kpi) {
+      console.warn(
+        'Données numériques KPI reçues :',
+        analyzedData.data.numeric_kpi,
+      );
+    } else if (analyzedData?.numeric_kpi) {
+      console.warn('Données numériques KPI reçues :', analyzedData.numeric_kpi);
+    } else {
+      console.warn('Aucune donnée numérique KPI trouvée dans analyzedData');
     }
   }, [analyzedData]);
 
@@ -93,6 +109,17 @@ const TextractResults = ({ i18n }) => {
       }
 
       console.error('Données à traiter:', data);
+
+      // Afficher les données numériques spécifiquement
+      if (data.data?.numeric_kpi) {
+        console.error('Données numériques détaillées:', data.data.numeric_kpi);
+      } else if (data.numeric_kpi) {
+        console.error('Données numériques détaillées:', data.numeric_kpi);
+      } else {
+        console.error(
+          'Aucune donnée numérique trouvée dans les données à traiter',
+        );
+      }
 
       let periods = [];
 
@@ -520,6 +547,80 @@ const TextractResults = ({ i18n }) => {
     navigate('/documents');
   };
 
+  // Fonction pour sauvegarder les données dans la base de données
+  const handleSaveToDatabase = async () => {
+    try {
+      setSavingDocument(true);
+
+      // Vérification que toutes les données nécessaires sont présentes
+      if (!analyzedData || !analyzedData.pdfUrl) {
+        notification.error({
+          message: t('documents:textract_results.save_error'),
+          description: t('documents:textract_results.missing_pdf'),
+        });
+        setSavingDocument(false);
+        return;
+      }
+
+      // Récupérer le contenu du PDF en base64
+      const pdfResponse = await axios.get(analyzedData.pdfUrl, {
+        responseType: 'blob',
+      });
+
+      // Convertir le blob en base64
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const base64data = reader.result.split(',')[1];
+
+          // Préparer les données pour l'API
+          const documentData = documentsService.prepareDocumentData(
+            analyzedData,
+            base64data,
+          );
+
+          // Appeler l'API pour sauvegarder
+          await documentsService.saveDocument(documentData);
+
+          notification.success({
+            message: t('documents:textract_results.save_success'),
+            description: t('documents:textract_results.save_success_desc'),
+          });
+
+          setSavingDocument(false);
+
+          // Rediriger vers la page des documents
+          setTimeout(() => {
+            navigate('/documents');
+          }, 1500);
+        } catch (error) {
+          console.error('Erreur lors de la sauvegarde:', error);
+          notification.error({
+            message: t('documents:textract_results.save_error'),
+            description: error.message,
+          });
+          setSavingDocument(false);
+        }
+      };
+      reader.onerror = error => {
+        console.error('Erreur lors de la lecture du PDF:', error);
+        notification.error({
+          message: t('documents:textract_results.save_error'),
+          description: t('documents:textract_results.pdf_read_error'),
+        });
+        setSavingDocument(false);
+      };
+      reader.readAsDataURL(pdfResponse.data);
+    } catch (error) {
+      console.error('Erreur lors de la récupération du PDF:', error);
+      notification.error({
+        message: t('documents:textract_results.save_error'),
+        description: error.message,
+      });
+      setSavingDocument(false);
+    }
+  };
+
   const renderPeriodicityInfo = () => {
     let periodicityLabel = '';
     if (periodicity === 'Q') {
@@ -860,6 +961,19 @@ const TextractResults = ({ i18n }) => {
                   <Button onClick={() => navigate(-1)}>
                     {t('analyze.cancel')}
                   </Button>
+                  {analyzedData && (
+                    <Button
+                      type="primary"
+                      onClick={handleSaveToDatabase}
+                      loading={savingDocument}
+                      icon={<SaveOutlined />}
+                    >
+                      {t(
+                        'documents:textract_results.save_to_database',
+                        'Sauvegarder en base de données',
+                      )}
+                    </Button>
+                  )}
                 </Space>
               </div>
             </Space>

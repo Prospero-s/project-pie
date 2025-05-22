@@ -286,7 +286,7 @@ def cleanup_files(processing_id):
     # Nettoyer aussi le fichier JSON de résultat
     result_json_path = os.path.join(app.config['PROCESSED_FOLDER'], f"{processing_id}_vision_results.json")
     safe_delete(result_json_path)
-    
+
     return jsonify({"message": f"Cleanup attempted for ID: {processing_id}"}), 200
     """
 
