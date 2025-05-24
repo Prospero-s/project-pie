@@ -26,6 +26,8 @@ import enDocuments from './locales/en/documents.json';
 import frDocuments from './locales/fr/documents.json';
 import enMetrics from './locales/en/metrics.json';
 import frMetrics from './locales/fr/metrics.json';
+import enTextract from './locales/en/textract.json';
+import frTextract from './locales/fr/textract.json';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -47,6 +49,7 @@ i18n.use(initReactI18next).init({
       charts: frCharts,
       documents: frDocuments,
       metrics: frMetrics,
+      textract: frTextract,
     },
     en: {
       translation: {
@@ -66,6 +69,7 @@ i18n.use(initReactI18next).init({
       charts: enCharts,
       documents: enDocuments,
       metrics: enMetrics,
+      textract: enTextract,
     },
   },
   lng: 'fr',

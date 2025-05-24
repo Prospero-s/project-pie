@@ -1,9 +1,8 @@
 {
-  "title": "Les documents",
+  "title": "Documents",
   "modal": {
-    "upload_title": "Envoyer un document",
-    "select_file": "Selectionner un fichier",
-    "validate": "Envoyer et analyser"
+    "upload_title": "Analyser un document financier",
+    "select_file": "Sélectionner un fichier PDF"
   },
   "analyze": {
     "title": "Previsualisation du PDF",
@@ -40,6 +39,133 @@
     "delete_error": "Erreur lors de la suppression du document.",
     "loading_error": "Erreur lors du chargement des documents"
   },
-  "no_documents": "Aucun fichier PDF disponible",
-  "back": "Retour"
+  "textract_results": {
+    "edit": "Modifier",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "document_source": "Document source",
+    "pdf_available": "PDF disponible",
+    "kpi_table": "Tableau de KPI",
+    "ai_validated": "Validé par IA",
+    "save_changes": "Sauvegarder les modifications",
+    "no_modifications": "Aucune modification à enregistrer",
+    "modifications_saved": "Modifications enregistrées",
+    "modifications_success": "Vos modifications ont été enregistrées avec succès",
+    "periodicity_info": {
+      "year": "Année",
+      "periodicity": "Périodicité",
+      "quarterly": "Trimestrielle",
+      "half_yearly": "Semestrielle",
+      "yearly": "Annuel",
+      "all_years": "Toutes les années",
+      "periods_detected": "périodes détectées"
+    },
+    "validation": {
+      "error_title": "Erreur de validation",
+      "form_failed": "Erreur lors de la validation du formulaire"
+    },
+    "extracted_document": "Document extrait",
+    "no_periods": "Aucune période détectée",
+    "no_data": "Aucune donnée KPI trouvée",
+    "alerts": {
+      "values_auto_filled": "Les valeurs ont été extraites automatiquement. Vous pouvez les modifier si nécessaire.",
+      "values_modified": "Valeur modifiée",
+      "verification_in_progress": "Vérification des données en cours...",
+      "validation_failed": "Échec de la validation des données"
+    },
+    "kpi_tooltips": {
+      "revenue": "Chiffre d'affaires de l'entreprise",
+      "net_bookings": "Réservations nettes",
+      "gross_margin": "Marge brute (revenus - coûts directs)",
+      "customer_acquisition_cost": "Coût moyen d'acquisition d'un nouveau client",
+      "cac_ratio": "Ratio coût d'acquisition / valeur client",
+      "customer_lifetime_value": "Valeur totale d'un client sur sa durée de vie",
+      "headcount": "Nombre total d'employés",
+      "cash_burn": "Taux de consommation de trésorerie",
+      "cash_balance": "Solde de trésorerie",
+      "ebitda": "Bénéfice avant intérêts, impôts, dépréciation et amortissement",
+      "arr": "Revenu annuel récurrent",
+      "net_arr": "Revenu annuel récurrent net",
+      "arr_base": "Base de revenu annuel récurrent",
+      "organic_arr_growth": "Croissance organique de l'ARR",
+      "enterprise_nrr": "Taux de rétention net des revenus des entreprises",
+      "churn": "Taux d'attrition des clients",
+      "mrr": "Revenu mensuel récurrent",
+      "funding_amount": "Montant total des fonds levés"
+    },
+    "tag_labels": {
+      "not_available": "N/A",
+      "modified": "Modifié",
+      "auto_filled": "Rempli auto",
+      "verified": "Vérifié"
+    },
+    "openai_validation": {
+      "no_content": "Aucun contenu textuel à valider",
+      "no_extracted_data": "Aucune donnée extraite à valider",
+      "success": "Validation OpenAI réussie",
+      "error": "Erreur lors de la validation OpenAI",
+      "communication_error": "Erreur de communication avec OpenAI"
+    },
+    "add_kpi": {
+      "button": "Ajouter un KPI",
+      "modal_title": "Ajouter un nouveau KPI",
+      "kpi_name_label": "Nom du KPI",
+      "kpi_name_placeholder": "Entrez le nom du nouveau KPI",
+      "kpi_name_required": "Le nom du KPI est requis",
+      "add_button": "Ajouter",
+      "duplicate_error": "Un KPI avec ce nom existe déjà.",
+      "success": "KPI '{kpiName}' ajouté avec succès.",
+      "validation_error": "Erreur de validation. Vérifiez les champs."
+    }
+  },
+  "upload": {
+    "title": "Télécharger un document",
+    "description": "Téléchargez des documents pour extraire automatiquement les données financières",
+    "select_kpis": "Sélectionnez les KPI à extraire",
+    "select_all_kpis": "Tout sélectionner",
+    "select_kpis_placeholder": "Sélectionnez un ou plusieurs KPI",
+    "select_periodicity": "Sélectionnez la périodicité",
+    "quarterly": "Trimestriel",
+    "half_yearly": "Semestriel",
+    "yearly": "Annuel",
+    "select_year": "Sélectionnez l'année",
+    "select_year_placeholder": "Année à analyser",
+    "analyze": "Analyser le document",
+    "kpi_labels": {
+      "chiffre_affaire": "Chiffre d'affaires",
+      "marge_brute": "Marge brute",
+      "cout_acquisition": "Coût d'acquisition client",
+      "valeur_vie_client": "Valeur vie client",
+      "nombre_employe": "Nombre d'employés",
+      "argent_brule": "Cash burn",
+      "ebitda": "EBITDA",
+      "revenu_annuel": "Revenu annuel récurrent (ARR)",
+      "revenu_mensuel": "Revenu mensuel récurrent (MRR)",
+      "montant_leve": "Montant levé"
+    },
+    "tooltips": {
+      "revenue": "Revenus générés par les ventes",
+      "gross_margin": "Profit après déduction des coûts directs",
+      "customer_acquisition_cost": "Coût moyen pour acquérir un nouveau client",
+      "customer_lifetime_value": "Valeur totale d'un client sur sa durée de vie",
+      "headcount": "Nombre total d'employés dans l'entreprise",
+      "cash_burn": "Taux auquel l'entreprise dépense son capital",
+      "ebitda": "Bénéfice avant intérêts, impôts, dépréciation et amortissement",
+      "arr": "Revenus récurrents annualisés",
+      "mrr": "Revenus récurrents mensuels",
+      "funding_amount": "Montant total de capital levé"
+    },
+    "errors": {
+      "no_file": "Veuillez sélectionner un fichier à analyser",
+      "no_kpi": "Veuillez sélectionner au moins un KPI à extraire",
+      "file_size_error": "Le fichier est trop volumineux. Taille maximum: 5MB",
+      "auth_error": "Erreur d'authentification",
+      "no_data": "Aucune donnée n'a pu être extraite",
+      "analysis_error": "Erreur lors de l'analyse du document",
+      "no_response": "Le serveur n'a pas répondu. Veuillez réessayer"
+    },
+    "file_selected": "Fichier sélectionné: {name}",
+    "file_removed": "Fichier supprimé",
+    "success": "Document analysé avec succès"
+  }
 }

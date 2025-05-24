@@ -9,9 +9,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
-import '@ant-design/v5-patch-for-react-19';
-import { unstableSetRender } from 'antd';
-import { createRoot } from 'react-dom/client';
 import './css/app.css';
 
 import './js/lib/polyfills';
@@ -43,17 +40,6 @@ import GroupRedirect from '@/components/common/redirect/GroupRedirect';
 import LanguageRedirect from '@/components/common/redirect/LanguageRedirect';
 import { RedirectProvider } from '@/context/redirectContext';
 import.meta.glob(['../img/**']);
-
-// Exposer navigate globalement
-window._env_ = {
-  navigate: path => {
-    if (window._router) {
-      window._router.navigate(path);
-    } else {
-      window.location.href = path;
-    }
-  },
-};
 
 // Détecter la langue initiale à partir de l'URL ou des préférences
 const detectInitialLanguage = () => {
@@ -96,17 +82,6 @@ Amplify.configure({
       secure: true,
     },
   },
-});
-
-// Configuration de compatibilité Ant Design - React 19
-unstableSetRender((node, container) => {
-  container._reactRoot ||= createRoot(container);
-  const root = container._reactRoot;
-  root.render(node);
-  return async () => {
-    await new Promise(resolve => setTimeout(resolve, 0));
-    root.unmount();
-  };
 });
 
 ReactDOM.createRoot(document.getElementById('root')).render(
