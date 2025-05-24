@@ -200,7 +200,7 @@ const GroupSelection = ({ i18n }) => {
       });
 
       const currentLang = i18n.language;
-      await navigate(`/${currentLang}/dashboard`, { replace: true });
+      navigate(`/${currentLang}/dashboard`, { replace: true });
     } catch (error) {
       let errorMessage = t('notifications.create_error.description');
       let errorTitle = t('notifications.create_error.title');
@@ -230,13 +230,15 @@ const GroupSelection = ({ i18n }) => {
     try {
       setUiState(prevState => ({ ...prevState, isRedirecting: true }));
       await axios.post(`/api/group-invitations/accept/${token}`);
-      setUiState(prevState => ({ ...prevState, success: t('join-success') }));
+
       const currentLang = i18n.language;
-      await navigate(`/${currentLang}/dashboard`, { replace: true });
-    } catch (error) {
-      setUiState(prevState => ({ ...prevState, error: t('join-error') }));
-      setUiState(prevState => ({ ...prevState, isRedirecting: false }));
-      throw error;
+      navigate(`/${currentLang}/dashboard`, { replace: true });
+    } catch {
+      setUiState(prevState => ({
+        ...prevState,
+        error: t('join-error'),
+        isRedirecting: false,
+      }));
     }
   };
 

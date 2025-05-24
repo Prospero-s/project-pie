@@ -9,33 +9,38 @@ const SelectCreationType = ({ onSelect, onNext, t }) => {
   };
 
   return (
-    <Space
-      direction="horizontal"
-      size="large"
-      className="w-full justify-center"
-    >
-      <Card
-        hoverable
-        className="w-64 text-center cursor-pointer"
-        onClick={() => handleSelect('automatic')}
+    <div className="w-full flex flex-col items-center">
+      <Space
+        direction="horizontal"
+        size="large"
+        className="w-full justify-center flex flex-wrap gap-4"
+        style={{ marginBottom: '20px' }}
       >
-        <DatabaseOutlined className="text-4xl text-blue-500 mb-4" />
-        <h3 className="text-lg font-medium">
-          {t('creation.automatic_creation')}
-        </h3>
-        <p>{t('creation.automatic_description')}</p>
-      </Card>
+        <Card
+          hoverable
+          className="w-64 text-center cursor-pointer flex-shrink-0 mb-4"
+          onClick={() => handleSelect('automatic')}
+        >
+          <DatabaseOutlined className="text-4xl text-blue-500 mb-4" />
+          <h3 className="text-lg font-medium">
+            {t('creation.automatic_creation')}
+          </h3>
+          <p>{t('creation.automatic_description')}</p>
+        </Card>
 
-      <Card
-        hoverable
-        className="w-64 text-center cursor-pointer"
-        onClick={() => handleSelect('manual')}
-      >
-        <FormOutlined className="text-4xl text-green-500 mb-4" />
-        <h3 className="text-lg font-medium">{t('creation.manual_creation')}</h3>
-        <p>{t('creation.manual_description')}</p>
-      </Card>
-    </Space>
+        <Card
+          hoverable
+          className="w-64 text-center cursor-pointer flex-shrink-0 mb-4"
+          onClick={() => handleSelect('manual')}
+        >
+          <FormOutlined className="text-4xl text-green-500 mb-4" />
+          <h3 className="text-lg font-medium">
+            {t('creation.manual_creation')}
+          </h3>
+          <p>{t('creation.manual_description')}</p>
+        </Card>
+      </Space>
+    </div>
   );
 };
 

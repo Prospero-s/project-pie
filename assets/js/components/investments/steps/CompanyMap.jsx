@@ -103,9 +103,13 @@ const CompanyMap = ({ address }) => {
           .addTo(map);
 
         L.tileLayer(
-          'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png',
+          'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
           {
-            maxZoom: 20,
+            attribution:
+              '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+
+            subdomains: 'abcd',
+            maxZoom: 19,
           },
         ).addTo(map);
 

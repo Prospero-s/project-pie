@@ -6,53 +6,64 @@
  */
 
 // any CSS you import will output into a single css file (app.css in this case)
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import ReactDOM from "react-dom/client";
-import "./css/app.css";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ReactDOM from 'react-dom/client';
+import '@ant-design/v5-patch-for-react-19';
+import { unstableSetRender } from 'antd';
+import { createRoot } from 'react-dom/client';
+import './css/app.css';
 
 import './js/lib/polyfills';
 import { Amplify } from 'aws-amplify';
 import { I18nextProvider } from 'react-i18next';
+
 import i18n from "./js/i18n";
 import ReduxProvider from "./js/redux/provider";
 
-import { UserProvider } from "@/context/userContext";
-import SignIn from "@/pages/SignIn";
-import SignUp from "@/pages/SignUp";
-import Dashboard from "@/pages/Dashboard";
-import Investments from "@/pages/Investments";
-import AllCompanies from "@/pages/AllCompanies";
-import AuthCallback from "@/pages/AuthCallback";
-import GroupSelection from "@/pages/GroupSelection";
-import CompanyDetails from "@/pages/CompanyDetails";
-import TextractResults from "@/pages/TextractResults";
-import EditDocument from "@/pages/EditDocument";
-import Documents from "@/pages/Documents";
 
-import AuthLayout from "@/components/common/layout/AuthLayout";
-import ProtectedRoute from "@/components/common/auth/ProtectedRoute";
-import AppLayout from "@/components/common/layout/AppLayout";
-import GroupRedirect from "@/components/common/redirect/GroupRedirect";
+import { UserProvider } from '@/context/userContext';
+import SignIn from '@/pages/SignIn';
+import SignUp from '@/pages/SignUp';
+import Dashboard from '@/pages/Dashboard';
+import Investments from '@/pages/Investments';
+import AllCompanies from '@/pages/AllCompanies';
+import AuthCallback from '@/pages/AuthCallback';
+import GroupSelection from '@/pages/GroupSelection';
+import CompanyDetails from '@/pages/CompanyDetails';
+import TextractResults from '@/pages/TextractResults';
+import EditDocument from '@/pages/EditDocument';
+import Documents from '@/pages/Documents';
 
-import LanguageRedirect from "@/components/common/redirect/LanguageRedirect";
-import { RedirectProvider } from "@/context/redirectContext";
-import.meta.glob(["../img/**"]);
+import AuthLayout from '@/components/common/layout/AuthLayout';
+import ProtectedRoute from '@/components/common/auth/ProtectedRoute';
+import AppLayout from '@/components/common/layout/AppLayout';
+import GroupRedirect from '@/components/common/redirect/GroupRedirect';
+
+import LanguageRedirect from '@/components/common/redirect/LanguageRedirect';
+import { RedirectProvider } from '@/context/redirectContext';
+import.meta.glob(['../img/**']);
 
 // Exposer navigate globalement
 window._env_ = {
-  navigate: (path) => navigate(path)
+  navigate: path => {
+    if (window._router) {
+      window._router.navigate(path);
+    } else {
+      window.location.href = path;
+    }
+  },
 };
 
 // Détecter la langue initiale à partir de l'URL ou des préférences
 const detectInitialLanguage = () => {
   const pathSegments = window.location.pathname.split('/').filter(Boolean);
   const allowedLanguages = ['fr', 'en'];
-  
+
   if (pathSegments.length > 0 && allowedLanguages.includes(pathSegments[0])) {
     return pathSegments[0];
   }
-  
+
   const storedLang = localStorage.getItem('preferredLanguage');
   const userLang = navigator.language.split('-')[0];
   return storedLang || (allowedLanguages.includes(userLang) ? userLang : 'fr');
@@ -76,18 +87,29 @@ Amplify.configure({
       redirectSignOut: `${window.location.origin}/${initialLang}/auth/signin`,
       responseType: 'code',
       clientId: import.meta.env.VITE_AWS_CLIENT_ID,
-      providers: ['Google', 'Microsoft']
+      providers: ['Google', 'Microsoft'],
     },
     cookieStorage: {
       domain: 'localhost',
       path: '/',
       expires: 365,
-      secure: true
-    }
-  }
+      secure: true,
+    },
+  },
 });
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+// Configuration de compatibilité Ant Design - React 19
+unstableSetRender((node, container) => {
+  container._reactRoot ||= createRoot(container);
+  const root = container._reactRoot;
+  root.render(node);
+  return async () => {
+    await new Promise(resolve => setTimeout(resolve, 0));
+    root.unmount();
+  };
+});
+
+ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <I18nextProvider i18n={i18n}>
       <UserProvider>
@@ -141,5 +163,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         </RedirectProvider>
       </UserProvider>
     </I18nextProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

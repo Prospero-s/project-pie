@@ -3,6 +3,7 @@ import { Modal, Form, Input, Button, Select, notification } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { sendNotification } from '@/services/notification/notificationService';
 
 const { Option } = Select;
 
@@ -37,6 +38,14 @@ const InviteMemberModal = ({
             'x-cognito-name': user?.user_metadata?.full_name,
           },
         },
+      );
+
+      sendNotification(
+        user,
+        'Invitation de groupe',
+        `${user?.email} vous a invité au groupe`,
+        'group_invitation',
+        values.email,
       );
 
       form.resetFields();

@@ -14,9 +14,9 @@ const TextractResults = ({ i18n }) => {
   const { t } = useTranslation('documents', { i18n });
   const company = analyzedData?.company || null;
   const [editedText, setEditedText] = useState(
-    analyzedData?.text?.content && Array.isArray(analyzedData.text.content) 
-      ? analyzedData.text.content.join("\n") 
-      : ""
+    analyzedData?.text?.content && Array.isArray(analyzedData.text.content)
+      ? analyzedData.text.content.join('\n')
+      : '',
   );
 
   const handleTextChange = e => {
@@ -58,8 +58,8 @@ const TextractResults = ({ i18n }) => {
     <>
       {!analyzedData ? (
         <div style={{ padding: 20 }}>
-          <Title level={4}>Aucun résultat disponible</Title>
-          <Button onClick={() => navigate(-1)}>Retour</Button>
+          <Title level={4}>{t('no_documents')}</Title>
+          <Button onClick={() => navigate(-1)}>{t('back')}</Button>
         </div>
       ) : (
         <div style={{ padding: 20 }}>
@@ -112,7 +112,7 @@ const TextractResults = ({ i18n }) => {
                     style={{ width: '100%', height: '500px', border: 'none' }}
                   />
                 ) : (
-                  <Text>Aucun fichier PDF disponible.</Text>
+                  <Text>{t('no_documents')}</Text>
                 )}
               </div>
             </Col>

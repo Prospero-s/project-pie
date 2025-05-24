@@ -14,6 +14,7 @@ const TableInvestments = ({
   isModalOpen,
   setIsModalOpen,
   onAddClick,
+  onEmptyStateChange,
 }) => {
   const { t } = useTranslation('investments', { i18n });
   const lng = i18n.language;
@@ -45,6 +46,16 @@ const TableInvestments = ({
       sortOrder: 'desc',
     });
   }, []);
+
+  useEffect(() => {
+    const isEmpty =
+      investments.length === 0 &&
+      !Object.values(activeFilters).some(filter => filter.length > 0);
+
+    if (typeof onEmptyStateChange === 'function') {
+      onEmptyStateChange(isEmpty);
+    }
+  }, [investments, activeFilters, onEmptyStateChange]);
 
   const loadInvestments = async (params = {}) => {
     try {
@@ -189,7 +200,7 @@ const TableInvestments = ({
                 alt={record?.company?.name ?? 'company-default-logo'}
                 className="w-10 h-10 rounded-full"
               />
-              <span>{text || '-'}</span>
+              <span>{t('company_details.company.name')}</span>
             </div>
           </Link>
         ),

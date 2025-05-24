@@ -46,5 +46,25 @@
     "cancel": "Annuler",
     "save": "Enregistrer",
     "retry": "Réessayer"
+  },
+  "notification": {
+    "label": "Notifications",
+    "send_request_group": "Invitation de groupe",
+    "send_reminder_bilan": "Rappel de bilan",
+    "email_enabled": "Email",
+    "sms_enabled": "SMS",
+    "push_enabled": "Push"
+  },
+  "preferences": {
+    "label": "Préférences du compte",
+    "languages": {
+      "label": "Langue et région",
+      "placeholder": "Choisir une langue",
+      "french": "français",
+      "english": "anglais",
+      "germany": "allemand"
+    },
+    "delete_account": "Supprimer votre compte",
+    "btn_delete_account": "Supprimer le compte"
   }
 } 
