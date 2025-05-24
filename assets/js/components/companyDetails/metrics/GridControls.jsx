@@ -26,8 +26,8 @@ const { Text } = Typography;
 
 // Données statiques pour les requêtes prédéfinies (utilisées uniquement si directFetchMode = false)
 const PREDEFINED_QUERIES = [
-  { 
-    id: '1', 
+    { 
+      id: '1', 
     name: 'Revenus mensuels',
     query: 'monthly_revenue',
     description: 'Affiche les revenus mensuels de l\'entreprise au cours des 12 derniers mois',
@@ -45,9 +45,9 @@ const PREDEFINED_QUERIES = [
       { month: '2022-08', revenue: 430000 },
       { month: '2022-07', revenue: 410000 }
     ]
-  },
-  { 
-    id: '2', 
+    },
+    { 
+      id: '2', 
     name: 'Clients par secteur',
     query: 'clients_by_sector',
     description: 'Répartition des clients par secteur d\'activité',
@@ -59,9 +59,9 @@ const PREDEFINED_QUERIES = [
       { sector: 'Commerce', client_count: 18 },
       { sector: 'Industrie', client_count: 15 }
     ]
-  },
-  { 
-    id: '3', 
+    },
+    { 
+      id: '3', 
     name: 'Croissance ARR',
     query: 'arr_growth', 
     description: 'Évolution de l\'ARR (Annual Recurring Revenue) par trimestre',
@@ -75,9 +75,9 @@ const PREDEFINED_QUERIES = [
       { year: 2021, quarter: 'Q4', arr_value: 3400000 },
       { year: 2021, quarter: 'Q3', arr_value: 3100000 }
     ]
-  },
-  { 
-    id: '4', 
+    },
+    { 
+      id: '4', 
     name: 'Top 10 clients',
     query: 'top_clients',
     description: 'Liste des 10 plus grands clients par valeur',
@@ -93,9 +93,9 @@ const PREDEFINED_QUERIES = [
       { client_name: 'GreenEco Innovations', annual_value: 180000 },
       { client_name: 'TransportationNow', annual_value: 170000 }
     ]
-  },
-  { 
-    id: '5', 
+    },
+    { 
+      id: '5', 
     name: 'Évolution des effectifs',
     query: 'headcount',
     description: 'Évolution du nombre d\'employés par trimestre',
@@ -109,9 +109,9 @@ const PREDEFINED_QUERIES = [
       { year: 2021, quarter: 'Q4', headcount: 65 },
       { year: 2021, quarter: 'Q3', headcount: 60 }
     ]
-  },
-  { 
-    id: '6', 
+    },
+    { 
+      id: '6', 
     name: 'Investissements',
     query: 'quarterly_investments',
     description: 'Valeur des investissements par trimestre',
@@ -215,7 +215,7 @@ const GridControls = () => {
       fetchCompanies();
     }
   }, [isCalculationModalVisible, id]);
-
+  
   // Colonnes pour les résultats (détectées dynamiquement à partir des résultats)
   const generateColumns = (results) => {
     if (!results || results.length === 0) return [];
@@ -528,16 +528,16 @@ const GridControls = () => {
               setErrorMessage(data.error);
               if (data.details) {
                 console.error(data.details);
-              }
-            } else {
+          }
+        } else {
               // Adapter au format de réponse du contrôleur qui encapsule les données dans 'results'
               const results = data.results || data;
               setQueryResults(results);
             }
           } else {
             setErrorMessage(`Erreur ${response.status}: ${response.statusText}`);
-          }
-        } catch (error) {
+      }
+    } catch (error) {
           console.error("Erreur lors du chargement des données:", error);
           setErrorMessage(`Erreur lors du chargement des données: ${error.message}`);
           // En mode développement, utiliser les données statiques en cas d'erreur
@@ -545,7 +545,7 @@ const GridControls = () => {
             console.log("Utilisation des données statiques en mode fallback");
             setQueryResults(selectedQuery.data);
           }
-        } finally {
+    } finally {
           setDataLoading(false);
         }
       } else {
@@ -1312,7 +1312,7 @@ const GridControls = () => {
               onClose={() => removeFilter(index)}
               className="mr-1 mb-1"
             >
-              <FilterOutlined /> <strong>{filter.column}</strong> {operatorText} "{valueText}"
+              <FilterOutlined /> <strong>{t(`data_explorer.column_header`, {column: filter.column})}</strong> {operatorText} "{valueText}"
             </Tag>
           );
         })}
@@ -1697,7 +1697,7 @@ const GridControls = () => {
                   
                   {/* Tableau de données avec colonnes enrichies */}
                   <div className="overflow-auto max-h-96">
-                    <Table 
+          <Table 
                       dataSource={displayData} 
                       columns={tableColumns.map(col => ({
                         ...col,
@@ -1709,7 +1709,7 @@ const GridControls = () => {
                           </Dropdown>
                         ),
                       }))}
-                      rowKey={(record, index) => index}
+            rowKey={(record, index) => index}
                       pagination={false}
                       size="small"
                       bordered
@@ -1795,7 +1795,7 @@ const GridControls = () => {
                 >
                   {displayData && displayData.length > 0 && 
                     getNonNumericColumns(displayData).map(column => (
-                      <Option key={column} value={column}>{column}</Option>
+                      <Option key={column} value={column}>{t(`data_explorer.column_header`, {column})}</Option>
                     ))
                   }
                 </Select>
