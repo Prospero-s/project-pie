@@ -165,4 +165,107 @@ class CompanyInvestmentController extends AbstractController
             ], 400);
         }
     }
+
+    /**
+     * Récupère la liste des requêtes prédéfinies pour l'explorateur de données
+     */
+    #[Route('/query/predefined', name: 'get_predefined_queries', methods: ['GET'])]
+    public function getPredefinedQueries(Request $request): JsonResponse
+    {
+        try {
+            // Récupérer l'ID Cognito depuis les headers
+            $cognitoId = $request->headers->get('x-cognito-id');
+            
+            // Log pour le débogage
+            if (!$cognitoId) {
+                return new JsonResponse([
+                    'error' => 'Utilisateur non authentifié',
+                    'details' => 'L\'en-tête x-cognito-id est manquant ou vide'
+                ], 401);
+            }
+            
+            // Chercher l'utilisateur par son ID Cognito
+            $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
+            if (!$user) {
+                return new JsonResponse([
+                    'error' => 'Utilisateur non trouvé',
+                    'details' => 'Aucun utilisateur trouvé avec cet identifiant Cognito'
+                ], 401);
+            }
+
+            $queries = $this->companyInvestmentRepository->getPredefinedQueries();
+
+            return new JsonResponse([
+                'queries' => $queries
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'error' => $e->getMessage(),
+                'details' => 'Une erreur est survenue lors de la récupération des requêtes prédéfinies'
+            ], 400);
+        }
+    }
+
+    /**
+     * Exécute une requête prédéfinie en fonction de son ID
+     */
+    #[Route('/query/execute', name: 'execute_query', methods: ['POST'])]
+    public function executeQuery(Request $request): JsonResponse
+    {
+        try {
+            // Récupérer l'ID Cognito depuis les headers
+            $cognitoId = $request->headers->get('x-cognito-id');
+            
+            // Log pour le débogage
+            if (!$cognitoId) {
+                return new JsonResponse([
+                    'error' => 'Utilisateur non authentifié',
+                    'details' => 'L\'en-tête x-cognito-id est manquant ou vide'
+                ], 401);
+            }
+            
+            // Chercher l'utilisateur par son ID Cognito
+            $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
+            if (!$user) {
+                return new JsonResponse([
+                    'error' => 'Utilisateur non trouvé',
+                    'details' => 'Aucun utilisateur trouvé avec cet identifiant Cognito'
+                ], 401);
+            }
+
+            $data = json_decode($request->getContent(), true);
+            
+            if (!isset($data['queryId'])) {
+                return new JsonResponse([
+                    'error' => 'Identifiant de requête manquant',
+                    'details' => 'Le paramètre queryId est requis'
+                ], 400);
+            }
+            
+            if (!isset($data['companyId'])) {
+                return new JsonResponse([
+                    'error' => 'Identifiant d\'entreprise manquant',
+                    'details' => 'Le paramètre companyId est requis'
+                ], 400);
+            }
+
+            $queryId = $data['queryId'];
+            $companyId = (int)$data['companyId'];
+
+            $results = $this->companyInvestmentRepository->executeQueryById(
+                $queryId,
+                $companyId,
+                $user->getUserGroup()
+            );
+
+            return new JsonResponse([
+                'results' => $results
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'error' => $e->getMessage(),
+                'details' => 'Une erreur est survenue lors de l\'exécution de la requête'
+            ], 400);
+        }
+    }
 }

@@ -17,7 +17,10 @@ import './css/app.css';
 import './js/lib/polyfills';
 import { Amplify } from 'aws-amplify';
 import { I18nextProvider } from 'react-i18next';
-import i18n from './js/i18n';
+
+import i18n from "./js/i18n";
+import ReduxProvider from "./js/redux/provider";
+
 
 import { UserProvider } from '@/context/userContext';
 import SignIn from '@/pages/SignIn';
@@ -111,74 +114,52 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <I18nextProvider i18n={i18n}>
       <UserProvider>
         <RedirectProvider>
-          <Router>
-            <LanguageRedirect />
-            <GroupRedirect />
-            <Routes>
-              <Route
-                path="/:lng/auth/*"
-                element={
-                  <AuthLayout i18n={i18n}>
-                    <Routes>
-                      <Route path="signin" element={<SignIn i18n={i18n} />} />
-                      <Route path="signup" element={<SignUp i18n={i18n} />} />
-                    </Routes>
-                  </AuthLayout>
-                }
-              />
-              <Route
-                path="/:lng/group-selection"
-                element={
-                  <ProtectedRoute i18n={i18n}>
-                    <GroupSelection i18n={i18n} />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/:lng/*"
-                element={
-                  <ProtectedRoute i18n={i18n}>
-                    <AppLayout i18n={i18n}>
+          <ReduxProvider>
+            <Router>
+              <LanguageRedirect />
+              <GroupRedirect />
+              <Routes>
+                <Route
+                  path="/:lng/auth/*"
+                  element={
+                    <AuthLayout i18n={i18n}>
                       <Routes>
-                        <Route
-                          path="dashboard"
-                          element={<Dashboard i18n={i18n} />}
-                        />
-                        <Route
-                          path="investments"
-                          element={<Investments i18n={i18n} />}
-                        />
-                        <Route
-                          path="companies"
-                          element={<AllCompanies i18n={i18n} />}
-                        />
-                        <Route
-                          path="company/details/:id"
-                          element={<CompanyDetails i18n={i18n} />}
-                        />
-                        <Route
-                          path="textract-results"
-                          element={<TextractResults i18n={i18n} />}
-                        />
-                        <Route
-                          path="/documents/edit/:id"
-                          element={<EditDocument i18n={i18n} />}
-                        />
-                        <Route
-                          path="documents"
-                          element={<Documents i18n={i18n} />}
-                        />
+                        <Route path="signin" element={<SignIn i18n={i18n} />} />
+                        <Route path="signup" element={<SignUp i18n={i18n} />} />
                       </Routes>
-                    </AppLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/auth/callback"
-                element={<AuthCallback i18n={i18n} />}
-              />
-            </Routes>
-          </Router>
+                    </AuthLayout>
+                  }
+                />
+                <Route
+                  path="/:lng/group-selection"
+                  element={
+                    <ProtectedRoute i18n={i18n}>
+                      <GroupSelection i18n={i18n} />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/:lng/*"
+                  element={
+                    <ProtectedRoute i18n={i18n}>
+                      <AppLayout i18n={i18n}>
+                        <Routes>
+                          <Route path="dashboard" element={<Dashboard i18n={i18n} />} />
+                          <Route path="investments" element={<Investments i18n={i18n} />} />
+                          <Route path="companies" element={<AllCompanies i18n={i18n} />} />
+                          <Route path="company/details/:id" element={<CompanyDetails i18n={i18n} />} />
+                          <Route path="textract-results" element={<TextractResults i18n={i18n}/>} />
+                          <Route path="/documents/edit/:id" element={<EditDocument i18n={i18n}/>} />
+                          <Route path="documents" element={<Documents i18n={i18n} />} />
+                        </Routes>
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/auth/callback" element={<AuthCallback i18n={i18n} />} />
+              </Routes>
+            </Router>
+          </ReduxProvider>
         </RedirectProvider>
       </UserProvider>
     </I18nextProvider>
