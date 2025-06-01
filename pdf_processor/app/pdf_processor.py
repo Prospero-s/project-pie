@@ -225,44 +225,64 @@ def get_kpi_mapping(kpi_code: str, language: str) -> List[str]:
     """
     mappings = {
         'chiffre_affaire': {
-            'fr': ["Chiffre d'affaires", "Revenu", "CA", "Ventes", "Recettes", "Net Bookings"],
-            'en': ["Revenue", "Sales", "Turnover", "Net Bookings", "Income"]
+            'fr': ["Chiffre d'affaires", "Revenu", "CA", "Ventes", "Recettes", "Net Bookings", "Revenus"],
+            'en': ["Revenue", "Sales", "Turnover", "Net Bookings", "Income", "Gross Revenue"]
         },
         'marge_brute': {
-            'fr': ["Marge brute", "Marge", "Résultat brut"],
-            'en': ["Gross Margin", "Margin", "Gross Profit"]
+            'fr': ["Marge brute", "Marge", "Résultat brut", "Bénéfice brut"],
+            'en': ["Gross Margin", "Margin", "Gross Profit", "Operating Margin"]
         },
         'cout_acquisition': {
-            'fr': ["Coût d'acquisition client", "CAC", "Coût d'acquisition"],
-            'en': ["Customer Acquisition Cost", "CAC", "Acquisition Cost"]
+            'fr': ["Coût d'acquisition client", "CAC", "Coût d'acquisition", "Coût par client"],
+            'en': ["Customer Acquisition Cost", "CAC", "Acquisition Cost", "Cost per Customer"]
         },
         'valeur_vie_client': {
-            'fr': ["Valeur à vie client", "LTV", "CLV", "Valeur vie client"],
-            'en': ["Customer Lifetime Value", "LTV", "CLV"]
+            'fr': ["Valeur à vie client", "LTV", "CLV", "Valeur vie client", "VVC"],
+            'en': ["Customer Lifetime Value", "LTV", "CLV", "Lifetime Value"]
         },
         'nombre_employe': {
-            'fr': ["Nombre d'employés", "Effectifs", "Taille de l'équipe", "Employés", "ETP"],
-            'en': ["Headcount", "Employee Count", "Employees", "Team Size", "FTE"]
+            'fr': ["Nombre d'employés", "Effectifs", "Taille de l'équipe", "Employés", "ETP", "Personnel"],
+            'en': ["Headcount", "Employee Count", "Employees", "Team Size", "FTE", "Staff"]
         },
         'argent_brule': {
-            'fr': ["Argent brûlé", "Cash Burn", "Brûlage de trésorerie", "Flux de trésorerie net"],
-            'en': ["Cash Burn", "Burn Rate", "Net Cash Flow"]
+            'fr': ["Argent brûlé", "Cash Burn", "Brûlage de trésorerie", "Flux de trésorerie net", "Burn Rate"],
+            'en': ["Cash Burn", "Burn Rate", "Net Cash Flow", "Cash Consumption"]
         },
         'ebitda': {
-            'fr': ["EBITDA", "BAIIA", "Excédent Brut d'Exploitation", "EBE"],
-            'en': ["EBITDA", "Earnings Before Interest, Taxes, Depreciation, and Amortization"]
+            'fr': ["EBITDA", "BAIIA", "Excédent Brut d'Exploitation", "EBE", "Résultat opérationnel"],
+            'en': ["EBITDA", "Earnings Before Interest, Taxes, Depreciation, and Amortization", "Operating Income"]
         },
         'revenu_annuel': {
-            'fr': ["Revenu Annuel Récurrent", "ARR", "Revenu récurrent annuel"],
-            'en': ["Annual Recurring Revenue", "ARR"]
+            'fr': ["Revenu Annuel Récurrent", "ARR", "Revenu récurrent annuel", "RRA"],
+            'en': ["Annual Recurring Revenue", "ARR", "Recurring Annual Revenue"]
         },
         'revenu_mensuel': {
-            'fr': ["Revenu Mensuel Récurrent", "MRR", "Revenu récurrent mensuel"],
-            'en': ["Monthly Recurring Revenue", "MRR"]
+            'fr': ["Revenu Mensuel Récurrent", "MRR", "Revenu récurrent mensuel", "RRM"],
+            'en': ["Monthly Recurring Revenue", "MRR", "Recurring Monthly Revenue"]
         },
         'montant_leve': {
-            'fr': ["Montant levé", "Levée de fonds", "Financement obtenu", "Capital levé"],
-            'en': ["Funding Amount", "Funds Raised", "Capital Raised"]
+            'fr': ["Montant levé", "Levée de fonds", "Financement obtenu", "Capital levé", "Fonds levés"],
+            'en': ["Funding Amount", "Funds Raised", "Capital Raised", "Investment Amount"]
+        },
+        'tresorerie': {
+            'fr': ["Trésorerie", "Cash", "Liquidités", "Encaisse", "Cash balance"],
+            'en': ["Cash", "Cash Balance", "Treasury", "Liquidity", "Cash on Hand"]
+        },
+        'croissance': {
+            'fr': ["Croissance", "Taux de croissance", "Croissance YoY", "Growth", "Progression"],
+            'en': ["Growth", "Growth Rate", "YoY Growth", "QoQ Growth", "Revenue Growth"]
+        },
+        'benefice_net': {
+            'fr': ["Bénéfice net", "Résultat net", "Profit net", "BN"],
+            'en': ["Net Profit", "Net Income", "Net Earnings", "Bottom Line"]
+        },
+        'churn': {
+            'fr': ["Churn", "Taux d'attrition", "Taux de départ", "Perte de clients"],
+            'en': ["Churn", "Churn Rate", "Customer Attrition", "Customer Loss Rate"]
+        },
+        'conversion': {
+            'fr': ["Taux de conversion", "Conversion", "Taux de transformation"],
+            'en': ["Conversion Rate", "Conversion", "Lead Conversion"]
         }
         # Ajouter d'autres KPI et leurs synonymes ici si nécessaire
     }
@@ -292,10 +312,12 @@ def analyze_images_with_gpt(
     logger.info(f"Analyse de {len(image_paths)} images avec GPT Vision (Langue: {requested_language}, périodicité: {periodicity}, année: {year})")
 
     # Limiter le nombre d'images par appel API si nécessaire
-    MAX_IMAGES_PER_CALL = 20
+    MAX_IMAGES_PER_CALL = 50  # Augmenté de 20 à 50
     if len(image_paths) > MAX_IMAGES_PER_CALL:
         logger.warning(f"Le nombre d'images ({len(image_paths)}) dépasse la limite fixée ({MAX_IMAGES_PER_CALL}). Tronquage.")
         image_paths = image_paths[:MAX_IMAGES_PER_CALL]
+    else:
+        logger.info(f"Traitement de {len(image_paths)} images (dans la limite de {MAX_IMAGES_PER_CALL})")
 
     try:
         # Déterminer la langue de la réponse souhaitée
@@ -321,7 +343,17 @@ def analyze_images_with_gpt(
                 kpi_names = get_kpi_mapping(kpi_code, requested_language)
                 kpi_targets.extend(kpi_names)
         
-        kpi_list_formatted = ", ".join([f'"{k}"' for k in kpi_targets]) if kpi_targets else "all financial KPIs in the document"
+        # Formuler la liste des KPIs demandés de manière plus flexible
+        if kpi_targets:
+            kpi_list_formatted = ", ".join([f'"{k}"' for k in kpi_targets])
+            kpi_instruction = f"""
+            PRIORITÉ: Recherchez spécifiquement ces KPIs: {kpi_list_formatted}
+            MAIS AUSSI: Extrayez TOUS les autres KPIs financiers trouvés dans le document, même s'ils ne sont pas dans la liste prioritaire.
+            """
+        else:
+            kpi_instruction = "Extrayez TOUS les KPIs financiers trouvés dans le document."
+            kpi_list_formatted = "all financial KPIs in the document"
+        
         kpi_primary_names = {}
         if selected_kpis:
             for kpi_code in selected_kpis:
@@ -353,60 +385,66 @@ def analyze_images_with_gpt(
         user_prompt = f"""
         # DATA EXTRACTION TASK
         
-        I need you to extract financial KPIs from the attached document images for the year {year}.
-        Specifically look for the following KPIs (and their common synonyms): {kpi_list_formatted}.
+        Vous devez extraire TOUS les KPIs financiers trouvés dans les images, pour l'année {year}.
         
-        Map any found synonyms to the corresponding primary KPI name as shown below:
-        Primary KPI Names: {json.dumps(kpi_primary_names, ensure_ascii=False)}
+        {kpi_instruction}
+        
+        RÈGLE IMPORTANTE: N'ignorez AUCUN KPI financier visible dans le document. Extrayez TOUT, même si ce n'est pas explicitement demandé.
+        
+        ## TYPES DE KPIs À RECHERCHER (liste non exhaustive)
+        
+        Recherchez ces types de données financières et leurs synonymes :
+        - Revenus/Chiffre d'affaires (Revenue, Sales, Net Bookings, Turnover)
+        - EBITDA (Excédent Brut d'Exploitation, EBE, BAIIA)
+        - Marges (Gross Margin, Operating Margin, Net Margin)
+        - Effectifs (Headcount, Employees, FTE, Personnel)
+        - Cash/Trésorerie (Cash, Cash Flow, Cash Burn, Funds)
+        - Revenus récurrents (ARR, MRR, Recurring Revenue)
+        - Coûts d'acquisition (CAC, Customer Acquisition Cost)
+        - Valeur vie client (LTV, CLV, Customer Lifetime Value)
+        - Levées de fonds (Funding, Capital Raised, Investment)
+        - Croissance (Growth Rate, YoY Growth, QoQ Growth)
+        - Ratios financiers (P/E, ROI, ROE, Debt Ratio)
+        - ET TOUT AUTRE INDICATEUR FINANCIER visible
         
         ## TABLE STRUCTURE UNDERSTANDING
         
-        The document contains tables with {period_description} for {year}. You MUST:
+        Le document contient des tableaux avec des périodes {period_description} pour {year}. Vous DEVEZ:
         
-        1. Carefully identify the EXACT headers and columns for: {', '.join(expected_periods)}
-        2. IGNORE all other columns, especially "Total", "YTD", or any similar summary columns.
-        3. PAY CLOSE ATTENTION TO VISUAL ALIGNMENT - trace an imaginary vertical line from each column header down to the data cells.
-        4. For each KPI row (identified by its name or a synonym), ONLY extract values that appear directly under the correct period column headers.
+        1. Identifier TOUTES les colonnes de périodes : {', '.join(expected_periods)}
+        2. Extraire TOUS les KPIs de TOUTES les lignes, pas seulement ceux demandés
+        3. Suivre visuellement l'alignement des colonnes avec précision
+        4. NE JAMAIS ignorer une ligne qui contient des données financières
         
         ## EXTRACTION RULES
         
-        - POSITION MATTERS: Only extract data that visually appears directly below a specific period header.
-        - SYNONYM MAPPING: If you find data for a synonym, report it under the corresponding primary KPI name provided above.
-        - MISSING VALUES: If a value doesn't appear for a period, mark it as missing rather than take values from adjacent columns.
-        - PRESERVE FORMAT: Maintain exact formatting including units (€, $, M, K, %, etc.) and symbols.
-        - NEVER GUESS: Do not attempt to derive, calculate, or estimate missing values.
-        - COLUMN DISCIPLINE: Values from YTD, Total, or other non-period columns must NEVER be included.
-        - PRESERVE NUMERIC FORMAT: Extract numbers exactly as they appear, keeping the same decimal separators (. or ,) and units.
-        
-        ## HOW TO APPROACH THE TASK
-        
-        1. First, carefully analyze the layout and structure of the tables in the images.
-        2. Identify the PRECISE column headers corresponding to each period ({', '.join(expected_periods)}).
-        3. For each row containing a KPI of interest (using its primary name or a known synonym), follow the row horizontally and locate values EXACTLY aligned with each period column.
-        4. For each KPI and each period, verify alignment by visually tracing a straight line from the column header to the data cell.
-        5. If a period's column appears empty for a KPI, report it as missing.
+        - INCLUSIVITÉ MAXIMALE: Extrayez TOUT indicateur financier trouvé
+        - POSITION PRÉCISE: Alignement visuel exact entre en-têtes et données
+        - SYNONYMES: Reconnaissez toutes les variantes possibles des noms de KPIs
+        - FORMAT PRÉSERVÉ: Gardez les unités, symboles et formatage exacts
+        - AUCUNE OMISSION: Ne manquez aucune ligne de données financières
+        - DÉTECTION INTELLIGENTE: Même si un KPI n'est pas dans votre liste, extrayez-le s'il est financier
         
         ## RESPONSE FORMAT
         
-        Return a JSON object structured like this, using the PRIMARY KPI names as keys:
+        Retournez un objet JSON avec TOUS les KPIs trouvés :
         ```json
         {{
           "periods": {json.dumps(expected_periods)},
           "kpi": {{
-            "Primary KPI Name 1": {{  // e.g., "Chiffre d'affaires"
-              "{expected_periods[0] if expected_periods else 'Period'}": "value with unit", 
-              // Add other periods if applicable (e.g., Q2, Q3, H2)
-              // Only include periods with actual visible values
+            "Nom du KPI 1": {{  // Utilisez le nom exact trouvé dans le document
+              "{expected_periods[0] if expected_periods else 'Period'}": "valeur avec unité", 
+              // Ajoutez toutes les autres périodes trouvées
             }},
-            "Primary KPI Name 2": {{ // e.g., "Nombre d'employés"
-               // ... period data ...
+            "Nom du KPI 2": {{ 
+               // ... données pour toutes les périodes ...
             }}
-            // Only include PRIMARY KPIs actually found (directly or via synonym) in the document
+            // INCLUEZ TOUS LES KPIs trouvés, même non demandés spécifiquement
           }}
         }}
         ```
         
-        IMPORTANT: If a requested KPI (or any of its synonyms) is missing from the document, completely exclude it from the output rather than returning empty values.
+        RAPPEL CRUCIAL: Extrayez TOUS les KPIs financiers visibles, pas seulement ceux de la liste prioritaire. Votre objectif est la complétude, pas la sélection.
         """
 
         # Construction du message pour l'API Vision
@@ -452,8 +490,26 @@ def analyze_images_with_gpt(
         result_text = response.choices[0].message.content
         logger.info(f"Réponse brute de GPT Vision: {result_text}")
         
+        # Sauvegarder la réponse brute pour debugging
+        try:
+            import os
+            debug_file = "gpt_vision_debug_response.json"
+            with open(debug_file, "w", encoding="utf-8") as f:
+                f.write(result_text)
+            logger.info(f"Réponse GPT Vision sauvegardée dans: {debug_file}")
+        except Exception as e:
+            logger.warning(f"Impossible de sauvegarder la réponse de debug: {e}")
+        
         try:
             result = json.loads(result_text)
+            
+            # Logging détaillé des KPIs extraits
+            if "kpi" in result and isinstance(result["kpi"], dict):
+                logger.info(f"Nombre de KPIs extraits par GPT Vision: {len(result['kpi'])}")
+                for kpi_name, kpi_data in result["kpi"].items():
+                    logger.info(f"  - KPI: {kpi_name} | Périodes: {list(kpi_data.keys()) if isinstance(kpi_data, dict) else 'Format invalide'}")
+            else:
+                logger.warning("Aucun KPI trouvé dans la réponse GPT Vision ou format invalide")
             
             # Extraire uniquement le texte par OCR pour le retourner séparément
             extracted_text = extract_text_from_images(image_paths)
@@ -737,12 +793,17 @@ def clean_kpi_data(
         # Si aucun KPI n'est sélectionné, on accepte tous les KPI extraits
         accept_all_kpis = not selected_kpis or len(selected_kpis) == 0
         
+        logger.info(f"Mode d'acceptation des KPIs: {'Tous les KPIs' if accept_all_kpis else 'KPIs sélectionnés uniquement'}")
+        logger.info(f"KPIs sélectionnés: {selected_kpis}")
+        logger.info(f"KPIs extraits bruts: {list(kpi_data.keys())}")
+        
         # Parcourir les données KPI extraites
         for kpi_name, periods_data in kpi_data.items():
             kpi_name_lower = kpi_name.lower()
             
             # Ignorer les entrées sans nom de KPI ou sans périodes
             if not kpi_name or not periods_data:
+                logger.warning(f"KPI ignoré - nom vide ou pas de données: {kpi_name}")
                 continue
                 
             # Vérifier si ce KPI fait partie des KPI sélectionnés
@@ -752,6 +813,7 @@ def clean_kpi_data(
             if accept_all_kpis:
                 # Si tous les KPI sont acceptés
                 selected = True
+                logger.info(f"KPI accepté (mode tous KPIs): {kpi_name}")
                 # Essayer de traduire le nom en français si possible
                 for kpi_code in ['chiffre_affaire', 'marge_brute', 'cout_acquisition', 'valeur_vie_client',
                               'nombre_employe', 'argent_brule', 'ebitda', 'revenu_annuel', 'revenu_mensuel', 'montant_leve']:
@@ -762,6 +824,7 @@ def clean_kpi_data(
                     for en_name in en_names:
                         if en_name.lower() in kpi_name_lower or kpi_name_lower in en_name.lower():
                             fr_kpi_name = fr_names[0] if fr_names else kpi_name
+                            logger.info(f"KPI traduit: {kpi_name} -> {fr_kpi_name}")
                             break
             else:
                 # Vérifier si ce KPI est dans la liste des KPI sélectionnés
@@ -772,9 +835,13 @@ def clean_kpi_data(
                     # Vérifier si le nom du KPI correspond à une des variantes (en anglais ou français)
                     for name_list in [fr_names, en_names]:
                         for name in name_list:
-                            if name.lower() in kpi_name_lower or kpi_name_lower in name.lower():
+                            # Rendre la correspondance plus flexible
+                            if (name.lower() in kpi_name_lower or 
+                                kpi_name_lower in name.lower() or
+                                any(word in kpi_name_lower.split() for word in name.lower().split())):
                                 selected = True
                                 fr_kpi_name = fr_names[0] if fr_names else kpi_name
+                                logger.info(f"KPI sélectionné correspondant: {kpi_name} -> {fr_kpi_name} (code: {kpi_code})")
                                 break
                         if selected:
                             break
