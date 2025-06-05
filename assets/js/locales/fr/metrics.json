@@ -112,7 +112,9 @@
   
   "common": {
     "loading": "Chargement...",
-    "close": "Fermer"
+    "close": "Fermer",
+    "yes": "Oui",
+    "no": "Non"
   },
   
   "data_explorer": {
@@ -134,6 +136,13 @@
     "name_required": "Le nom de la colonne est requis",
     "expression_required": "L'expression est requise",
     "column_added": "Colonne calculée ajoutée",
+    "column_updated": "Colonne calculée modifiée",
+    "column_removed": "Colonne calculée supprimée",
+    "edit_column": "Modifier la colonne",
+    "delete_column": "Supprimer la colonne",
+    "confirm_delete_column": "Supprimer cette colonne ?",
+    "delete_column_warning": "Cette action ne peut pas être annulée.",
+    "column_name_required": "Le nom de la colonne est requis",
     "show_in_visualization": "Afficher dans la visualisation",
     "hide_from_visualization": "Masquer dans la visualisation",
     "remove_pivot": "Supprimer le pivot",
@@ -177,5 +186,40 @@
     "external_data_error": "Erreur lors de la récupération des données externes"
   },
   
-  "type_fixed_for_total_investment": "Graphique en barres recommandé pour cette visualisation"
+  "type_fixed_for_total_investment": "Graphique en barres recommandé pour cette visualisation",
+  
+  "predefined_queries": {
+    "1": {
+      "name": "Revenus mensuels",
+      "description": "Évolution des revenus par mois"
+    },
+    "2": {
+      "name": "Clients par secteur", 
+      "description": "Répartition des clients par secteur d'activité"
+    },
+    "3": {
+      "name": "Croissance ARR",
+      "description": "Évolution de l'ARR (Annual Recurring Revenue) par trimestre"
+    },
+    "4": {
+      "name": "Top 10 clients",
+      "description": "Liste des 10 plus grands clients par valeur"
+    },
+    "5": {
+      "name": "Évolution des effectifs",
+      "description": "Évolution du nombre d'employés par trimestre"
+    },
+    "6": {
+      "name": "Investissements",
+      "description": "Valeur des investissements par trimestre"
+    },
+    "7": {
+      "name": "Total investi",
+      "description": "Montant total investi dans l'entreprise"
+    },
+    "8": {
+      "name": "Analyse KPI par période",
+      "description": "Vue d'ensemble des KPI principaux avec évolution période par période"
+    }
+  }
 }

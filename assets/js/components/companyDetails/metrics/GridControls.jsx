@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { Drawer, Button, Table, Select, Space, Tooltip, Typography, Radio, Input, message, Spin, Menu, Dropdown, Popover, Modal, Form, InputNumber, Switch, Tag } from 'antd';
+import { Drawer, Button, Table, Select, Space, Tooltip, Typography, Radio, Input, message, Spin, Menu, Dropdown, Popover, Modal, Form, InputNumber, Switch, Tag, Popconfirm, Card, Divider } from 'antd';
 import { useTranslation } from 'react-i18next';
 import {
   updateCols,
@@ -13,7 +13,8 @@ import {
 import {
   DownOutlined, FilterOutlined, SettingOutlined,
   PlusOutlined, EyeInvisibleOutlined, TableOutlined,
-  SortAscendingOutlined, SortDescendingOutlined
+  SortAscendingOutlined, SortDescendingOutlined,
+  EditOutlined, DeleteOutlined
 } from '@ant-design/icons';
 import {
   BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis,
@@ -136,6 +137,22 @@ const PREDEFINED_QUERIES = [
       { category: 'Seed', total_amount: 3500000, nb_investments: 12, first_investment: '2021-01-15', last_investment: '2021-08-10' },
       { category: 'Series A', total_amount: 5450000, nb_investments: 33, first_investment: '2021-09-22', last_investment: '2023-06-30' }
     ]
+  },
+  { 
+    id: '8', 
+    name: 'Analyse KPI par période',
+    query: 'kpi_analysis_by_period',
+    description: 'Vue d\'ensemble des KPI principaux avec évolution période par période',
+    data: [
+      { year: 2024, quarter: 'Q1', nb_investments: 3, nb_companies: 2, avg_investment_value: 125000, total_investment_value: 375000, max_investment_value: 200000, min_investment_value: 75000, funding_types: 'Seed, Series A', sectors: 'Tech, Health' },
+      { year: 2023, quarter: 'Q4', nb_investments: 4, nb_companies: 3, avg_investment_value: 118000, total_investment_value: 472000, max_investment_value: 180000, min_investment_value: 80000, funding_types: 'Seed, Series A', sectors: 'Tech, Finance, Health' },
+      { year: 2023, quarter: 'Q3', nb_investments: 2, nb_companies: 2, avg_investment_value: 112000, total_investment_value: 224000, max_investment_value: 140000, min_investment_value: 84000, funding_types: 'Series A', sectors: 'Tech, Finance' },
+      { year: 2023, quarter: 'Q2', nb_investments: 5, nb_companies: 4, avg_investment_value: 108000, total_investment_value: 540000, max_investment_value: 150000, min_investment_value: 60000, funding_types: 'Seed, Series A, Series B', sectors: 'Tech, Health, Education' },
+      { year: 2023, quarter: 'Q1', nb_investments: 3, nb_companies: 2, avg_investment_value: 102000, total_investment_value: 306000, max_investment_value: 130000, min_investment_value: 88000, funding_types: 'Seed, Series A', sectors: 'Tech, Health' },
+      { year: 2022, quarter: 'Q4', nb_investments: 2, nb_companies: 2, avg_investment_value: 95000, total_investment_value: 190000, max_investment_value: 110000, min_investment_value: 80000, funding_types: 'Seed', sectors: 'Tech, Finance' },
+      { year: 2022, quarter: 'Q3', nb_investments: 4, nb_companies: 3, avg_investment_value: 88000, total_investment_value: 352000, max_investment_value: 120000, min_investment_value: 70000, funding_types: 'Seed, Series A', sectors: 'Tech, Health, Education' },
+      { year: 2022, quarter: 'Q2', nb_investments: 3, nb_companies: 2, avg_investment_value: 82000, total_investment_value: 246000, max_investment_value: 100000, min_investment_value: 65000, funding_types: 'Seed', sectors: 'Tech, Health' }
+    ]
   }
 ];
 
@@ -168,6 +185,8 @@ const GridControls = () => {
   const [filters, setFilters] = useState([]);
   const [sortInfo, setSortInfo] = useState(null);
   const [isCalculationModalVisible, setIsCalculationModalVisible] = useState(false);
+  const [isEditingColumn, setIsEditingColumn] = useState(false);
+  const [originalColumnName, setOriginalColumnName] = useState('');
   const [newCalculation, setNewCalculation] = useState({
     name: '',
     expression: '',
@@ -257,6 +276,20 @@ const GridControls = () => {
         return data.map(item => ({
           name: item.category,
           value: parseFloat(item.total_amount) || 0
+        }));
+      }
+      
+      // Traitement spécifique pour les données de "Analyse KPI par période"
+      if (selectedQuery && selectedQuery.query === 'kpi_analysis_by_period') {
+        // Pour kpi_analysis_by_period, utiliser year + quarter comme nom et plusieurs métriques
+        return data.map(item => ({
+          name: item.year && item.quarter ? `${item.year} ${item.quarter}` : 'Non spécifié',
+          nb_investments: parseInt(item.nb_investments) || 0,
+          nb_companies: parseInt(item.nb_companies) || 0,
+          avg_investment_value: parseFloat(item.avg_investment_value) || 0,
+          total_investment_value: parseFloat(item.total_investment_value) || 0,
+          max_investment_value: parseFloat(item.max_investment_value) || 0,
+          min_investment_value: parseFloat(item.min_investment_value) || 0
         }));
       }
       
@@ -909,11 +942,60 @@ const GridControls = () => {
           
           return {
             title: (
-              <div>
-                <span>{t('data_explorer.column_header', { column: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) })}</span>
-                {isPivot && <TableOutlined style={{ marginLeft: 5, color: '#1890ff' }} />}
-                {isHidden && <EyeInvisibleOutlined style={{ marginLeft: 5, color: '#ff4d4f' }} />}
-                {calculatedColumn && <span style={{ marginLeft: 5, color: '#722ed1' }}>ƒ</span>}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <span>{t('data_explorer.column_header', { column: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) })}</span>
+                  {isPivot && <TableOutlined style={{ marginLeft: 5, color: '#1890ff' }} />}
+                  {isHidden && <EyeInvisibleOutlined style={{ marginLeft: 5, color: '#ff4d4f' }} />}
+                  {calculatedColumn && <span style={{ marginLeft: 5, color: '#722ed1' }}>ƒ</span>}
+                </div>
+                {calculatedColumn && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Tooltip title={t('data_explorer.edit_column')}>
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<EditOutlined />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          editCalculatedColumn(key);
+                        }}
+                        style={{ 
+                          padding: '2px 4px', 
+                          minWidth: 'auto',
+                          height: '20px',
+                          lineHeight: '16px'
+                        }}
+                      />
+                    </Tooltip>
+                    <Tooltip title={t('data_explorer.delete_column')}>
+                      <Popconfirm
+                        title={t('data_explorer.confirm_delete_column')}
+                        description={t('data_explorer.delete_column_warning')}
+                        onConfirm={(e) => {
+                          e.stopPropagation();
+                          removeCalculatedColumn(key);
+                        }}
+                        okText={t('common.yes')}
+                        cancelText={t('common.no')}
+                      >
+                        <Button
+                          type="text"
+                          size="small"
+                          icon={<DeleteOutlined />}
+                          onClick={(e) => e.stopPropagation()}
+                          style={{ 
+                            padding: '2px 4px', 
+                            minWidth: 'auto',
+                            height: '20px',
+                            lineHeight: '16px',
+                            color: '#ff4d4f'
+                          }}
+                        />
+                      </Popconfirm>
+                    </Tooltip>
+                  </div>
+                )}
               </div>
             ),
             dataIndex: key,
@@ -983,7 +1065,130 @@ const GridControls = () => {
   
   // Gérer le clic sur le bouton d'ajout de colonne calculée
   const handleAddCalculatedColumn = () => {
+    setIsEditingColumn(false);
+    setOriginalColumnName('');
+    setNewCalculation({
+      name: '',
+      expression: '',
+      format: 'default',
+      externalSource: false,
+      externalCompanyId: null
+    });
     setIsCalculationModalVisible(true);
+  };
+
+  
+  // Modifier handleSaveCalculation pour gérer les sources externes (RESTAURÉ)
+  const handleSaveCalculation = async () => {
+    if (!newCalculation.name.trim()) {
+      message.error(t('data_explorer.name_required'));
+      return;
+    }
+    
+    // Si c'est une source externe mais aucune entreprise n'est sélectionnée
+    if (newCalculation.externalSource && !newCalculation.externalCompanyId) {
+      message.error(t('data_explorer.company_required'));
+      return;
+    }
+    
+    // Si c'est une source externe, charger les données
+    if (newCalculation.externalSource && newCalculation.externalCompanyId) {
+      try {
+        // Utiliser la même requête que celle sélectionnée actuellement
+        const queryId = selectedQuery ? selectedQuery.query : 'monthly_revenue';
+        const externalData = await fetchExternalCompanyData(newCalculation.externalCompanyId, queryId);
+        
+        if (!externalData || externalData.length === 0) {
+          message.error(t('data_explorer.no_external_data'));
+          return;
+        }
+        
+        // Vérifier si on édite une colonne existante ou on en ajoute une nouvelle
+        const existingColumnIndex = isEditingColumn 
+          ? calculatedColumns.findIndex(calc => calc.name === originalColumnName)
+          : -1;
+        
+        if (existingColumnIndex !== -1) {
+          // Modifier la colonne existante
+          const updatedColumns = [...calculatedColumns];
+          updatedColumns[existingColumnIndex] = { 
+            name: newCalculation.name,
+            format: newCalculation.format,
+            isExternal: true,
+            externalCompanyId: newCalculation.externalCompanyId,
+            externalQuery: queryId,
+            externalData: externalData
+          };
+          setCalculatedColumns(updatedColumns);
+          message.success(t('data_explorer.column_updated'));
+        } else {
+          // Ajouter une nouvelle colonne calculée spéciale pour les données externes
+          setCalculatedColumns([
+            ...calculatedColumns, 
+            { 
+              name: newCalculation.name,
+              format: newCalculation.format,
+              isExternal: true,
+              externalCompanyId: newCalculation.externalCompanyId,
+              externalQuery: queryId,
+              externalData: externalData
+            }
+          ]);
+          message.success(t('data_explorer.column_added'));
+        }
+        
+        setIsCalculationModalVisible(false);
+        setIsEditingColumn(false);
+        setOriginalColumnName('');
+        setNewCalculation({ 
+          name: '', 
+          expression: '', 
+          format: 'default',
+          externalSource: false,
+          externalCompanyId: null
+        });
+      } catch (error) {
+        console.error('Erreur lors de l\'ajout de la colonne externe:', error);
+        message.error(t('data_explorer.external_data_error'));
+      }
+    } else {
+      // Cas normal avec une expression à évaluer
+      if (!newCalculation.expression.trim()) {
+        message.error(t('data_explorer.expression_required'));
+        return;
+      }
+      
+      // Vérifier si on édite une colonne existante ou on en ajoute une nouvelle
+      const existingColumnIndex = isEditingColumn 
+        ? calculatedColumns.findIndex(calc => calc.name === originalColumnName)
+        : -1;
+      
+      if (existingColumnIndex !== -1) {
+        // Modifier la colonne existante
+        const updatedColumns = [...calculatedColumns];
+        updatedColumns[existingColumnIndex] = { ...newCalculation, isExternal: false };
+        setCalculatedColumns(updatedColumns);
+        message.success(t('data_explorer.column_updated'));
+      } else {
+        // Ajouter une nouvelle colonne
+        setCalculatedColumns([
+          ...calculatedColumns, 
+          { ...newCalculation, isExternal: false }
+        ]);
+        message.success(t('data_explorer.column_added'));
+      }
+      
+      setIsCalculationModalVisible(false);
+      setIsEditingColumn(false);
+      setOriginalColumnName('');
+      setNewCalculation({ 
+        name: '', 
+        expression: '', 
+        format: 'default',
+        externalSource: false,
+        externalCompanyId: null
+      });
+    }
   };
   
   // Fonction pour charger les données d'une entreprise externe
@@ -1020,81 +1225,6 @@ const GridControls = () => {
     } catch (error) {
       console.error("Erreur lors du chargement des données externes:", error);
       return null;
-    }
-  };
-
-  // Modifier handleSaveCalculation pour gérer les sources externes
-  const handleSaveCalculation = async () => {
-    if (!newCalculation.name.trim()) {
-      message.error(t('data_explorer.name_required'));
-      return;
-    }
-    
-    // Si c'est une source externe mais aucune entreprise n'est sélectionnée
-    if (newCalculation.externalSource && !newCalculation.externalCompanyId) {
-      message.error(t('data_explorer.company_required'));
-      return;
-    }
-    
-    // Si c'est une source externe, charger les données
-    if (newCalculation.externalSource && newCalculation.externalCompanyId) {
-      try {
-        // Utiliser la même requête que celle sélectionnée actuellement
-        const queryId = selectedQuery ? selectedQuery.query : 'monthly_revenue';
-        const externalData = await fetchExternalCompanyData(newCalculation.externalCompanyId, queryId);
-        
-        if (!externalData || externalData.length === 0) {
-          message.error(t('data_explorer.no_external_data'));
-          return;
-        }
-        
-        // Ajouter une colonne calculée spéciale pour les données externes
-        setCalculatedColumns([
-          ...calculatedColumns, 
-          { 
-            name: newCalculation.name,
-            format: newCalculation.format,
-            isExternal: true,
-            externalCompanyId: newCalculation.externalCompanyId,
-            externalQuery: queryId,
-            externalData: externalData
-          }
-        ]);
-        
-        setIsCalculationModalVisible(false);
-        setNewCalculation({ 
-          name: '', 
-          expression: '', 
-          format: 'default',
-          externalSource: false,
-          externalCompanyId: null
-        });
-        message.success(t('data_explorer.column_added'));
-      } catch (error) {
-        console.error('Erreur lors de l\'ajout de la colonne externe:', error);
-        message.error(t('data_explorer.external_data_error'));
-      }
-    } else {
-      // Cas normal avec une expression à évaluer
-      if (!newCalculation.expression.trim()) {
-        message.error(t('data_explorer.expression_required'));
-        return;
-      }
-      
-      setCalculatedColumns([
-        ...calculatedColumns, 
-        { ...newCalculation, isExternal: false }
-      ]);
-      
-      setIsCalculationModalVisible(false);
-      setNewCalculation({ 
-        name: '', 
-        expression: '', 
-        format: 'default',
-        externalSource: false,
-        externalCompanyId: null
-      });
-      message.success(t('data_explorer.column_added'));
     }
   };
   
@@ -1524,6 +1654,23 @@ const GridControls = () => {
     }
   };
 
+  // Supprimer une colonne calculée
+  const removeCalculatedColumn = (columnName) => {
+    setCalculatedColumns(calculatedColumns.filter(calc => calc.name !== columnName));
+    message.success(t('data_explorer.column_removed'));
+  };
+
+  // Éditer une colonne calculée
+  const editCalculatedColumn = (columnName) => {
+    const columnToEdit = calculatedColumns.find(calc => calc.name === columnName);
+    if (columnToEdit) {
+      setIsEditingColumn(true);
+      setOriginalColumnName(columnName);
+      setNewCalculation({ ...columnToEdit });
+      setIsCalculationModalVisible(true);
+    }
+  };
+
   return (
     <div className="flex items-center space-x-4 mb-2">
       <div>
@@ -1845,7 +1992,18 @@ const GridControls = () => {
         title={t('data_explorer.create_calculated_column')}
         visible={isCalculationModalVisible}
         onOk={handleSaveCalculation}
-        onCancel={() => setIsCalculationModalVisible(false)}
+        onCancel={() => {
+          setIsCalculationModalVisible(false);
+          setIsEditingColumn(false);
+          setOriginalColumnName('');
+          setNewCalculation({ 
+            name: '', 
+            expression: '', 
+            format: 'default',
+            externalSource: false,
+            externalCompanyId: null
+          });
+        }}
         width={600}
         destroyOnClose
       >

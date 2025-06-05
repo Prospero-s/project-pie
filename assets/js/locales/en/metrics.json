@@ -112,7 +112,9 @@
   
   "common": {
     "loading": "Loading...",
-    "close": "Close"
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No"
   },
   
   "data_explorer": {
@@ -134,6 +136,13 @@
     "name_required": "Column name is required",
     "expression_required": "Expression is required",
     "column_added": "Calculated column added",
+    "column_updated": "Calculated column updated",
+    "column_removed": "Calculated column removed",
+    "edit_column": "Edit column",
+    "delete_column": "Delete column",
+    "confirm_delete_column": "Delete this column?",
+    "delete_column_warning": "This action cannot be undone.",
+    "column_name_required": "Column name is required",
     "show_in_visualization": "Show in visualization",
     "hide_from_visualization": "Hide from visualization",
     "remove_pivot": "Remove pivot",
@@ -177,5 +186,40 @@
     "external_data_error": "Error retrieving external data"
   },
   
-  "type_fixed_for_total_investment": "Bar chart recommended for this visualization"
+  "type_fixed_for_total_investment": "Bar chart recommended for this visualization",
+  
+  "predefined_queries": {
+    "1": {
+      "name": "Monthly Revenue",
+      "description": "Revenue evolution by month"
+    },
+    "2": {
+      "name": "Clients by Sector", 
+      "description": "Client distribution by business sector"
+    },
+    "3": {
+      "name": "ARR Growth",
+      "description": "Annual Recurring Revenue evolution by quarter"
+    },
+    "4": {
+      "name": "Top 10 Clients",
+      "description": "List of top 10 clients by value"
+    },
+    "5": {
+      "name": "Headcount Evolution",
+      "description": "Employee count evolution by quarter"
+    },
+    "6": {
+      "name": "Investments",
+      "description": "Investment value by quarter"
+    },
+    "7": {
+      "name": "Total Invested",
+      "description": "Total amount invested in the company"
+    },
+    "8": {
+      "name": "KPI Analysis by Period",
+      "description": "Overview of main KPIs with period-over-period evolution"
+    }
+  }
 }

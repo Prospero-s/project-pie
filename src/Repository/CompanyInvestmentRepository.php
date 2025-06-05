@@ -151,11 +151,11 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
             [
                 'id' => '1',
                 'name' => 'Revenus mensuels',
-                'description' => 'Affiche les revenus mensuels de l\'entreprise au cours des 12 derniers mois',
+                'description' => 'Évolution des revenus par mois',
                 'query' => 'monthly_revenue'
             ],
             [
-                'id' => '2',
+                'id' => '2', 
                 'name' => 'Clients par secteur',
                 'description' => 'Répartition des clients par secteur d\'activité',
                 'query' => 'clients_by_sector'
@@ -189,6 +189,12 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
                 'name' => 'Total investi',
                 'description' => 'Montant total investi dans l\'entreprise',
                 'query' => 'total_investment'
+            ],
+            [
+                'id' => '8',
+                'name' => 'Analyse KPI par période',
+                'description' => 'Vue d\'ensemble des KPI principaux avec évolution période par période',
+                'query' => 'kpi_analysis_by_period'
             ]
         ];
     }
@@ -345,6 +351,33 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
                     GROUP BY ci.funding_type
                     HAVING SUM(ci.amount) > 0
                     ORDER BY total_amount DESC;
+                ";
+                break;
+                
+            case 'kpi_analysis_by_period':
+            case '8':
+                // Analyse KPI par période - basée sur les investissements pour avoir des données
+                $sql = "
+                    SELECT 
+                        EXTRACT(YEAR FROM ci.invested_at)::INTEGER as year,
+                        CONCAT('Q', EXTRACT(QUARTER FROM ci.invested_at)) as quarter,
+                        COUNT(DISTINCT ci.id) as nb_investments,
+                        COUNT(DISTINCT c.id) as nb_companies,
+                        COALESCE(AVG(ci.amount), 0) as avg_investment_value,
+                        COALESCE(SUM(ci.amount), 0) as total_investment_value,
+                        COALESCE(MAX(ci.amount), 0) as max_investment_value,
+                        COALESCE(MIN(ci.amount), 0) as min_investment_value,
+                        STRING_AGG(DISTINCT ci.funding_type, ', ') as funding_types,
+                        STRING_AGG(DISTINCT c.sector, ', ') as sectors
+                    FROM company_investment ci
+                    LEFT JOIN company c ON ci.company_id = c.id
+                    WHERE ci.company_id = :companyId
+                    AND ci.user_group_id = :userGroupId
+                    AND EXTRACT(YEAR FROM ci.invested_at) >= EXTRACT(YEAR FROM NOW()) - 3
+                    GROUP BY year, quarter
+                    HAVING COUNT(DISTINCT ci.id) > 0
+                    ORDER BY year DESC, quarter DESC
+                    LIMIT 12;
                 ";
                 break;
                 
