@@ -15,9 +15,8 @@ import './js/lib/polyfills';
 import { Amplify } from 'aws-amplify';
 import { I18nextProvider } from 'react-i18next';
 
-import i18n from "./js/i18n";
-import ReduxProvider from "./js/redux/provider";
-
+import i18n from './js/i18n';
+import ReduxProvider from './js/redux/provider';
 
 import { UserProvider } from '@/context/userContext';
 import SignIn from '@/pages/SignIn';
@@ -28,7 +27,7 @@ import AllCompanies from '@/pages/AllCompanies';
 import AuthCallback from '@/pages/AuthCallback';
 import GroupSelection from '@/pages/GroupSelection';
 import CompanyDetails from '@/pages/CompanyDetails';
-import TextractResults from '@/pages/TextractResults';
+import ExtractResult from '@/pages/ExtractResult';
 import EditDocument from '@/pages/EditDocument';
 import Documents from '@/pages/Documents';
 
@@ -119,19 +118,43 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     <ProtectedRoute i18n={i18n}>
                       <AppLayout i18n={i18n}>
                         <Routes>
-                          <Route path="dashboard" element={<Dashboard i18n={i18n} />} />
-                          <Route path="investments" element={<Investments i18n={i18n} />} />
-                          <Route path="companies" element={<AllCompanies i18n={i18n} />} />
-                          <Route path="company/details/:id" element={<CompanyDetails i18n={i18n} />} />
-                          <Route path="textract-results" element={<TextractResults i18n={i18n}/>} />
-                          <Route path="/documents/edit/:id" element={<EditDocument i18n={i18n}/>} />
-                          <Route path="documents" element={<Documents i18n={i18n} />} />
+                          <Route
+                            path="dashboard"
+                            element={<Dashboard i18n={i18n} />}
+                          />
+                          <Route
+                            path="investments"
+                            element={<Investments i18n={i18n} />}
+                          />
+                          <Route
+                            path="companies"
+                            element={<AllCompanies i18n={i18n} />}
+                          />
+                          <Route
+                            path="company/details/:id"
+                            element={<CompanyDetails i18n={i18n} />}
+                          />
+                          <Route
+                            path="extract-results"
+                            element={<ExtractResult i18n={i18n} />}
+                          />
+                          <Route
+                            path="/documents/edit/:id"
+                            element={<EditDocument i18n={i18n} />}
+                          />
+                          <Route
+                            path="documents"
+                            element={<Documents i18n={i18n} />}
+                          />
                         </Routes>
                       </AppLayout>
                     </ProtectedRoute>
                   }
                 />
-                <Route path="/auth/callback" element={<AuthCallback i18n={i18n} />} />
+                <Route
+                  path="/auth/callback"
+                  element={<AuthCallback i18n={i18n} />}
+                />
               </Routes>
             </Router>
           </ReduxProvider>

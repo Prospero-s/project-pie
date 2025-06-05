@@ -26,7 +26,8 @@
     "actions": "Actions",
     "statuses": {
       "draft": "Brouillon",
-      "processed": "Traité"
+      "processed": "Traité",
+      "validated": "Validé"
     },
     "tooltips": {
       "edit": "Modifier",
@@ -58,11 +59,32 @@
       "half_yearly": "Semestrielle",
       "yearly": "Annuel",
       "all_years": "Toutes les années",
+      "year_not_specified": "Année non spécifiée",
       "periods_detected": "périodes détectées"
+    },
+    "year_selection": {
+      "title": "Sélection de l'année requise",
+      "description": "L'année n'a pas pu être détectée automatiquement. Veuillez sélectionner l'année correspondant aux données financières du document.",
+      "select_year": "Sélectionnez l'année",
+      "placeholder": "Choisissez une année",
+      "continue": "Continuer",
+      "change_hint": "Vous pouvez modifier l'année pour retraiter les données",
+      "year_updated": "Année mise à jour: {{year}}. Données retraitées.",
+      "year_cleared": "Année effacée. Données retraitées sans année spécifique."
     },
     "validation": {
       "error_title": "Erreur de validation",
-      "form_failed": "Erreur lors de la validation du formulaire"
+      "form_failed": "Erreur lors de la validation du formulaire",
+      "year_required_title": "Année requise",
+      "year_required_message": "Une année doit être spécifiée pour pouvoir valider le document. Veuillez sélectionner une année avant de continuer.",
+      "missing_data_title": "Données manquantes",
+      "missing_pdf_message": "Les données du document sont incomplètes. Impossible de procéder à la validation.",
+      "success_title": "Document validé avec succès",
+      "success_message": "Le document a été validé et sauvegardé. Vous allez être redirigé vers la liste des documents.",
+      "error_message": "Une erreur est survenue lors de la validation du document: {{error}}",
+      "pdf_read_error": "Impossible de lire le contenu du document PDF.",
+      "network_error": "Erreur réseau lors de la récupération du document.",
+      "validating": "Validation du document en cours..."
     },
     "extracted_document": "Document extrait",
     "no_periods": "Aucune période détectée",
@@ -114,7 +136,7 @@
       "kpi_name_required": "Le nom du KPI est requis",
       "add_button": "Ajouter",
       "duplicate_error": "Un KPI avec ce nom existe déjà.",
-      "success": "KPI '{kpiName}' ajouté avec succès.",
+      "success": "KPI '{{kpiName}}' ajouté avec succès.",
       "validation_error": "Erreur de validation. Vérifiez les champs."
     }
   },
@@ -130,7 +152,13 @@
     "yearly": "Annuel",
     "select_year": "Sélectionnez l'année",
     "select_year_placeholder": "Année à analyser",
+    "year_optional_hint": "L'année est optionnelle. Si non spécifiée, l'IA tentera de la détecter automatiquement.",
     "analyze": "Analyser le document",
+    "processing": {
+      "title": "Traitement en cours...",
+      "message": "Votre document est en cours d'analyse. Merci de patienter.",
+      "file_size_note": "Le traitement peut prendre quelques secondes selon la taille du fichier."
+    },
     "kpi_labels": {
       "chiffre_affaire": "Chiffre d'affaires",
       "marge_brute": "Marge brute",
@@ -164,8 +192,8 @@
       "analysis_error": "Erreur lors de l'analyse du document",
       "no_response": "Le serveur n'a pas répondu. Veuillez réessayer"
     },
-    "file_selected": "Fichier sélectionné: {name}",
     "file_removed": "Fichier supprimé",
     "success": "Document analysé avec succès"
-  }
+  },
+  "validate_document": "Valider le document"
 }

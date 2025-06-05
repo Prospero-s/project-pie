@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250526112321 extends AbstractMigration
+final class Version20250605133036 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -30,6 +30,7 @@ final class Version20250526112321 extends AbstractMigration
           add_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
           year INT NOT NULL,
           periodicity VARCHAR(10) NOT NULL,
+          status VARCHAR(20) DEFAULT \'draft\' NOT NULL,
           filename VARCHAR(255) DEFAULT NULL,
           PRIMARY KEY(id)
         )');
@@ -40,9 +41,8 @@ final class Version20250526112321 extends AbstractMigration
           id UUID NOT NULL,
           document_id UUID NOT NULL,
           name VARCHAR(255) NOT NULL,
-          value VARCHAR(255) NOT NULL,
+          value DOUBLE PRECISION DEFAULT NULL,
           period VARCHAR(10) NOT NULL,
-          numeric_value DOUBLE PRECISION DEFAULT NULL,
           unit VARCHAR(20) DEFAULT NULL,
           PRIMARY KEY(id)
         )');

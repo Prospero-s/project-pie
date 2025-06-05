@@ -242,6 +242,10 @@ class DocumentController extends AbstractController
             $document->setCompany($company);
             $document->setUserGroup($userGroup);
             
+            // Définir le statut du document (par défaut 'validated', ou 'draft' si spécifié)
+            $status = isset($data['status']) ? $data['status'] : 'validated';
+            $document->setStatus($status);
+            
             // Définir le nom du fichier s'il est disponible
             if (isset($data['filename']) && !empty($data['filename'])) {
                 $document->setFilename($data['filename']);
@@ -257,35 +261,22 @@ class DocumentController extends AbstractController
             if (isset($data['kpis']) && is_array($data['kpis'])) {
                 foreach ($data['kpis'] as $kpiName => $periods) {
                     foreach ($periods as $period => $value) {
-                        if (!is_array($value) || !isset($value['display'])) {
-                            continue;
-                        }
-                        
                         $kpi = new Kpi();
                         $kpi->setName($kpiName);
                         $kpi->setPeriod($period);
-                        $kpi->setValue($value['display']);
                         $kpi->setDocument($document);
                         
-                        // Utiliser directement la valeur numérique fournie par GPT
-                        if (isset($value['value']) && $value['value'] !== null) {
-                            $kpi->setNumericValue((float)$value['value']);
+                        // Les valeurs sont maintenant directement numériques
+                        if (is_numeric($value)) {
+                            $kpi->setValue((float)$value);
                         } else {
-                            // Tenter de convertir la valeur affichée en valeur numérique
-                            $displayValue = $value['display'] ?? '';
-                            $numericValue = $this->extractNumericValue($displayValue);
-                            $kpi->setNumericValue($numericValue);
+                            // Fallback : essayer d'extraire la valeur si ce n'est pas numérique
+                            $numericValue = $this->extractNumericValue($value);
+                            $kpi->setValue($numericValue);
                         }
                         
-                        // Utiliser l'unité fournie par GPT, ou "€" par défaut
-                        if (isset($value['unit']) && !empty($value['unit'])) {
-                            $kpi->setUnit($value['unit']);
-                        } else {
-                            // Extraire l'unité depuis la valeur affichée
-                            $displayValue = $value['display'] ?? '';
-                            $unit = $this->extractUnit($displayValue);
-                            $kpi->setUnit($unit);
-                        }
+                        // Définir une unité par défaut (on pourrait l'améliorer plus tard)
+                        $kpi->setUnit('€');
                         
                         $this->entityManager->persist($kpi);
                     }
@@ -298,6 +289,58 @@ class DocumentController extends AbstractController
                 ['id' => $document->getId(), 'message' => 'Document saved successfully'],
                 Response::HTTP_CREATED
             );
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/{id}/view', name: 'view_pdf', methods: ['GET'])]
+    public function viewPdf(string $id, Request $request): Response
+    {
+        $cognitoId = $request->headers->get('X-Cognito-Id');
+        
+        if (!$cognitoId) {
+            return $this->json(['error' => 'Authentication required'], Response::HTTP_UNAUTHORIZED);
+        }
+        
+        try {
+            // Récupérer l'utilisateur et son groupe
+            $user = $this->userService->findUserByCognitoId($cognitoId);
+            
+            if (!$user) {
+                return $this->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+            }
+            
+            $userGroup = $user->getUserGroup();
+            
+            if (!$userGroup) {
+                return $this->json(['error' => 'User group not found'], Response::HTTP_NOT_FOUND);
+            }
+            
+            $document = $this->documentRepository->findOneByUuid($id);
+            
+            if (!$document) {
+                return $this->json(['error' => 'Document not found'], Response::HTTP_NOT_FOUND);
+            }
+            
+            // Vérifier que le document appartient au groupe de l'utilisateur
+            if ($document->getUserGroup() !== $userGroup) {
+                return $this->json(['error' => 'Access denied'], Response::HTTP_FORBIDDEN);
+            }
+            
+            // Décoder le contenu base64 du PDF
+            $pdfContent = base64_decode($document->getBlob());
+            
+            if ($pdfContent === false) {
+                return $this->json(['error' => 'Invalid PDF content'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+            
+            // Créer la réponse avec le contenu PDF
+            $response = new Response($pdfContent);
+            $response->headers->set('Content-Type', 'application/pdf');
+            $response->headers->set('Content-Disposition', 'inline; filename="' . ($document->getFilename() ?: 'document.pdf') . '"');
+            
+            return $response;
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }

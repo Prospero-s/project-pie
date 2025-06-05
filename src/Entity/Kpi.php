@@ -19,7 +19,7 @@ class Kpi
     #[Groups(["kpi", "document"])]
     private $name;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'float', nullable: true)]
     #[Groups(["kpi", "document"])]
     private $value;
 
@@ -30,10 +30,6 @@ class Kpi
     #[ORM\ManyToOne(targetEntity: Document::class, inversedBy: 'kpis')]
     #[ORM\JoinColumn(nullable: false)]
     private $document;
-
-    #[ORM\Column(type: 'float', nullable: true)]
-    #[Groups(["kpi", "document"])]
-    private $numericValue;
 
     #[ORM\Column(type: 'string', length: 20, nullable: true)]
     #[Groups(["kpi", "document"])]
@@ -61,12 +57,12 @@ class Kpi
         return $this;
     }
 
-    public function getValue(): ?string
+    public function getValue(): ?float
     {
         return $this->value;
     }
 
-    public function setValue(string $value): self
+    public function setValue(?float $value): self
     {
         $this->value = $value;
 
@@ -93,18 +89,6 @@ class Kpi
     public function setDocument(?Document $document): self
     {
         $this->document = $document;
-
-        return $this;
-    }
-
-    public function getNumericValue(): ?float
-    {
-        return $this->numericValue;
-    }
-
-    public function setNumericValue(?float $numericValue): self
-    {
-        $this->numericValue = $numericValue;
 
         return $this;
     }

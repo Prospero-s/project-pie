@@ -32,6 +32,10 @@ class Document
     #[Groups(["document", "document_list"])]
     private $periodicity;
 
+    #[ORM\Column(type: 'string', length: 20, options: ['default' => 'draft'])]
+    #[Groups(["document", "document_list"])]
+    private $status = 'draft';
+
     #[ORM\OneToMany(mappedBy: 'document', targetEntity: Kpi::class, orphanRemoval: true)]
     #[Groups(["document"])]
     private $kpis;
@@ -55,6 +59,7 @@ class Document
         $this->id = Uuid::v4();
         $this->addDate = new \DateTime();
         $this->kpis = new ArrayCollection();
+        $this->status = 'draft';
     }
 
     public function getId(): ?Uuid
@@ -106,6 +111,18 @@ class Document
     public function setPeriodicity(string $periodicity): self
     {
         $this->periodicity = $periodicity;
+
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
 
         return $this;
     }

@@ -4,6 +4,7 @@ import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import {
   fetchDocuments,
   deleteDocument,
+  openDocumentInNewWindow,
 } from '@/services/documents/documentsService';
 import { useNavigate } from 'react-router-dom';
 import EmptyDocumentState from './EmptyDocumentState';
@@ -72,7 +73,7 @@ const TableDocuments = ({ t }) => {
       key: 'status',
       filters: [
         { text: t('table.statuses.draft'), value: 'draft' },
-        { text: t('table.statuses.processed'), value: 'processed' },
+        { text: t('table.statuses.validated'), value: 'validated' },
       ],
       onFilter: (value, record) => record.status === value,
       render: status =>
@@ -90,7 +91,12 @@ const TableDocuments = ({ t }) => {
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : (
-          text || record.pdfUrl || t('table.unknown_filename')
+          <span
+            className="text-blue-600 hover:text-blue-800 cursor-pointer underline"
+            onClick={() => openDocumentInNewWindow(record.id)}
+          >
+            {text || record.pdfUrl || t('table.unknown_filename')}
+          </span>
         ),
     },
     {

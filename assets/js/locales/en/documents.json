@@ -26,7 +26,8 @@
     "actions": "Actions",
     "statuses": {
       "draft": "Draft",
-      "processed": "Processed"
+      "processed": "Processed",
+      "validated": "Validated"
     },
     "tooltips": {
       "edit": "Edit",
@@ -58,11 +59,22 @@
       "half_yearly": "Half-yearly",
       "yearly": "Yearly",
       "all_years": "All Years",
+      "year_not_specified": "Year not specified",
       "periods_detected": "periods detected"
     },
     "validation": {
       "error_title": "Validation error",
-      "form_failed": "Error validating the form"
+      "form_failed": "Error validating the form",
+      "year_required_title": "Year required",
+      "year_required_message": "A year must be specified to validate the document. Please select a year before continuing.",
+      "missing_data_title": "Missing data",
+      "missing_pdf_message": "The document data is incomplete. Unable to proceed with validation.",
+      "success_title": "Document validated successfully",
+      "success_message": "The document has been validated and saved. You will be redirected to the documents list.",
+      "error_message": "An error occurred while validating the document: {{error}}",
+      "pdf_read_error": "Unable to read the PDF document content.",
+      "network_error": "Network error while retrieving the document.",
+      "validating": "Document validation in progress..."
     },
     "extracted_document": "Extracted document",
     "no_periods": "No periods detected",
@@ -114,8 +126,18 @@
       "kpi_name_required": "KPI name is required",
       "add_button": "Add",
       "duplicate_error": "A KPI with this name already exists.",
-      "success": "KPI '{kpiName}' added successfully.",
+      "success": "KPI '{{kpiName}}' added successfully.",
       "validation_error": "Validation error. Check the fields."
+    },
+    "year_selection": {
+      "title": "Year selection required",
+      "description": "The year could not be detected automatically. Please select the year corresponding to the financial data in the document.",
+      "select_year": "Select year",
+      "placeholder": "Choose a year",
+      "continue": "Continue",
+      "change_hint": "You can modify the year to reprocess the data",
+      "year_updated": "Year updated: {{year}}. Data reprocessed.",
+      "year_cleared": "Year cleared. Data reprocessed without specific year."
     }
   },
   "upload": {
@@ -130,7 +152,13 @@
     "yearly": "Yearly",
     "select_year": "Select year",
     "select_year_placeholder": "Year to analyze",
+    "year_optional_hint": "Year is optional. If not specified, AI will attempt to detect it automatically.",
     "analyze": "Analyze document",
+    "processing": {
+      "title": "Processing in progress...",
+      "message": "Your document is being analyzed. Please wait.",
+      "file_size_note": "Processing may take a few seconds depending on file size."
+    },
     "kpi_labels": {
       "chiffre_affaire": "Revenue",
       "marge_brute": "Gross margin",
@@ -164,8 +192,8 @@
       "analysis_error": "Error analyzing the document",
       "no_response": "Server did not respond. Please try again"
     },
-    "file_selected": "File selected: {name}",
     "file_removed": "File removed",
     "success": "Document analyzed successfully"
-  }
+  },
+  "validate_document": "Validate document"
 }

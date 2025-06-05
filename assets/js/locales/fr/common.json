@@ -1,3 +1,7 @@
 {
-  "processing": "Traitement en cours..."
-} 
+  "processing": "Traitement en cours...",
+  "ok": "OK",
+  "understood": "Compris",
+  "cancel": "Annuler",
+  "validate": "Valider"
+}

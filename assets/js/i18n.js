@@ -26,8 +26,10 @@ import enDocuments from './locales/en/documents.json';
 import frDocuments from './locales/fr/documents.json';
 import enMetrics from './locales/en/metrics.json';
 import frMetrics from './locales/fr/metrics.json';
-import enTextract from './locales/en/textract.json';
-import frTextract from './locales/fr/textract.json';
+import enExtractResult from './locales/en/extractresult.json';
+import frExtractResult from './locales/fr/extractresult.json';
+import frCommon from './locales/fr/common.json';
+import enCommon from './locales/en/common.json';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -35,7 +37,7 @@ i18n.use(initReactI18next).init({
       translation: {
         ...frGlobal,
         ...frMetrics,
-        metrics: frMetrics
+        metrics: frMetrics,
       },
       signin: frSignIn,
       signup: frSignUp,
@@ -49,13 +51,14 @@ i18n.use(initReactI18next).init({
       charts: frCharts,
       documents: frDocuments,
       metrics: frMetrics,
-      textract: frTextract,
+      extractresult: frExtractResult,
+      common: frCommon,
     },
     en: {
       translation: {
         ...enGlobal,
         ...enMetrics,
-        metrics: enMetrics
+        metrics: enMetrics,
       },
       signin: enSignIn,
       signup: enSignUp,
@@ -69,7 +72,8 @@ i18n.use(initReactI18next).init({
       charts: enCharts,
       documents: enDocuments,
       metrics: enMetrics,
-      textract: enTextract,
+      extractresult: enExtractResult,
+      common: enCommon,
     },
   },
   lng: 'fr',
@@ -82,7 +86,22 @@ i18n.use(initReactI18next).init({
     bindI18n: 'languageChanged loaded',
   },
   defaultNS: 'translation',
-  ns: ['translation', 'signin', 'signup', 'menu', 'investments', 'allCompanies', 'groups', 'global', 'dashboard', 'settings', 'charts', 'documents', 'metrics'],
+  ns: [
+    'translation',
+    'signin',
+    'signup',
+    'menu',
+    'investments',
+    'allCompanies',
+    'groups',
+    'global',
+    'dashboard',
+    'settings',
+    'charts',
+    'documents',
+    'metrics',
+    'common',
+  ],
   initImmediate: true,
 });
 
