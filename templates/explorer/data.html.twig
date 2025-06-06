@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Explorateur de données - {{ queryName }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Données pour {{ company.denomination }}</h1>
+    <h2>{{ queryName }}</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        {% for key, value in data[0] ?? {} %}
+                            <th>{{ key|capitalize|replace({'_': ' '}) }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                        <tr>
+                            {% for key, value in row %}
+                                <td>
+                                    {% if value is numeric and (key ends with 'value' or key ends with 'revenue' or key ends with 'amount') %}
+                                        {% if value >= 1000000 %}
+                                            {{ (value / 1000000)|number_format(2) }} M€
+                                        {% else %}
+                                            {{ (value / 1000)|number_format(0) }} K€
+                                        {% endif %}
+                                    {% else %}
+                                        {{ value }}
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="{{ path('explorer_queries') }}" class="btn btn-primary">Retour aux requêtes</a>
+    </div>
+</div>
+
+{# Script pour initialiser le JSON des données pour l'utilisation dans JavaScript #}
+<script>
+    window.explorerData = {{ data|json_encode|raw }};
+    window.queryName = "{{ queryName }}";
+</script>
+{% endblock %} 

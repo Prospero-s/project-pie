@@ -4,6 +4,7 @@ import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import {
   fetchDocuments,
   deleteDocument,
+  openDocumentInNewWindow,
 } from '@/services/documents/documentsService';
 import { useNavigate } from 'react-router-dom';
 import EmptyDocumentState from './EmptyDocumentState';
@@ -72,7 +73,7 @@ const TableDocuments = ({ t }) => {
       key: 'status',
       filters: [
         { text: t('table.statuses.draft'), value: 'draft' },
-        { text: t('table.statuses.processed'), value: 'processed' },
+        { text: t('table.statuses.validated'), value: 'validated' },
       ],
       onFilter: (value, record) => record.status === value,
       render: status =>
@@ -84,30 +85,48 @@ const TableDocuments = ({ t }) => {
     },
     {
       title: t('table.filename'),
-      dataIndex: 'pdfUrl',
-      key: 'pdfUrl',
-      render: text =>
-        loading ? <Skeleton.Input block active size="small" /> : text,
+      dataIndex: 'filename',
+      key: 'filename',
+      render: (text, record) =>
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : (
+          <span
+            className="text-blue-600 hover:text-blue-800 cursor-pointer underline"
+            onClick={() => openDocumentInNewWindow(record.id)}
+          >
+            {text || record.pdfUrl || t('table.unknown_filename')}
+          </span>
+        ),
     },
     {
       title: t('table.company'),
       dataIndex: 'company',
       key: 'company',
-      render: text =>
-        loading ? <Skeleton.Input block active size="small" /> : text,
+      render: company =>
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : company && company.denomination ? (
+          company.denomination
+        ) : (
+          t('table.unknown_company')
+        ),
     },
     {
       title: t('table.last_update'),
-      dataIndex: 'createdAt',
-      key: 'createdAt',
+      dataIndex: 'addDate',
+      key: 'addDate',
       render: date =>
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : (
+          date &&
           new Date(date).toLocaleDateString('fr-FR', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
           })
         ),
     },

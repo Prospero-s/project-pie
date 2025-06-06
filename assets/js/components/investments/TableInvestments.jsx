@@ -200,7 +200,7 @@ const TableInvestments = ({
                 alt={record?.company?.name ?? 'company-default-logo'}
                 className="w-10 h-10 rounded-full"
               />
-              <span>{t('company_details.company.name')}</span>
+              <span>{text}</span>
             </div>
           </Link>
         ),

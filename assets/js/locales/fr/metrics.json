@@ -1,7 +1,225 @@
 {
-  "all_metrics": "Tous les indicateurs",
-  "global_metrics": "Indicateurs globaux",
+  "all_metrics": "Toutes les Métriques",
+  "global_metrics": "Métriques Globales",
   "documents": "Documents",
-  "investment_details": "Détails de l'investissement",
-  "info": "Info"
+  "investment_details": "Détails d'Investissement",
+  "info": "Info",
+  
+  "data": "Données",
+  "no_data": "Aucune donnée disponible",
+  "custom_chart": "Graphique Personnalisé",
+  "unsupported_chart_type": "Type de graphique non pris en charge",
+  
+  "layout": {
+    "columns": "Colonnes",
+    "move": "Déplacer",
+    "resize": "Redimensionner"
+  },
+  
+  "drawer": {
+    "title": "Explorateur de Données",
+    "execute": "Exécuter",
+    "select_query": "Sélectionnez une requête prédéfinie",
+    "results": "Résultats",
+    "add_chart": "Ajouter un Graphique",
+    "chart_title": "Titre du Graphique",
+    "chart_title_placeholder": "Entrez un titre pour le graphique",
+    "chart_type": "Type de Graphique",
+    "add_chart_button": "Ajouter ce graphique",
+    "execute_query": "Exécutez une requête pour voir les résultats",
+    "select_and_execute": "Sélectionnez et exécutez une requête",
+    "graph_added": "Graphique ajouté au tableau de bord",
+    "no_data": "Aucune donnée disponible pour créer un graphique",
+    "x_axis": "Axe X",
+    "y_axes": "Axe(s) Y",
+    "select_x_axis": "Sélectionnez une colonne pour l'axe X",
+    "select_y_axes": "Sélectionnez une ou plusieurs colonnes pour l'axe Y",
+    "chart_preview": "Aperçu du graphique",
+    "missing_axes": "Vous devez sélectionner un axe X et au moins un axe Y"
+  },
+  
+  "chart_types": {
+    "bar": "Barre",
+    "line": "Ligne",
+    "area": "Zone",
+    "pie": "Camembert",
+    "radar": "Radar"
+  },
+  
+  "chart_preview": {
+    "no_data": "Sélectionnez les axes pour voir l'aperçu",
+    "invalid_type": "Type de graphique non valide"
+  },
+  
+  "queries": {
+    "monthly_revenue": {
+      "name": "Revenu Mensuel",
+      "description": "Montre le revenu mensuel pour les 12 derniers mois"
+    },
+    "clients_by_sector": {
+      "name": "Clients par Secteur",
+      "description": "Répartition des clients par secteur d'activité"
+    },
+    "arr_growth": {
+      "name": "Croissance ARR",
+      "description": "Évolution du revenu annuel récurrent par trimestre"
+    },
+    "top_clients": {
+      "name": "Top 10 Clients",
+      "description": "Liste des 10 plus grands clients par valeur"
+    },
+    "headcount": {
+      "name": "Évolution des Effectifs",
+      "description": "Nombre d'employés par trimestre"
+    },
+    "investments": {
+      "name": "Investissements",
+      "description": "Valeur des investissements par trimestre"
+    },
+    "total_investment": {
+      "name": "Total investi",
+      "description": "Montant total investi dans l'entreprise"
+    }
+  },
+  
+  "default_query": {
+    "name": "Requête par Défaut",
+    "description": "Une requête par défaut"
+  },
+  
+  "errors": {
+    "cannot_load_queries": "Impossible de charger les requêtes prédéfinies. Utilisation des requêtes par défaut.",
+    "select_query": "Veuillez sélectionner une requête à exécuter",
+    "invalid_format": "Format de résultats invalide",
+    "query_execution": "Erreur lors de l'exécution de la requête",
+    "unknown": "Erreur inconnue",
+    "cannot_transform_data": "Impossible de transformer les données pour le graphique",
+    "cannot_create_chart": "Impossible de créer le graphique : ",
+    "custom_error": "{{error}}"
+  },
+  
+  "info": {
+    "no_results": "La requête n'a retourné aucun résultat"
+  },
+  
+  "warnings": {
+    "execute_query_first": "Veuillez d'abord exécuter une requête pour obtenir des données"
+  },
+  
+  "success": {
+    "chart_added": "Graphique ajouté avec succès"
+  },
+  
+  "common": {
+    "loading": "Chargement...",
+    "close": "Fermer",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  
+  "data_explorer": {
+    "add_column": "Ajouter une colonne",
+    "pivot": "Pivot",
+    "visibility": "Visibilité",
+    "create_calculated_column": "Créer une colonne calculée",
+    "column_name": "Nom de la colonne",
+    "column_name_placeholder": "ex: Marge brute",
+    "expression": "Expression",
+    "expression_placeholder": "ex: revenue * 0.7",
+    "display_format": "Format d'affichage",
+    "available_columns": "Colonnes disponibles:",
+    "operators": "Opérateurs: +, -, *, /, >, <, ==, !=, &&, ||, ?",
+    "format_default": "Par défaut",
+    "format_percentage": "Pourcentage",
+    "format_currency": "Devise (€)",
+    "name_expression_required": "Le nom et l'expression sont requis",
+    "name_required": "Le nom de la colonne est requis",
+    "expression_required": "L'expression est requise",
+    "column_added": "Colonne calculée ajoutée",
+    "column_updated": "Colonne calculée modifiée",
+    "column_removed": "Colonne calculée supprimée",
+    "edit_column": "Modifier la colonne",
+    "delete_column": "Supprimer la colonne",
+    "confirm_delete_column": "Supprimer cette colonne ?",
+    "delete_column_warning": "Cette action ne peut pas être annulée.",
+    "column_name_required": "Le nom de la colonne est requis",
+    "show_in_visualization": "Afficher dans la visualisation",
+    "hide_from_visualization": "Masquer dans la visualisation",
+    "remove_pivot": "Supprimer le pivot",
+    "add_pivot": "Pivoter cette colonne",
+    "filter": "Filtrer",
+    "equals": "Égal à...",
+    "not_equals": "Différent de...",
+    "contains": "Contient...",
+    "not_contains": "Ne contient pas...",
+    "greater_than": "Supérieur à...",
+    "greater_equal": "Supérieur ou égal à...",
+    "less_than": "Inférieur à...",
+    "less_equal": "Inférieur ou égal à...",
+    "between": "Entre...",
+    "between_min": "Valeur minimale",
+    "between_max": "Valeur maximale",
+    "starts_with": "Commence par...",
+    "ends_with": "Se termine par...",
+    "equals_number": "Égal à (nombre)...",
+    "contains_short": "contient",
+    "not_contains_short": "ne contient pas",
+    "between_short": "entre",
+    "starts_with_short": "commence par",
+    "ends_with_short": "se termine par",
+    "clear_all_filters": "Effacer tous les filtres",
+    "sort_ascending": "Trier croissant",
+    "sort_descending": "Trier décroissant",
+    "sort": "Tri:",
+    "filter_label": "Filtre:",
+    "column_header": "{{column}}",
+    "data_source": "Source de données",
+    "external_company": "Entreprise externe",
+    "formula": "Formule",
+    "external_company_help": "Choisissez une autre entreprise comme source de données",
+    "formula_help": "Créez une formule avec les colonnes existantes",
+    "select_company": "Sélectionner une entreprise",
+    "select_company_help": "Choisissez une entreprise dont vous souhaitez utiliser les données",
+    "select_company_placeholder": "Sélectionner une entreprise...",
+    "company_required": "Une entreprise doit être sélectionnée",
+    "no_external_data": "Aucune donnée disponible pour cette entreprise",
+    "external_data_error": "Erreur lors de la récupération des données externes"
+  },
+  
+  "type_fixed_for_total_investment": "Graphique en barres recommandé pour cette visualisation",
+  
+  "predefined_queries": {
+    "1": {
+      "name": "Revenus mensuels",
+      "description": "Évolution des revenus par mois"
+    },
+    "2": {
+      "name": "Clients par secteur", 
+      "description": "Répartition des clients par secteur d'activité"
+    },
+    "3": {
+      "name": "Croissance ARR",
+      "description": "Évolution de l'ARR (Annual Recurring Revenue) par trimestre"
+    },
+    "4": {
+      "name": "Top 10 clients",
+      "description": "Liste des 10 plus grands clients par valeur"
+    },
+    "5": {
+      "name": "Évolution des effectifs",
+      "description": "Évolution du nombre d'employés par trimestre"
+    },
+    "6": {
+      "name": "Investissements",
+      "description": "Valeur des investissements par trimestre"
+    },
+    "7": {
+      "name": "Total investi",
+      "description": "Montant total investi dans l'entreprise"
+    },
+    "8": {
+      "name": "Analyse KPI par période",
+      "description": "Vue d'ensemble des KPI principaux avec évolution période par période"
+    }
+  }
 }

@@ -17,5 +17,6 @@
   "portfolio": "Portfolio",
   "dashboard": "Dashboard",
   "companies": "Companies",
-  "documents": "Documents"
+  "documents": "Documents",
+  "financial_extraction": "Financial Extraction"
 }

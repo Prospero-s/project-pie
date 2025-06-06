@@ -26,10 +26,19 @@ import enDocuments from './locales/en/documents.json';
 import frDocuments from './locales/fr/documents.json';
 import enMetrics from './locales/en/metrics.json';
 import frMetrics from './locales/fr/metrics.json';
+import enExtractResult from './locales/en/extractresult.json';
+import frExtractResult from './locales/fr/extractresult.json';
+import frCommon from './locales/fr/common.json';
+import enCommon from './locales/en/common.json';
 
 i18n.use(initReactI18next).init({
   resources: {
     fr: {
+      translation: {
+        ...frGlobal,
+        ...frMetrics,
+        metrics: frMetrics,
+      },
       signin: frSignIn,
       signup: frSignUp,
       menu: frMenu,
@@ -42,8 +51,15 @@ i18n.use(initReactI18next).init({
       charts: frCharts,
       documents: frDocuments,
       metrics: frMetrics,
+      extractresult: frExtractResult,
+      common: frCommon,
     },
     en: {
+      translation: {
+        ...enGlobal,
+        ...enMetrics,
+        metrics: enMetrics,
+      },
       signin: enSignIn,
       signup: enSignUp,
       menu: enMenu,
@@ -56,6 +72,8 @@ i18n.use(initReactI18next).init({
       charts: enCharts,
       documents: enDocuments,
       metrics: enMetrics,
+      extractresult: enExtractResult,
+      common: enCommon,
     },
   },
   lng: 'fr',
@@ -67,6 +85,23 @@ i18n.use(initReactI18next).init({
     useSuspense: false,
     bindI18n: 'languageChanged loaded',
   },
+  defaultNS: 'translation',
+  ns: [
+    'translation',
+    'signin',
+    'signup',
+    'menu',
+    'investments',
+    'allCompanies',
+    'groups',
+    'global',
+    'dashboard',
+    'settings',
+    'charts',
+    'documents',
+    'metrics',
+    'common',
+  ],
   initImmediate: true,
 });
 

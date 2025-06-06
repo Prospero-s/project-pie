@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity]
 class Company
@@ -12,12 +13,15 @@ class Company
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["document", "document_list"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 9, unique: true)]
+    #[Groups(["document", "document_list"])]
     private string $siren;
 
     #[ORM\Column(type: 'text')]
+    #[Groups(["document", "document_list"])]
     private string $denomination;
 
     #[ORM\Column(type: 'text', nullable: true)]
@@ -30,6 +34,7 @@ class Company
     private ?string $siret = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(["document", "document_list"])]
     private ?string $sector = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
