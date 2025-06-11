@@ -9,7 +9,7 @@ const EmptyDocumentState = ({ t, onAddClick }) => {
       <h3 className="text-lg font-medium text-slate-900 mb-2">
         {t('empty.title')}
       </h3>
-      <p className="text-sm text-slate-500 mb-4 text-center max-w-md">
+      <p className="font-degarism text-sm text-slate-500 mb-4 text-center max-w-md">
         {t('empty.description')}
       </p>
       <Button type="primary" onClick={onAddClick} className="bg-blue-500">

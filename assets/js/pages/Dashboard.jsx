@@ -66,7 +66,9 @@ const Dashboard = ({ i18n }) => {
       <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
         {t('message_start')}, {user.user_metadata.full_name ?? user.email}
       </h2>
-      <p className="mt-4 mb-8 text-gray-500">{t('message_description')}</p>
+      <p className="font-degarism text-base mt-4 mb-8 text-gray-500">
+        {t('message_description')}
+      </p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white rounded-lg shadow-sm">

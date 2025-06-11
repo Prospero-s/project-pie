@@ -37,28 +37,44 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, i18n }) => {
     {
       key: 'dashboard',
       icon: <DashboardOutlined className="!text-2xl lg:text-xl" />,
-      label: <Link to={`/${lng}/dashboard`}>{t('dashboard')}</Link>,
+      label: (
+        <Link className="text-base" to={`/${lng}/dashboard`}>
+          {t('dashboard')}
+        </Link>
+      ),
     },
     {
       key: 'investments',
       icon: <FolderOutlined className="!text-2xl lg:text-xl" />,
-      label: <Link to={`/${lng}/investments`}>{t('portfolio')}</Link>,
+      label: (
+        <Link className="text-base" to={`/${lng}/investments`}>
+          {t('portfolio')}
+        </Link>
+      ),
     },
     {
       key: 'companies',
       icon: <FileSearchOutlined className="!text-2xl lg:text-xl" />,
-      label: <Link to={`/${lng}/companies`}>{t('companies')}</Link>,
+      label: (
+        <Link className="text-base" to={`/${lng}/companies`}>
+          {t('companies')}
+        </Link>
+      ),
     },
     {
       key: 'documents',
       icon: <FolderOpenOutlined className="!text-2xl lg:text-xl" />,
-      label: <Link to={`/${lng}/documents`}>{t('documents')}</Link>,
+      label: (
+        <Link className="text-base" to={`/${lng}/documents`}>
+          {t('documents')}
+        </Link>
+      ),
     },
   ];
 
   return (
     <Sider
-      className="!bg-gray_100"
+      className="!bg-gray_100 flex flex-col h-full"
       width={240}
       collapsible={!isMobile}
       collapsed={isMobile || !sidebarOpen}
@@ -66,26 +82,33 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, i18n }) => {
       trigger={null}
     >
       <div className="flex items-center justify-between h-16 px-4">
-        <img
-          src={sidebarOpen ? logoProspero : logoIconProspero}
-          alt="Logo"
-          className="h-6 w-auto transition-all duration-300"
-        />
         <button
-          className="p-2 ml-2 bg-gray_200 text-black rounded-md hover:bg-blue-500 hover:text-white transition-all duration-300"
+          className="text-lg p-2 m-auto bg-gray_200 text-black rounded-md hover:bg-blue-500 hover:text-white transition-all duration-300"
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
           {sidebarOpen ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
         </button>
       </div>
+
       <Divider className="my-0" />
-      <Menu
-        theme="light"
-        className="bg-gray_100 p-2"
-        mode="inline"
-        selectedKeys={[activePath]}
-        items={menuItems}
-      />
+
+      <div className="flex-1 overflow-auto">
+        <Menu
+          theme="light"
+          className="bg-gray_100 p-2"
+          mode="inline"
+          selectedKeys={[activePath]}
+          items={menuItems}
+        />
+      </div>
+
+      <div className="absolute bottom-5 left-[15%] right-[15%] flex justify-center">
+        <img
+          src={sidebarOpen ? logoProspero : logoIconProspero}
+          alt="Logo"
+          className="h-6 w-auto mb-4 transition-all duration-300"
+        />
+      </div>
     </Sider>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BellOutlined } from '@ant-design/icons';
+import { BellOutlined, SunOutlined, MoonOutlined } from '@ant-design/icons';
 import { Badge, Dropdown, Spin } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { fetchNotifications } from '@/services/notification/notificationService';
@@ -10,6 +10,20 @@ const DropdownNotification = ({ i18n, user }) => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [countNotifications, setCountNotifications] = useState(null);
+
+  // État du thème, récupère depuis localStorage ou par défaut 'light'
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem('theme') || 'light',
+  );
+
+  useEffect(() => {
+    // Appliquer la classe thème sur body
+    document.body.classList.remove('light', 'dark');
+    document.body.classList.add(theme);
+
+    // Sauvegarder dans localStorage
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -37,7 +51,7 @@ const DropdownNotification = ({ i18n, user }) => {
           {
             key: 'notifications_list',
             label: (
-              <div className="flex flex-col gap-2 px-2 py-1 lg:px-6 lg:py-4">
+              <div className="flex flex-col gap-2 p-4 lg:px-6 lg:py-4">
                 {notifications.length > 0 && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text_gray_900">
@@ -52,7 +66,7 @@ const DropdownNotification = ({ i18n, user }) => {
                   {notifications.map(notification => (
                     <li
                       key={notification.id}
-                      className="flex items-center gap-4 border-b border-stroke px-2 py-1 lg:px-4 lg:py-2 hover:bg-gray-2"
+                      className="flex items-center gap-4 border-b border-stroke px-2 pt-2 pb-4 lg:px-4 hover:bg-gray-2"
                     >
                       <div className="flex flex-1 items-center justify-between">
                         <div>
@@ -87,25 +101,46 @@ const DropdownNotification = ({ i18n, user }) => {
           },
         ];
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center">
-        <Spin size="large" />
-      </div>
-    );
-  }
+  // Fonction toggle thème
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
 
   return (
-    <Dropdown
-      menu={{ items }}
-      trigger={['click']}
-      placement={isMobile ? 'bottomLeft' : 'bottom'}
-      arrow
-    >
-      <Badge count={countNotifications} className="cursor-pointer">
-        <BellOutlined className="text-2xl lg:text-3xl hover:text-primary transition-colors duration-300" />
-      </Badge>
-    </Dropdown>
+    <div className="flex items-center gap-4">
+      {/* Dropdown notification */}
+      <Dropdown
+        menu={{ items }}
+        trigger={['click']}
+        placement={isMobile ? 'bottomLeft' : 'bottom'}
+        arrow
+        dropdownRender={menuNode => (
+          <div className="ring-1 ring-black/5 rounded-md bg-white shadow-md w-80">
+            {menuNode}
+          </div>
+        )}
+      >
+        <div className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 hover:ring-1 hover:ring-black/10 transition-all duration-300 cursor-pointer">
+          <Badge count={countNotifications}>
+            <BellOutlined className="text-2xl hover:text-primary transition-colors duration-300" />
+          </Badge>
+        </div>
+      </Dropdown>
+
+      {/* Toggle theme (hors dropdown) */}
+      <button
+        onClick={toggleTheme}
+        className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 hover:ring-1 hover:ring-black/10 transition-all duration-300 cursor-pointer select-none"
+        aria-label="Toggle theme"
+        type="button"
+      >
+        {theme === 'light' ? (
+          <SunOutlined className="text-2xl text-yellow-400" />
+        ) : (
+          <MoonOutlined className="text-2xl text-indigo-700" />
+        )}
+      </button>
+    </div>
   );
 };
 

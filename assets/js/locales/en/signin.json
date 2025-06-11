@@ -29,7 +29,7 @@
   "check_inbox": "Please check your inbox for the new verification email.",
   "resend_error": "Resend error",
   "resend_error_message": "An error occurred while resending the verification email. Please try again later.",
-  "forgot_password_text": "Forgot password?",
+  "forgot_password_text": "Forgot password ?",
   "forgot_password": {
     "title": "Reset Password",
     "email": "Email",

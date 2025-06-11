@@ -21,6 +21,21 @@
   src: url("./fonts/Inter-VariableFont.ttf");
 }
 
+@font-face {
+  font-family: "Degarism";
+  src: url("./fonts/Degarism-Studio-Alliance-No.1-Light.otf");
+}
+
+body.light {
+  /* styles day */
+}
+
+body.dark {
+  /* styles night */
+  background-color: #1a202c; /* exemple */
+  color: #f7fafc;
+}
+
 .ant-menu-item-selected {
   background-color: #f1f1f1 !important;
 }

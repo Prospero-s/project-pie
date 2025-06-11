@@ -15,13 +15,13 @@ const FooterLayout = ({ i18n, isDashboard }) => {
 
   return isDashboard ? (
     <Footer style={{ textAlign: 'center' }}>
-      <span className="text-sm text-gray-500">
+      <span className="font-degarism text-sm text-gray-500">
         © 2024 - {new Date().getFullYear()} | {t('copyright')}
       </span>
     </Footer>
   ) : (
     <div className="px-8 py-6 lg:px-12">
-      <span className="text-sm text-gray-500">
+      <span className="font-degarism text-sm text-gray-500">
         {' '}
         © 2024 - {new Date().getFullYear()} | {t('copyright')}
       </span>

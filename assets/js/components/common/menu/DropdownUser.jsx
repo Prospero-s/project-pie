@@ -55,7 +55,17 @@ const DropdownUser = ({ i18n, user }) => {
 
   return (
     <>
-      <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
+      <Dropdown
+        menu={{ items }}
+        trigger={['click']}
+        placement="bottomRight"
+        arrow
+        dropdownRender={menuNode => (
+          <div className="ring-1 ring-black/5 rounded-md bg-white shadow-md w-80">
+            {menuNode}
+          </div>
+        )}
+      >
         <div className="flex items-center gap-4 cursor-pointer text-lg">
           <div className="hidden lg:block text-right">
             <span className="block font-medium">
