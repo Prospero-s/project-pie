@@ -183,6 +183,27 @@ const TableInvestments = ({
     }
   };
 
+  const getSectorTypeColor = type => {
+    switch (type) {
+      case 'technology':
+        return 'geekblue';
+      case 'healthcare':
+        return 'volcano';
+      case 'finance':
+        return 'gold';
+      case 'retail':
+        return 'magenta';
+      case 'manufacturing':
+        return 'purple';
+      case 'energy':
+        return 'lime';
+      case 'education':
+        return 'cyan';
+      default:
+        return 'default';
+    }
+  };
+
   const columns = [
     {
       title: t('company_details.company.name'),
@@ -232,7 +253,9 @@ const TableInvestments = ({
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : sector ? (
-          t(`company_details.sectors.${sector}`)
+          <Tag color={getSectorTypeColor(sector)}>
+            {t(`company_details.sectors.${sector}`)}
+          </Tag>
         ) : (
           '-'
         ),
