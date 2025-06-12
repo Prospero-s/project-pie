@@ -8,10 +8,10 @@ const Support = ({ i18n }) => {
   const { TextArea } = Input;
 
   const onFinish = values => {
-    console.log('Success:', values);
+    console.warn('Success:', values);
   };
   const onFinishFailed = errorInfo => {
-    console.log('Failed:', errorInfo);
+    console.error('Failed:', errorInfo);
   };
 
   return (

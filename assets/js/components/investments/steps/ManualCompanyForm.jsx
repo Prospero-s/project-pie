@@ -4,6 +4,7 @@ import { Form, Input, Button, Select } from 'antd';
 const { Option } = Select;
 
 const ManualCompanyForm = ({ onNext, onBack, t }) => {
+  const [form] = Form.useForm();
   const sectors = [
     { value: 'technology', label: t('company_details.sectors.technology') },
     { value: 'healthcare', label: t('company_details.sectors.healthcare') },
@@ -33,7 +34,12 @@ const ManualCompanyForm = ({ onNext, onBack, t }) => {
   };
 
   return (
-    <Form layout="vertical" className="px-1 sm:px-2" onFinish={onFinish}>
+    <Form
+      form={form}
+      layout="vertical"
+      className="px-1 sm:px-2"
+      onFinish={onFinish}
+    >
       <Form.Item
         name="denomination"
         label={t('company_details.company.name')}
@@ -52,14 +58,24 @@ const ManualCompanyForm = ({ onNext, onBack, t }) => {
         label={t('company_details.siren')}
         rules={[
           { required: true, message: t('company_details.siren_required') },
-          { min: 9, message: t('company_details.siren_invalid') },
-          { max: 9, message: t('company_details.siren_invalid') },
+          { pattern: /^\d{9}$/, message: t('company_details.siren_invalid') },
         ]}
       >
         <Input
           placeholder={t('company_details.siren_placeholder')}
-          minLength={9}
           maxLength={9}
+          inputMode="numeric"
+          onPaste={e => {
+            const pasted = e.clipboardData.getData('Text') || '';
+            const cleaned = pasted.replace(/\D/g, '').slice(0, 9); // Supprime non-chiffres, max 9
+
+            e.preventDefault();
+            form.setFieldsValue({ siren: cleaned });
+          }}
+          onChange={e => {
+            const cleaned = e.target.value.replace(/\D/g, '').slice(0, 9);
+            form.setFieldsValue({ siren: cleaned });
+          }}
         />
       </Form.Item>
 

@@ -144,6 +144,7 @@ const AutomaticCompanyForm = ({ onNext, onBack }) => {
       >
         <Input
           placeholder={t('company_details.siren_placeholder')}
+          minLength={9}
           maxLength={9}
           disabled={loading}
           onChange={e => {
