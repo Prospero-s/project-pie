@@ -3,7 +3,7 @@ import { Form, Input, Button, Select } from 'antd';
 
 const { Option } = Select;
 
-const ManualCompanyForm = ({ onNext, t }) => {
+const ManualCompanyForm = ({ onNext, onBack, t }) => {
   const sectors = [
     { value: 'technology', label: t('company_details.sectors.technology') },
     { value: 'healthcare', label: t('company_details.sectors.healthcare') },
@@ -33,7 +33,7 @@ const ManualCompanyForm = ({ onNext, t }) => {
   };
 
   return (
-    <Form layout="vertical" onFinish={onFinish}>
+    <Form layout="vertical" className="px-1 sm:px-2" onFinish={onFinish}>
       <Form.Item
         name="denomination"
         label={t('company_details.company.name')}
@@ -79,8 +79,11 @@ const ManualCompanyForm = ({ onNext, t }) => {
         </Select>
       </Form.Item>
 
-      <Form.Item>
-        <Button type="primary" htmlType="submit" block>
+      <Form.Item className="flex justify-end gap-3 flex-nowrap sm:flex-nowrap">
+        <Button className="mx-2" onClick={onBack}>
+          {t('common.back')}
+        </Button>
+        <Button className="mx-2" type="primary" htmlType="submit">
           {t('common.next')}
         </Button>
       </Form.Item>

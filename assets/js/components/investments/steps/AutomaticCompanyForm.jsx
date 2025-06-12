@@ -6,7 +6,7 @@ import { fetchCompanyDetails } from '@/services/company/companyService';
 
 const { Option } = Select;
 
-const AutomaticCompanyForm = ({ onNext }) => {
+const AutomaticCompanyForm = ({ onNext, onBack }) => {
   const { t } = useTranslation('investments');
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -180,8 +180,18 @@ const AutomaticCompanyForm = ({ onNext }) => {
           </div>
         </div>
       ) : (
-        <Form.Item className="flex justify-end">
-          <Button type="primary" htmlType="submit" className="w-full sm:w-auto">
+        <Form.Item className="flex justify-end gap-3 flex-nowrap sm:flex-nowrap">
+          <Button
+            className="mx-2"
+            onClick={() => {
+              setShowConfirmation(false);
+              setCompanyData(null);
+              onBack();
+            }}
+          >
+            {t('common.back')}
+          </Button>
+          <Button className="mx-2" type="primary" htmlType="submit">
             {t('common.search')}
           </Button>
         </Form.Item>
