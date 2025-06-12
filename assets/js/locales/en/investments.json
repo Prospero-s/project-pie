@@ -26,7 +26,8 @@
     "delete_success": "Investment deleted successfully",
     "delete_error": "Error deleting investment",
     "investment_not_found": "Investment not found",
-    "error_loading": "Error loading"
+    "error_loading": "Error loading",
+    "exportXSLX": "Export to XSLX"
   },
   "creation": {
     "title": "Company Creation",

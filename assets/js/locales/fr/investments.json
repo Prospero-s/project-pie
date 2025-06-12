@@ -26,7 +26,8 @@
     "delete_success": "Investissement supprimé avec succès",
     "delete_error": "Erreur lors de la suppression de l'investissement",
     "investment_not_found": "Investissement non trouvé",
-    "error_loading": "Erreur lors du chargement"
+    "error_loading": "Erreur lors du chargement",
+    "exportXSLX": "Export en XSLX"
   },
   "creation": {
     "title": "Création d'entreprise",

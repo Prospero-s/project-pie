@@ -35,7 +35,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, i18n }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const menuItems = [
+  const mainMenuItems = [
     {
       key: 'dashboard',
       icon: <AppstoreOutlined className="!text-2xl lg:text-xl" />,
@@ -72,12 +72,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, i18n }) => {
         </Link>
       ),
     },
+  ];
+
+  const supportMenuItems = [
     {
-      key: 'divider',
-      icon: <Divider className="my-0" />,
-    },
-    {
-      key: 'Support',
+      key: 'support',
       icon: <ToolOutlined className="!text-2xl lg:text-xl" />,
       label: (
         <Link className="text-base" to={`/${lng}/support`}>
@@ -113,7 +112,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, i18n }) => {
           className="bg-gray_100 p-2"
           mode="inline"
           selectedKeys={[activePath]}
-          items={menuItems}
+          items={mainMenuItems}
+        />
+        <Divider className="my-2" />
+        <Menu
+          theme="light"
+          className="bg-gray_100 p-2"
+          mode="inline"
+          selectedKeys={[activePath]}
+          items={supportMenuItems}
         />
       </div>
 
