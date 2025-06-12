@@ -48,7 +48,7 @@ const InvestmentGlobalSectorChart = () => {
           <CardTitle className="text-2xl font-bold text-gray-900">
             {charts('investmentGlobalSectorChart.title')}
           </CardTitle>
-          <CardDescription className="text-sm text-gray-500 mt-1">
+          <CardDescription className="text-gray-500 mt-1">
             {new Date().getFullYear()}
           </CardDescription>
         </CardHeader>
@@ -87,7 +87,7 @@ const InvestmentGlobalSectorChart = () => {
           <CardTitle className="text-2xl font-bold text-gray-900">
             {charts('investmentGlobalSectorChart.title')}
           </CardTitle>
-          <CardDescription className="text-sm text-gray-500 mt-1">
+          <CardDescription className="text-gray-500 mt-1">
             {new Date().getFullYear()}
           </CardDescription>
         </CardHeader>
@@ -131,7 +131,7 @@ const InvestmentGlobalSectorChart = () => {
         <CardTitle className="text-2xl font-bold text-gray-900">
           {charts('investmentGlobalSectorChart.title')}
         </CardTitle>
-        <CardDescription className="text-sm text-gray-500 mt-1">
+        <CardDescription className="text-gray-500 mt-1">
           {new Date().getFullYear()}
         </CardDescription>
       </CardHeader>
