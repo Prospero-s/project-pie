@@ -6,6 +6,8 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   FolderOpenOutlined,
+  AppstoreOutlined,
+  ToolOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Divider } from 'antd';
 import { Link } from 'react-router-dom';
@@ -36,7 +38,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, i18n }) => {
   const menuItems = [
     {
       key: 'dashboard',
-      icon: <DashboardOutlined className="!text-2xl lg:text-xl" />,
+      icon: <AppstoreOutlined className="!text-2xl lg:text-xl" />,
       label: (
         <Link className="text-base" to={`/${lng}/dashboard`}>
           {t('dashboard')}
@@ -67,6 +69,19 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, i18n }) => {
       label: (
         <Link className="text-base" to={`/${lng}/documents`}>
           {t('documents')}
+        </Link>
+      ),
+    },
+    {
+      key: 'divider',
+      icon: <Divider className="my-0" />,
+    },
+    {
+      key: 'Support',
+      icon: <ToolOutlined className="!text-2xl lg:text-xl" />,
+      label: (
+        <Link className="text-base" to={`/${lng}/support`}>
+          Assistance
         </Link>
       ),
     },
