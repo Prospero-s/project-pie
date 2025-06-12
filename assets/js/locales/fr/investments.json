@@ -38,6 +38,7 @@
   },
   "company_details": {
     "title": "Détails de l'entreprise",
+    "others_informations": "Autres informations",
     "confirmation_title": "Confirmation des détails de l'entreprise",
     "siren": "Numéro SIREN",
     "siren_placeholder": "Entrez le numéro SIREN (9 chiffres)",
