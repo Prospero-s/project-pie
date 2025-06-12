@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  DashboardOutlined,
   FolderOutlined,
   FileSearchOutlined,
   MenuFoldOutlined,

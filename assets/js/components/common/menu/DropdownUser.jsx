@@ -47,8 +47,8 @@ const DropdownUser = ({ i18n, user }) => {
     },
     {
       key: 'logout',
-      icon: <LogoutOutlined className="!text-base" />,
-      label: <div className="text-base">{t('logout')}</div>,
+      icon: <LogoutOutlined className="!text-base text-red-600" />,
+      label: <div className="text-base text-red-600">{t('logout')}</div>,
       onClick: handleLogout,
     },
   ];

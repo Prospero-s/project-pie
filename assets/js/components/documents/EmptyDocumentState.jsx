@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileTextOutlined } from '@ant-design/icons';
+import { FileTextOutlined, FileOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 
 const EmptyDocumentState = ({ t, onAddClick }) => {
@@ -13,6 +13,7 @@ const EmptyDocumentState = ({ t, onAddClick }) => {
         {t('empty.description')}
       </p>
       <Button type="primary" onClick={onAddClick} className="bg-blue-500">
+        <FileOutlined />
         {t('empty.action')}
       </Button>
     </div>
