@@ -14,7 +14,7 @@ from openai import OpenAI
 
 # Configuration du logging
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
@@ -253,8 +253,12 @@ def get_kpi_mapping(kpi_code: str, language: str) -> List[str]:
             'en': ["EBITDA", "Earnings Before Interest, Taxes, Depreciation, and Amortization", "Operating Income"]
         },
         'revenu_annuel': {
-            'fr': ["Revenu Annuel Récurrent", "ARR", "Revenu récurrent annuel", "RRA"],
-            'en': ["Annual Recurring Revenue", "ARR", "Recurring Annual Revenue"]
+            'fr': ["Revenu Annuel Récurrent", "ARR", "Revenu récurrent annuel", "RRA", "Net ARR", "ARR base"],
+            'en': ["Annual Recurring Revenue", "ARR", "Recurring Annual Revenue", "Net ARR", "ARR base"]
+        },
+        'croissance_arr': {
+            'fr': ["Croissance ARR", "Organic ARR growth", "Croissance ARR organique", "Taux de croissance ARR"],
+            'en': ["ARR Growth", "Organic ARR growth", "ARR Growth Rate", "Organic Growth"]
         },
         'revenu_mensuel': {
             'fr': ["Revenu Mensuel Récurrent", "MRR", "Revenu récurrent mensuel", "RRM"],
@@ -398,14 +402,30 @@ def analyze_images_with_gpt(
         - EBITDA (Excédent Brut d'Exploitation, EBE, BAIIA)
         - Marges (Gross Margin, Operating Margin, Net Margin)
         - Effectifs (Headcount, Employees, FTE, Personnel)
-        - Cash/Trésorerie (Cash, Cash Flow, Cash Burn, Funds)
-        - Revenus récurrents (ARR, MRR, Recurring Revenue)
-        - Coûts d'acquisition (CAC, Customer Acquisition Cost)
+        - Cash/Trésorerie (Cash, Cash Flow, Cash Burn, Funds, Cash Balance)
+        - Revenus récurrents (ARR, MRR, Net ARR, Recurring Revenue) - ATTENTION: distinguer les montants des pourcentages de croissance
+        - Coûts d'acquisition (CAC, Customer Acquisition Cost, CAC Ratio)
         - Valeur vie client (LTV, CLV, Customer Lifetime Value)
         - Levées de fonds (Funding, Capital Raised, Investment)
-        - Croissance (Growth Rate, YoY Growth, QoQ Growth)
-        - Ratios financiers (P/E, ROI, ROE, Debt Ratio)
+        - Croissance (Growth Rate, YoY Growth, QoQ Growth, Organic Growth) - Ces valeurs sont souvent en pourcentages
+        - Ratios financiers (P/E, ROI, ROE, Debt Ratio, NRR, Enterprise NRR)
+        - Churn (Taux d'attrition, Customer Churn)
         - ET TOUT AUTRE INDICATEUR FINANCIER visible
+        
+        ## RÈGLES SPÉCIALES POUR L'EXTRACTION
+        
+        1. **ARR vs Croissance ARR**: 
+           - "Net ARR", "ARR base" = montants financiers (ex: 4.8m, 2.7m)
+           - "Organic ARR growth", "ARR growth" = pourcentages (ex: 23%, 29%)
+           
+        2. **Traitement des parenthèses**: 
+           - Les valeurs entre parenthèses comme (2.1m) indiquent des valeurs NÉGATIVES
+           - Convertissez (2.1m) en -2.1m dans votre extraction
+           
+        3. **Différenciation des unités**:
+           - Montants financiers: utilisez €, $, £, ¥ ou aucune unité
+           - Pourcentages de croissance: utilisez %
+           - Ratios: utilisez x
         
         ## TABLE STRUCTURE UNDERSTANDING
         
@@ -415,15 +435,29 @@ def analyze_images_with_gpt(
         2. Extraire TOUS les KPIs de TOUTES les lignes, pas seulement ceux demandés
         3. Suivre visuellement l'alignement des colonnes avec précision
         4. NE JAMAIS ignorer une ligne qui contient des données financières
+        5. IGNORER les lignes sans valeurs numériques ou avec des données incohérentes
+        6. **ATTENTION**: Bien distinguer les lignes similaires (ex: "Net ARR" vs "Organic ARR growth")
         
         ## EXTRACTION RULES
         
         - INCLUSIVITÉ MAXIMALE: Extrayez TOUT indicateur financier trouvé
         - POSITION PRÉCISE: Alignement visuel exact entre en-têtes et données
         - SYNONYMES: Reconnaissez toutes les variantes possibles des noms de KPIs
-        - FORMAT PRÉSERVÉ: Gardez les unités, symboles et formatage exacts
-        - AUCUNE OMISSION: Ne manquez aucune ligne de données financières
+        - VALIDATION DES DONNÉES: Ne gardez que les lignes avec des valeurs numériques réelles
+        - UNITÉS VALABLES UNIQUEMENT: N'utilisez que ces unités: €, $, £, ¥, %, x (ou aucune unité)
+        - AUCUNE OMISSION: Ne manquez aucune ligne de données financières valides
         - DÉTECTION INTELLIGENTE: Même si un KPI n'est pas dans votre liste, extrayez-le s'il est financier
+        - **TRAITEMENT DES PARENTHÈSES**: Convertissez automatiquement (valeur) en -valeur
+        
+        ## CRITICAL FORMATTING RULES
+        
+        - Si une ligne contient uniquement des "N/A", "-", "n.d.", ou des valeurs non numériques, NE PAS l'inclure
+        - Si une valeur semble être un texte ou un code (ex: "m", "text"), remplacez par "N.A"
+        - UNITÉS AUTORISÉES: Seulement €, $, £, ¥, %, x - Toute autre unité doit être ignorée
+        - Préservez les multiplicateurs (K, M, B) mais seulement avec les unités autorisées
+        - **PARENTHÈSES = NÉGATIF**: (125K€) devient -125K€, (15%) devient -15%
+        - Exemple valide: "125K€", "15%", "2.5M$", "1000", "0.7x", "1.2x", "-2.1m"
+        - Exemple invalide: "125m", "2.5T" → convertir en "N.A"
         
         ## RESPONSE FORMAT
         
@@ -433,18 +467,24 @@ def analyze_images_with_gpt(
           "periods": {json.dumps(expected_periods)},
           "kpi": {{
             "Nom du KPI 1": {{  // Utilisez le nom exact trouvé dans le document
-              "{expected_periods[0] if expected_periods else 'Period'}": "valeur avec unité", 
+              "{expected_periods[0] if expected_periods else 'Period'}": "valeur avec unité valable ou N.A", 
               // Ajoutez toutes les autres périodes trouvées
             }},
             "Nom du KPI 2": {{ 
                // ... données pour toutes les périodes ...
             }}
-            // INCLUEZ TOUS LES KPIs trouvés, même non demandés spécifiquement
+            // INCLUEZ TOUS LES KPIs trouvés avec des valeurs numériques valides
           }}
         }}
         ```
         
-        RAPPEL CRUCIAL: Extrayez TOUS les KPIs financiers visibles, pas seulement ceux de la liste prioritaire. Votre objectif est la complétude, pas la sélection.
+        RAPPEL CRUCIAL: 
+        1. Extrayez TOUS les KPIs financiers visibles avec des données numériques valides
+        2. Utilisez SEULEMENT les unités autorisées: €, $, £, ¥, %, x
+        3. Remplacez par "N.A" toute valeur non numérique ou avec unité non autorisée
+        4. NE PAS inclure les lignes entièrement vides ou non numériques
+        5. **PARENTHÈSES = VALEURS NÉGATIVES**: (2.1m) → -2.1m
+        6. **DISTINGUER**: "Net ARR" (montants) vs "Organic ARR growth" (pourcentages)
         """
 
         # Construction du message pour l'API Vision
@@ -556,10 +596,10 @@ def extract_numeric_value(value_str: str) -> Dict[str, Any]:
         Dictionnaire avec les clés:
         - value: Valeur numérique (float ou int)
         - display: Valeur formatée pour affichage
-        - unit: Unité extraite
+        - unit: Unité extraite (seulement les unités valables)
         - is_numeric: True si la conversion a réussi
     """
-    if not value_str or value_str == 'N.A':
+    if not value_str or value_str == 'N.A' or value_str.strip() == '':
         return {
             "value": None,
             "display": "N.A",
@@ -570,11 +610,25 @@ def extract_numeric_value(value_str: str) -> Dict[str, Any]:
     original_value = value_str
     value_str = str(value_str).strip()
     
-    # Traiter les valeurs négatives avec parenthèses (ex: "(123)" -> "-123")
+    # Log de débogage pour voir les valeurs traitées
+    logger.debug(f"Traitement de la valeur: '{original_value}' -> '{value_str}'")
+    
+    # Si la valeur ne contient que des caractères non numériques, la rejeter
+    if not any(c.isdigit() for c in value_str):
+        logger.debug(f"Valeur rejetée - aucun chiffre détecté: '{value_str}'")
+        return {
+            "value": None,
+            "display": "N.A",
+            "unit": "",
+            "is_numeric": False
+        }
+    
+    # Traiter les valeurs négatives avec parenthèses (ex: "(123)" -> "-123", "(2.1m)" -> "-2.1m")
     is_negative = False
     if value_str.startswith('(') and value_str.endswith(')'):
-        value_str = value_str[1:-1]
+        value_str = value_str[1:-1].strip()
         is_negative = True
+        logger.debug(f"Valeur avec parenthèses détectée comme négative: '{original_value}' -> '{value_str}' (négatif)")
     
     # Remplacer certaines expressions pour faciliter l'extraction
     value_str = value_str.replace('−', '-')  # Remplacer le signe moins unicode par un tiret
@@ -587,23 +641,28 @@ def extract_numeric_value(value_str: str) -> Dict[str, Any]:
     # Extraire le nombre et l'unité avec des expressions régulières
     import re
     
-    # Expressions régulières pour différents formats
-    # Formats courants en finance: 12,3 M€, 45K$, 1,234.56€, -78%, (90), etc.
+    # Liste des unités valables
+    valid_units = ['€', '$', '£', '¥', '%', 'x']
+    
+    # Expressions régulières pour différents formats (seulement unités valables)
     patterns = [
         # Pourcentages: 12% ou 12.3%
-        r'^([\d\s]+[.,]?\d*)\s*(%)',
+        r'^([\d\s,]+[.,]?\d*)\s*(%)',
         
         # Devises avec suffixe: 12K€, 5.3M$, etc.
-        r'^([\d\s]+[.,]?\d*)\s*([KkMBG])?\s*([€$£¥])',
+        r'^([\d\s,]+[.,]?\d*)\s*([KkMBG])?\s*([€$£¥x])',
         
         # Devises avec préfixe: €12K, $5.3M, etc.
-        r'^([€$£¥])\s*([\d\s]+[.,]?\d*)\s*([KkMBG])?',
+        r'^([€$£¥])\s*([\d\s,]+[.,]?\d*)\s*([KkMBG])?',
         
-        # Multiplicateurs sans devise: 12K, 5.3M, etc.
-        r'^([\d\s]+[.,]?\d*)\s*([KkMBG])',
+        # Multiplicateurs seuls avec nombres: 12K, 5.3M (sans unité de devise)
+        r'^([\d\s,]+[.,]?\d*)\s*([KkMBG])(?![€$£¥%x])',
         
-        # Nombres simples avec unités potentielles: 123, 456, 789, etc.
-        r'^([\d\s]+[.,]?\d*)(.*)'
+        # Nombres avec espaces (ex: "1 234 567")
+        r'^([\d\s]+[.,]?\d*)\s*([€$£¥%x])?',
+        
+        # Nombres simples: 123, 456.78, etc.
+        r'^([\d\s,]+[.,]?\d*)$'
     ]
     
     # Tester chaque pattern
@@ -614,12 +673,57 @@ def extract_numeric_value(value_str: str) -> Dict[str, Any]:
         match = re.match(pattern, value_str, re.IGNORECASE)
         if match:
             matched_pattern = i
+            logger.debug(f"Pattern {i} correspond pour '{value_str}': {match.groups()}")
             break
     
     if not match:
+        logger.warning(f"Aucun pattern correspondant pour: '{value_str}' - Tentative de traitement alternatif")
+        
+        # Tentative de traitement alternatif pour des formats non standard
+        # Extraire tous les chiffres et points/virgules
+        clean_for_number = re.sub(r'[^\d.,\-]', '', value_str)
+        if clean_for_number and any(c.isdigit() for c in clean_for_number):
+            try:
+                # Normaliser les séparateurs décimaux
+                clean_for_number = clean_for_number.replace(',', '.')
+                # Gérer les nombres avec plusieurs points
+                if clean_for_number.count('.') > 1:
+                    parts = clean_for_number.split('.')
+                    clean_for_number = ''.join(parts[:-1]) + '.' + parts[-1]
+                
+                num_value = float(clean_for_number)
+                
+                # Chercher les multiplicateurs dans la valeur originale
+                original_upper = original_value.upper()
+                if 'K' in original_upper:
+                    num_value *= 1000
+                elif 'M' in original_upper:
+                    num_value *= 1000000
+                elif 'B' in original_upper or 'G' in original_upper:
+                    num_value *= 1000000000
+                
+                # Chercher une unité valide
+                found_unit = ""
+                for unit in valid_units:
+                    if unit in original_value:
+                        found_unit = unit
+                        break
+                
+                logger.info(f"Traitement alternatif réussi pour '{original_value}': valeur={num_value}, unité='{found_unit}'")
+                
+                return {
+                    "value": int(num_value) if num_value == int(num_value) else num_value,
+                    "display": original_value,
+                    "unit": found_unit,
+                    "is_numeric": True
+                }
+                
+            except (ValueError, TypeError) as e:
+                logger.warning(f"Échec du traitement alternatif pour '{value_str}': {e}")
+        
         return {
             "value": None,
-            "display": original_value,
+            "display": "N.A",
             "unit": "",
             "is_numeric": False
         }
@@ -630,28 +734,48 @@ def extract_numeric_value(value_str: str) -> Dict[str, Any]:
     
     if matched_pattern == 0:  # Pourcentages
         num_str = match.group(1)
-        unit = match.group(2)
+        unit = "%"
     elif matched_pattern == 1:  # Devises avec suffixe
         num_str = match.group(1)
         multiplier = match.group(2) if match.group(2) else ""
         currency = match.group(3) if match.group(3) else ""
-        unit = multiplier + currency
+        # Vérifier que la devise est valable
+        if currency in valid_units:
+            unit = currency  # On ne garde que la devise, pas le multiplicateur dans l'unité
+        else:
+            unit = ""
     elif matched_pattern == 2:  # Devises avec préfixe
         currency = match.group(1)
         num_str = match.group(2)
         multiplier = match.group(3) if match.group(3) else ""
-        unit = currency + multiplier
+        # Vérifier que la devise est valable
+        if currency in valid_units:
+            unit = currency  # On ne garde que la devise, pas le multiplicateur dans l'unité
+        else:
+            unit = ""
     elif matched_pattern == 3:  # Multiplicateurs sans devise
         num_str = match.group(1)
-        unit = match.group(2)
-    else:  # Nombres simples avec unités potentielles
+        # Pas d'unité car pas de devise détectée
+        unit = ""
+    elif matched_pattern == 4:  # Nombres avec espaces et unité optionnelle
         num_str = match.group(1)
-        unit = match.group(2).strip() if match.group(2) else ""
+        potential_unit = match.group(2) if match.group(2) else ""
+        unit = potential_unit if potential_unit in valid_units else ""
+    else:  # Nombres simples
+        num_str = match.group(1)
+        unit = ""
     
     # Nettoyer la chaîne numérique
     if num_str:
-        # Supprimer les espaces et remplacer la virgule par un point
+        # Supprimer les espaces et normaliser les séparateurs décimaux
         num_str = num_str.replace(' ', '').replace(',', '.')
+        # Gérer le cas des nombres avec plusieurs points/virgules
+        if num_str.count('.') > 1:
+            # Garder seulement le dernier point comme séparateur décimal
+            parts = num_str.split('.')
+            num_str = ''.join(parts[:-1]) + '.' + parts[-1]
+    
+    logger.debug(f"Chaîne numérique extraite: '{num_str}', unité: '{unit}'")
     
     try:
         # Convertir en nombre
@@ -661,34 +785,32 @@ def extract_numeric_value(value_str: str) -> Dict[str, Any]:
         if is_negative:
             num_value = -num_value
         
-        # Traitement spécial pour les pourcentages
-        if '%' in unit:
-            # Laisser tel quel (pourcentage)
-            pass
-        else:
-            # Appliquer les multiplicateurs basés sur l'unité
-            if 'K' in unit or 'k' in unit:
-                num_value *= 1000
-            elif 'M' in unit or 'm' in unit:
-                num_value *= 1000000
-            elif 'B' in unit or 'G' in unit or 'b' in unit or 'g' in unit:
-                num_value *= 1000000000
+        # Appliquer les multiplicateurs détectés (même si on ne les garde pas dans l'unité)
+        original_for_multiplier = original_value.upper()
+        if 'K' in original_for_multiplier and not '%' in unit:
+            num_value *= 1000
+        elif 'M' in original_for_multiplier and not '%' in unit:
+            num_value *= 1000000
+        elif ('B' in original_for_multiplier or 'G' in original_for_multiplier) and not '%' in unit:
+            num_value *= 1000000000
         
         # Convertir en entier si c'est un nombre sans décimales
         if num_value == int(num_value):
             num_value = int(num_value)
         
+        logger.debug(f"Valeur finale: {num_value}, unité: '{unit}'")
+        
         return {
             "value": num_value,
             "display": original_value,
-            "unit": unit,
+            "unit": unit,  # Seulement les unités valables
             "is_numeric": True
         }
     except (ValueError, TypeError) as e:
         logger.warning(f"Impossible de convertir '{num_str}' en nombre: {e}")
         return {
             "value": None,
-            "display": original_value,
+            "display": "N.A",
             "unit": "",
             "is_numeric": False
         }
@@ -805,6 +927,20 @@ def clean_kpi_data(
             if not kpi_name or not periods_data:
                 logger.warning(f"KPI ignoré - nom vide ou pas de données: {kpi_name}")
                 continue
+            
+            # Vérifier si le KPI contient au moins une valeur valide (pas que des N.A)
+            has_valid_data = False
+            if isinstance(periods_data, dict):
+                for period_value in periods_data.values():
+                    if period_value and str(period_value).strip() not in ['N.A', 'N/A', '-', 'n.d.', '']:
+                        # Vérifier si la valeur contient au moins un chiffre
+                        if any(c.isdigit() for c in str(period_value)):
+                            has_valid_data = True
+                            break
+            
+            if not has_valid_data:
+                logger.warning(f"KPI ignoré - aucune donnée numérique valide: {kpi_name}")
+                continue
                 
             # Vérifier si ce KPI fait partie des KPI sélectionnés
             selected = False
@@ -862,19 +998,39 @@ def clean_kpi_data(
                 if period in periods and value:
                     # Normaliser la valeur (enlever les espaces superflus, etc.)
                     clean_value = str(value).strip()
-                    clean_values[period] = clean_value
                     
-                    # Extraire la valeur numérique mais la stocker séparément
-                    numeric_result = extract_numeric_value(clean_value)
-                    numeric_values[period] = numeric_result
-                    
-                    # Logging détaillé des valeurs extraites
-                    logger.info(f"KPI {fr_kpi_name}, période {period}: valeur={clean_value}, valeur numérique={numeric_result}")
+                    # Vérifier que la valeur n'est pas vide ou invalide
+                    if clean_value and clean_value.lower() not in ['n.a', 'n/a', '-', 'n.d.', 'na']:
+                        # Extraire la valeur numérique
+                        numeric_result = extract_numeric_value(clean_value)
+                        
+                        # Seulement ajouter si la conversion a réussi ou si c'est une valeur valide
+                        # Améliorer la validation pour accepter les nombres décimaux avec unités
+                        is_valid_numeric = (
+                            numeric_result.get('is_numeric', False) or 
+                            (any(c.isdigit() for c in clean_value) and 
+                             clean_value.lower() not in ['n.a', 'n/a', '-', 'n.d.', 'na', 'nan'])
+                        )
+                        
+                        # Log détaillé pour le débogage
+                        logger.debug(f"Validation pour {fr_kpi_name}, période {period}: valeur='{clean_value}', numeric_result={numeric_result}, is_valid={is_valid_numeric}")
+                        if is_valid_numeric:
+                            clean_values[period] = clean_value
+                            numeric_values[period] = numeric_result
+                            
+                            # Logging détaillé des valeurs extraites
+                            logger.info(f"KPI {fr_kpi_name}, période {period}: valeur={clean_value}, valeur numérique={numeric_result}")
+                        else:
+                            logger.warning(f"Valeur non numérique ignorée pour {fr_kpi_name}, période {period}: {clean_value}")
+                    else:
+                        logger.info(f"Valeur vide ou invalide ignorée pour {fr_kpi_name}, période {period}: {clean_value}")
             
-            # N'ajouter le KPI que s'il a des valeurs
+            # N'ajouter le KPI que s'il a des valeurs valides
             if clean_values:
                 clean_kpi[fr_kpi_name] = clean_values
                 numeric_kpi[fr_kpi_name] = numeric_values
+            else:
+                logger.warning(f"KPI {fr_kpi_name} ignoré car aucune valeur valide trouvée")
         
         logger.info(f"Données KPI nettoyées: {len(clean_kpi)} KPIs trouvés")
         

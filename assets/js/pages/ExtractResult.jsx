@@ -68,6 +68,17 @@ const ExtractResult = ({ i18n }) => {
   const [isAddColumnModalVisible, setIsAddColumnModalVisible] = useState(false);
   const [addColumnForm] = Form.useForm();
 
+  // Options d'unités disponibles
+  const availableUnits = [
+    { value: '€', label: '€ (Euro)' },
+    { value: '$', label: '$ (Dollar)' },
+    { value: '£', label: '£ (Livre)' },
+    { value: '¥', label: '¥ (Yen)' },
+    { value: '%', label: '% (Pourcentage)' },
+    { value: 'x', label: 'x (Ratio)' },
+    { value: '', label: t('extractresult:no_unit', 'Sans unité') },
+  ];
+
   const periodicity = analyzedData?.periodicity || 'Q';
   const [selectedYear, setSelectedYear] = useState(
     analyzedData &&
@@ -226,6 +237,12 @@ const ExtractResult = ({ i18n }) => {
           dataIndex: period,
           key: period,
           render: (text, record) => {
+            const unit = record.units?.[period] || '';
+            const displayValue =
+              !text || text === 'N.A' || text === null || text === undefined
+                ? 'N.A'
+                : `${text}${unit}`;
+
             return (
               <div
                 className="editable-cell-value-wrap"
@@ -239,7 +256,7 @@ const ExtractResult = ({ i18n }) => {
                     {t('extractresult:tag_labels.not_available')}
                   </Tag>
                 ) : (
-                  <Tag color="blue">{text}</Tag>
+                  <Tag color="blue">{displayValue}</Tag>
                 )}
                 {record.modified && record.modified[period] && (
                   <Tooltip title={t('extractresult:alerts.values_modified')}>
@@ -258,7 +275,7 @@ const ExtractResult = ({ i18n }) => {
         title: t('extractresult:actions', 'Actions'),
         dataIndex: 'actions',
         fixed: 'right',
-        width: 200,
+        width: 100,
         render: (_, record) => {
           return (
             <Space>
@@ -267,18 +284,16 @@ const ExtractResult = ({ i18n }) => {
                 icon={<EditOutlined />}
                 onClick={() => edit(record)}
                 size="small"
-              >
-                {t('extractresult:edit')}
-              </Button>
+                title={t('extractresult:edit')}
+              />
               <Button
                 type="text"
                 icon={<DeleteOutlined />}
                 onClick={() => deleteKpi(record)}
                 size="small"
                 danger
-              >
-                {t('extractresult:delete')}
-              </Button>
+                title={t('extractresult:delete')}
+              />
             </Space>
           );
         },
@@ -372,30 +387,40 @@ const ExtractResult = ({ i18n }) => {
             kpi: kpiName,
             tooltip: kpiTooltipMapping[kpiName] || '',
             modified: {},
+            units: {}, // Ajouter un objet pour stocker les unités par période
           };
 
           if (typeof periodValues === 'object') {
             periods.forEach(period => {
               // Utiliser la valeur numérique si disponible, sinon utiliser 'N.A'
-              const numericValue =
+              const numericData =
                 numericKpiData[kpiName] && numericKpiData[kpiName][period]
-                  ? numericKpiData[kpiName][period].value
+                  ? numericKpiData[kpiName][period]
                   : null;
 
-              if (numericValue !== null && numericValue !== undefined) {
+              if (
+                numericData &&
+                numericData.value !== null &&
+                numericData.value !== undefined
+              ) {
                 // Formater la valeur numérique pour l'affichage
-                row[period] = numericValue;
+                row[period] = numericData.value;
+                row.units[period] = numericData.unit || '';
               } else {
                 row[period] = 'N.A';
+                row.units[period] = '';
               }
             });
           } else {
             row[periods[0]] = 'N.A';
+            row.units[periods[0]] = '';
           }
 
           return row;
         },
       );
+
+      // Les unités sont maintenant stockées directement dans les enregistrements
 
       setPeriodTableData(dataRows);
       setEditedValues(
@@ -455,9 +480,15 @@ const ExtractResult = ({ i18n }) => {
     // Get all period keys from the record (excluding common fields)
     const recordPeriodKeys = Object.keys(record).filter(
       key =>
-        !['key', 'kpi', 'tooltip', 'modified', 'actions', 'rowKey'].includes(
-          key,
-        ),
+        ![
+          'key',
+          'kpi',
+          'tooltip',
+          'modified',
+          'actions',
+          'rowKey',
+          'units',
+        ].includes(key),
     );
 
     // Match period keys with record keys
@@ -465,6 +496,12 @@ const ExtractResult = ({ i18n }) => {
       initialValues[periodKey] =
         record[periodKey] === 'N.A' ? '' : record[periodKey];
     });
+
+    // Ajouter l'unité commune (prendre la première unité non vide ou '')
+    const commonUnit = record.units
+      ? Object.values(record.units).find(unit => unit && unit !== '') || ''
+      : '';
+    initialValues.unit = commonUnit;
 
     editKpiForm.setFieldsValue(initialValues);
     setIsEditModalVisible(true);
@@ -536,10 +573,24 @@ const ExtractResult = ({ i18n }) => {
         kpi: newKpiName,
         tooltip: '',
         modified: {},
+        units: {},
       };
 
+      const commonUnit = values.unit || '';
+
       periodsFound.forEach(period => {
-        newRow[period] = values[period] || 'N.A';
+        let value = values[period] || 'N.A';
+
+        // Convertir la valeur en nombre si possible
+        if (value !== 'N.A' && value !== '' && value !== null) {
+          const parsedValue = parseFloat(value);
+          if (!isNaN(parsedValue)) {
+            value = parsedValue;
+          }
+        }
+
+        newRow[period] = value;
+        newRow.units[period] = commonUnit;
         newRow.modified[period] = true;
       });
 
@@ -595,6 +646,7 @@ const ExtractResult = ({ i18n }) => {
       if (index > -1) {
         const item = newData[index];
         const modifiedPeriods = { ...item.modified };
+        const updatedUnits = { ...item.units };
 
         const updatedItem = {
           ...item,
@@ -602,17 +654,32 @@ const ExtractResult = ({ i18n }) => {
           kpi: newKpiName,
         };
 
+        const commonUnit = values.unit || '';
+
         periodsFound.forEach(period => {
-          const newValue = values[period] || 'N.A';
+          let newValue = values[period] || 'N.A';
+
+          // Convertir la valeur en nombre si possible
+          if (newValue !== 'N.A' && newValue !== '' && newValue !== null) {
+            const parsedValue = parseFloat(newValue);
+            if (!isNaN(parsedValue)) {
+              newValue = parsedValue;
+            }
+          }
+
           if (item[period] !== newValue) {
             updatedItem[period] = newValue;
             modifiedPeriods[period] = true;
           } else {
             modifiedPeriods[period] = item.modified?.[period] || false;
           }
+
+          // Mettre à jour l'unité (même unité pour toutes les périodes)
+          updatedUnits[period] = commonUnit;
         });
 
         updatedItem.modified = modifiedPeriods;
+        updatedItem.units = updatedUnits;
 
         newData.splice(index, 1, updatedItem);
         setPeriodTableData(newData);
@@ -621,6 +688,8 @@ const ExtractResult = ({ i18n }) => {
         const newEditedValues = { ...editedValues };
         newEditedValues[originalRowKey] = updatedItem;
         setEditedValues(newEditedValues);
+
+        // Les unités sont maintenant stockées directement dans l'enregistrement
 
         setIsEditModalVisible(false);
         setEditingKpiData(null);
@@ -678,7 +747,8 @@ const ExtractResult = ({ i18n }) => {
           const base64data = reader.result.split(',')[1];
 
           // Préparer les données modifiées pour l'API
-          const modifiedKpis = convertTableDataToKpiFormat();
+          const { kpis: modifiedKpis, units: kpiUnits } =
+            convertTableDataToKpiFormat();
           const status = saveAsDraft ? 'draft' : 'validated';
 
           const documentData = documentsService.prepareDocumentData(
@@ -689,6 +759,7 @@ const ExtractResult = ({ i18n }) => {
             base64data,
             status,
             modifiedKpis,
+            kpiUnits,
           );
 
           // Appeler l'API pour sauvegarder
@@ -828,22 +899,50 @@ const ExtractResult = ({ i18n }) => {
   // Fonction pour convertir periodTableData en format KPI pour la sauvegarde
   const convertTableDataToKpiFormat = () => {
     const kpis = {};
+    const units = {};
 
     periodTableData.forEach(row => {
       const kpiName = row.kpi;
       kpis[kpiName] = {};
 
+      // Récupérer l'unité pour ce KPI (première unité non vide ou '')
+      const kpiUnit = row.units
+        ? Object.values(row.units).find(unit => unit && unit !== '') || ''
+        : '';
+      units[kpiName] = kpiUnit;
+
       // Parcourir toutes les périodes pour ce KPI
       periodsFound.forEach(period => {
         if (row[period] && row[period] !== 'N.A') {
-          // Utiliser directement la valeur numérique du tableau
-          kpis[kpiName][period] =
-            typeof row[period] === 'number' ? row[period] : 0;
+          let numericValue = 0;
+
+          if (typeof row[period] === 'number') {
+            numericValue = row[period];
+          } else if (typeof row[period] === 'string') {
+            // Convertir la string en nombre
+            const cleanValue = row[period]
+              .replace(/[^\d.,-]/g, '')
+              .replace(',', '.');
+            const parsed = parseFloat(cleanValue);
+            numericValue = isNaN(parsed) ? 0 : parsed;
+
+            // Gérer les multiplicateurs (K, M, B)
+            const upperValue = row[period].toUpperCase();
+            if (upperValue.includes('K')) {
+              numericValue *= 1000;
+            } else if (upperValue.includes('M')) {
+              numericValue *= 1000000;
+            } else if (upperValue.includes('B') || upperValue.includes('G')) {
+              numericValue *= 1000000000;
+            }
+          }
+
+          kpis[kpiName][period] = numericValue;
         }
       });
     });
 
-    return kpis;
+    return { kpis, units };
   };
 
   // Nouvelle fonction pour ajouter une colonne
@@ -1417,6 +1516,18 @@ const ExtractResult = ({ i18n }) => {
               }
             />
           </Form.Item>
+
+          <Form.Item name="unit" label={t('extractresult:unit', 'Unité')}>
+            <Select
+              placeholder={t(
+                'extractresult:select_unit',
+                'Sélectionner une unité',
+              )}
+              allowClear
+              options={availableUnits}
+            />
+          </Form.Item>
+
           <Row gutter={16}>
             {periodsFound.map(period => (
               <Col
@@ -1465,6 +1576,17 @@ const ExtractResult = ({ i18n }) => {
             />
           </Form.Item>
 
+          <Form.Item name="unit" label={t('extractresult:unit', 'Unité')}>
+            <Select
+              placeholder={t(
+                'extractresult:select_unit',
+                'Sélectionner une unité',
+              )}
+              allowClear
+              options={availableUnits}
+            />
+          </Form.Item>
+
           <Row gutter={16}>
             {editingKpiData &&
               Object.keys(editingKpiData)
@@ -1477,6 +1599,7 @@ const ExtractResult = ({ i18n }) => {
                       'modified',
                       'actions',
                       'rowKey',
+                      'units',
                     ].includes(key),
                 )
                 .map(period => (
@@ -1494,6 +1617,7 @@ const ExtractResult = ({ i18n }) => {
                                 'modified',
                                 'actions',
                                 'rowKey',
+                                'units',
                               ].includes(k),
                           ).length,
                       ),

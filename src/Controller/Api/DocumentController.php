@@ -259,7 +259,13 @@ class DocumentController extends AbstractController
             
             // Traitement des KPIs
             if (isset($data['kpis']) && is_array($data['kpis'])) {
+                // Récupérer les unités si elles sont fournies
+                $kpiUnits = isset($data['units']) && is_array($data['units']) ? $data['units'] : [];
+                
                 foreach ($data['kpis'] as $kpiName => $periods) {
+                    // Récupérer l'unité pour ce KPI
+                    $kpiUnit = isset($kpiUnits[$kpiName]) ? $this->validateUnit($kpiUnits[$kpiName]) : '';
+                    
                     foreach ($periods as $period => $value) {
                         $kpi = new Kpi();
                         $kpi->setName($kpiName);
@@ -275,8 +281,8 @@ class DocumentController extends AbstractController
                             $kpi->setValue($numericValue);
                         }
                         
-                        // Définir une unité par défaut (on pourrait l'améliorer plus tard)
-                        $kpi->setUnit('€');
+                        // Définir l'unité validée
+                        $kpi->setUnit($kpiUnit);
                         
                         $this->entityManager->persist($kpi);
                     }
@@ -395,14 +401,26 @@ class DocumentController extends AbstractController
     }
     
     /**
+     * Valide qu'une unité fait partie des unités autorisées
+     * @param string $unit Unité à valider
+     * @return string Unité validée ou chaîne vide si non autorisée
+     */
+    private function validateUnit(string $unit): string
+    {
+        $allowedUnits = ['€', '$', '£', '¥', '%', 'x', ''];
+        
+        return in_array($unit, $allowedUnits) ? $unit : '';
+    }
+    
+    /**
      * Extrait l'unité d'une chaîne
      * @param string $value Chaîne contenant une valeur (ex: "125K€", "-3.2M$", "12%")
-     * @return string Unité extraite ou "€" par défaut
+     * @return string Unité extraite ou "" par défaut
      */
     private function extractUnit(string $value): string
     {
         if (empty($value) || $value === 'N.A') {
-            return "€";
+            return "";
         }
         
         // Chercher des unités courantes
@@ -418,21 +436,6 @@ class DocumentController extends AbstractController
             return "¥";
         }
         
-        // Chercher les multiplicateurs
-        if (preg_match('/[KMBGkmb]/', $value)) {
-            $unit = "€"; // Unité par défaut
-            
-            if (preg_match('/K/i', $value)) {
-                $unit = "K" . $unit;
-            } elseif (preg_match('/M/i', $value)) {
-                $unit = "M" . $unit;
-            } elseif (preg_match('/[BG]/i', $value)) {
-                $unit = "B" . $unit;
-            }
-            
-            return $unit;
-        }
-        
-        return "€"; // Unité par défaut
+        return ""; // Pas d'unité détectée
     }
 } 

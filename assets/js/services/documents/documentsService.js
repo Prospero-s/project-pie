@@ -140,6 +140,7 @@ const documentsService = {
    * @param {string} pdfBase64 - Contenu PDF en base64
    * @param {string} status - Statut du document ('draft' ou 'validated')
    * @param {Object} modifiedKpis - KPIs modifiés par l'utilisateur (optionnel)
+   * @param {Object} kpiUnits - Unités des KPIs (optionnel)
    * @returns {Object} Données formatées pour l'API
    */
   prepareDocumentData: (
@@ -147,6 +148,7 @@ const documentsService = {
     pdfBase64,
     status = 'validated',
     modifiedKpis = null,
+    kpiUnits = null,
   ) => {
     // Vérification des données
     if (!analyzedData || !analyzedData.company) {
@@ -205,6 +207,7 @@ const documentsService = {
       periodicity: analyzedData.periodicity || 'Q',
       year: analyzedData.year || new Date().getFullYear(),
       kpis: kpis,
+      units: kpiUnits || {},
       filename: filename,
       status: status,
     };
