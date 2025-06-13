@@ -223,7 +223,8 @@ class DocumentController extends AbstractController
             
             $data = json_decode($request->getContent(), true);
             
-            if (!isset($data['companyId']) || !isset($data['pdf']) || !isset($data['periodicity']) || !isset($data['year'])) {
+            if (!isset($data['companyId']) || !isset($data['pdf']) || 
+                !isset($data['periodicity']) || !isset($data['year'])) {
                 return $this->json(['error' => 'Missing required fields'], Response::HTTP_BAD_REQUEST);
             }
             
@@ -335,7 +336,7 @@ class DocumentController extends AbstractController
             }
             
             // Décoder le contenu base64 du PDF
-            $pdfContent = base64_decode($document->getBlob());
+            $pdfContent = base64_decode($document->getBlob(), true);
             
             if ($pdfContent === false) {
                 return $this->json(['error' => 'Invalid PDF content'], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -344,7 +345,8 @@ class DocumentController extends AbstractController
             // Créer la réponse avec le contenu PDF
             $response = new Response($pdfContent);
             $response->headers->set('Content-Type', 'application/pdf');
-            $response->headers->set('Content-Disposition', 'inline; filename="' . ($document->getFilename() ?: 'document.pdf') . '"');
+            $filename = $document->getFilename() ?: 'document.pdf';
+            $response->headers->set('Content-Disposition', 'inline; filename="' . $filename . '"');
             
             return $response;
         } catch (\Exception $e) {
@@ -411,31 +413,5 @@ class DocumentController extends AbstractController
         
         return in_array($unit, $allowedUnits) ? $unit : '';
     }
-    
-    /**
-     * Extrait l'unité d'une chaîne
-     * @param string $value Chaîne contenant une valeur (ex: "125K€", "-3.2M$", "12%")
-     * @return string Unité extraite ou "" par défaut
-     */
-    private function extractUnit(string $value): string
-    {
-        if (empty($value) || $value === 'N.A') {
-            return "";
-        }
-        
-        // Chercher des unités courantes
-        if (strpos($value, '%') !== false) {
-            return "%";
-        } elseif (strpos($value, '€') !== false) {
-            return "€";
-        } elseif (strpos($value, '$') !== false) {
-            return "$";
-        } elseif (strpos($value, '£') !== false) {
-            return "£";
-        } elseif (strpos($value, '¥') !== false) {
-            return "¥";
-        }
-        
-        return ""; // Pas d'unité détectée
-    }
+
 } 
