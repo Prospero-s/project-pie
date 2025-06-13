@@ -8,7 +8,7 @@
 // any CSS you import will output into a single css file (app.css in this case)
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import ReactDOM from 'react-dom/client';
+import ReactDOM, { createRoot } from 'react-dom/client';
 import './css/app.css';
 
 import './js/lib/polyfills';
@@ -28,7 +28,6 @@ import AuthCallback from '@/pages/AuthCallback';
 import GroupSelection from '@/pages/GroupSelection';
 import CompanyDetails from '@/pages/CompanyDetails';
 import ExtractResult from '@/pages/ExtractResult';
-import EditDocument from '@/pages/EditDocument';
 import Documents from '@/pages/Documents';
 
 import AuthLayout from '@/components/common/layout/AuthLayout';
@@ -38,6 +37,7 @@ import GroupRedirect from '@/components/common/redirect/GroupRedirect';
 
 import LanguageRedirect from '@/components/common/redirect/LanguageRedirect';
 import { RedirectProvider } from '@/context/redirectContext';
+import { unstableSetRender } from 'antd';
 import.meta.glob(['../img/**']);
 
 // Détecter la langue initiale à partir de l'URL ou des préférences
@@ -81,6 +81,16 @@ Amplify.configure({
       secure: true,
     },
   },
+});
+
+unstableSetRender((node, container) => {
+  container._reactRoot ||= createRoot(container);
+  const root = container._reactRoot;
+  root.render(node);
+  return async () => {
+    await new Promise(resolve => setTimeout(resolve, 0));
+    root.unmount();
+  };
 });
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -137,10 +147,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                           <Route
                             path="extract-results"
                             element={<ExtractResult i18n={i18n} />}
-                          />
-                          <Route
-                            path="/documents/edit/:id"
-                            element={<EditDocument i18n={i18n} />}
                           />
                           <Route
                             path="documents"
