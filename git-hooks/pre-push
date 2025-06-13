@@ -6,8 +6,8 @@ if [ -z "$BASH" ]; then
     exit 1
 fi
 
-# Regex pour les noms de branches (compatible macOS) - modifiée pour accepter plus de caractères spéciaux
-branch_regex='^(feat|fix|docs|style|refactor|test|chore)/PROS-[0-9]+(-[a-zA-Z0-9_.-]+)+$'
+# Regex pour les noms de branches (compatible macOS) - utilise les classes POSIX pour supporter l'Unicode
+branch_regex='^(feat|fix|docs|style|refactor|test|chore)/PROS-[0-9]+(-[a-zA-Z0-9_.[:alpha:]-]+)+$'
 
 z40=0000000000000000000000000000000000000000
 
@@ -31,7 +31,7 @@ while read local_ref local_sha remote_ref remote_sha; do
             echo "❌ Le format du nom de la branche '$branch_name' est invalide."
             echo "Format attendu: <type>/PROS-<ticket-id>-<description>"
             echo "Types autorisés: feat, fix, docs, style, refactor, test, chore"
-            echo "👀 Exemple: feat/PROS-123-ajout-de-la-fonctionnalite-de-login"
+            echo "👀 Exemple avec accents: feat/PROS-456-amélioration-des-données-françaises"
             echo "⚠️ Pour renommer la branche, utilisez la commande suivante:"
             echo "git branch -m <ancien_nom> <nouveau_nom>"
             echo "--------------------------------"
