@@ -28,6 +28,7 @@ help:
 	@echo "  test-db-local     - Vérifier la connexion à la base de données locale"
 	@echo "  test-db-aws       - Vérifier la connexion à la base de données AWS"
 	@echo "  test-all-db       - Vérifier les deux bases de données"
+	@echo "  demo-data         - Charger les données de démo (utilisateur avec beaucoup d'investissements)"
 	@echo "  hooks     - Installer les hooks Git"
 
 # Cibles
@@ -83,6 +84,11 @@ hooks:
 
 load-dev-fixtures: ;\
 	$(SYMFONY) doctrine:f:load -n
+
+demo-data: ## Charger les données de démo avec un utilisateur riche en investissements
+	@echo "🚀 Chargement des données de démo..."
+	$(SYMFONY) app:load-demo-data
+	@echo "✅ Données de démo chargées ! Utilisez l'utilisateur 'demo@investisseur.com' pour vos démos."
 
 migrations-diff:
 	$(SYMFONY) doctrine:migrations:diff --formatted
