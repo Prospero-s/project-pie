@@ -3,6 +3,7 @@ import { Skeleton, Table } from 'antd';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getAllCompanies } from '@/services/company/companyService';
+import { formatDate, getDateLocale } from '@/lib/utils';
 
 const TableCompanies = ({ i18n }) => {
   const { t } = useTranslation('allCompanies', { i18n });
@@ -101,7 +102,7 @@ const TableCompanies = ({ i18n }) => {
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : (
-          new Date(date).toLocaleDateString()
+          formatDate(date, getDateLocale(i18n.language))
         ),
     },
   ];

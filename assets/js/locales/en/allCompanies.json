@@ -37,7 +37,18 @@
       "retail": "Retail",
       "manufacturing": "Manufacturing",
       "energy": "Energy",
-      "education": "Education"
+      "education": "Education",
+      "luxury": "Luxury",
+      "beauty_personal_care": "Beauty & Personal Care",
+      "aerospace": "Aerospace",
+      "automotive": "Automotive",
+      "pharmaceuticals": "Pharmaceuticals",
+      "telecommunications": "Telecommunications",
+      "industrial_equipment": "Industrial Equipment",
+      "software": "Software",
+      "technology_services": "Technology Services",
+      "defense_aerospace": "Defense & Aerospace",
+      "other": "Other"
     }
   }
 }

@@ -8,8 +8,9 @@ import {
 } from '@/services/documents/documentsService';
 import { useNavigate } from 'react-router-dom';
 import EmptyDocumentState from './EmptyDocumentState';
+import { formatDate, getDateLocale } from '@/lib/utils';
 
-const TableDocuments = ({ t }) => {
+const TableDocuments = ({ t, lng = 'en' }) => {
   const [loading, setLoading] = useState(true);
   const [documents, setDocuments] = useState([]);
   const navigate = useNavigate();
@@ -121,7 +122,7 @@ const TableDocuments = ({ t }) => {
           <Skeleton.Input block active size="small" />
         ) : (
           date &&
-          new Date(date).toLocaleDateString('fr-FR', {
+          formatDate(date, getDateLocale(lng), {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
