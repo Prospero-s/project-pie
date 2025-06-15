@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { getCompanyKpisByYear, getCompanyKpisYears } from '@/services/company/companyService';
-import '@/css/components/metrics.css';
+import '../../../../css/components/metrics.css';
 
 const { Option } = Select;
 
@@ -368,15 +368,15 @@ const KpiComparisonModal = ({ visible, onClose }) => {
       ]}
       destroyOnClose
     >
-      <div style={{ marginBottom: 20 }}>
-        <Space size="large" style={{ width: '100%', justifyContent: 'space-between' }}>
+      <div className="kpi-comparison-container">
+        <Space size="large" className="kpi-comparison-controls">
           <div>
-            <label style={{ marginRight: 10, fontWeight: 'bold' }}>
+            <label className="kpi-comparison-label">
               {t('kpi_comparison.select_years')}:
             </label>
             <Select
               mode="multiple"
-              style={{ width: 300 }}
+              className="kpi-comparison-select"
               placeholder={t('kpi_comparison.select_years_placeholder')}
               value={selectedYears}
               onChange={setSelectedYears}
@@ -414,14 +414,14 @@ const KpiComparisonModal = ({ visible, onClose }) => {
           message={t('kpi_comparison.select_two_years')}
           type="warning"
           showIcon
-          style={{ marginBottom: 20 }}
+          className="kpi-comparison-alert"
         />
       )}
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: 50 }}>
+        <div className="kpi-comparison-loading">
           <Spin size="large" />
-          <div style={{ marginTop: 10 }}>{t('common.loading')}</div>
+          <div className="kpi-comparison-loading-text">{t('common.loading')}</div>
         </div>
       ) : selectedYears.length >= 2 && comparisonData.length > 0 ? (
         <>

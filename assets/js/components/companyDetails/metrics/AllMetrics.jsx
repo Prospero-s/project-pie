@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getCompanyKpisByYear, getCompanyKpisYears } from '@/services/company/companyService';
 import KpiComparisonModal from './KpiComparisonModal';
-import '@/css/components/metrics.css';
+import '../../../../css/components/metrics.css';
 
 const { Option } = Select;
 

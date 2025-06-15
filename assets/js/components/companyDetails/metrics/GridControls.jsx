@@ -21,7 +21,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer
 } from 'recharts';
 import { getAllCompanies } from '@/services/company/companyService';
-import '@/css/components/metrics.css';
+import '../../../../css/components/metrics.css';
 
 const { Option } = Select;
 const { Text } = Typography;

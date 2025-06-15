@@ -11,7 +11,7 @@ import LineChartLabelComponent from '@/components/graphes/LineChartLabel';
 import CustomChartComponent from './customCharts/CustomChartComponent';
 import { CloseOutlined } from '@ant-design/icons';
 import GridControls from './GridControls';
-import '@/css/components/metrics.css';
+import '../../../../css/components/metrics.css';
 
 // Import required CSS
 import 'react-grid-layout/css/styles.css';
