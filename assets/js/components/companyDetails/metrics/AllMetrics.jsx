@@ -166,7 +166,7 @@ const AllMetrics = () => {
   if (availableYears.length === 0) {
     return (
       <div style={{ textAlign: 'center', padding: '50px' }}>
-        <div>{t('all_metrics.no_kpi_data')}</div>
+        <div>{t('no_kpi_data')}</div>
       </div>
     );
   }
@@ -177,7 +177,7 @@ const AllMetrics = () => {
       <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Space size="middle">
           <CalendarOutlined style={{ fontSize: '16px', color: '#1890ff' }} />
-          <span style={{ fontWeight: 'bold' }}>{t('all_metrics.year_label')} :</span>
+          <span style={{ fontWeight: 'bold' }}>{t('year_label')} :</span>
           
           <Space.Compact>
             <Button 

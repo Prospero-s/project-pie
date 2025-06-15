@@ -4,6 +4,8 @@
   "documents": "Documents",
   "investment_details": "Détails d'Investissement",
   "info": "Info",
+  "no_kpi_data": "Aucune donnée KPI disponible pour cette entreprise.",
+  "year_label": "Année",
   
   "data": "Données",
   "no_data": "Aucune donnée disponible",
@@ -252,8 +254,5 @@
       "name": "Analyse KPI globale",
       "description": "Vue d'ensemble de tous les KPI disponibles avec métriques par période"
     }
-  },
-  
-  "no_kpi_data": "Aucune donnée KPI disponible pour cette entreprise.",
-  "year_label": "Année"
+  }
 }

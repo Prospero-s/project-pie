@@ -14,14 +14,13 @@ import {
   DownOutlined, FilterOutlined, SettingOutlined,
   PlusOutlined, EyeInvisibleOutlined, TableOutlined,
   SortAscendingOutlined, SortDescendingOutlined,
-  EditOutlined, DeleteOutlined, BarChartOutlined
+  EditOutlined, DeleteOutlined
 } from '@ant-design/icons';
 import {
   BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis,
   XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer
 } from 'recharts';
 import { getAllCompanies } from '@/services/company/companyService';
-import KpiComparisonModal from './KpiComparisonModal';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -192,7 +191,6 @@ const GridControls = () => {
   const [companies, setCompanies] = useState([]);
   const [loadingCompanies, setLoadingCompanies] = useState(false);
   const [externalData, setExternalData] = useState({});
-  const [comparisonModalVisible, setComparisonModalVisible] = useState(false);
   
   // Effet pour définir selectedQuery quand selectedQueryId change
   useEffect(() => {
@@ -1703,14 +1701,6 @@ const GridControls = () => {
         >
           {t('data')}
         </button>
-
-        <button
-          onClick={() => setComparisonModalVisible(true)}
-          className="px-2 py-1 rounded text-xs border border-green-400 bg-green-50 ml-2"
-        >
-          <BarChartOutlined className="mr-1" />
-          {t('kpi_comparison.button_text')}
-        </button>
       </div>
 
       <Drawer
@@ -2104,12 +2094,6 @@ const GridControls = () => {
           )}
         </Form>
       </Modal>
-
-      {/* Modal de comparaison KPI */}
-      <KpiComparisonModal
-        visible={comparisonModalVisible}
-        onClose={() => setComparisonModalVisible(false)}
-      />
     </div>
   );
 };
