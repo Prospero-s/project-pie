@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getCompanyKpisByYear, getCompanyKpisYears } from '@/services/company/companyService';
 import KpiComparisonModal from './KpiComparisonModal';
+import '@/css/components/metrics.css';
 
 const { Option } = Select;
 
@@ -156,16 +157,16 @@ const AllMetrics = () => {
 
   if (yearsLoading) {
     return (
-      <div style={{ textAlign: 'center', padding: '50px' }}>
+      <div className="metrics-loading-container">
         <Spin size="large" />
-        <div style={{ marginTop: '16px' }}>{t('common.loading_years')}</div>
+        <div className="metrics-loading-text">{t('common.loading_years')}</div>
       </div>
     );
   }
 
   if (availableYears.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: '50px' }}>
+      <div className="metrics-empty-container">
         <div>{t('no_kpi_data')}</div>
       </div>
     );
@@ -174,10 +175,10 @@ const AllMetrics = () => {
   return (
     <div>
       {/* Sélecteur d'année avec navigation */}
-      <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className="metrics-header">
         <Space size="middle">
-          <CalendarOutlined style={{ fontSize: '16px', color: '#1890ff' }} />
-          <span style={{ fontWeight: 'bold' }}>{t('year_label')} :</span>
+          <CalendarOutlined className="metrics-year-icon" />
+          <span className="metrics-year-label">{t('year_label')} :</span>
           
           <Space.Compact>
             <Button 
@@ -190,7 +191,7 @@ const AllMetrics = () => {
             <Select
               value={selectedYear}
               onChange={handleYearChange}
-              style={{ width: 100 }}
+              className="metrics-year-selector"
               size="middle"
             >
               {availableYears.map(year => (
@@ -220,7 +221,7 @@ const AllMetrics = () => {
             {t('kpi_comparison.button_text')}
           </Button>
           
-          <div style={{ color: '#666', fontSize: '14px' }}>
+          <div className="metrics-info-text">
             {availableYears.length} année{availableYears.length > 1 ? 's' : ''} disponible{availableYears.length > 1 ? 's' : ''}
           </div>
         </Space>

@@ -11,48 +11,13 @@ import LineChartLabelComponent from '@/components/graphes/LineChartLabel';
 import CustomChartComponent from './customCharts/CustomChartComponent';
 import { CloseOutlined } from '@ant-design/icons';
 import GridControls from './GridControls';
+import '@/css/components/metrics.css';
 
 // Import required CSS
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
-
-// Style pour les conteneurs de graphiques
-const chartContainerStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-between'
-};
-
-// Style CSS pour la classe qui définit la hauteur
-const chartContainerClass = `
-  .chart-container {
-    width: 100%;
-    height: 100%;
-    position: relative;
-  }
-  
-  .chart-close-btn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    z-index: 10;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.8);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  
-  .chart-close-btn:hover {
-    background-color: rgba(255, 0, 0, 0.1);
-  }
-`;
 
 const GlobalMetrics = () => {
   const { t } = useTranslation();
@@ -117,16 +82,16 @@ const GlobalMetrics = () => {
         compactType="vertical"
         useCSSTransforms={true}
       >
-        <div key="radar" style={chartContainerStyle} className="chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm">
+        <div key="radar" className="chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm">
           <RadarChartComponent />
         </div>
-        <div key="barMixed" style={chartContainerStyle} className="chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm">
+        <div key="barMixed" className="chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm">
           <BarChartMixedComponent />
         </div>
-        <div key="lineLabel" style={chartContainerStyle} className="chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm">
+        <div key="lineLabel" className="chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm">
           <LineChartLabelComponent />
         </div>
-        <div key="areaInteractive" style={chartContainerStyle} className="chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm">
+        <div key="areaInteractive" className="chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm">
           <AreaChartInteractiveComponent />
         </div>
         
@@ -134,7 +99,6 @@ const GlobalMetrics = () => {
         {companyCustomCharts.map(chartId => (
           <div 
             key={chartId} 
-            style={chartContainerStyle} 
             className="chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm"
           >
             <div 
@@ -144,7 +108,7 @@ const GlobalMetrics = () => {
                 handleRemoveChart(chartId);
               }}
             >
-              <CloseOutlined style={{ fontSize: '12px' }} />
+              <CloseOutlined />
             </div>
             <CustomChartComponent chartId={chartId} />
           </div>

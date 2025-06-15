@@ -21,6 +21,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer
 } from 'recharts';
 import { getAllCompanies } from '@/services/company/companyService';
+import '@/css/components/metrics.css';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -927,15 +928,15 @@ const GridControls = () => {
           
           return {
             title: (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div className="grid-controls-header">
                 <div>
                   <span>{t('data_explorer.column_header', { column: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) })}</span>
-                  {isPivot && <TableOutlined style={{ marginLeft: 5, color: '#1890ff' }} />}
-                  {isHidden && <EyeInvisibleOutlined style={{ marginLeft: 5, color: '#ff4d4f' }} />}
-                  {calculatedColumn && <span style={{ marginLeft: 5, color: '#722ed1' }}>ƒ</span>}
+                  {isPivot && <TableOutlined className="grid-controls-icon grid-controls-icon-primary" />}
+                  {isHidden && <EyeInvisibleOutlined className="grid-controls-icon grid-controls-icon-danger" />}
+                  {calculatedColumn && <span className="grid-controls-icon grid-controls-icon-purple">ƒ</span>}
                 </div>
                 {calculatedColumn && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <div className="grid-controls-actions">
                     <Tooltip title={t('data_explorer.edit_column')}>
                       <Button
                         type="text"
@@ -945,12 +946,7 @@ const GridControls = () => {
                           e.stopPropagation();
                           editCalculatedColumn(key);
                         }}
-                        style={{ 
-                          padding: '2px 4px', 
-                          minWidth: 'auto',
-                          height: '20px',
-                          lineHeight: '16px'
-                        }}
+                        className="grid-controls-action-btn"
                       />
                     </Tooltip>
                     <Tooltip title={t('data_explorer.delete_column')}>
@@ -969,13 +965,7 @@ const GridControls = () => {
                           size="small"
                           icon={<DeleteOutlined />}
                           onClick={(e) => e.stopPropagation()}
-                          style={{ 
-                            padding: '2px 4px', 
-                            minWidth: 'auto',
-                            height: '20px',
-                            lineHeight: '16px',
-                            color: '#ff4d4f'
-                          }}
+                          className="grid-controls-action-btn grid-controls-action-btn-danger"
                         />
                       </Popconfirm>
                     </Tooltip>
@@ -1721,10 +1711,9 @@ const GridControls = () => {
         <div className="mb-6">
           <h4 className="mb-2 font-medium">{t('metrics.drawer.select_query')}</h4>
           <Select
-            style={{ width: '100%' }}
+            className="grid-controls-select-full"
             value={selectedQueryId}
             onChange={handleQueryChange}
-            className="mb-2"
           >
             {PREDEFINED_QUERIES.map(query => (
               <Option key={query.id} value={query.id}>{t('queries.' + query.id, query.name)}</Option>
@@ -1920,7 +1909,7 @@ const GridControls = () => {
               <div>
                 <label className="block text-sm mb-1">{t('metrics.drawer.x_axis')}:</label>
                 <Select
-                  style={{ width: '100%' }}
+                  className="grid-controls-select-full"
                   value={selectedXAxis}
                   onChange={setSelectedXAxis}
                   placeholder={t('metrics.drawer.select_x_axis')}
@@ -1937,10 +1926,10 @@ const GridControls = () => {
                 <label className="block text-sm mb-1">{t('metrics.drawer.y_axes')}:</label>
                 <Select
                   mode="multiple"
-                  style={{ width: '100%' }}
+                  className="grid-controls-select-full"
+                  placeholder={t('metrics.drawer.select_y_axes')}
                   value={selectedYAxes}
                   onChange={setSelectedYAxes}
-                  placeholder={t('metrics.drawer.select_y_axes')}
                   maxTagCount={3}
                 >
                   {displayData && displayData.length > 0 && 
@@ -1948,7 +1937,7 @@ const GridControls = () => {
                       <Option key={column} value={column}>
                         {column} 
                         {calculatedColumns.some(calc => calc.name === column) && 
-                          <span className="ml-1" style={{ color: '#722ed1' }}>ƒ</span>
+                          <span className="grid-controls-icon-purple">ƒ</span>
                         }
                       </Option>
                     ))

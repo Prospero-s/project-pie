@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { getCompanyKpisByYear, getCompanyKpisYears } from '@/services/company/companyService';
+import '@/css/components/metrics.css';
 
 const { Option } = Select;
 
@@ -178,11 +179,11 @@ const KpiComparisonModal = ({ visible, onClose }) => {
   const getTrendIcon = (trend) => {
     switch (trend) {
       case 'up':
-        return <RiseOutlined style={{ color: '#52c41a' }} />;
+        return <RiseOutlined className="kpi-trend-up" />;
       case 'down':
-        return <FallOutlined style={{ color: '#ff4d4f' }} />;
+        return <FallOutlined className="kpi-trend-down" />;
       default:
-        return <MinusOutlined style={{ color: '#d9d9d9' }} />;
+        return <MinusOutlined className="kpi-trend-stable" />;
     }
   };
 
@@ -230,7 +231,7 @@ const KpiComparisonModal = ({ visible, onClose }) => {
       render: (_, record) => (
         <Space>
           {getTrendIcon(record.trend)}
-          <span style={{ color: getTrendColor(record.trend) }}>
+          <span className={`kpi-trend-${record.trend}`}>
             {record.evolution > 0 ? '+' : ''}{formatValue(record.evolution, record.unit)}
           </span>
         </Space>
@@ -304,7 +305,7 @@ const KpiComparisonModal = ({ visible, onClose }) => {
     const stableTrends = comparisonData.filter(item => item.trend === 'stable').length;
 
     return (
-      <Row gutter={16} style={{ marginBottom: 20 }}>
+      <Row gutter={16} className="kpi-comparison-container">
         <Col span={6}>
           <Card>
             <Statistic
@@ -438,7 +439,7 @@ const KpiComparisonModal = ({ visible, onClose }) => {
             />
           ) : (
             <div>
-              <h4 style={{ marginBottom: 16 }}>{t('kpi_comparison.evolution_chart')}</h4>
+              <h4 className="kpi-comparison-chart-title">{t('kpi_comparison.evolution_chart')}</h4>
               {renderChart()}
             </div>
           )}
