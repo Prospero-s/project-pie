@@ -1,10 +1,41 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Select, Table, Spin, Alert, Card, Statistic, Row, Col, Tag, Button, Space, Tooltip } from 'antd';
-import { RiseOutlined, FallOutlined, MinusOutlined, InfoCircleOutlined, BarChartOutlined } from '@ant-design/icons';
+import {
+  Modal,
+  Select,
+  Table,
+  Spin,
+  Alert,
+  Card,
+  Statistic,
+  Row,
+  Col,
+  Tag,
+  Button,
+  Space,
+} from 'antd';
+import {
+  RiseOutlined,
+  FallOutlined,
+  MinusOutlined,
+  InfoCircleOutlined,
+  BarChartOutlined,
+} from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { getCompanyKpisByYear, getCompanyKpisYears } from '@/services/company/companyService';
+import {
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  Legend,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from 'recharts';
+import {
+  getCompanyKpisByYear,
+  getCompanyKpisYears,
+} from '@/services/company/companyService';
 import '../../../../css/components/metrics.css';
 
 const { Option } = Select;
@@ -35,7 +66,7 @@ const KpiComparisonModal = ({ visible, onClose }) => {
     try {
       const years = await getCompanyKpisYears(id);
       setAvailableYears(years);
-      
+
       // Sélectionner automatiquement les 2 années les plus récentes
       if (years.length >= 2) {
         setSelectedYears([years[0], years[1]]);
@@ -53,15 +84,15 @@ const KpiComparisonModal = ({ visible, onClose }) => {
     setLoading(true);
     try {
       // Charger les données pour chaque année sélectionnée
-      const yearDataPromises = selectedYears.map(year => 
-        getCompanyKpisByYear(id, year).then(data => ({ year, data }))
+      const yearDataPromises = selectedYears.map(year =>
+        getCompanyKpisByYear(id, year).then(data => ({ year, data })),
       );
-      
+
       const yearDataResults = await Promise.all(yearDataPromises);
-      
+
       // Organiser les données par métrique
       const metricsMap = new Map();
-      
+
       yearDataResults.forEach(({ year, data }) => {
         data.forEach(item => {
           const metricKey = item.metric;
@@ -69,50 +100,52 @@ const KpiComparisonModal = ({ visible, onClose }) => {
             metricsMap.set(metricKey, {
               metric: metricKey,
               unit: item.unit || '',
-              values: {}
+              values: {},
             });
           }
-          
+
           // Extraire la valeur numérique des colonnes Q1, Q2, Q3, Q4
           const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
           let totalValue = 0;
           let quarterCount = 0;
-          
+
           quarters.forEach(quarter => {
             if (item[quarter] && item[quarter] !== null) {
               // Extraire le nombre de la chaîne (ex: "7 531 666.67 €" -> 7531666.67)
-              const numericValue = parseFloat(item[quarter].toString().replace(/[^\d.-]/g, ''));
+              const numericValue = parseFloat(
+                item[quarter].toString().replace(/[^\d.-]/g, ''),
+              );
               if (!isNaN(numericValue)) {
                 totalValue += numericValue;
                 quarterCount++;
               }
             }
           });
-          
+
           // Calculer la moyenne si on a des données
           const averageValue = quarterCount > 0 ? totalValue / quarterCount : 0;
           metricsMap.get(metricKey).values[year] = averageValue;
         });
       });
-      
+
       // Convertir en tableau et calculer les évolutions
       const comparisonArray = Array.from(metricsMap.values()).map(metric => {
         const sortedYears = selectedYears.sort((a, b) => a - b);
         const oldestYear = sortedYears[0];
         const newestYear = sortedYears[sortedYears.length - 1];
-        
+
         const oldValue = metric.values[oldestYear] || 0;
         const newValue = metric.values[newestYear] || 0;
-        
+
         // Calculer l'évolution
         let evolution = 0;
         let evolutionPercent = 0;
         let trend = 'stable';
-        
+
         if (oldValue !== 0) {
           evolution = newValue - oldValue;
           evolutionPercent = ((newValue - oldValue) / Math.abs(oldValue)) * 100;
-          
+
           if (evolutionPercent > 5) {
             trend = 'up';
           } else if (evolutionPercent < -5) {
@@ -122,7 +155,7 @@ const KpiComparisonModal = ({ visible, onClose }) => {
           trend = 'up';
           evolutionPercent = 100;
         }
-        
+
         return {
           ...metric,
           oldValue,
@@ -131,12 +164,12 @@ const KpiComparisonModal = ({ visible, onClose }) => {
           evolutionPercent,
           trend,
           oldestYear,
-          newestYear
+          newestYear,
         };
       });
-      
+
       setComparisonData(comparisonArray);
-      
+
       // Préparer les données pour le graphique
       const chartDataArray = comparisonArray.map(metric => {
         const chartItem = { metric: metric.metric };
@@ -145,11 +178,13 @@ const KpiComparisonModal = ({ visible, onClose }) => {
         });
         return chartItem;
       });
-      
+
       setChartData(chartDataArray);
-      
     } catch (error) {
-      console.error('Erreur lors du chargement des données de comparaison:', error);
+      console.error(
+        'Erreur lors du chargement des données de comparaison:',
+        error,
+      );
     } finally {
       setLoading(false);
     }
@@ -157,7 +192,7 @@ const KpiComparisonModal = ({ visible, onClose }) => {
 
   const formatValue = (value, unit) => {
     if (value === 0) return '0';
-    
+
     // Formatage selon l'unité
     if (unit === '€') {
       if (Math.abs(value) >= 1000000) {
@@ -176,7 +211,7 @@ const KpiComparisonModal = ({ visible, onClose }) => {
     }
   };
 
-  const getTrendIcon = (trend) => {
+  const getTrendIcon = trend => {
     switch (trend) {
       case 'up':
         return <RiseOutlined className="kpi-trend-up" />;
@@ -187,18 +222,7 @@ const KpiComparisonModal = ({ visible, onClose }) => {
     }
   };
 
-  const getTrendColor = (trend) => {
-    switch (trend) {
-      case 'up':
-        return '#52c41a';
-      case 'down':
-        return '#ff4d4f';
-      default:
-        return '#d9d9d9';
-    }
-  };
-
-  const renderMetricName = (metricName) => {
+  const renderMetricName = metricName => {
     // Cette fonction rend le nom de la métrique qui est une valeur dynamique
     return React.createElement('strong', {}, metricName);
   };
@@ -210,19 +234,19 @@ const KpiComparisonModal = ({ visible, onClose }) => {
       key: 'metric',
       width: 200,
       fixed: 'left',
-      render: renderMetricName
+      render: renderMetricName,
     },
     {
       title: `${comparisonData[0]?.oldestYear || ''}`,
       key: 'oldValue',
       width: 150,
-      render: (_, record) => formatValue(record.oldValue, record.unit)
+      render: (_, record) => formatValue(record.oldValue, record.unit),
     },
     {
       title: `${comparisonData[0]?.newestYear || ''}`,
       key: 'newValue',
       width: 150,
-      render: (_, record) => formatValue(record.newValue, record.unit)
+      render: (_, record) => formatValue(record.newValue, record.unit),
     },
     {
       title: t('kpi_comparison.evolution'),
@@ -232,34 +256,57 @@ const KpiComparisonModal = ({ visible, onClose }) => {
         <Space>
           {getTrendIcon(record.trend)}
           <span className={`kpi-trend-${record.trend}`}>
-            {record.evolution > 0 ? '+' : ''}{formatValue(record.evolution, record.unit)}
+            {record.evolution > 0 ? '+' : ''}
+            {formatValue(record.evolution, record.unit)}
           </span>
         </Space>
-      )
+      ),
     },
     {
       title: t('kpi_comparison.variation_percent'),
       key: 'evolutionPercent',
       width: 120,
       render: (_, record) => (
-        <Tag color={record.trend === 'up' ? 'green' : record.trend === 'down' ? 'red' : 'default'}>
-          {record.evolutionPercent > 0 ? '+' : ''}{record.evolutionPercent.toFixed(1)}%
+        <Tag
+          color={
+            record.trend === 'up'
+              ? 'green'
+              : record.trend === 'down'
+                ? 'red'
+                : 'default'
+          }
+        >
+          {record.evolutionPercent > 0 ? '+' : ''}
+          {record.evolutionPercent.toFixed(1)}%
         </Tag>
-      )
+      ),
     },
     {
       title: t('kpi_comparison.trend'),
       key: 'trend',
       width: 100,
       render: (_, record) => {
-        const trendText = record.trend === 'up' ? t('kpi_comparison.trend_up') : record.trend === 'down' ? t('kpi_comparison.trend_down') : t('kpi_comparison.trend_stable');
+        const trendText =
+          record.trend === 'up'
+            ? t('kpi_comparison.trend_up')
+            : record.trend === 'down'
+              ? t('kpi_comparison.trend_down')
+              : t('kpi_comparison.trend_stable');
         return (
-          <Tag color={record.trend === 'up' ? 'green' : record.trend === 'down' ? 'red' : 'default'}>
+          <Tag
+            color={
+              record.trend === 'up'
+                ? 'green'
+                : record.trend === 'down'
+                  ? 'red'
+                  : 'default'
+            }
+          >
             {trendText}
           </Tag>
         );
-      }
-    }
+      },
+    },
   ];
 
   const renderChart = () => {
@@ -267,25 +314,28 @@ const KpiComparisonModal = ({ visible, onClose }) => {
 
     return (
       <ResponsiveContainer width="100%" height={400}>
-        <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+        <BarChart
+          data={chartData}
+          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+        >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis 
-            dataKey="metric" 
-            angle={-45} 
-            textAnchor="end" 
+          <XAxis
+            dataKey="metric"
+            angle={-45}
+            textAnchor="end"
             height={100}
             interval={0}
           />
           <YAxis />
-          <RechartsTooltip 
+          <RechartsTooltip
             formatter={(value, name) => [
-              formatValue(value, ''), 
-              name.replace('year_', t('kpi_comparison.year_prefix') + ' ')
+              formatValue(value, ''),
+              name.replace('year_', t('kpi_comparison.year_prefix') + ' '),
             ]}
           />
           <Legend />
           {selectedYears.map((year, index) => (
-            <Bar 
+            <Bar
               key={year}
               dataKey={`year_${year}`}
               name={`${t('kpi_comparison.year_prefix')} ${year}`}
@@ -301,8 +351,12 @@ const KpiComparisonModal = ({ visible, onClose }) => {
     if (comparisonData.length === 0) return null;
 
     const upTrends = comparisonData.filter(item => item.trend === 'up').length;
-    const downTrends = comparisonData.filter(item => item.trend === 'down').length;
-    const stableTrends = comparisonData.filter(item => item.trend === 'stable').length;
+    const downTrends = comparisonData.filter(
+      item => item.trend === 'down',
+    ).length;
+    const stableTrends = comparisonData.filter(
+      item => item.trend === 'stable',
+    ).length;
 
     return (
       <Row gutter={16} className="kpi-comparison-container">
@@ -364,7 +418,7 @@ const KpiComparisonModal = ({ visible, onClose }) => {
       footer={[
         <Button key="close" onClick={onClose}>
           {t('common.close')}
-        </Button>
+        </Button>,
       ]}
       destroyOnClose
     >
@@ -389,16 +443,16 @@ const KpiComparisonModal = ({ visible, onClose }) => {
               ))}
             </Select>
           </div>
-          
+
           <div>
             <Button.Group>
-              <Button 
+              <Button
                 type={viewMode === 'table' ? 'primary' : 'default'}
                 onClick={() => setViewMode('table')}
               >
                 {t('kpi_comparison.table_view')}
               </Button>
-              <Button 
+              <Button
                 type={viewMode === 'chart' ? 'primary' : 'default'}
                 onClick={() => setViewMode('chart')}
               >
@@ -421,12 +475,14 @@ const KpiComparisonModal = ({ visible, onClose }) => {
       {loading ? (
         <div className="kpi-comparison-loading">
           <Spin size="large" />
-          <div className="kpi-comparison-loading-text">{t('common.loading')}</div>
+          <div className="kpi-comparison-loading-text">
+            {t('common.loading')}
+          </div>
         </div>
       ) : selectedYears.length >= 2 && comparisonData.length > 0 ? (
         <>
           {renderSummaryCards()}
-          
+
           {viewMode === 'table' ? (
             <Table
               columns={columns}
@@ -439,7 +495,9 @@ const KpiComparisonModal = ({ visible, onClose }) => {
             />
           ) : (
             <div>
-              <h4 className="kpi-comparison-chart-title">{t('kpi_comparison.evolution_chart')}</h4>
+              <h4 className="kpi-comparison-chart-title">
+                {t('kpi_comparison.evolution_chart')}
+              </h4>
               {renderChart()}
             </div>
           )}
@@ -449,4 +507,4 @@ const KpiComparisonModal = ({ visible, onClose }) => {
   );
 };
 
-export default KpiComparisonModal; 
+export default KpiComparisonModal;

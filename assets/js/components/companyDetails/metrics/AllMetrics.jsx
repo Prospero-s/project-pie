@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Skeleton, Select, Button, Space, Spin } from 'antd';
-import { LeftOutlined, RightOutlined, CalendarOutlined, BarChartOutlined } from '@ant-design/icons';
+import {
+  LeftOutlined,
+  RightOutlined,
+  CalendarOutlined,
+  BarChartOutlined,
+} from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getCompanyKpisByYear, getCompanyKpisYears } from '@/services/company/companyService';
+import {
+  getCompanyKpisByYear,
+  getCompanyKpisYears,
+} from '@/services/company/companyService';
 import KpiComparisonModal from './KpiComparisonModal';
 import '../../../../css/components/metrics.css';
 
@@ -34,7 +42,7 @@ const AllMetrics = () => {
     try {
       const years = await getCompanyKpisYears(id);
       setAvailableYears(years);
-      
+
       // Sélectionner automatiquement l'année la plus récente
       if (years.length > 0) {
         setSelectedYear(years[0]); // Les années sont triées par ordre décroissant
@@ -47,28 +55,28 @@ const AllMetrics = () => {
     }
   };
 
-  const loadMetrics = async (year) => {
+  const loadMetrics = async year => {
     setLoading(true);
     try {
       const kpisData = await getCompanyKpisByYear(id, year);
-      
+
       // Transformer les données pour le tableau
       const transformedData = kpisData.map((kpi, index) => {
         const rowData = {
           key: index + 1,
           metric: kpi.metric,
         };
-        
+
         // Ajouter dynamiquement toutes les périodes disponibles
         Object.keys(kpi).forEach(key => {
           if (key !== 'metric' && key !== 'unit') {
             rowData[key] = kpi[key];
           }
         });
-        
+
         return rowData;
       });
-      
+
       setData(transformedData);
     } catch (error) {
       console.error('Erreur lors du chargement des KPI:', error);
@@ -77,8 +85,8 @@ const AllMetrics = () => {
         {
           key: '1',
           metric: 'Aucune donnée disponible',
-          message: `Impossible de charger les KPI pour l'année ${year}`
-        }
+          message: `Impossible de charger les KPI pour l'année ${year}`,
+        },
       ]);
     } finally {
       setLoading(false);
@@ -100,7 +108,7 @@ const AllMetrics = () => {
     }
   };
 
-  const handleYearChange = (year) => {
+  const handleYearChange = year => {
     setSelectedYear(year);
   };
 
@@ -115,7 +123,7 @@ const AllMetrics = () => {
           key: 'metric',
           render: text =>
             loading ? <Skeleton.Input block active size="small" /> : text,
-        }
+        },
       ];
     }
 
@@ -126,7 +134,7 @@ const AllMetrics = () => {
         key: 'metric',
         render: text =>
           loading ? <Skeleton.Input block active size="small" /> : text,
-      }
+      },
     ];
 
     // Créer les colonnes pour toutes les périodes trouvées dans les données
@@ -148,7 +156,7 @@ const AllMetrics = () => {
         dataIndex: period,
         key: period,
         render: text =>
-          loading ? <Skeleton.Input block active size="small" /> : (text || '-'),
+          loading ? <Skeleton.Input block active size="small" /> : text || '-',
       });
     });
 
@@ -179,15 +187,18 @@ const AllMetrics = () => {
         <Space size="middle">
           <CalendarOutlined className="metrics-year-icon" />
           <span className="metrics-year-label">{t('year_label')} :</span>
-          
+
           <Space.Compact>
-            <Button 
-              icon={<LeftOutlined />} 
+            <Button
+              icon={<LeftOutlined />}
               onClick={goToPreviousYear}
-              disabled={availableYears.indexOf(selectedYear) >= availableYears.length - 1}
+              disabled={
+                availableYears.indexOf(selectedYear) >=
+                availableYears.length - 1
+              }
               title="Année précédente"
             />
-            
+
             <Select
               value={selectedYear}
               onChange={handleYearChange}
@@ -200,9 +211,9 @@ const AllMetrics = () => {
                 </Option>
               ))}
             </Select>
-            
-            <Button 
-              icon={<RightOutlined />} 
+
+            <Button
+              icon={<RightOutlined />}
               onClick={goToNextYear}
               disabled={availableYears.indexOf(selectedYear) <= 0}
               title="Année suivante"
@@ -216,13 +227,18 @@ const AllMetrics = () => {
             icon={<BarChartOutlined />}
             onClick={() => setComparisonModalVisible(true)}
             disabled={availableYears.length < 2}
-            title={availableYears.length < 2 ? t('kpi_comparison.comparison_help') : ''}
+            title={
+              availableYears.length < 2
+                ? t('kpi_comparison.comparison_help')
+                : ''
+            }
           >
             {t('kpi_comparison.button_text')}
           </Button>
-          
+
           <div className="metrics-info-text">
-            {availableYears.length} année{availableYears.length > 1 ? 's' : ''} disponible{availableYears.length > 1 ? 's' : ''}
+            {availableYears.length} année{availableYears.length > 1 ? 's' : ''}{' '}
+            disponible{availableYears.length > 1 ? 's' : ''}
           </div>
         </Space>
       </div>
