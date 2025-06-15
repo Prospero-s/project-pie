@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,9 @@ import LineChartLabelComponent from '@/components/graphes/LineChartLabel';
 import CustomChartComponent from './customCharts/CustomChartComponent';
 import { CloseOutlined } from '@ant-design/icons';
 import GridControls from './GridControls';
+import { Button, Space } from 'antd';
+import { BarChartOutlined } from '@ant-design/icons';
+import KpiComparisonModal from './KpiComparisonModal';
 
 // Import required CSS
 import 'react-grid-layout/css/styles.css';
@@ -59,6 +62,7 @@ const GlobalMetrics = () => {
   const dispatch = useDispatch();
   const { id } = useParams(); // Get the company ID from URL
   const { layoutsByCompany, defaultLayout, customCharts, cols, rowHeight, isDraggable, isResizable } = useSelector((state) => state.layout);
+  const [comparisonModalVisible, setComparisonModalVisible] = useState(false);
 
   // Use company-specific layout if available, otherwise use default layout
   const currentLayout = id && layoutsByCompany[id] ? layoutsByCompany[id] : defaultLayout;
@@ -102,8 +106,15 @@ const GlobalMetrics = () => {
 
   return (
     <>
-      <div className="mb-4">
+      <div className="mb-4 flex justify-between items-center">
         <GridControls />
+        <Button
+          type="primary"
+          icon={<BarChartOutlined />}
+          onClick={() => setComparisonModalVisible(true)}
+        >
+          {t('kpi_comparison.button_text')}
+        </Button>
       </div>
       <ResponsiveGridLayout
         className="layout"
@@ -150,6 +161,12 @@ const GlobalMetrics = () => {
           </div>
         ))}
       </ResponsiveGridLayout>
+
+      {/* Modal de comparaison KPI */}
+      <KpiComparisonModal
+        visible={comparisonModalVisible}
+        onClose={() => setComparisonModalVisible(false)}
+      />
     </>
   );
 };

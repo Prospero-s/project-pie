@@ -6,10 +6,13 @@ use App\Entity\Company;
 use App\Entity\CompanyAddress;
 use App\Entity\CompanyInvestment;
 use App\Entity\Representative;
+use App\Entity\User;
+use App\Entity\UserGroup;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class CompanyFixtures extends Fixture
+class CompanyFixtures extends Fixture implements DependentFixtureInterface
 {
     /** @var array<string> */
     private array $businessStructures = ['SARL', 'SAS', 'SA', 'EURL', 'SASU'];
@@ -36,14 +39,20 @@ class CompanyFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        // Créer un investisseur qui investira dans plusieurs entreprises
-        $multiInvestorId = 'MULTI_INVESTOR_USER';
+        // Récupérer les utilisateurs et groupes créés par UserFixtures
+        $users = $manager->getRepository(User::class)->findAll();
+        $userGroup = $manager->getRepository(UserGroup::class)->findOneBy([]);
+        
+        if (empty($users) || !$userGroup) {
+            throw new \Exception('Les utilisateurs et groupes doivent être créés avant les entreprises');
+        }
 
         // Générer 20 entreprises
         for ($i = 0; $i < 20; $i++) {
             $company = new Company();
-            // Pour les entreprises 0, 5 et 10, utiliser le même investisseur
-            $cognitoId = ($i == 0 || $i == 5 || $i == 10) ? $multiInvestorId : 'FIXTURE_USER_' . $i;
+            
+            // Sélectionner un utilisateur aléatoire
+            $user = $users[array_rand($users)];
 
             // Générer un SIREN valide (9 chiffres)
             $siren = str_pad((string)mt_rand(1, 999999999), 9, '0', STR_PAD_LEFT);
@@ -76,19 +85,37 @@ class CompanyFixtures extends Fixture
             $investment = new CompanyInvestment();
             $investment
                 ->setCompany($company)
-                ->setAmount(mt_rand(10000, 1000000))
+                ->setUser($user)
+                ->setUserGroup($userGroup)
+                ->setAmount($this->generateInvestmentAmount($i))
                 ->setFundingType($this->fundingTypes[array_rand($this->fundingTypes)])
                 ->setCurrency('EUR')
-                ->setInvestedAt(new \DateTime());
+                ->setInvestedAt($this->generateInvestmentDate($i));
 
             $company->addInvestment($investment);
 
-            // Créer et associer un représentant pour l'investisseur
+            // Ajouter un deuxième investissement pour certaines entreprises (simulation de tours de financement)
+            if ($i % 3 === 0) {
+                $secondInvestment = new CompanyInvestment();
+                $secondInvestment
+                    ->setCompany($company)
+                    ->setUser($user)
+                    ->setUserGroup($userGroup)
+                    ->setAmount($this->generateInvestmentAmount($i) * 1.5) // Montant plus élevé pour le tour suivant
+                    ->setFundingType($this->fundingTypes[array_rand($this->fundingTypes)])
+                    ->setCurrency('EUR')
+                    ->setInvestedAt($this->generateInvestmentDate($i, true)); // Date plus récente
+
+                $company->addInvestment($secondInvestment);
+                $manager->persist($secondInvestment);
+            }
+
+            // Créer et associer un représentant
             $representative = new Representative();
             $representative
                 ->setCompany($company)
-                ->setNom($cognitoId === $multiInvestorId ? 'Multi Investisseur' : 'Investisseur ' . $i)
-                ->setQualite('Investisseur');
+                ->setNom('Représentant ' . $company->getDenomination())
+                ->setQualite('Directeur Général');
 
             $manager->persist($representative);
             $manager->persist($address);
@@ -97,6 +124,13 @@ class CompanyFixtures extends Fixture
         }
 
         $manager->flush();
+    }
+
+    public function getDependencies(): array
+    {
+        return [
+            UserFixtures::class,
+        ];
     }
 
     private function generateCompanyName(): string
@@ -130,5 +164,38 @@ class CompanyFixtures extends Fixture
         $dept = $departements[array_rand($departements)];
 
         return $dept . str_pad((string)mt_rand(1, 999), 3, '0', STR_PAD_LEFT);
+    }
+
+    private function generateInvestmentAmount($i)
+    {
+        // Générer des montants d'investissement réalistes selon le type d'entreprise
+        $ranges = [
+            ['min' => 50000, 'max' => 250000],    // Seed
+            ['min' => 250000, 'max' => 1000000],  // Series A
+            ['min' => 1000000, 'max' => 5000000], // Series B
+            ['min' => 100000, 'max' => 500000],   // Bridge
+        ];
+        
+        $range = $ranges[$i % count($ranges)];
+        return mt_rand($range['min'], $range['max']);
+    }
+
+    private function generateInvestmentDate($i, $isSecond = false)
+    {
+        // Générer des dates d'investissement réalistes sur les 4 dernières années
+        $currentYear = (int)date('Y');
+        $startYear = $currentYear - 3;
+        
+        if ($isSecond) {
+            // Pour un deuxième tour, toujours plus récent
+            $year = $currentYear - mt_rand(0, 1);
+        } else {
+            $year = $startYear + ($i % 4);
+        }
+        
+        $month = mt_rand(1, 12);
+        $day = mt_rand(1, 28); // Éviter les problèmes de fin de mois
+        
+        return new \DateTime(sprintf('%d-%02d-%02d', $year, $month, $day));
     }
 }

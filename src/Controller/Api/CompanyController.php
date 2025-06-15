@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Service\Company\CompanyServiceInterface;
 use App\Repository\CompanyRepository;
+use App\Repository\KpiRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +17,7 @@ class CompanyController extends AbstractController
     public function __construct(
         private readonly CompanyServiceInterface $companyService,
         private readonly CompanyRepository $companyRepository,
+        private readonly KpiRepository $kpiRepository,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -139,6 +141,98 @@ class CompanyController extends AbstractController
             return new JsonResponse([
                 'error' => $e->getMessage(),
                 'details' => 'Une erreur est survenue lors de la récupération des investissements globaux'
+            ], 400);
+        }
+    }
+
+    #[Route('/company/{id}/kpis', name: 'get_company_kpis', methods: ['GET'])]
+    public function getCompanyKpis(int $id, Request $request): JsonResponse
+    {
+        try {
+            // Vérifier si l'entreprise existe
+            $company = $this->companyRepository->findOneBy(['id' => $id]);
+            if (!$company) {
+                throw new \Exception('Entreprise non trouvée');
+            }
+
+            // Récupérer le paramètre année (optionnel)
+            $year = $request->query->get('year');
+
+            // Récupérer les KPI selon l'année spécifiée ou tous
+            if ($year) {
+                $kpis = $this->kpiRepository->findByCompanyIdAndYear($id, (int)$year);
+            } else {
+                $kpis = $this->kpiRepository->findByCompanyId($id);
+            }
+
+            // Organiser les données par métrique et période
+            $organizedData = [];
+            foreach ($kpis as $kpi) {
+                $metricName = $kpi->getName();
+                $period = $kpi->getPeriod();
+                $value = $kpi->getValue();
+                $unit = $kpi->getUnit();
+
+                if (!isset($organizedData[$metricName])) {
+                    $organizedData[$metricName] = [
+                        'metric' => $metricName,
+                        'unit' => $unit
+                    ];
+                }
+                
+                // Formater la valeur avec l'unité si elle existe
+                $formattedValue = $value;
+                if ($unit && $value !== null) {
+                    $formattedValue = number_format($value, 2, ',', ' ') . ' ' . $unit;
+                } elseif ($value !== null) {
+                    $formattedValue = number_format($value, 2, ',', ' ');
+                }
+                
+                $organizedData[$metricName][$period] = $formattedValue;
+            }
+
+            // Convertir en tableau indexé pour la réponse
+            $result = array_values($organizedData);
+
+            return new JsonResponse($result);
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur critique dans getCompanyKpis', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'companyId' => $id
+            ]);
+
+            return new JsonResponse([
+                'error' => $e->getMessage(),
+                'details' => 'Une erreur est survenue lors de la récupération des KPI'
+            ], 400);
+        }
+    }
+
+    #[Route('/company/{id}/kpis/years', name: 'get_company_kpis_years', methods: ['GET'])]
+    public function getCompanyKpisYears(int $id): JsonResponse
+    {
+        try {
+            // Vérifier si l'entreprise existe
+            $company = $this->companyRepository->findOneBy(['id' => $id]);
+            if (!$company) {
+                throw new \Exception('Entreprise non trouvée');
+            }
+
+            // Récupérer toutes les années disponibles pour cette entreprise
+            $years = $this->kpiRepository->findAvailableYearsByCompanyId($id);
+
+            return new JsonResponse($years);
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur critique dans getCompanyKpisYears', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'companyId' => $id
+            ]);
+
+            return new JsonResponse([
+                'error' => $e->getMessage(),
+                'details' => 'Une erreur est survenue lors de la récupération des années'
             ], 400);
         }
     }

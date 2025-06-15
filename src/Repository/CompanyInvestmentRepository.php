@@ -150,50 +150,50 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
         return [
             [
                 'id' => '1',
-                'name' => 'Revenus mensuels',
-                'description' => 'Évolution des revenus par mois',
+                'name' => 'Revenus par période',
+                'description' => 'Analyse des KPI de revenus (Revenu Annuel Récurrent) par période',
                 'query' => 'monthly_revenue'
             ],
             [
-                'id' => '2', 
-                'name' => 'Clients par secteur',
-                'description' => 'Répartition des clients par secteur d\'activité',
+                'id' => '2',
+                'name' => 'Portefeuille par secteur',
+                'description' => 'Répartition des entreprises du portefeuille par secteur d\'activité',
                 'query' => 'clients_by_sector'
             ],
             [
                 'id' => '3',
-                'name' => 'Croissance ARR',
-                'description' => 'Évolution de l\'ARR (Annual Recurring Revenue) par trimestre',
-                'query' => 'arr_growth'
+                'name' => 'Évolution Argent brûlé',
+                'description' => 'Analyse de l\'évolution de l\'argent brûlé par période - métrique clé de performance',
+                'query' => 'burn_rate_evolution'
             ],
             [
                 'id' => '4',
-                'name' => 'Top 10 clients',
-                'description' => 'Liste des 10 plus grands clients par valeur',
+                'name' => 'Top investissements',
+                'description' => 'Classement des 10 entreprises avec les plus gros investissements',
                 'query' => 'top_clients'
             ],
             [
                 'id' => '5',
-                'name' => 'Évolution des effectifs',
-                'description' => 'Évolution du nombre d\'employés par trimestre',
+                'name' => 'Évolution nombre d\'employés',
+                'description' => 'Suivi de l\'évolution du nombre d\'employés des entreprises du portefeuille',
                 'query' => 'headcount'
             ],
             [
                 'id' => '6',
-                'name' => 'Investissements',
-                'description' => 'Valeur des investissements par trimestre',
+                'name' => 'Investissements trimestriels',
+                'description' => 'Montants investis par trimestre avec types de financement',
                 'query' => 'quarterly_investments'
             ],
             [
                 'id' => '7',
-                'name' => 'Total investi',
-                'description' => 'Montant total investi dans l\'entreprise',
+                'name' => 'Synthèse investissements',
+                'description' => 'Vue d\'ensemble des montants totaux investis par type de financement',
                 'query' => 'total_investment'
             ],
             [
                 'id' => '8',
-                'name' => 'Analyse KPI par période',
-                'description' => 'Vue d\'ensemble des KPI principaux avec évolution période par période',
+                'name' => 'Analyse KPI globale',
+                'description' => 'Vue d\'ensemble de tous les KPI disponibles avec métriques par période',
                 'query' => 'kpi_analysis_by_period'
             ]
         ];
@@ -214,110 +214,120 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
         switch ($queryId) {
             case 'monthly_revenue':
             case '1':
-                // Revenus mensuels
+                // Revenus par période - basés sur les KPI de revenus réels
                 $sql = "
-                    WITH RECURSIVE months AS (
-                        SELECT generate_series(1, 12) AS month_number,
-                        to_char(NOW() - (INTERVAL '1 month' * generate_series(0, 11)), 'YYYY-MM') as month_year
-                    )
                     SELECT 
-                        months.month_year as month,
-                        COALESCE(SUM((k.kpi->>'revenue')::numeric), 0) as revenue
-                    FROM months
-                    LEFT JOIN kpi_data k ON 
-                        to_char(k.created_at, 'YYYY-MM') = months.month_year
-                        AND k.company_id = :companyId
-                        AND k.user_group_id = :userGroupId
-                        AND k.deleted_at IS NULL
-                    GROUP BY months.month_year, months.month_number
-                    ORDER BY months.month_year DESC
-                    LIMIT 12;
+                        CONCAT(d.year, '-', k.period) as period,
+                        k.name as kpi_name,
+                        ROUND(k.value::numeric, 2) as revenue,
+                        k.unit
+                    FROM kpi k
+                    INNER JOIN document d ON k.document_id = d.id
+                    INNER JOIN company c ON d.company_id = c.id
+                    WHERE c.id = :companyId
+                    AND k.name IN ('Revenu Annuel Récurrent', 'EBITDA')
+                    AND k.value IS NOT NULL
+                    ORDER BY d.year DESC, k.period DESC, k.name
+                    LIMIT 20;
                 ";
                 break;
                 
             case 'clients_by_sector':
             case '2':
-                // Clients par secteur
+                // Clients par secteur - basé sur les entreprises dans le portefeuille
                 $sql = "
                     SELECT 
-                        c.sector,
-                        COUNT(*) as client_count
+                        COALESCE(c.sector, 'Non défini') as sector,
+                        COUNT(DISTINCT c.id) as client_count,
+                        SUM(ci.amount) as total_invested
                     FROM company c
                     INNER JOIN company_investment ci ON c.id = ci.company_id
-                    WHERE ci.company_id = :companyId
-                    AND ci.user_group_id = :userGroupId
-                    AND c.deleted_at IS NULL
+                    WHERE ci.amount > 0
                     GROUP BY c.sector
-                    HAVING COUNT(*) > 0
-                    ORDER BY client_count DESC;
+                    HAVING COUNT(DISTINCT c.id) > 0
+                    ORDER BY client_count DESC, total_invested DESC;
                 ";
                 break;
                 
-            case 'arr_growth':
+            case 'burn_rate_evolution':
             case '3':
-                // Croissance ARR
+                // Évolution Argent brûlé - basée sur les KPI réels
                 $sql = "
                     SELECT 
-                        CONCAT('Q', EXTRACT(QUARTER FROM k.created_at)) as quarter,
-                        EXTRACT(YEAR FROM k.created_at)::INTEGER as year,
-                        COALESCE(SUM((k.kpi->>'arr')::numeric), 0) as arr_value
-                    FROM kpi_data k
-                    WHERE k.company_id = :companyId
-                    AND k.user_group_id = :userGroupId
-                    AND k.deleted_at IS NULL
-                    GROUP BY quarter, year
-                    ORDER BY year DESC, quarter DESC
+                        d.year,
+                        k.period,
+                        CAST(AVG(k.value) AS DECIMAL(15,2)) as argent_brule,
+                        k.unit,
+                        COUNT(k.id) as nb_metrics
+                    FROM kpi k
+                    INNER JOIN document d ON k.document_id = d.id
+                    INNER JOIN company c ON d.company_id = c.id
+                    WHERE c.id = :companyId
+                    AND k.name = 'Argent brûlé'
+                    AND k.value IS NOT NULL
+                    GROUP BY d.year, k.period, k.unit
+                    HAVING COUNT(k.id) > 0
+                    ORDER BY d.year DESC, k.period DESC
                     LIMIT 8;
                 ";
                 break;
                 
             case 'top_clients':
             case '4':
-                // Top 10 clients
+                // Top 10 clients - basé sur les investissements réels
                 $sql = "
                     SELECT 
                         c.denomination as client_name,
-                        SUM(ci.amount) as annual_value
+                        c.sector,
+                        SUM(ci.amount) as total_investment,
+                        COUNT(ci.id) as nb_investments,
+                        MAX(ci.invested_at) as last_investment
                     FROM company c
                     INNER JOIN company_investment ci ON c.id = ci.company_id
-                    WHERE ci.user_group_id = :userGroupId
-                    AND c.deleted_at IS NULL
-                    GROUP BY c.denomination
-                    ORDER BY annual_value DESC
+                    WHERE ci.amount > 0
+                    GROUP BY c.id, c.denomination, c.sector
+                    HAVING SUM(ci.amount) > 0
+                    ORDER BY total_investment DESC
                     LIMIT 10;
                 ";
                 break;
                 
             case 'headcount':
             case '5':
-                // Évolution des effectifs
+                // Évolution du nombre d'employés - basée sur les KPI réels
                 $sql = "
                     SELECT 
-                        CONCAT('Q', EXTRACT(QUARTER FROM k.created_at)) as quarter,
-                        EXTRACT(YEAR FROM k.created_at)::INTEGER as year,
-                        COALESCE((k.kpi->>'headcount')::INTEGER, 0) as headcount
-                    FROM kpi_data k
-                    WHERE k.company_id = :companyId
-                    AND k.user_group_id = :userGroupId
-                    AND k.deleted_at IS NULL
-                    AND k.kpi ? 'headcount'
-                    ORDER BY year DESC, quarter DESC
-                    LIMIT 8;
+                        CONCAT(d.year, '-', k.period) as period,
+                        k.name as kpi_name,
+                        ROUND(k.value::numeric, 0) as nombre_employes,
+                        k.unit
+                    FROM kpi k
+                    INNER JOIN document d ON k.document_id = d.id
+                    INNER JOIN company c ON d.company_id = c.id
+                    WHERE c.id = :companyId
+                    AND k.name = 'Nombre d''employés'
+                    AND k.value IS NOT NULL
+                    ORDER BY d.year DESC, k.period DESC
+                    LIMIT 15;
                 ";
                 break;
                 
             case 'quarterly_investments':
             case '6':
-                // Investissements trimestriels
+                // Investissements trimestriels - données réelles d'investissement
                 $sql = "
                     SELECT 
-                        CONCAT('Q', EXTRACT(QUARTER FROM ci.invested_at)) as quarter,
                         EXTRACT(YEAR FROM ci.invested_at)::INTEGER as year,
-                        SUM(ci.amount) as investment_value
+                        CONCAT('Q', EXTRACT(QUARTER FROM ci.invested_at)) as quarter,
+                        SUM(ci.amount) as investment_value,
+                        COUNT(ci.id) as nb_investments,
+                        STRING_AGG(DISTINCT ci.funding_type, ', ') as funding_types
                     FROM company_investment ci
-                    WHERE ci.company_id = :companyId
-                    AND ci.user_group_id = :userGroupId
-                    GROUP BY quarter, year
+                    INNER JOIN company c ON ci.company_id = c.id
+                    WHERE c.id = :companyId
+                    AND ci.amount > 0
+                    GROUP BY year, quarter
+                    HAVING SUM(ci.amount) > 0
                     ORDER BY year DESC, quarter DESC
                     LIMIT 8;
                 ";
@@ -325,29 +335,31 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
                 
             case 'total_investment':
             case '7':
-                // Total investi
+                // Total investi - synthèse des investissements
                 $sql = "
                     SELECT 
-                        'Total' as category,
+                        'Total Global' as category,
                         SUM(ci.amount) as total_amount,
                         COUNT(ci.id) as nb_investments,
                         MIN(ci.invested_at) as first_investment,
-                        MAX(ci.invested_at) as last_investment
+                        MAX(ci.invested_at) as last_investment,
+                        STRING_AGG(DISTINCT ci.currency, ', ') as currencies
                     FROM company_investment ci
-                    WHERE ci.company_id = :companyId
-                    AND ci.user_group_id = :userGroupId
+                    INNER JOIN company c ON ci.company_id = c.id
+                    WHERE c.id = :companyId
                     
                     UNION ALL
                     
                     SELECT 
-                        ci.funding_type as category,
+                        COALESCE(ci.funding_type, 'Non défini') as category,
                         SUM(ci.amount) as total_amount,
                         COUNT(ci.id) as nb_investments,
                         MIN(ci.invested_at) as first_investment,
-                        MAX(ci.invested_at) as last_investment
+                        MAX(ci.invested_at) as last_investment,
+                        STRING_AGG(DISTINCT ci.currency, ', ') as currencies
                     FROM company_investment ci
-                    WHERE ci.company_id = :companyId
-                    AND ci.user_group_id = :userGroupId
+                    INNER JOIN company c ON ci.company_id = c.id
+                    WHERE c.id = :companyId
                     GROUP BY ci.funding_type
                     HAVING SUM(ci.amount) > 0
                     ORDER BY total_amount DESC;
@@ -356,42 +368,113 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
                 
             case 'kpi_analysis_by_period':
             case '8':
-                // Analyse KPI par période - basée sur les investissements pour avoir des données
+                // Analyse KPI par période - reproduit EXACTEMENT le format de "Tous les metrics"
                 $sql = "
+                    WITH kpi_data AS (
+                        SELECT 
+                            k.name as metric,
+                            k.period,
+                            k.value,
+                            k.unit
+                        FROM kpi k
+                        INNER JOIN document d ON k.document_id = d.id
+                        INNER JOIN company c ON d.company_id = c.id
+                        WHERE c.id = :companyId
+                        AND k.value IS NOT NULL
+                    ),
+                    pivoted_data AS (
+                        SELECT 
+                            metric,
+                            unit,
+                            -- Utiliser les vraies périodes Q1, Q2, Q3 de votre base
+                            MAX(CASE WHEN period = 'Q1' THEN 
+                                CASE 
+                                    WHEN unit IS NOT NULL AND unit != '' THEN 
+                                        REPLACE(TO_CHAR(value, 'FM999,999,999.00'), ',', ' ') || ' ' || unit
+                                    ELSE 
+                                        REPLACE(TO_CHAR(value, 'FM999,999,999.00'), ',', ' ')
+                                END
+                            END) as \"Q1\",
+                            MAX(CASE WHEN period = 'Q2' THEN 
+                                CASE 
+                                    WHEN unit IS NOT NULL AND unit != '' THEN 
+                                        REPLACE(TO_CHAR(value, 'FM999,999,999.00'), ',', ' ') || ' ' || unit
+                                    ELSE 
+                                        REPLACE(TO_CHAR(value, 'FM999,999,999.00'), ',', ' ')
+                                END
+                            END) as \"Q2\",
+                            MAX(CASE WHEN period = 'Q3' THEN 
+                                CASE 
+                                    WHEN unit IS NOT NULL AND unit != '' THEN 
+                                        REPLACE(TO_CHAR(value, 'FM999,999,999.00'), ',', ' ') || ' ' || unit
+                                    ELSE 
+                                        REPLACE(TO_CHAR(value, 'FM999,999,999.00'), ',', ' ')
+                                END
+                            END) as \"Q3\",
+                            MAX(CASE WHEN period = 'Q4' THEN 
+                                CASE 
+                                    WHEN unit IS NOT NULL AND unit != '' THEN 
+                                        REPLACE(TO_CHAR(value, 'FM999,999,999.00'), ',', ' ') || ' ' || unit
+                                    ELSE 
+                                        REPLACE(TO_CHAR(value, 'FM999,999,999.00'), ',', ' ')
+                                END
+                            END) as \"Q4\"
+                        FROM kpi_data
+                        GROUP BY metric, unit
+                    )
+                    SELECT * FROM pivoted_data
+                    WHERE metric IS NOT NULL
+                    
+                    UNION ALL
+                    
+                    -- Fallback: si pas de données, retourner au moins un exemple
                     SELECT 
-                        EXTRACT(YEAR FROM ci.invested_at)::INTEGER as year,
-                        CONCAT('Q', EXTRACT(QUARTER FROM ci.invested_at)) as quarter,
-                        COUNT(DISTINCT ci.id) as nb_investments,
-                        COUNT(DISTINCT c.id) as nb_companies,
-                        COALESCE(AVG(ci.amount), 0) as avg_investment_value,
-                        COALESCE(SUM(ci.amount), 0) as total_investment_value,
-                        COALESCE(MAX(ci.amount), 0) as max_investment_value,
-                        COALESCE(MIN(ci.amount), 0) as min_investment_value,
-                        STRING_AGG(DISTINCT ci.funding_type, ', ') as funding_types,
-                        STRING_AGG(DISTINCT c.sector, ', ') as sectors
-                    FROM company_investment ci
-                    LEFT JOIN company c ON ci.company_id = c.id
-                    WHERE ci.company_id = :companyId
-                    AND ci.user_group_id = :userGroupId
-                    AND EXTRACT(YEAR FROM ci.invested_at) >= EXTRACT(YEAR FROM NOW()) - 3
-                    GROUP BY year, quarter
-                    HAVING COUNT(DISTINCT ci.id) > 0
-                    ORDER BY year DESC, quarter DESC
-                    LIMIT 12;
+                        'Aucune donnée disponible' as metric,
+                        '' as unit,
+                        NULL as \"Q1\",
+                        NULL as \"Q2\",
+                        NULL as \"Q3\",
+                        NULL as \"Q4\"
+                    WHERE NOT EXISTS (SELECT 1 FROM pivoted_data WHERE metric IS NOT NULL)
+                    
+                    ORDER BY metric;
                 ";
                 break;
-                
+
             default:
-                // Requête par défaut
-                return [];
+                // Requête par défaut - vue d'ensemble des données disponibles
+                $sql = "
+                    SELECT 
+                        'Données disponibles' as category,
+                        COUNT(DISTINCT k.id) as nb_kpis,
+                        COUNT(DISTINCT d.id) as nb_documents,
+                        COUNT(DISTINCT ci.id) as nb_investments,
+                        MAX(d.year) as latest_year
+                    FROM company c
+                    LEFT JOIN document d ON c.id = d.company_id
+                    LEFT JOIN kpi k ON d.id = k.document_id
+                    LEFT JOIN company_investment ci ON c.id = ci.company_id
+                    WHERE c.id = :companyId;
+                ";
+                break;
         }
 
-        $stmt = $conn->prepare($sql);
-        $result = $stmt->executeQuery([
-            'companyId' => $companyId,
-            'userGroupId' => $userGroup->getId(),
-        ]);
+        try {
+            $result = $conn->executeQuery($sql, [
+                'companyId' => $companyId,
+                'userGroupId' => $userGroup->getId()
+            ])->fetchAllAssociative();
 
-        return $result->fetchAllAssociative();
+            return $result;
+        } catch (\Exception $e) {
+            // En cas d'erreur, retourner un tableau vide avec un message d'erreur
+            return [
+                [
+                    'error' => 'Erreur lors de l\'exécution de la requête',
+                    'message' => $e->getMessage(),
+                    'query_id' => $queryId
+                ]
+            ];
+        }
     }
 }

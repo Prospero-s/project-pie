@@ -14,13 +14,14 @@ import {
   DownOutlined, FilterOutlined, SettingOutlined,
   PlusOutlined, EyeInvisibleOutlined, TableOutlined,
   SortAscendingOutlined, SortDescendingOutlined,
-  EditOutlined, DeleteOutlined
+  EditOutlined, DeleteOutlined, BarChartOutlined
 } from '@ant-design/icons';
 import {
   BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis,
   XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer
 } from 'recharts';
 import { getAllCompanies } from '@/services/company/companyService';
+import KpiComparisonModal from './KpiComparisonModal';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -29,57 +30,49 @@ const { Text } = Typography;
 const PREDEFINED_QUERIES = [
     { 
       id: '1', 
-    name: 'Revenus mensuels',
+    name: 'Revenus par période',
     query: 'monthly_revenue',
-    description: 'Affiche les revenus mensuels de l\'entreprise au cours des 12 derniers mois',
+    description: 'Analyse des KPI de revenus (Revenu Annuel Récurrent) par période',
     data: [
-      { month: '2023-06', revenue: 520000 },
-      { month: '2023-05', revenue: 480000 },
-      { month: '2023-04', revenue: 510000 },
-      { month: '2023-03', revenue: 450000 },
-      { month: '2023-02', revenue: 430000 },
-      { month: '2023-01', revenue: 460000 },
-      { month: '2022-12', revenue: 490000 },
-      { month: '2022-11', revenue: 470000 },
-      { month: '2022-10', revenue: 440000 },
-      { month: '2022-09', revenue: 420000 },
-      { month: '2022-08', revenue: 430000 },
-      { month: '2022-07', revenue: 410000 }
+      { period: '2024-Q3', kpi_name: 'Revenu Annuel Récurrent', revenue: 520000, unit: '€' },
+      { period: '2024-Q2', kpi_name: 'Revenu Annuel Récurrent', revenue: 480000, unit: '€' },
+      { period: '2024-Q1', kpi_name: 'EBITDA', revenue: 510000, unit: '€' },
+      { period: '2023-Q4', kpi_name: 'Revenu Annuel Récurrent', revenue: 450000, unit: '€' },
+      { period: '2023-Q3', kpi_name: 'EBITDA', revenue: 430000, unit: '€' },
+      { period: '2023-Q2', kpi_name: 'Revenu Annuel Récurrent', revenue: 460000, unit: '€' }
     ]
     },
     { 
       id: '2', 
-    name: 'Clients par secteur',
+    name: 'Portefeuille par secteur',
     query: 'clients_by_sector',
-    description: 'Répartition des clients par secteur d\'activité',
+    description: 'Répartition des entreprises du portefeuille par secteur d\'activité',
     data: [
-      { sector: 'Technologie', client_count: 45 },
-      { sector: 'Santé', client_count: 32 },
-      { sector: 'Finance', client_count: 28 },
-      { sector: 'Éducation', client_count: 20 },
-      { sector: 'Commerce', client_count: 18 },
-      { sector: 'Industrie', client_count: 15 }
+      { sector: 'Technologie', client_count: 45, total_invested: 12500000 },
+      { sector: 'Santé', client_count: 32, total_invested: 8900000 },
+      { sector: 'Finance', client_count: 28, total_invested: 7200000 },
+      { sector: 'Éducation', client_count: 20, total_invested: 4500000 },
+      { sector: 'Commerce', client_count: 18, total_invested: 3800000 },
+      { sector: 'Industrie', client_count: 15, total_invested: 2900000 }
     ]
     },
     { 
       id: '3', 
-    name: 'Croissance ARR',
-    query: 'arr_growth', 
-    description: 'Évolution de l\'ARR (Annual Recurring Revenue) par trimestre',
+    name: 'Évolution Argent brûlé',
+    query: 'burn_rate_evolution', 
+    description: 'Analyse de l\'évolution de l\'argent brûlé par période - métrique clé de performance',
     data: [
-      { year: 2023, quarter: 'Q2', arr_value: 5200000 },
-      { year: 2023, quarter: 'Q1', arr_value: 4800000 },
-      { year: 2022, quarter: 'Q4', arr_value: 4500000 },
-      { year: 2022, quarter: 'Q3', arr_value: 4200000 },
-      { year: 2022, quarter: 'Q2', arr_value: 3900000 },
-      { year: 2022, quarter: 'Q1', arr_value: 3600000 },
-      { year: 2021, quarter: 'Q4', arr_value: 3400000 },
-      { year: 2021, quarter: 'Q3', arr_value: 3100000 }
+      { year: 2024, period: 'Q3', argent_brule: 7700000.00, unit: '€', nb_metrics: 1 },
+      { year: 2024, period: 'Q2', argent_brule: 7500000.00, unit: '€', nb_metrics: 1 },
+      { year: 2024, period: 'Q1', argent_brule: 7200000.00, unit: '€', nb_metrics: 1 },
+      { year: 2023, period: 'Q4', argent_brule: 6900000.00, unit: '€', nb_metrics: 1 },
+      { year: 2023, period: 'Q3', argent_brule: 6600000.00, unit: '€', nb_metrics: 1 },
+      { year: 2023, period: 'Q2', argent_brule: 6300000.00, unit: '€', nb_metrics: 1 }
     ]
     },
     { 
       id: '4', 
-    name: 'Top 10 clients',
+    name: 'Top investissements',
     query: 'top_clients',
     description: 'Liste des 10 plus grands clients par valeur',
     data: [
@@ -97,61 +90,54 @@ const PREDEFINED_QUERIES = [
     },
     { 
       id: '5', 
-    name: 'Évolution des effectifs',
+    name: 'Évolution nombre d\'employés',
     query: 'headcount',
-    description: 'Évolution du nombre d\'employés par trimestre',
+    description: 'Suivi de l\'évolution du nombre d\'employés des entreprises du portefeuille',
     data: [
-      { year: 2023, quarter: 'Q2', headcount: 120 },
-      { year: 2023, quarter: 'Q1', headcount: 110 },
-      { year: 2022, quarter: 'Q4', headcount: 95 },
-      { year: 2022, quarter: 'Q3', headcount: 85 },
-      { year: 2022, quarter: 'Q2', headcount: 78 },
-      { year: 2022, quarter: 'Q1', headcount: 70 },
-      { year: 2021, quarter: 'Q4', headcount: 65 },
-      { year: 2021, quarter: 'Q3', headcount: 60 }
+      { period: '2024-Q3', kpi_name: 'Nombre d\'employés', nombre_employes: 320, unit: 'personnes' },
+      { period: '2024-Q2', kpi_name: 'Nombre d\'employés', nombre_employes: 310, unit: 'personnes' },
+      { period: '2024-Q1', kpi_name: 'Nombre d\'employés', nombre_employes: 295, unit: 'personnes' },
+      { period: '2023-Q4', kpi_name: 'Nombre d\'employés', nombre_employes: 285, unit: 'personnes' },
+      { period: '2023-Q3', kpi_name: 'Nombre d\'employés', nombre_employes: 278, unit: 'personnes' },
+      { period: '2023-Q2', kpi_name: 'Nombre d\'employés', nombre_employes: 270, unit: 'personnes' }
     ]
     },
     { 
       id: '6', 
-    name: 'Investissements',
+    name: 'Investissements trimestriels',
     query: 'quarterly_investments',
-    description: 'Valeur des investissements par trimestre',
+    description: 'Montants investis par trimestre avec types de financement',
     data: [
-      { year: 2023, quarter: 'Q2', investment_value: 1200000 },
-      { year: 2023, quarter: 'Q1', investment_value: 950000 },
-      { year: 2022, quarter: 'Q4', investment_value: 870000 },
-      { year: 2022, quarter: 'Q3', investment_value: 920000 },
-      { year: 2022, quarter: 'Q2', investment_value: 780000 },
-      { year: 2022, quarter: 'Q1', investment_value: 730000 },
-      { year: 2021, quarter: 'Q4', investment_value: 650000 },
-      { year: 2021, quarter: 'Q3', investment_value: 580000 }
+      { year: 2024, quarter: 'Q3', investment_value: 1200000, nb_investments: 3, funding_types: 'Series A, Series B' },
+      { year: 2024, quarter: 'Q2', investment_value: 950000, nb_investments: 2, funding_types: 'Seed, Series A' },
+      { year: 2024, quarter: 'Q1', investment_value: 870000, nb_investments: 4, funding_types: 'Seed' },
+      { year: 2023, quarter: 'Q4', investment_value: 920000, nb_investments: 2, funding_types: 'Series A' },
+      { year: 2023, quarter: 'Q3', investment_value: 780000, nb_investments: 3, funding_types: 'Seed, Series A' },
+      { year: 2023, quarter: 'Q2', investment_value: 730000, nb_investments: 1, funding_types: 'Series B' }
     ]
   },
   { 
     id: '7', 
-    name: 'Total investi',
+    name: 'Synthèse investissements',
     query: 'total_investment',
-    description: 'Montant total investi dans l\'entreprise',
+    description: 'Vue d\'ensemble des montants totaux investis par type de financement',
     data: [
-      { category: 'Total', total_amount: 8950000, nb_investments: 45, first_investment: '2021-01-15', last_investment: '2023-06-30' },
-      { category: 'Seed', total_amount: 3500000, nb_investments: 12, first_investment: '2021-01-15', last_investment: '2021-08-10' },
-      { category: 'Series A', total_amount: 5450000, nb_investments: 33, first_investment: '2021-09-22', last_investment: '2023-06-30' }
+      { category: 'Total Global', total_amount: 8950000, nb_investments: 45, first_investment: '2021-01-15', last_investment: '2024-06-30', currencies: 'EUR' },
+      { category: 'Series A', total_amount: 5450000, nb_investments: 18, first_investment: '2021-09-22', last_investment: '2024-06-30', currencies: 'EUR' },
+      { category: 'Seed', total_amount: 3500000, nb_investments: 27, first_investment: '2021-01-15', last_investment: '2024-03-15', currencies: 'EUR' }
     ]
   },
   { 
     id: '8', 
-    name: 'Analyse KPI par période',
+    name: 'Analyse KPI globale',
     query: 'kpi_analysis_by_period',
-    description: 'Vue d\'ensemble des KPI principaux avec évolution période par période',
+    description: 'Vue d\'ensemble de tous les KPI disponibles avec métriques par période',
     data: [
-      { year: 2024, quarter: 'Q1', nb_investments: 3, nb_companies: 2, avg_investment_value: 125000, total_investment_value: 375000, max_investment_value: 200000, min_investment_value: 75000, funding_types: 'Seed, Series A', sectors: 'Tech, Health' },
-      { year: 2023, quarter: 'Q4', nb_investments: 4, nb_companies: 3, avg_investment_value: 118000, total_investment_value: 472000, max_investment_value: 180000, min_investment_value: 80000, funding_types: 'Seed, Series A', sectors: 'Tech, Finance, Health' },
-      { year: 2023, quarter: 'Q3', nb_investments: 2, nb_companies: 2, avg_investment_value: 112000, total_investment_value: 224000, max_investment_value: 140000, min_investment_value: 84000, funding_types: 'Series A', sectors: 'Tech, Finance' },
-      { year: 2023, quarter: 'Q2', nb_investments: 5, nb_companies: 4, avg_investment_value: 108000, total_investment_value: 540000, max_investment_value: 150000, min_investment_value: 60000, funding_types: 'Seed, Series A, Series B', sectors: 'Tech, Health, Education' },
-      { year: 2023, quarter: 'Q1', nb_investments: 3, nb_companies: 2, avg_investment_value: 102000, total_investment_value: 306000, max_investment_value: 130000, min_investment_value: 88000, funding_types: 'Seed, Series A', sectors: 'Tech, Health' },
-      { year: 2022, quarter: 'Q4', nb_investments: 2, nb_companies: 2, avg_investment_value: 95000, total_investment_value: 190000, max_investment_value: 110000, min_investment_value: 80000, funding_types: 'Seed', sectors: 'Tech, Finance' },
-      { year: 2022, quarter: 'Q3', nb_investments: 4, nb_companies: 3, avg_investment_value: 88000, total_investment_value: 352000, max_investment_value: 120000, min_investment_value: 70000, funding_types: 'Seed, Series A', sectors: 'Tech, Health, Education' },
-      { year: 2022, quarter: 'Q2', nb_investments: 3, nb_companies: 2, avg_investment_value: 82000, total_investment_value: 246000, max_investment_value: 100000, min_investment_value: 65000, funding_types: 'Seed', sectors: 'Tech, Health' }
+      { metric: 'Argent brûlé', unit: '€', Q1: '7 531 666.67 €', Q2: '7 531 666.67 €', Q3: '7 531 666.67 €', Q4: null },
+      { metric: 'Coût d\'acquisition client', unit: '', Q1: '0.97', Q2: '0.97', Q3: '0.97', Q4: null },
+      { metric: 'EBITDA', unit: '€', Q1: '-1 200 000.00 €', Q2: '-1 200 000.00 €', Q3: '-1 200 000.00 €', Q4: null },
+      { metric: 'Nombre d\'employés', unit: 'personnes', Q1: '276 personnes', Q2: '276 personnes', Q3: '276 personnes', Q4: null },
+      { metric: 'Revenu Annuel Récurrent', unit: '€', Q1: '27.67 €', Q2: '27.67 €', Q3: '27.67 €', Q4: null }
     ]
   }
 ];
@@ -206,6 +192,7 @@ const GridControls = () => {
   const [companies, setCompanies] = useState([]);
   const [loadingCompanies, setLoadingCompanies] = useState(false);
   const [externalData, setExternalData] = useState({});
+  const [comparisonModalVisible, setComparisonModalVisible] = useState(false);
   
   // Effet pour définir selectedQuery quand selectedQueryId change
   useEffect(() => {
@@ -1716,6 +1703,14 @@ const GridControls = () => {
         >
           {t('data')}
         </button>
+
+        <button
+          onClick={() => setComparisonModalVisible(true)}
+          className="px-2 py-1 rounded text-xs border border-green-400 bg-green-50 ml-2"
+        >
+          <BarChartOutlined className="mr-1" />
+          {t('kpi_comparison.button_text')}
+        </button>
       </div>
 
       <Drawer
@@ -2109,6 +2104,12 @@ const GridControls = () => {
           )}
         </Form>
       </Modal>
+
+      {/* Modal de comparaison KPI */}
+      <KpiComparisonModal
+        visible={comparisonModalVisible}
+        onClose={() => setComparisonModalVisible(false)}
+      />
     </div>
   );
 };

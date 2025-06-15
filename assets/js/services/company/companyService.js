@@ -188,3 +188,36 @@ export const getCompanyDetailsById = async id => {
     );
   }
 };
+
+export const getCompanyKpis = async id => {
+  try {
+    const response = await axios.get(`/api/company/${id}/kpis`);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      `Erreur lors de la récupération des KPI: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`,
+    );
+  }
+};
+
+export const getCompanyKpisByYear = async (id, year) => {
+  try {
+    const response = await axios.get(`/api/company/${id}/kpis?year=${year}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      `Erreur lors de la récupération des KPI pour l'année ${year}: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`,
+    );
+  }
+};
+
+export const getCompanyKpisYears = async id => {
+  try {
+    const response = await axios.get(`/api/company/${id}/kpis/years`);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      `Erreur lors de la récupération des années disponibles: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`,
+    );
+  }
+};
