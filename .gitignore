@@ -76,4 +76,4 @@ phpstan.neon
 ###< phpunit/phpunit ###
 
 # Python
-__pycache__/
+pdf_processor/app/__pycache__/
