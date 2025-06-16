@@ -42,7 +42,7 @@ class DemoAccountFixtures extends Fixture implements FixtureGroupInterface
             'siret' => '55203253400477',
             'denomination' => 'LVMH Moët Hennessy Louis Vuitton',
             'codeApe' => '7010Z',
-            'sector' => 'luxury',
+            'sector' => 'retail',
             'businessStructure' => 'SA',
             'address' => [
                 'streetNumber' => '22',
@@ -57,7 +57,7 @@ class DemoAccountFixtures extends Fixture implements FixtureGroupInterface
             'siret' => '55212022200047',
             'denomination' => 'L\'Oréal',
             'codeApe' => '2042Z',
-            'sector' => 'beauty_personal_care',
+            'sector' => 'healthcare',
             'businessStructure' => 'SA',
             'address' => [
                 'streetNumber' => '14',
@@ -72,7 +72,7 @@ class DemoAccountFixtures extends Fixture implements FixtureGroupInterface
             'siret' => '77567041700455',
             'denomination' => 'Airbus SE',
             'codeApe' => '3030Z',
-            'sector' => 'aerospace',
+            'sector' => 'manufacturing',
             'businessStructure' => 'SE',
             'address' => [
                 'streetNumber' => '2',
@@ -87,7 +87,7 @@ class DemoAccountFixtures extends Fixture implements FixtureGroupInterface
             'siret' => '31567648400895',
             'denomination' => 'Michelin',
             'codeApe' => '2211Z',
-            'sector' => 'automotive',
+            'sector' => 'manufacturing',
             'businessStructure' => 'SCA',
             'address' => [
                 'streetNumber' => '23',
@@ -102,7 +102,7 @@ class DemoAccountFixtures extends Fixture implements FixtureGroupInterface
             'siret' => '54210765100508',
             'denomination' => 'Sanofi',
             'codeApe' => '2120Z',
-            'sector' => 'pharmaceuticals',
+            'sector' => 'healthcare',
             'businessStructure' => 'SA',
             'address' => [
                 'streetNumber' => '54',
@@ -117,7 +117,7 @@ class DemoAccountFixtures extends Fixture implements FixtureGroupInterface
             'siret' => '54204403115522',
             'denomination' => 'Orange',
             'codeApe' => '6110Z',
-            'sector' => 'telecommunications',
+            'sector' => 'technology',
             'businessStructure' => 'SA',
             'address' => [
                 'streetNumber' => '111',
@@ -132,7 +132,7 @@ class DemoAccountFixtures extends Fixture implements FixtureGroupInterface
             'siret' => '71205459900507',
             'denomination' => 'Safran',
             'codeApe' => '2611Z',
-            'sector' => 'aerospace',
+            'sector' => 'manufacturing',
             'businessStructure' => 'SA',
             'address' => [
                 'streetNumber' => '2',
@@ -147,7 +147,7 @@ class DemoAccountFixtures extends Fixture implements FixtureGroupInterface
             'siret' => '54202916600127',
             'denomination' => 'Schneider Electric',
             'codeApe' => '2712Z',
-            'sector' => 'industrial_equipment',
+            'sector' => 'energy',
             'businessStructure' => 'SE',
             'address' => [
                 'streetNumber' => '35',
@@ -162,7 +162,7 @@ class DemoAccountFixtures extends Fixture implements FixtureGroupInterface
             'siret' => '42276963800395',
             'denomination' => 'Dassault Systèmes',
             'codeApe' => '5829C',
-            'sector' => 'software',
+            'sector' => 'technology',
             'businessStructure' => 'SE',
             'address' => [
                 'streetNumber' => '10',
@@ -177,7 +177,7 @@ class DemoAccountFixtures extends Fixture implements FixtureGroupInterface
             'siret' => '77566128500397',
             'denomination' => 'Capgemini',
             'codeApe' => '6202A',
-            'sector' => 'technology_services',
+            'sector' => 'technology',
             'businessStructure' => 'SE',
             'address' => [
                 'streetNumber' => '11',
@@ -192,7 +192,7 @@ class DemoAccountFixtures extends Fixture implements FixtureGroupInterface
             'siret' => '54210899600047',
             'denomination' => 'Thales',
             'codeApe' => '2651B',
-            'sector' => 'defense_aerospace',
+            'sector' => 'finance',
             'businessStructure' => 'SA',
             'address' => [
                 'streetNumber' => '4',
@@ -206,33 +206,25 @@ class DemoAccountFixtures extends Fixture implements FixtureGroupInterface
 
     /** @var array<string> */
     private array $fundingTypes = [
-        'Seed',
-        'Series A',
-        'Series B',
-        'Series C',
-        'Growth',
-        'Private Equity',
-        'Venture Capital',
-        'Corporate Venture',
-        'Strategic Investment',
-        'Bridge Funding'
+        'seed',
+        'serieA',
+        'serieB',
+        'serieC',
+        'growth',
+        'ipo'
     ];
 
     public function load(ObjectManager $manager): void
     {
-        // Vérifier si l'utilisateur demo existe déjà
+        // Vérifier si l'utilisateur demo existe déjà et le supprimer
         $existingUser = $manager->getRepository(User::class)->findOneBy([
             'email' => self::DEMO_USER_EMAIL
         ]);
         
         if ($existingUser) {
-            echo "⚠️  Le compte de démonstration existe déjà !\n";
-            echo "📧 Email: " . self::DEMO_USER_EMAIL . "\n";
-            echo "🔑 Mot de passe: " . self::DEMO_USER_PASSWORD . "\n";
-            echo "💰 Portfolio total: 48M EUR répartis sur 24 investissements\n";
-            echo "🌐 Secteurs traduits correctement\n";
-            echo "🛑 Arrêt du processus de création.\n";
-            return;
+            echo "🔄 Suppression de l'ancien compte de démonstration...\n";
+            $this->cleanupExistingDemoData($manager, $existingUser);
+            echo "✅ Ancien compte supprimé avec succès.\n";
         }
 
         echo "✅ Création du nouveau compte de démonstration...\n";
@@ -384,20 +376,16 @@ class DemoAccountFixtures extends Fixture implements FixtureGroupInterface
     private function getBaseAmountForSector(string $sector): float
     {
         $sectorMultipliers = [
-            'energy' => 2500000,            // 2.5M €
-            'luxury' => 1500000,            // 1.5M €
-            'beauty_personal_care' => 800000,  // 800K €
-            'aerospace' => 3000000,         // 3M €
-            'automotive' => 2000000,        // 2M €
-            'pharmaceuticals' => 1800000,   // 1.8M €
-            'telecommunications' => 1200000, // 1.2M €
-            'industrial_equipment' => 900000, // 900K €
-            'software' => 600000,           // 600K €
-            'technology_services' => 750000, // 750K €
-            'defense_aerospace' => 4000000, // 4M €
+            'technology' => 1500000,        // 1.5M €
+            'healthcare' => 2000000,        // 2M €
+            'finance' => 2500000,           // 2.5M €
+            'retail' => 1200000,            // 1.2M €
+            'manufacturing' => 1800000,     // 1.8M €
+            'energy' => 3000000,            // 3M €
+            'education' => 800000,          // 800K €
         ];
 
-        return $sectorMultipliers[$sector] ?? 500000; // Default 500K €
+        return $sectorMultipliers[$sector] ?? 1000000; // Default 1M €
     }
 
     private function generateExecutiveName(): string
@@ -431,6 +419,71 @@ class DemoAccountFixtures extends Fixture implements FixtureGroupInterface
         ];
 
         return $roles[array_rand($roles)];
+    }
+
+    private function cleanupExistingDemoData(ObjectManager $manager, User $existingUser): void
+    {
+        $connection = $manager->getConnection();
+        $userId = $existingUser->getId();
+        
+        // Approche simple : supprimer directement par requêtes SQL dans le bon ordre
+        
+        // 1. Récupérer les IDs des entreprises liées à cet utilisateur AVANT de supprimer les investissements
+        $companyIds = $connection->fetchFirstColumn(
+            'SELECT DISTINCT company_id FROM company_investment WHERE user_id = ?',
+            [$userId]
+        );
+        
+        // 2. Supprimer les investissements
+        $connection->executeStatement(
+            'DELETE FROM company_investment WHERE user_id = ?',
+            [$userId]
+        );
+        
+        // 3. Supprimer les paramètres de notification
+        $connection->executeStatement(
+            'DELETE FROM notification_settings WHERE user_id_id = ?',
+            [$userId]
+        );
+        
+        // 4. Supprimer les représentants de ces entreprises
+        if (!empty($companyIds)) {
+            $placeholders = str_repeat('?,', count($companyIds) - 1) . '?';
+            $connection->executeStatement(
+                "DELETE FROM representative WHERE company_id IN ($placeholders)",
+                $companyIds
+            );
+            
+            // 5. Supprimer les adresses de ces entreprises
+            $connection->executeStatement(
+                "DELETE FROM company_address WHERE company_id IN ($placeholders)",
+                $companyIds
+            );
+            
+            // 6. Supprimer ces entreprises
+            $connection->executeStatement(
+                "DELETE FROM company WHERE id IN ($placeholders)",
+                $companyIds
+            );
+        }
+        
+        // 7. Retirer la référence du groupe de l'utilisateur
+        $connection->executeStatement(
+            'UPDATE "user" SET user_group_id = NULL WHERE id = ?',
+            [$userId]
+        );
+        
+        // 8. Supprimer le groupe demo
+        $connection->executeStatement(
+            'DELETE FROM user_group WHERE owner_id = ? AND name = ?',
+            [$userId, self::DEMO_GROUP_NAME]
+        );
+        
+        // 9. Supprimer l'utilisateur
+        $connection->executeStatement(
+            'DELETE FROM "user" WHERE id = ?',
+            [$userId]
+        );
     }
 
     public static function getGroups(): array
