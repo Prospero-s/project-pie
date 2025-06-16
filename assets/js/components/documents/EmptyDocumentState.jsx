@@ -3,16 +3,17 @@ import { FileTextOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import UploadPopup from '@/components/common/upload/UploadPopup';
 
-const EmptyDocumentState = ({ t }) => {
-  const [isUploadPopupVisible, setIsUploadPopupVisible] = useState(false);
-
+const EmptyDocumentState = ({ t, i18n, lng }) => {
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
   const handleButtonClick = () => {
-    setIsUploadPopupVisible(true);
+    setIsPopupVisible(true);
   };
 
-  const handleUploadPopupCancel = () => {
-    setIsUploadPopupVisible(false);
+  const handleClosePopup = () => {
+    setIsPopupVisible(false);
   };
+
+
 
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 bg-white rounded-lg border border-slate-200">
@@ -26,10 +27,13 @@ const EmptyDocumentState = ({ t }) => {
       <Button type="primary" onClick={handleButtonClick} className="bg-blue-500">
         {t('empty.action')}
       </Button>
-      {isUploadPopupVisible && (
+      {isPopupVisible && (
         <UploadPopup
-          visible={isUploadPopupVisible}
-          onClose={handleUploadPopupCancel}
+          visible={isPopupVisible}
+          onClose={handleClosePopup}
+          company={null}
+          i18n={i18n}
+          lng={lng}
         />
       )}
     </div>

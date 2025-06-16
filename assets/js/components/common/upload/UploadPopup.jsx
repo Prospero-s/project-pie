@@ -31,7 +31,7 @@ const { Text } = Typography;
 const { Option } = Select;
 
 // URL du service Python PDF Processor
-const PDF_PROCESSOR_URL = 'http://localhost:5000';
+const PDF_PROCESSOR_URL = 'http://localhost:5001';
 
 const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
   const [fileList, setFileList] = useState([]);
@@ -162,7 +162,9 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
     const file = fileList[0];
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('companyId', company?.id || '');
+    if (company?.id) {
+      formData.append('companyId', company.id);
+    }
     formData.append('periodicity', periodicity);
     formData.append('kpis', JSON.stringify(selectedKpis));
     if (selectedYear !== null && selectedYear !== 'all') {
@@ -173,7 +175,6 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
     try {
       setLoading(true);
       setError(null);
-
       // Authentification avec Cognito si nécessaire
       let cognitoToken = null;
       try {
@@ -366,6 +367,7 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
   );
 
   return (
+    <>  
     <Modal
       title={loading ? null : t('documents:modal.upload_title')}
       open={visible}
@@ -531,6 +533,7 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
         </>
       )}
     </Modal>
+    </>
   );
 };
 

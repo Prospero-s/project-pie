@@ -74,6 +74,17 @@ test-db-aws:
 
 test-all-db: test-db-local test-db-aws
 
+# Commandes pour reset la base de données
+
+reset-db:
+	$(DOCKER_COMPOSE) exec postgres psql -U postgres -d template1 -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'postgres';"
+	$(DOCKER_COMPOSE) exec postgres psql -U postgres -d template1 -c "DROP DATABASE IF EXISTS postgres;"
+	$(DOCKER_COMPOSE) exec postgres psql -U postgres -d template1 -c "CREATE DATABASE postgres;"
+	$(DOCKER_COMPOSE) exec php php bin/console doctrine:migrations:migrate --no-interaction
+
+#reset-db-aws:
+#	DATABASE_URL="$$DATABASE_URL_AWS" $(SYMFONY) doctrine:database:drop --force
+
 # Commandes pour installer les hooks
 hooks:
 	chmod +x ./scripts/install-hooks.sh

@@ -8,8 +8,9 @@ import {
 } from '@/services/documents/documentsService';
 import { useNavigate } from 'react-router-dom';
 import EmptyDocumentState from './EmptyDocumentState';
+import { useTranslation } from 'react-i18next';
 
-const TableDocuments = ({ t }) => {
+const TableDocuments = ({ }) => {
   const [loading, setLoading] = useState(true);
   const [documents, setDocuments] = useState([]);
   const navigate = useNavigate();
@@ -17,6 +18,8 @@ const TableDocuments = ({ t }) => {
     current: 1,
     pageSize: 10,
   });
+  const { t, i18n } = useTranslation('documents');
+  const lng = i18n.language;
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState('');
 
@@ -182,7 +185,7 @@ const TableDocuments = ({ t }) => {
             locale={{
               emptyText:
                 documents.length === 0 && !loading ? (
-                  <EmptyDocumentState t={t} />
+                  <EmptyDocumentState t={t} i18n={i18n} lng={lng} company={null} />
                 ) : null,
             }}
           />
