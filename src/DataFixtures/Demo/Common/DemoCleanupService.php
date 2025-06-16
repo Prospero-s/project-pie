@@ -4,6 +4,8 @@ namespace App\DataFixtures\Demo\Common;
 
 use App\Entity\User;
 use Doctrine\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManager;
+use Doctrine\DBAL\Connection;
 
 class DemoCleanupService
 {
@@ -22,6 +24,10 @@ class DemoCleanupService
 
         echo "🔄 Suppression de l'ancien compte de démonstration...\n";
         
+        if (!$manager instanceof EntityManager) {
+            throw new \RuntimeException('Expected EntityManager instance');
+        }
+        
         $connection = $manager->getConnection();
         $userId = $existingUser->getId();
         
@@ -31,7 +37,7 @@ class DemoCleanupService
         return true;
     }
 
-    private function executeCleanupQueries($connection, int $userId): void
+    private function executeCleanupQueries(Connection $connection, int $userId): void
     {
         // 1. Récupérer les IDs des entreprises liées à cet utilisateur AVANT de supprimer les investissements
         $companyIds = $connection->fetchFirstColumn(
@@ -75,7 +81,10 @@ class DemoCleanupService
         );
     }
 
-    private function cleanupCompanies($connection, array $companyIds): void
+    /**
+     * @param array<int> $companyIds
+     */
+    private function cleanupCompanies(Connection $connection, array $companyIds): void
     {
         $placeholders = str_repeat('?,', count($companyIds) - 1) . '?';
         

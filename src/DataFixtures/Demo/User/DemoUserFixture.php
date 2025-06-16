@@ -11,6 +11,9 @@ use Doctrine\Persistence\ObjectManager;
 class DemoUserFixture
 {
     private DemoDataLoader $dataLoader;
+    /**
+     * @var array<string, mixed>
+     */
     private array $userData;
 
     public function __construct(DemoDataLoader $dataLoader)

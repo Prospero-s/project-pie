@@ -2,6 +2,8 @@
 
 namespace App\DataFixtures\Demo;
 
+use App\Entity\Company;
+use App\Entity\CompanyInvestment;
 use App\DataFixtures\Demo\Common\DemoCleanupService;
 use App\DataFixtures\Demo\Common\DemoDataLoader;
 use App\DataFixtures\Demo\User\DemoUserFixture;
@@ -69,6 +71,10 @@ class DemoFixturesLoader extends Fixture implements FixtureGroupInterface
         $this->displaySummary($companies, $investments);
     }
 
+    /**
+     * @param Company[] $companies
+     * @param CompanyInvestment[] $investments
+     */
     private function displaySummary(array $companies, array $investments): void
     {
         $totalValue = $this->investmentFixture->calculateTotalPortfolioValue($investments);
@@ -85,6 +91,9 @@ class DemoFixturesLoader extends Fixture implements FixtureGroupInterface
         echo str_repeat("=", 50) . "\n\n";
     }
 
+    /**
+     * @return string[]
+     */
     public static function getGroups(): array
     {
         return ['demo'];

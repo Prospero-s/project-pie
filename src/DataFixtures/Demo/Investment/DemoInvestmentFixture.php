@@ -12,6 +12,9 @@ use Doctrine\Persistence\ObjectManager;
 class DemoInvestmentFixture
 {
     private DemoDataLoader $dataLoader;
+    /**
+     * @var array<string, mixed>
+     */
     private array $investmentConfig;
 
     public function __construct(DemoDataLoader $dataLoader)
@@ -20,6 +23,10 @@ class DemoInvestmentFixture
         $this->investmentConfig = $this->dataLoader->loadInvestmentConfig();
     }
 
+    /**
+     * @param Company[] $companies
+     * @return CompanyInvestment[]
+     */
     public function createInvestmentsForCompanies(
         ObjectManager $manager, 
         array $companies, 
@@ -40,6 +47,9 @@ class DemoInvestmentFixture
         return $investments;
     }
 
+    /**
+     * @return CompanyInvestment[]
+     */
     private function createInvestmentsForCompany(Company $company, User $user, UserGroup $group): array
     {
         $rules = $this->investmentConfig['investmentRules'];
@@ -96,6 +106,9 @@ class DemoInvestmentFixture
         return $fundingTypes[array_rand($fundingTypes)];
     }
 
+    /**
+     * @param CompanyInvestment[] $investments
+     */
     public function calculateTotalPortfolioValue(array $investments): int
     {
         $total = 0;
@@ -105,6 +118,9 @@ class DemoInvestmentFixture
         return $total;
     }
 
+    /**
+     * @return string[]
+     */
     public function getFundingTypes(): array
     {
         return $this->investmentConfig['fundingTypes'];

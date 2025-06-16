@@ -13,6 +13,7 @@ class DemoDataLoader
 
     /**
      * Charge les données depuis un fichier JSON
+     * @return array<string, mixed>
      */
     public function loadJsonData(string $category, string $filename): array
     {
@@ -23,6 +24,10 @@ class DemoDataLoader
         }
 
         $content = file_get_contents($filePath);
+        if ($content === false) {
+            throw new \RuntimeException("Cannot read file: {$filePath}");
+        }
+        
         $data = json_decode($content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -34,6 +39,7 @@ class DemoDataLoader
 
     /**
      * Charge les données utilisateur
+     * @return array<string, mixed>
      */
     public function loadUserData(): array
     {
@@ -42,6 +48,7 @@ class DemoDataLoader
 
     /**
      * Charge les données des entreprises
+     * @return array<string, mixed>
      */
     public function loadCompaniesData(): array
     {
@@ -50,6 +57,7 @@ class DemoDataLoader
 
     /**
      * Charge la configuration des investissements
+     * @return array<string, mixed>
      */
     public function loadInvestmentConfig(): array
     {

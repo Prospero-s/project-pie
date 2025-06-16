@@ -11,6 +11,9 @@ use Doctrine\Persistence\ObjectManager;
 class DemoCompanyFixture
 {
     private DemoDataLoader $dataLoader;
+    /**
+     * @var array<string, mixed>
+     */
     private array $companiesData;
 
     public function __construct(DemoDataLoader $dataLoader)
@@ -19,6 +22,9 @@ class DemoCompanyFixture
         $this->companiesData = $this->dataLoader->loadCompaniesData();
     }
 
+    /**
+     * @return Company[]
+     */
     public function createCompaniesWithDetails(ObjectManager $manager): array
     {
         $companies = [];
@@ -43,6 +49,9 @@ class DemoCompanyFixture
         return $companies;
     }
 
+    /**
+     * @param array<string, mixed> $companyData
+     */
     private function createCompany(array $companyData): Company
     {
         $company = new Company();
@@ -57,6 +66,9 @@ class DemoCompanyFixture
         return $company;
     }
 
+    /**
+     * @param array<string, mixed> $addressData
+     */
     private function createCompanyAddress(Company $company, array $addressData): CompanyAddress
     {
         $address = new CompanyAddress();
@@ -71,6 +83,9 @@ class DemoCompanyFixture
         return $address;
     }
 
+    /**
+     * @param array<string, mixed> $representativeData
+     */
     private function createRepresentative(Company $company, array $representativeData): Representative
     {
         $representative = new Representative();
