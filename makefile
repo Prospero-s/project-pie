@@ -4,6 +4,7 @@ SYMFONY = docker-compose exec php bin/console
 COMPOSER = docker-compose exec php composer
 NPM = docker-compose exec node npm
 PHP_CONTAINER = php
+PHPUNIT = docker-compose exec $(PHP_CONTAINER) ./vendor/bin/phpunit
 
 # Inclure les variables d'environnement
 include .env
@@ -32,8 +33,10 @@ help:
 	@echo "  lint-phpcs        - Lance PHP Code Sniffer"
 	@echo "  lint-phpcs-fix    - Corrige automatiquement les erreurs PHP Code Sniffer"
 	@echo "  phpstan           - Lance PHPStan"
+	@echo "  test     		   - Exécuter les tests PHPUnit avec testdox et couverture de code"
 	@echo ""
 	@echo "Base de données:"
+	@echo "  migrations        - Exécuter les migrations de base de données"
 	@echo "  test-db-local     - Vérifier la connexion à la base de données locale"
 	@echo "  test-db-aws       - Vérifier la connexion à la base de données AWS"
 	@echo "  test-all-db       - Vérifier les deux bases de données"
@@ -167,3 +170,5 @@ run-tests: ## Lance tous les tests et vérifications de qualité de code
 	@echo "📦 Build du frontend..."
 	$(NPM) run build
 	@echo "✅ Tous les tests et vérifications sont terminés !"
+test:
+	$(PHPUNIT) --testdox --coverage-text
