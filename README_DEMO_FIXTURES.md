@@ -1,8 +1,26 @@
-# 🎯 Demo Account Fixtures
+# 🎯 Demo Account Fixtures - Architecture Refactorisée
 
-## Qu'est-ce que c'est ?
+## 🏗️ Architecture Modulaire
 
-Système de fixtures pour créer un **compte de démonstration** avec des données réalistes d'entreprises françaises pour les présentations commerciales et les tests.
+Le système de fixtures de démonstration a été refactorisé selon les **bonnes pratiques de clean code** :
+
+### Structure des fichiers :
+```
+src/DataFixtures/Demo/
+├── DemoFixturesLoader.php          # 🎯 Orchestrateur principal
+├── User/
+│   ├── DemoUserFixture.php         # 👤 Gestion utilisateur & groupe
+│   └── demo-user.json              # 📄 Données utilisateur
+├── Company/
+│   ├── DemoCompanyFixture.php      # 🏢 Gestion entreprises
+│   └── demo-companies.json         # 📄 Données entreprises françaises
+├── Investment/
+│   ├── DemoInvestmentFixture.php   # 💰 Gestion investissements
+│   └── demo-investments.json       # 📄 Configuration investissements
+└── Common/
+    ├── DemoDataLoader.php          # 📥 Service de chargement JSON
+    └── DemoCleanupService.php      # 🧹 Service de nettoyage
+```
 
 ## 🚀 Comment lancer
 
@@ -18,26 +36,74 @@ make test-demo-account
 
 ### Données créées :
 - **1 utilisateur démo** : `tifasek566@ethsms.com` (AWS Cognito)
-- **24 entreprises françaises** avec vrais numéros SIREN
-- **48M EUR** de portefeuille d'investissements
-- **11 secteurs** d'activité variés
-- **Types de financement** : Private Equity, Series A/B/C, etc.
+- **12 entreprises françaises** avec vrais numéros SIREN/SIRET
+- **~30M EUR** de portefeuille d'investissements
+- **7 secteurs** d'activité : technology, healthcare, finance, retail, manufacturing, energy, education
+- **Types de financement** : seed, serieA, serieB, serieC, growth, ipo
 
 ### Entreprises incluses :
-- **Tech** : Criteo, BlaBlaCar, Doctolib, Mirakl
-- **FinTech** : Lydia, Qonto, PayFit
-- **E-commerce** : Veepee, ManoMano
-- **Santé** : Sanofi, Biomerieux
-- **Et plus...**
+- **Énergie** : TotalEnergies, Schneider Electric
+- **Tech** : Orange, Dassault Systèmes, Capgemini
+- **Santé** : L'Oréal, Sanofi
+- **Retail** : LVMH
+- **Manufacturing** : Airbus, Michelin, Safran
+- **Finance** : Thales
+
+## 🔧 Avantages de la refactorisation
+
+### ✅ **Séparation des responsabilités**
+- Chaque fixture a une responsabilité unique
+- Code plus lisible et maintenable
+- Tests unitaires plus faciles
+
+### ✅ **Configuration externalisée**
+- Données dans des fichiers JSON
+- Modification sans toucher au code PHP
+- Configuration centralisée des règles métier
+
+### ✅ **Réutilisabilité**
+- Services communs réutilisables
+- Architecture extensible
+- Ajout facile de nouvelles fixtures
+
+### ✅ **Gestion d'erreurs robuste**
+- Validation des fichiers JSON
+- Messages d'erreur explicites
+- Nettoyage automatique des données existantes
 
 ## 🔧 Fichiers techniques
 
-- `src/DataFixtures/DemoAccountFixtures.php` - Fixtures Doctrine
-- `scripts/test-demo-account.php` - Script de test et validation
-- Commandes Makefile : `load-demo-fixtures`, `test-demo-account`
+### Fixtures PHP :
+- `DemoFixturesLoader.php` - Point d'entrée principal
+- `DemoUserFixture.php` - Création utilisateur/groupe/notifications
+- `DemoCompanyFixture.php` - Création entreprises/adresses/représentants
+- `DemoInvestmentFixture.php` - Création investissements avec logique métier
+
+### Services :
+- `DemoDataLoader.php` - Chargement et validation JSON
+- `DemoCleanupService.php` - Nettoyage sécurisé des données
+
+### Configuration JSON :
+- `demo-user.json` - Utilisateur, groupe, paramètres notifications
+- `demo-companies.json` - Entreprises françaises avec dirigeants réels
+- `demo-investments.json` - Types de financement et montants par secteur
 
 ## ⚠️ Important
 
-- Utilise le flag `--append` pour ne pas écraser les données existantes
-- Données réalistes mais **fictives** pour les montants d'investissement
-- Compatible avec le système de traductions FR/EN 
+- **Nettoyage automatique** : Supprime et recrée les données à chaque exécution
+- **Données réalistes** : Entreprises françaises avec vrais SIREN/SIRET
+- **Compatible frontend** : Types de financement alignés avec les traductions
+- **Montants fictifs** : Investissements générés aléatoirement pour la démo
+
+## 🎯 Résumé affiché
+
+```
+==================================================
+🎯 RÉSUMÉ DU COMPTE DE DÉMONSTRATION
+==================================================
+📊 Entreprises créées: 12
+💰 Investissements créés: 24
+💼 Valeur totale du portefeuille: 30.2M EUR
+🏷️  Types de financement: seed, serieA, serieB, serieC, growth, ipo
+==================================================
+``` 
