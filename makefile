@@ -82,7 +82,7 @@ cache-clear:
 	$(SYMFONY) cache:clear
 
 test:
-	$(DOCKER_COMPOSE) exec $(PHP_CONTAINER) ./vendor/bin/phpunit
+	$(PHPUNIT) --testdox --coverage-text
 
 test-db-local:
 	$(SYMFONY) doctrine:schema:validate
