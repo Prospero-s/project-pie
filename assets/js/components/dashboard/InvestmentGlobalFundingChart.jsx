@@ -10,6 +10,7 @@ import {
 import PieChartComponent from '@/components/graphes/PieChart';
 import { useTranslation } from 'react-i18next';
 import { PieChartOutlined } from '@ant-design/icons';
+import { fundingTypeTranslation } from '@/services/graphe/grapheService';
 
 const InvestmentGlobalFundingChart = () => {
   const { t } = useTranslation('investments');
@@ -24,7 +25,7 @@ const InvestmentGlobalFundingChart = () => {
       setIsLoading(true);
       const response = await fetchGlobalFundingInvestments();
       const formattedData = response.map(item => ({
-        name: t(`funding.types.${item.funding_type}`),
+        name: fundingTypeTranslation(t, item.funding_type),
         value: Number(item.total_investment),
       }));
 

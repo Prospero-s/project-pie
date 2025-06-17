@@ -1,0 +1,232 @@
+{
+  "companies": [
+    {
+      "siren": "542051180",
+      "siret": "54205118000016",
+      "denomination": "TotalEnergies SE",
+      "codeApe": "6420Z",
+      "sector": "energy",
+      "businessStructure": "SE",
+      "address": {
+        "streetNumber": "2",
+        "streetType": "place",
+        "voie": "Jean-Millier",
+        "codePostal": "92400",
+        "commune": "Courbevoie"
+      },
+      "representative": {
+        "nom": "Patrick Pouyanné",
+        "qualite": "Président-Directeur Général"
+      }
+    },
+    {
+      "siren": "552032534",
+      "siret": "55203253400477",
+      "denomination": "LVMH Moët Hennessy Louis Vuitton",
+      "codeApe": "7010Z",
+      "sector": "retail",
+      "businessStructure": "SA",
+      "address": {
+        "streetNumber": "22",
+        "streetType": "avenue",
+        "voie": "Montaigne",
+        "codePostal": "75008",
+        "commune": "Paris"
+      },
+      "representative": {
+        "nom": "Bernard Arnault",
+        "qualite": "Président-Directeur Général"
+      }
+    },
+    {
+      "siren": "552120222",
+      "siret": "55212022200047",
+      "denomination": "L'Oréal",
+      "codeApe": "2042Z",
+      "sector": "healthcare",
+      "businessStructure": "SA",
+      "address": {
+        "streetNumber": "14",
+        "streetType": "rue",
+        "voie": "Royale",
+        "codePostal": "75008",
+        "commune": "Paris"
+      },
+      "representative": {
+        "nom": "Nicolas Hieronimus",
+        "qualite": "Directeur Général"
+      }
+    },
+    {
+      "siren": "775670417",
+      "siret": "77567041700455",
+      "denomination": "Airbus SE",
+      "codeApe": "3030Z",
+      "sector": "manufacturing",
+      "businessStructure": "SE",
+      "address": {
+        "streetNumber": "2",
+        "streetType": "rond-point",
+        "voie": "Emile Dewoitine",
+        "codePostal": "31700",
+        "commune": "Blagnac"
+      },
+      "representative": {
+        "nom": "Guillaume Faury",
+        "qualite": "Président-Directeur Général"
+      }
+    },
+    {
+      "siren": "315676484",
+      "siret": "31567648400895",
+      "denomination": "Michelin",
+      "codeApe": "2211Z",
+      "sector": "manufacturing",
+      "businessStructure": "SCA",
+      "address": {
+        "streetNumber": "23",
+        "streetType": "place",
+        "voie": "des Carmes-Déchaux",
+        "codePostal": "63000",
+        "commune": "Clermont-Ferrand"
+      },
+      "representative": {
+        "nom": "Florent Menegaux",
+        "qualite": "Président-Directeur Général"
+      }
+    },
+    {
+      "siren": "542107651",
+      "siret": "54210765100508",
+      "denomination": "Sanofi",
+      "codeApe": "2120Z",
+      "sector": "healthcare",
+      "businessStructure": "SA",
+      "address": {
+        "streetNumber": "54",
+        "streetType": "rue",
+        "voie": "La Boétie",
+        "codePostal": "75008",
+        "commune": "Paris"
+      },
+      "representative": {
+        "nom": "Paul Hudson",
+        "qualite": "Directeur Général"
+      }
+    },
+    {
+      "siren": "542044031",
+      "siret": "54204403115522",
+      "denomination": "Orange",
+      "codeApe": "6110Z",
+      "sector": "technology",
+      "businessStructure": "SA",
+      "address": {
+        "streetNumber": "111",
+        "streetType": "quai",
+        "voie": "du Président Roosevelt",
+        "codePostal": "92130",
+        "commune": "Issy-les-Moulineaux"
+      },
+      "representative": {
+        "nom": "Christel Heydemann",
+        "qualite": "Directrice Générale"
+      }
+    },
+    {
+      "siren": "712054599",
+      "siret": "71205459900507",
+      "denomination": "Safran",
+      "codeApe": "2611Z",
+      "sector": "manufacturing",
+      "businessStructure": "SA",
+      "address": {
+        "streetNumber": "2",
+        "streetType": "boulevard",
+        "voie": "du Général Martial Valin",
+        "codePostal": "75015",
+        "commune": "Paris"
+      },
+      "representative": {
+        "nom": "Olivier Andriès",
+        "qualite": "Directeur Général"
+      }
+    },
+    {
+      "siren": "542029166",
+      "siret": "54202916600127",
+      "denomination": "Schneider Electric",
+      "codeApe": "2712Z",
+      "sector": "energy",
+      "businessStructure": "SE",
+      "address": {
+        "streetNumber": "35",
+        "streetType": "rue",
+        "voie": "Joseph Monier",
+        "codePostal": "92500",
+        "commune": "Rueil-Malmaison"
+      },
+      "representative": {
+        "nom": "Peter Herweck",
+        "qualite": "Directeur Général"
+      }
+    },
+    {
+      "siren": "422769638",
+      "siret": "42276963800395",
+      "denomination": "Dassault Systèmes",
+      "codeApe": "5829C",
+      "sector": "technology",
+      "businessStructure": "SE",
+      "address": {
+        "streetNumber": "10",
+        "streetType": "rue",
+        "voie": "Marcel Dassault",
+        "codePostal": "78140",
+        "commune": "Vélizy-Villacoublay"
+      },
+      "representative": {
+        "nom": "Pascal Daloz",
+        "qualite": "Directeur Général"
+      }
+    },
+    {
+      "siren": "775661285",
+      "siret": "77566128500397",
+      "denomination": "Capgemini",
+      "codeApe": "6202A",
+      "sector": "technology",
+      "businessStructure": "SE",
+      "address": {
+        "streetNumber": "11",
+        "streetType": "rue",
+        "voie": "de Tilsitt",
+        "codePostal": "75017",
+        "commune": "Paris"
+      },
+      "representative": {
+        "nom": "Aiman Ezzat",
+        "qualite": "Directeur Général"
+      }
+    },
+    {
+      "siren": "542108996",
+      "siret": "54210899600047",
+      "denomination": "Thales",
+      "codeApe": "2651B",
+      "sector": "finance",
+      "businessStructure": "SA",
+      "address": {
+        "streetNumber": "4",
+        "streetType": "avenue",
+        "voie": "des Louvresses",
+        "codePostal": "92230",
+        "commune": "Gennevilliers"
+      },
+      "representative": {
+        "nom": "Patrice Caine",
+        "qualite": "Président-Directeur Général"
+      }
+    }
+  ]
+} 

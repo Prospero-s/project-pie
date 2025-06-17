@@ -8,7 +8,6 @@ parameters:
     scanDirectories:
         - vendor/
     ignoreErrors:
-        - '#Property [a-zA-Z0-9\\_]+\\Entity\\[a-zA-Z0-9\\_]+::\$[a-zA-Z0-9_]+ is never written, only read#'
         # Pour ignorer toutes les erreurs dans le dossier Entity
         - message: '#.*#'
           path: src/Entity/*

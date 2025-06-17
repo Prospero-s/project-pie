@@ -58,6 +58,7 @@ class Company
     public function __construct()
     {
         $this->representatives = new ArrayCollection();
+        $this->investments = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->deletedAt = null;
     }

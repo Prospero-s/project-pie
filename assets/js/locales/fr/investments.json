@@ -14,7 +14,13 @@
     "back": "Retour",
     "confirm": "Confirmer",
     "reset_filters": "Réinitialiser les filtres",
-    "reset": "Réinitialiser"
+    "reset": "Réinitialiser",
+    "company_name": "Nom de l'entreprise",
+    "business_sector": "Secteur d'activité",
+    "amount_raised": "Montant levé",
+    "funding_type": "Type de levée",
+    "last_update": "Dernière mise à jour",
+    "actions": "Actions"
   },
   "creation": {
     "title": "Création d'entreprise",
@@ -89,6 +95,16 @@
       "manufacturing": "Industrie",
       "energy": "Énergie",
       "education": "Éducation",
+      "luxury": "Luxe",
+      "beauty_personal_care": "Beauté & Soins personnels",
+      "aerospace": "Aéronautique",
+      "automotive": "Automobile",
+      "pharmaceuticals": "Pharmaceutique",
+      "telecommunications": "Télécommunications",
+      "industrial_equipment": "Équipement industriel",
+      "software": "Logiciel",
+      "technology_services": "Services technologiques",
+      "defense_aerospace": "Défense & Aéronautique",
       "other": "Autre"
     },
     "sector_required": "Veuillez sélectionner un secteur d'activité",
@@ -112,8 +128,28 @@
       "ipo": "Introduction en bourse (IPO)",
       "debt": "Dette",
       "grant": "Subvention",
-      "other": "Autre"
+      "other": "Autre",
+      "Private Equity": "Capital-investissement",
+      "Series A": "Série A",
+      "Series B": "Série B",
+      "Series C": "Série C",
+      "Venture Capital": "Capital-risque",
+      "Strategic Investment": "Investissement stratégique",
+      "Corporate Venture": "Corporate Venture",
+      "Seed": "Amorçage"
     }
+  },
+  "funding_types": {
+    "Private Equity": "Capital-investissement",
+    "Series A": "Série A",
+    "Series B": "Série B",
+    "Series C": "Série C",
+    "Venture Capital": "Capital-risque",
+    "Strategic Investment": "Investissement stratégique",
+    "Corporate Venture": "Corporate Venture",
+    "Seed": "Amorçage",
+    "Growth": "Croissance",
+    "Bridge Funding": "Financement relais"
   },
   "actions": {
     "title": "Actions",

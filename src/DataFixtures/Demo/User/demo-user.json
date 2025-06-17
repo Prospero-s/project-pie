@@ -1,0 +1,16 @@
+{
+  "user": {
+    "cognitoId": "f18910ae-f0c1-7059-42c3-3980693e8095",
+    "name": "Demo Investor",
+    "email": "tifasek566@ethsms.com",
+    "password": "Tifasek566@ethsms.com"
+  },
+  "group": {
+    "name": "Demo Portfolio"
+  },
+  "notificationSettings": {
+    "emailEnabled": true,
+    "smsEnabled": false,
+    "pushEnabled": true
+  }
+} 

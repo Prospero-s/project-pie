@@ -8,6 +8,8 @@ import AddCompanyModal from '@/components/investments/AddCompanyModal';
 import EmptyInvestmentState from '@/components/investments/table/EmptyInvestmentState';
 import NoResultsState from '@/components/investments/table/NoResultsState';
 import UploadPopup from '@/components/common/upload/UploadPopup';
+import { formatDate, getDateLocale } from '@/lib/utils';
+import { fundingTypeTranslation } from '@/services/graphe/grapheService';
 
 const TableInvestments = ({
   i18n,
@@ -266,7 +268,7 @@ const TableInvestments = ({
           <div className="flex flex-wrap gap-1">
             {record.investment?.fundingTypes?.map((type, index) => (
               <Tag key={index} color={getFundingTypeColor(type)}>
-                {t(`funding.types.${type}`)}
+                {fundingTypeTranslation(t, type)}
               </Tag>
             ))}
           </div>
@@ -282,11 +284,7 @@ const TableInvestments = ({
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : date ? (
-          new Date(date).toLocaleDateString('fr-FR', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })
+          formatDate(date, getDateLocale(lng))
         ) : (
           '-'
         ),

@@ -14,7 +14,13 @@
     "back": "Back",
     "confirm": "Confirm",
     "reset_filters": "Reset filters",
-    "reset": "Reset"
+    "reset": "Reset",
+    "company_name": "Company name",
+    "business_sector": "Business sector",
+    "amount_raised": "Amount raised",
+    "funding_type": "Funding Type",
+    "last_update": "Last update",
+    "actions": "Actions"
   },
   "creation": {
     "title": "Company Creation",
@@ -88,6 +94,16 @@
       "manufacturing": "Manufacturing",
       "energy": "Energy",
       "education": "Education",
+      "luxury": "Luxury",
+      "beauty_personal_care": "Beauty & Personal Care",
+      "aerospace": "Aerospace",
+      "automotive": "Automotive",
+      "pharmaceuticals": "Pharmaceuticals",
+      "telecommunications": "Telecommunications",
+      "industrial_equipment": "Industrial Equipment",
+      "software": "Software",
+      "technology_services": "Technology Services",
+      "defense_aerospace": "Defense & Aerospace",
       "other": "Other"
     },
     "sector_required": "Please select an activity sector",
@@ -111,8 +127,28 @@
       "ipo": "Initial Public Offering (IPO)",
       "debt": "Debt",
       "grant": "Grant",
-      "other": "Other"
+      "other": "Other",
+      "Private Equity": "Private Equity",
+      "Series A": "Series A",
+      "Series B": "Series B", 
+      "Series C": "Series C",
+      "Venture Capital": "Venture Capital",
+      "Strategic Investment": "Strategic Investment",
+      "Corporate Venture": "Corporate Venture",
+      "Seed": "Seed"
     }
+  },
+  "funding_types": {
+    "Private Equity": "Private Equity",
+    "Series A": "Series A",
+    "Series B": "Series B",
+    "Series C": "Series C", 
+    "Venture Capital": "Venture Capital",
+    "Strategic Investment": "Strategic Investment",
+    "Corporate Venture": "Corporate Venture",
+    "Seed": "Seed",
+    "Growth": "Growth",
+    "Bridge Funding": "Bridge Funding"
   },
   "no_investments": {
     "title": "No investments",

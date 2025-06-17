@@ -81,8 +81,14 @@ hooks:
 
 # Commandes pour les migrations
 
-load-dev-fixtures: ;\
+load-dev-fixtures:
 	$(SYMFONY) doctrine:f:load -n
+
+load-demo-fixtures:
+	$(SYMFONY) doctrine:fixtures:load --group=demo --append --no-interaction
+
+test-demo-account:
+	$(DOCKER_COMPOSE) exec php php scripts/test-demo-account.php
 
 migrations-diff:
 	$(SYMFONY) doctrine:migrations:diff --formatted
