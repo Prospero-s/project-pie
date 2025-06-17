@@ -78,4 +78,59 @@ class KpiRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    /**
+     * Trouve tous les KPIs d'une entreprise donnée
+     * @return array<int, Kpi>
+     */
+    public function findByCompanyId(int $companyId): array
+    {
+        return $this->createQueryBuilder('k')
+            ->join('k.document', 'd')
+            ->join('d.company', 'c')
+            ->andWhere('c.id = :companyId')
+            ->setParameter('companyId', $companyId)
+            ->orderBy('k.name', 'ASC')
+            ->addOrderBy('k.period', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Trouve tous les KPIs d'une entreprise donnée pour une année spécifique
+     * @return array<int, Kpi>
+     */
+    public function findByCompanyIdAndYear(int $companyId, int $year): array
+    {
+        return $this->createQueryBuilder('k')
+            ->join('k.document', 'd')
+            ->join('d.company', 'c')
+            ->andWhere('c.id = :companyId')
+            ->andWhere('d.year = :year')
+            ->setParameter('companyId', $companyId)
+            ->setParameter('year', $year)
+            ->orderBy('k.name', 'ASC')
+            ->addOrderBy('k.period', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Trouve toutes les années disponibles pour les KPI d'une entreprise
+     * @return array<int>
+     */
+    public function findAvailableYearsByCompanyId(int $companyId): array
+    {
+        $result = $this->createQueryBuilder('k')
+            ->select('DISTINCT d.year')
+            ->join('k.document', 'd')
+            ->join('d.company', 'c')
+            ->andWhere('c.id = :companyId')
+            ->setParameter('companyId', $companyId)
+            ->orderBy('d.year', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        return array_map(fn($item) => $item['year'], $result);
+    }
 } 

@@ -31,7 +31,7 @@ const CompanyDetails = ({ i18n }) => {
   };
 
   if (loading) {
-    return <div>Chargement...</div>;
+    return <div>{t('common.loading')}</div>;
   }
 
   return (
@@ -41,6 +41,7 @@ const CompanyDetails = ({ i18n }) => {
       </h2>
       <Card className="shadow-lg rounded-lg">
         <Tabs
+          destroyInactiveTabPane={false}
           items={[
             {
               key: '1',

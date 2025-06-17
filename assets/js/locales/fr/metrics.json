@@ -4,6 +4,8 @@
   "documents": "Documents",
   "investment_details": "Détails d'Investissement",
   "info": "Info",
+  "no_kpi_data": "Aucune donnée KPI disponible pour cette entreprise.",
+  "year_label": "Année",
   
   "data": "Données",
   "no_data": "Aucune donnée disponible",
@@ -53,32 +55,36 @@
   
   "queries": {
     "monthly_revenue": {
-      "name": "Revenu Mensuel",
-      "description": "Montre le revenu mensuel pour les 12 derniers mois"
+      "name": "Revenus par période",
+      "description": "Analyse des KPI de revenus (Revenu Annuel Récurrent) par période"
     },
     "clients_by_sector": {
-      "name": "Clients par Secteur",
-      "description": "Répartition des clients par secteur d'activité"
+      "name": "Portefeuille par secteur",
+      "description": "Répartition des entreprises du portefeuille par secteur d'activité"
     },
-    "arr_growth": {
-      "name": "Croissance ARR",
-      "description": "Évolution du revenu annuel récurrent par trimestre"
+    "burn_rate_evolution": {
+      "name": "Évolution Argent brûlé",
+      "description": "Analyse de l'évolution de l'argent brûlé par période - métrique clé de performance"
     },
     "top_clients": {
-      "name": "Top 10 Clients",
-      "description": "Liste des 10 plus grands clients par valeur"
+      "name": "Top investissements",
+      "description": "Classement des 10 entreprises avec les plus gros investissements"
     },
     "headcount": {
-      "name": "Évolution des Effectifs",
-      "description": "Nombre d'employés par trimestre"
+      "name": "Évolution nombre d'employés",
+      "description": "Suivi de l'évolution du nombre d'employés des entreprises du portefeuille"
     },
-    "investments": {
-      "name": "Investissements",
-      "description": "Valeur des investissements par trimestre"
+    "quarterly_investments": {
+      "name": "Investissements trimestriels",
+      "description": "Montants investis par trimestre avec types de financement"
     },
     "total_investment": {
-      "name": "Total investi",
-      "description": "Montant total investi dans l'entreprise"
+      "name": "Synthèse investissements",
+      "description": "Vue d'ensemble des montants totaux investis par type de financement"
+    },
+    "kpi_analysis_by_period": {
+      "name": "Analyse KPI globale",
+      "description": "Vue d'ensemble de tous les KPI disponibles avec métriques par période"
     }
   },
   
@@ -112,6 +118,7 @@
   
   "common": {
     "loading": "Chargement...",
+    "loading_years": "Chargement des années disponibles...",
     "close": "Fermer",
     "yes": "Oui",
     "no": "Non"
@@ -188,38 +195,89 @@
   
   "type_fixed_for_total_investment": "Graphique en barres recommandé pour cette visualisation",
   
+  "kpi_comparison": {
+    "title": "Comparaison des KPI",
+    "button_text": "Comparer les KPI",
+    "comparison_mode": "Mode de comparaison",
+    "between_years": "Entre années",
+    "between_companies": "Entre entreprises",
+    "reference_year": "Année de référence",
+    "companies_to_compare": "Entreprises à comparer",
+    "select_years": "Sélectionner les années",
+    "select_years_placeholder": "Choisissez au moins 2 années",
+    "select_year_placeholder": "Choisissez une année",
+    "select_companies_placeholder": "Choisissez des entreprises",
+    "current_company": "Entreprise courante",
+    "metric_column": "Métrique",
+    "evolution": "Évolution",
+    "difference": "Différence",
+    "variation_percent": "Variation %",
+    "difference_percent": "Différence %",
+    "trend": "Tendance",
+    "comparison": "Comparaison",
+    "trend_up": "Hausse",
+    "trend_down": "Baisse",
+    "trend_stable": "Stable",
+    "superior": "Supérieur",
+    "inferior": "Inférieur",
+    "similar": "Similaire",
+    "table_view": "Vue tableau",
+    "chart_view": "Vue graphique",
+    "chart_type": "Type de graphique",
+    "chart_percentage": "Évolution en %",
+    "chart_radar": "Radar",
+    "chart_separated": "Séparé par échelle",
+    "chart_bar": "Barres",
+    "select_two_years": "Veuillez sélectionner au moins 2 années pour la comparaison",
+    "select_companies_and_year": "Veuillez sélectionner au moins 2 entreprises et une année de référence",
+    "no_valid_data": "Aucune donnée valide à afficher dans le graphique",
+    "year_prefix": "Année",
+    "evolution_chart": "Graphique d'évolution",
+    "evolution_percent": "Évolution %",
+    "absolute_evolution": "Évolution absolue",
+    "important_metrics": "Métriques importantes (Millions)",
+    "medium_metrics": "Métriques moyennes (Milliers)",
+    "detailed_metrics": "Métriques détaillées",
+    "best_performing_company": "Meilleure entreprise",
+    "metrics": "métriques",
+    "metrics_up": "Métriques en hausse",
+    "metrics_down": "Métriques en baisse",
+    "metrics_stable": "Métriques stables",
+    "total_metrics": "Total métriques"
+  },
+  
   "predefined_queries": {
     "1": {
-      "name": "Revenus mensuels",
-      "description": "Évolution des revenus par mois"
+      "name": "Revenus par période",
+      "description": "Analyse des KPI de revenus (Revenu Annuel Récurrent) par période"
     },
     "2": {
-      "name": "Clients par secteur", 
-      "description": "Répartition des clients par secteur d'activité"
+      "name": "Portefeuille par secteur", 
+      "description": "Répartition des entreprises du portefeuille par secteur d'activité"
     },
     "3": {
-      "name": "Croissance ARR",
-      "description": "Évolution de l'ARR (Annual Recurring Revenue) par trimestre"
+      "name": "Évolution Argent brûlé",
+      "description": "Analyse de l'évolution de l'argent brûlé par période - métrique clé de performance"
     },
     "4": {
-      "name": "Top 10 clients",
-      "description": "Liste des 10 plus grands clients par valeur"
+      "name": "Top investissements",
+      "description": "Classement des 10 entreprises avec les plus gros investissements"
     },
     "5": {
-      "name": "Évolution des effectifs",
-      "description": "Évolution du nombre d'employés par trimestre"
+      "name": "Évolution nombre d'employés",
+      "description": "Suivi de l'évolution du nombre d'employés des entreprises du portefeuille"
     },
     "6": {
-      "name": "Investissements",
-      "description": "Valeur des investissements par trimestre"
+      "name": "Investissements trimestriels",
+      "description": "Montants investis par trimestre avec types de financement"
     },
     "7": {
-      "name": "Total investi",
-      "description": "Montant total investi dans l'entreprise"
+      "name": "Synthèse investissements",
+      "description": "Vue d'ensemble des montants totaux investis par type de financement"
     },
     "8": {
-      "name": "Analyse KPI par période",
-      "description": "Vue d'ensemble des KPI principaux avec évolution période par période"
+      "name": "Analyse KPI globale",
+      "description": "Vue d'ensemble de tous les KPI disponibles avec métriques par période"
     }
   }
 }

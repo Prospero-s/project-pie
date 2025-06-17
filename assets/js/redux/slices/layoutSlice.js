@@ -3,9 +3,36 @@ import { createSlice } from '@reduxjs/toolkit';
 // Default layout configuration for the charts
 const initialLayout = {
   radar: { i: 'radar', x: 0, y: 0, w: 1, h: 2, minW: 1, minH: 1, maxW: 3 },
-  barMixed: { i: 'barMixed', x: 1, y: 0, w: 1, h: 2, minW: 1, minH: 1, maxW: 3 },
-  lineLabel: { i: 'lineLabel', x: 2, y: 0, w: 1, h: 2, minW: 1, minH: 1, maxW: 3 },
-  areaInteractive: { i: 'areaInteractive', x: 0, y: 2, w: 3, h: 2, minW: 1, minH: 1, maxW: 3 },
+  barMixed: {
+    i: 'barMixed',
+    x: 1,
+    y: 0,
+    w: 1,
+    h: 2,
+    minW: 1,
+    minH: 1,
+    maxW: 3,
+  },
+  lineLabel: {
+    i: 'lineLabel',
+    x: 2,
+    y: 0,
+    w: 1,
+    h: 2,
+    minW: 1,
+    minH: 1,
+    maxW: 3,
+  },
+  areaInteractive: {
+    i: 'areaInteractive',
+    x: 0,
+    y: 2,
+    w: 3,
+    h: 2,
+    minW: 1,
+    minH: 1,
+    maxW: 3,
+  },
 };
 
 export const layoutSlice = createSlice({
@@ -34,32 +61,40 @@ export const layoutSlice = createSlice({
       }
     },
     addCustomChart: (state, action) => {
-      const { companyId, chartId, chartData, chartType, title, columnsMetadata } = action.payload;
-      
+      const {
+        companyId,
+        chartId,
+        chartData,
+        chartType,
+        title,
+        columnsMetadata,
+      } = action.payload;
+
       // Store chart data
       if (!state.customCharts[companyId]) {
         state.customCharts[companyId] = {};
       }
-      
+
       state.customCharts[companyId][chartId] = {
         data: chartData,
         type: chartType,
         title: title,
-        columnsMetadata: columnsMetadata || {}
+        columnsMetadata: columnsMetadata || {},
       };
-      
+
       // Add to layout
-      const currentLayout = companyId && state.layoutsByCompany[companyId] 
-        ? { ...state.layoutsByCompany[companyId] } 
-        : { ...state.defaultLayout };
-      
+      const currentLayout =
+        companyId && state.layoutsByCompany[companyId]
+          ? { ...state.layoutsByCompany[companyId] }
+          : { ...state.defaultLayout };
+
       // Find available Y position (place chart below existing ones)
       let maxY = 0;
       Object.values(currentLayout).forEach(item => {
         const itemBottom = item.y + item.h;
         if (itemBottom > maxY) maxY = itemBottom;
       });
-      
+
       // Add chart to layout
       currentLayout[chartId] = {
         i: chartId,
@@ -69,9 +104,9 @@ export const layoutSlice = createSlice({
         h: 2,
         minW: 1,
         minH: 1,
-        maxW: 3
+        maxW: 3,
       };
-      
+
       // Update layout
       if (companyId) {
         state.layoutsByCompany[companyId] = currentLayout;
@@ -81,20 +116,24 @@ export const layoutSlice = createSlice({
     },
     removeCustomChart: (state, action) => {
       const { companyId, chartId } = action.payload;
-      
+
       // Remove chart data
-      if (state.customCharts[companyId] && state.customCharts[companyId][chartId]) {
+      if (
+        state.customCharts[companyId] &&
+        state.customCharts[companyId][chartId]
+      ) {
         delete state.customCharts[companyId][chartId];
       }
-      
+
       // Remove from layout
-      const currentLayout = companyId && state.layoutsByCompany[companyId] 
-        ? { ...state.layoutsByCompany[companyId] } 
-        : { ...state.defaultLayout };
-      
+      const currentLayout =
+        companyId && state.layoutsByCompany[companyId]
+          ? { ...state.layoutsByCompany[companyId] }
+          : { ...state.defaultLayout };
+
       if (currentLayout[chartId]) {
         delete currentLayout[chartId];
-        
+
         // Update layout
         if (companyId) {
           state.layoutsByCompany[companyId] = currentLayout;
@@ -109,10 +148,10 @@ export const layoutSlice = createSlice({
     updateRowHeight: (state, action) => {
       state.rowHeight = action.payload;
     },
-    toggleDraggable: (state) => {
+    toggleDraggable: state => {
       state.isDraggable = !state.isDraggable;
     },
-    toggleResizable: (state) => {
+    toggleResizable: state => {
       state.isResizable = !state.isResizable;
     },
   },
@@ -128,4 +167,4 @@ export const {
   toggleResizable,
 } = layoutSlice.actions;
 
-export default layoutSlice.reducer; 
+export default layoutSlice.reducer;
