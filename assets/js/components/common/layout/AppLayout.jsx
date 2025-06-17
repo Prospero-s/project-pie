@@ -54,6 +54,7 @@ export default function AppLayout({ i18n, children }) {
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
         i18n={i18n}
+        user={user}
       />
       <Layout className="site-layout">
         <AppHeader user={user} setUser={setUser} i18n={i18n} />
