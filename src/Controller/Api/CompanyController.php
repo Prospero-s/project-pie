@@ -104,6 +104,7 @@ class CompanyController extends AbstractController
                     'id' => $company->getId(),
                     'name' => $company->getDenomination(),
                     'sector' => $company->getSector(),
+                    'businessStructures' => $company->getBusinessStructures(),
                     'created_at' => $company->getCreatedAt()->format('Y-m-d'),
                 ];
             }

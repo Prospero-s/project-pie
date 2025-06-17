@@ -15,6 +15,7 @@
   },
   "company": {
     "name": "Nom de l'entreprise",
+    "businessStructures": "Structure juridique",
     "sector": "Secteur d'activité",
     "siren": "SIREN",
     "siret": "SIRET",

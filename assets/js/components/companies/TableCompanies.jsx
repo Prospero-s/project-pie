@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Skeleton, Table } from 'antd';
+import { Skeleton, Table, Tag } from 'antd';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getAllCompanies } from '@/services/company/companyService';
@@ -12,7 +12,6 @@ const TableCompanies = ({ i18n }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems] = useState(0);
   const [pageSize] = useState(10);
-  const [uniqueSectors, setUniqueSectors] = useState([]);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 500);
@@ -21,11 +20,6 @@ const TableCompanies = ({ i18n }) => {
       try {
         const data = await getAllCompanies();
         setCompanies(data);
-        // Extraire les secteurs uniques des données
-        const sectors = [...new Set(data.map(company => company.sector))]
-          .filter(Boolean)
-          .sort();
-        setUniqueSectors(sectors);
       } catch (error) {
         console.error(
           'Erreur lors de la récupération des entreprises :',
@@ -40,6 +34,27 @@ const TableCompanies = ({ i18n }) => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  const getSectorTypeColor = type => {
+    switch (type) {
+      case 'technology':
+        return 'geekblue';
+      case 'healthcare':
+        return 'volcano';
+      case 'finance':
+        return 'gold';
+      case 'retail':
+        return 'magenta';
+      case 'manufacturing':
+        return 'purple';
+      case 'energy':
+        return 'lime';
+      case 'education':
+        return 'cyan';
+      default:
+        return 'default';
+    }
+  };
 
   const columns = [
     {
@@ -72,23 +87,44 @@ const TableCompanies = ({ i18n }) => {
         ),
     },
     {
+      title: t('company.businessStructures'),
+      dataIndex: 'businessStructures',
+      key: 'businessStructures',
+      sorter: (a, b) =>
+        a.businessStructures.localeCompare(b.businessStructures),
+      sortDirections: ['ascend', 'descend'],
+      render: businessStructures =>
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : businessStructures ? (
+          businessStructures
+        ) : (
+          '-'
+        ),
+    },
+    {
       title: t('company.sector'),
       dataIndex: 'sector',
       key: 'sector',
-      filters: uniqueSectors.map(sector => ({
-        text: t(`company_details.sectors.${sector}`),
-        value: sector,
-      })),
-      onFilter: (value, record) => record.sector === value,
-      filterMode: 'menu',
-      filterSearch: true,
-      sorter: (a, b) => a.sector.localeCompare(b.sector),
-      sortDirections: ['ascend', 'descend'],
+      filters: [
+        { text: t('company_details.sectors.technology'), value: 'technology' },
+        { text: t('company_details.sectors.healthcare'), value: 'healthcare' },
+        { text: t('company_details.sectors.finance'), value: 'finance' },
+        { text: t('company_details.sectors.retail'), value: 'retail' },
+        {
+          text: t('company_details.sectors.manufacturing'),
+          value: 'manufacturing',
+        },
+        { text: t('company_details.sectors.energy'), value: 'energy' },
+        { text: t('company_details.sectors.education'), value: 'education' },
+      ],
       render: sector =>
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : sector ? (
-          t(`company_details.sectors.${sector}`)
+          <Tag color={getSectorTypeColor(sector)}>
+            {t(`company_details.sectors.${sector}`)}
+          </Tag>
         ) : (
           '-'
         ),
