@@ -15,20 +15,15 @@ import {
   Spin,
   Menu,
   Dropdown,
-  Popover,
   Modal,
   Form,
-  InputNumber,
   Switch,
   Tag,
   Popconfirm,
-  Card,
-  Divider,
 } from 'antd';
 import { useTranslation } from 'react-i18next';
 import {
   updateCols,
-  updateRowHeight,
   toggleDraggable,
   toggleResizable,
   addCustomChart,
@@ -72,329 +67,33 @@ import '../../../../css/components/metrics.css';
 const { Option } = Select;
 const { Text } = Typography;
 
-// Données statiques pour les requêtes prédéfinies (utilisées uniquement si directFetchMode = false)
-const PREDEFINED_QUERIES = [
-  {
-    id: '1',
-    name: 'Revenus par période',
-    query: 'monthly_revenue',
-    description:
-      'Analyse des KPI de revenus (Revenu Annuel Récurrent) par période',
-    data: [
-      {
-        period: '2024-Q3',
-        kpi_name: 'Revenu Annuel Récurrent',
-        revenue: 520000,
-        unit: '€',
-      },
-      {
-        period: '2024-Q2',
-        kpi_name: 'Revenu Annuel Récurrent',
-        revenue: 480000,
-        unit: '€',
-      },
-      { period: '2024-Q1', kpi_name: 'EBITDA', revenue: 510000, unit: '€' },
-      {
-        period: '2023-Q4',
-        kpi_name: 'Revenu Annuel Récurrent',
-        revenue: 450000,
-        unit: '€',
-      },
-      { period: '2023-Q3', kpi_name: 'EBITDA', revenue: 430000, unit: '€' },
-      {
-        period: '2023-Q2',
-        kpi_name: 'Revenu Annuel Récurrent',
-        revenue: 460000,
-        unit: '€',
-      },
-    ],
-  },
-  {
-    id: '2',
-    name: 'Portefeuille par secteur',
-    query: 'clients_by_sector',
-    description:
-      "Répartition des entreprises du portefeuille par secteur d'activité",
-    data: [
-      { sector: 'Technologie', client_count: 45, total_invested: 12500000 },
-      { sector: 'Santé', client_count: 32, total_invested: 8900000 },
-      { sector: 'Finance', client_count: 28, total_invested: 7200000 },
-      { sector: 'Éducation', client_count: 20, total_invested: 4500000 },
-      { sector: 'Commerce', client_count: 18, total_invested: 3800000 },
-      { sector: 'Industrie', client_count: 15, total_invested: 2900000 },
-    ],
-  },
-  {
-    id: '3',
-    name: 'Évolution Argent brûlé',
-    query: 'burn_rate_evolution',
-    description:
-      "Analyse de l'évolution de l'argent brûlé par période - métrique clé de performance",
-    data: [
-      {
-        year: 2024,
-        period: 'Q3',
-        argent_brule: 7700000.0,
-        unit: '€',
-        nb_metrics: 1,
-      },
-      {
-        year: 2024,
-        period: 'Q2',
-        argent_brule: 7500000.0,
-        unit: '€',
-        nb_metrics: 1,
-      },
-      {
-        year: 2024,
-        period: 'Q1',
-        argent_brule: 7200000.0,
-        unit: '€',
-        nb_metrics: 1,
-      },
-      {
-        year: 2023,
-        period: 'Q4',
-        argent_brule: 6900000.0,
-        unit: '€',
-        nb_metrics: 1,
-      },
-      {
-        year: 2023,
-        period: 'Q3',
-        argent_brule: 6600000.0,
-        unit: '€',
-        nb_metrics: 1,
-      },
-      {
-        year: 2023,
-        period: 'Q2',
-        argent_brule: 6300000.0,
-        unit: '€',
-        nb_metrics: 1,
-      },
-    ],
-  },
-  {
-    id: '4',
-    name: 'Top investissements',
-    query: 'top_clients',
-    description: 'Liste des 10 plus grands clients par valeur',
-    data: [
-      { client_name: 'TechCorp Inc.', annual_value: 450000 },
-      { client_name: 'MediHealth Systems', annual_value: 380000 },
-      { client_name: 'Finance Partners', annual_value: 320000 },
-      { client_name: 'EduLearn Global', annual_value: 290000 },
-      { client_name: 'RetailPro', annual_value: 270000 },
-      { client_name: 'Manufacturing Plus', annual_value: 240000 },
-      { client_name: 'Creative Solutions', annual_value: 210000 },
-      { client_name: 'DataSmart Analytics', annual_value: 190000 },
-      { client_name: 'GreenEco Innovations', annual_value: 180000 },
-      { client_name: 'TransportationNow', annual_value: 170000 },
-    ],
-  },
-  {
-    id: '5',
-    name: "Évolution nombre d'employés",
-    query: 'headcount',
-    description:
-      "Suivi de l'évolution du nombre d'employés des entreprises du portefeuille",
-    data: [
-      {
-        period: '2024-Q3',
-        kpi_name: "Nombre d'employés",
-        nombre_employes: 320,
-        unit: 'personnes',
-      },
-      {
-        period: '2024-Q2',
-        kpi_name: "Nombre d'employés",
-        nombre_employes: 310,
-        unit: 'personnes',
-      },
-      {
-        period: '2024-Q1',
-        kpi_name: "Nombre d'employés",
-        nombre_employes: 295,
-        unit: 'personnes',
-      },
-      {
-        period: '2023-Q4',
-        kpi_name: "Nombre d'employés",
-        nombre_employes: 285,
-        unit: 'personnes',
-      },
-      {
-        period: '2023-Q3',
-        kpi_name: "Nombre d'employés",
-        nombre_employes: 278,
-        unit: 'personnes',
-      },
-      {
-        period: '2023-Q2',
-        kpi_name: "Nombre d'employés",
-        nombre_employes: 270,
-        unit: 'personnes',
-      },
-    ],
-  },
-  {
-    id: '6',
-    name: 'Investissements trimestriels',
-    query: 'quarterly_investments',
-    description: 'Montants investis par trimestre avec types de financement',
-    data: [
-      {
-        year: 2024,
-        quarter: 'Q3',
-        investment_value: 1200000,
-        nb_investments: 3,
-        funding_types: 'Series A, Series B',
-      },
-      {
-        year: 2024,
-        quarter: 'Q2',
-        investment_value: 950000,
-        nb_investments: 2,
-        funding_types: 'Seed, Series A',
-      },
-      {
-        year: 2024,
-        quarter: 'Q1',
-        investment_value: 870000,
-        nb_investments: 4,
-        funding_types: 'Seed',
-      },
-      {
-        year: 2023,
-        quarter: 'Q4',
-        investment_value: 920000,
-        nb_investments: 2,
-        funding_types: 'Series A',
-      },
-      {
-        year: 2023,
-        quarter: 'Q3',
-        investment_value: 780000,
-        nb_investments: 3,
-        funding_types: 'Seed, Series A',
-      },
-      {
-        year: 2023,
-        quarter: 'Q2',
-        investment_value: 730000,
-        nb_investments: 1,
-        funding_types: 'Series B',
-      },
-    ],
-  },
-  {
-    id: '7',
-    name: 'Synthèse investissements',
-    query: 'total_investment',
-    description:
-      "Vue d'ensemble des montants totaux investis par type de financement",
-    data: [
-      {
-        category: 'Total Global',
-        total_amount: 8950000,
-        nb_investments: 45,
-        first_investment: '2021-01-15',
-        last_investment: '2024-06-30',
-        currencies: 'EUR',
-      },
-      {
-        category: 'Series A',
-        total_amount: 5450000,
-        nb_investments: 18,
-        first_investment: '2021-09-22',
-        last_investment: '2024-06-30',
-        currencies: 'EUR',
-      },
-      {
-        category: 'Seed',
-        total_amount: 3500000,
-        nb_investments: 27,
-        first_investment: '2021-01-15',
-        last_investment: '2024-03-15',
-        currencies: 'EUR',
-      },
-    ],
-  },
-  {
-    id: '8',
-    name: 'Analyse KPI globale',
-    query: 'kpi_analysis_by_period',
-    description:
-      "Vue d'ensemble de tous les KPI disponibles avec métriques par période",
-    data: [
-      {
-        metric: 'Argent brûlé',
-        unit: '€',
-        Q1: '7 531 666.67 €',
-        Q2: '7 531 666.67 €',
-        Q3: '7 531 666.67 €',
-        Q4: null,
-      },
-      {
-        metric: "Coût d'acquisition client",
-        unit: '',
-        Q1: '0.97',
-        Q2: '0.97',
-        Q3: '0.97',
-        Q4: null,
-      },
-      {
-        metric: 'EBITDA',
-        unit: '€',
-        Q1: '-1 200 000.00 €',
-        Q2: '-1 200 000.00 €',
-        Q3: '-1 200 000.00 €',
-        Q4: null,
-      },
-      {
-        metric: "Nombre d'employés",
-        unit: 'personnes',
-        Q1: '276 personnes',
-        Q2: '276 personnes',
-        Q3: '276 personnes',
-        Q4: null,
-      },
-      {
-        metric: 'Revenu Annuel Récurrent',
-        unit: '€',
-        Q1: '27.67 €',
-        Q2: '27.67 €',
-        Q3: '27.67 €',
-        Q4: null,
-      },
-    ],
-  },
-];
-
-// Constante pour décider si on utilise l'appel fetch direct ou les données statiques
-const USE_DIRECT_FETCH = true;
-
 // Palettes de couleurs pour les graphiques
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A259FF'];
+
+// Liste des requêtes disponibles (récupérées depuis le backend)
+const AVAILABLE_QUERIES = [
+  { id: 'monthly_revenue', name: 'Revenus par période' },
+  { id: 'clients_by_sector', name: 'Portefeuille par secteur' },
+  { id: 'burn_rate_evolution', name: 'Évolution Argent brûlé' },
+  { id: 'top_clients', name: 'Top investissements' },
+  { id: 'headcount', name: "Évolution nombre d'employés" },
+  { id: 'quarterly_investments', name: 'Investissements trimestriels' },
+  { id: 'total_investment', name: 'Synthèse investissements' },
+  { id: 'kpi_analysis_by_period', name: 'Analyse KPI globale' },
+];
 
 const GridControls = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { id } = useParams(); // Get the company ID from URL
-  const { cols, rowHeight, isDraggable, isResizable } = useSelector(
-    state => state.layout,
-  );
+  const { cols, isDraggable, isResizable } = useSelector(state => state.layout);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedQueryId, setSelectedQueryId] = useState('1');
-  const [selectedQuery, setSelectedQuery] = useState(null);
+  const [selectedQueryId, setSelectedQueryId] = useState('monthly_revenue');
   const [queryResults, setQueryResults] = useState([]);
   const [dataLoading, setDataLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [chartType, setChartType] = useState('bar');
   const [chartTitle, setChartTitle] = useState('');
-  const [iframeUrl, setIframeUrl] = useState('');
-  const [iframeLoading, setIframeLoading] = useState(false);
 
   // Nouveaux états pour les fonctionnalités avancées
   const [calculatedColumns, setCalculatedColumns] = useState([]);
@@ -424,13 +123,6 @@ const GridControls = () => {
   // Nouveaux états pour la gestion des entreprises externes
   const [companies, setCompanies] = useState([]);
   const [loadingCompanies, setLoadingCompanies] = useState(false);
-  const [externalData, setExternalData] = useState({});
-
-  // Effet pour définir selectedQuery quand selectedQueryId change
-  useEffect(() => {
-    const query = PREDEFINED_QUERIES.find(q => q.id === selectedQueryId);
-    setSelectedQuery(query);
-  }, [selectedQueryId]);
 
   // Effet pour charger la liste des entreprises
   useEffect(() => {
@@ -456,201 +148,6 @@ const GridControls = () => {
     }
   }, [isCalculationModalVisible, id]);
 
-  // Colonnes pour les résultats (détectées dynamiquement à partir des résultats)
-  const generateColumns = results => {
-    if (!results || results.length === 0) return [];
-
-    // Créer des colonnes à partir du premier résultat
-    const firstResult = results[0];
-    return Object.keys(firstResult).map(key => {
-      const column = {
-        title: key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '),
-        dataIndex: key,
-        key: key,
-      };
-
-      // Formater certaines colonnes
-      if (
-        key.includes('revenue') ||
-        key.includes('value') ||
-        key.includes('amount')
-      ) {
-        column.render = val => {
-          if (typeof val !== 'number') return val;
-          return val >= 1000000
-            ? `${(val / 1000000).toFixed(2)} M€`
-            : `${(val / 1000).toFixed(0)} K€`;
-        };
-      }
-
-      return column;
-    });
-  };
-
-  // Transformation des données pour les graphiques
-  const transformDataForCharts = data => {
-    if (!data || !Array.isArray(data) || data.length === 0) {
-      console.warn('Aucune donnée valide pour créer un graphique');
-      return [];
-    }
-
-    try {
-      // Traitement spécifique pour les données de "Total investi"
-      if (selectedQuery && selectedQuery.query === 'total_investment') {
-        // Pour total_investment, utiliser un format simplifié avec category et total_amount
-        return data.map(item => ({
-          name: item.category,
-          value: parseFloat(item.total_amount) || 0,
-        }));
-      }
-
-      // Traitement spécifique pour les données de "Analyse KPI par période"
-      if (selectedQuery && selectedQuery.query === 'kpi_analysis_by_period') {
-        // Pour kpi_analysis_by_period, utiliser year + quarter comme nom et plusieurs métriques
-        return data.map(item => ({
-          name:
-            item.year && item.quarter
-              ? `${item.year} ${item.quarter}`
-              : 'Non spécifié',
-          nb_investments: parseInt(item.nb_investments) || 0,
-          nb_companies: parseInt(item.nb_companies) || 0,
-          avg_investment_value: parseFloat(item.avg_investment_value) || 0,
-          total_investment_value: parseFloat(item.total_investment_value) || 0,
-          max_investment_value: parseFloat(item.max_investment_value) || 0,
-          min_investment_value: parseFloat(item.min_investment_value) || 0,
-        }));
-      }
-
-      // Pour les graphiques en secteurs (pie)
-      if (chartType === 'pie') {
-        // Détecter automatiquement la colonne de nom et de valeur
-        const keys = Object.keys(data[0] || {});
-        if (keys.length < 2) {
-          console.warn(
-            'Données insuffisantes pour créer un graphique (moins de 2 colonnes)',
-          );
-          return [];
-        }
-
-        const valueColumn =
-          keys.find(
-            key =>
-              key.includes('count') ||
-              key.includes('value') ||
-              key.includes('amount') ||
-              key.includes('revenue') ||
-              typeof data[0][key] === 'number',
-          ) || keys[1];
-
-        // La colonne de nom est généralement la première colonne qui n'est pas un nombre
-        const nameColumn =
-          keys.find(
-            key =>
-              key !== valueColumn &&
-              (key.includes('name') ||
-                key.includes('sector') ||
-                key.includes('category') ||
-                typeof data[0][key] === 'string'),
-          ) || keys[0];
-
-        return data.map(item => ({
-          name: item[nameColumn] ? String(item[nameColumn]) : 'Sans nom',
-          value: parseFloat(item[valueColumn]) || 0,
-        }));
-      }
-
-      // Pour les graphiques de type bar, line, area
-      // Trouver les colonnes de nom et de valeur
-      const keys = Object.keys(data[0] || {});
-      if (keys.length < 1) {
-        console.warn(
-          'Données insuffisantes pour créer un graphique (aucune colonne)',
-        );
-        return [];
-      }
-
-      // La colonne de valeur est généralement un nombre
-      const valueColumns = keys.filter(
-        key =>
-          key.includes('count') ||
-          key.includes('value') ||
-          key.includes('amount') ||
-          key.includes('revenue') ||
-          key.includes('headcount') ||
-          typeof data[0][key] === 'number',
-      );
-
-      if (valueColumns.length === 0) {
-        console.warn(
-          'Aucune colonne de valeur numérique trouvée pour le graphique',
-        );
-        // Utiliser la dernière colonne comme valeur par défaut
-        valueColumns.push(keys[keys.length - 1]);
-      }
-
-      // La colonne de nom est généralement une chaîne ou une date
-      const possibleNameColumns = [
-        'month',
-        'year',
-        'quarter',
-        'name',
-        'sector',
-        'client_name',
-        'category',
-      ];
-      let nameColumn = keys.find(key =>
-        possibleNameColumns.some(name => key.includes(name)),
-      );
-
-      // Si on a deux colonnes associées comme year et quarter, les combiner
-      if (keys.includes('year') && keys.includes('quarter')) {
-        return data.map(item => {
-          const result = {
-            name:
-              item.year && item.quarter
-                ? `${item.year} ${item.quarter}`
-                : 'Non spécifié',
-          };
-
-          valueColumns.forEach(valueCol => {
-            if (valueCol !== 'year' && valueCol !== 'quarter') {
-              result[valueCol] = parseFloat(item[valueCol]) || 0;
-            }
-          });
-
-          return result;
-        });
-      }
-
-      // Si aucune colonne de nom n'est trouvée, utiliser la première colonne qui n'est pas une valeur
-      if (!nameColumn) {
-        nameColumn = keys.find(key => !valueColumns.includes(key)) || keys[0];
-      }
-
-      return data.map((item, index) => {
-        const result = {
-          name: item[nameColumn]
-            ? String(item[nameColumn])
-            : `Item ${index + 1}`,
-        };
-
-        valueColumns.forEach(valueCol => {
-          if (valueCol !== nameColumn) {
-            result[valueCol] = parseFloat(item[valueCol]) || 0;
-          }
-        });
-
-        return result;
-      });
-    } catch (error) {
-      console.error(
-        'Erreur lors de la transformation des données pour le graphique:',
-        error,
-      );
-      return [];
-    }
-  };
-
   const showDrawer = () => {
     setDrawerOpen(true);
   };
@@ -662,7 +159,7 @@ const GridControls = () => {
   const handleQueryChange = value => {
     setSelectedQueryId(value);
     setQueryResults([]);
-    setIframeUrl('');
+    setErrorMessage(null);
   };
 
   // Fonction pour déterminer les colonnes numériques pour l'axe Y
@@ -745,6 +242,7 @@ const GridControls = () => {
           'sector',
           'client_name',
           'category',
+          'period',
         ];
         const defaultX =
           nonNumericCols.find(col =>
@@ -808,164 +306,105 @@ const GridControls = () => {
 
   // Fonction pour exécuter la requête sélectionnée
   const executeQuery = async () => {
-    if (selectedQuery) {
-      console.log('Exécution de la requête:', selectedQuery.query);
+    if (!selectedQueryId) {
+      message.error(t('metrics.drawer.select_query_first'));
+      return;
+    }
 
-      if (USE_DIRECT_FETCH) {
-        // Utiliser un appel fetch direct au backend
-        setDataLoading(true);
-        setErrorMessage(null);
+    setDataLoading(true);
+    setErrorMessage(null);
 
-        try {
-          const url = `/explorer/data/${id}/${selectedQuery.query}`;
+    try {
+      const url = `/explorer/data/${id}/${selectedQueryId}`;
 
-          const response = await fetch(url, {
-            headers: {
-              Accept: 'application/json',
-            },
-          });
+      const response = await fetch(url, {
+        headers: {
+          Accept: 'application/json',
+        },
+      });
 
-          // Vérifier si la réponse est du JSON valide
-          const contentType = response.headers.get('content-type');
-          if (!contentType || !contentType.includes('application/json')) {
-            throw new Error(`Réponse non-JSON reçue: ${contentType}`);
+      // Vérifier si la réponse est du JSON valide
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error(`Réponse non-JSON reçue: ${contentType}`);
+      }
+
+      const data = await response.json();
+
+      if (response.ok) {
+        if (data.error) {
+          setErrorMessage(data.error);
+          if (data.details) {
+            console.error(data.details);
           }
-
-          const data = await response.json();
-
-          if (response.ok) {
-            if (data.error) {
-              setErrorMessage(data.error);
-              if (data.details) {
-                console.error(data.details);
-              }
-            } else {
-              // Adapter au format de réponse du contrôleur qui encapsule les données dans 'results'
-              const results = data.results || data;
-              setQueryResults(results);
-            }
-          } else {
-            setErrorMessage(
-              `Erreur ${response.status}: ${response.statusText}`,
-            );
-          }
-        } catch (error) {
-          console.error('Erreur lors du chargement des données:', error);
-          setErrorMessage(
-            `Erreur lors du chargement des données: ${error.message}`,
-          );
-          // En mode développement, utiliser les données statiques en cas d'erreur
-          if (selectedQuery && selectedQuery.data) {
-            console.log('Utilisation des données statiques en mode fallback');
-            setQueryResults(selectedQuery.data);
-          }
-        } finally {
-          setDataLoading(false);
+        } else {
+          // Adapter au format de réponse du contrôleur qui encapsule les données dans 'results'
+          const results = data.results || data;
+          setQueryResults(results);
         }
       } else {
-        // Utiliser les données statiques (mode développement/démo)
-        const staticData = selectedQuery.data || [];
-        setQueryResults(staticData);
+        setErrorMessage(`Erreur ${response.status}: ${response.statusText}`);
       }
+    } catch (error) {
+      console.error('Erreur lors du chargement des données:', error);
+      setErrorMessage(
+        `Erreur lors du chargement des données: ${error.message}`,
+      );
+    } finally {
+      setDataLoading(false);
     }
   };
 
   // Fonction pour ajouter un graphique basé sur les données actuelles
   const addGraphFromCurrentData = () => {
-    if (USE_DIRECT_FETCH) {
-      if (
-        displayData &&
-        displayData.length > 0 &&
-        selectedXAxis &&
-        selectedYAxes.length > 0
-      ) {
-        // Préparer les données pour le graphique avec les axes sélectionnés
-        const chartData = displayData.map(item => {
-          const newItem = { name: item[selectedXAxis] };
+    if (
+      displayData &&
+      displayData.length > 0 &&
+      selectedXAxis &&
+      selectedYAxes.length > 0
+    ) {
+      // Préparer les données pour le graphique avec les axes sélectionnés
+      const chartData = displayData.map(item => {
+        const newItem = { name: item[selectedXAxis] };
 
-          selectedYAxes.forEach(yAxis => {
-            if (item[yAxis] !== undefined) {
-              newItem[yAxis] = parseFloat(item[yAxis]) || 0;
-            }
-          });
-
-          return newItem;
-        });
-
-        // Créer un objet metadata pour identifier les colonnes calculées
-        const columnsMetadata = {};
-
-        // Identifier les colonnes calculées sélectionnées
-        calculatedColumns.forEach(calc => {
-          if (selectedYAxes.includes(calc.name)) {
-            columnsMetadata[calc.name] = {
-              isCalculated: true,
-              format: calc.format,
-              expression: calc.expression,
-            };
+        selectedYAxes.forEach(yAxis => {
+          if (item[yAxis] !== undefined) {
+            newItem[yAxis] = parseFloat(item[yAxis]) || 0;
           }
         });
 
-        addGraph({
-          title:
-            chartTitle ||
-            (selectedQuery ? selectedQuery.name : 'Graphique personnalisé'),
-          description: selectedQuery ? selectedQuery.description || '' : '',
-          data: chartData,
-          query: selectedQuery ? selectedQuery.query : 'custom',
-          columnsMetadata: columnsMetadata, // Ajouter les métadonnées des colonnes
-          type: chartType, // Spécifier le type de graphique sélectionné
-        });
-        message.success(t('metrics.drawer.graph_added'));
-      } else {
-        message.error(t('metrics.drawer.missing_axes'));
-      }
+        return newItem;
+      });
+
+      // Créer un objet metadata pour identifier les colonnes calculées
+      const columnsMetadata = {};
+
+      // Identifier les colonnes calculées sélectionnées
+      calculatedColumns.forEach(calc => {
+        if (selectedYAxes.includes(calc.name)) {
+          columnsMetadata[calc.name] = {
+            isCalculated: true,
+            format: calc.format,
+            expression: calc.expression,
+          };
+        }
+      });
+
+      const queryName =
+        AVAILABLE_QUERIES.find(q => q.id === selectedQueryId)?.name ||
+        'Graphique personnalisé';
+
+      addGraph({
+        title: chartTitle || queryName,
+        description: `Données de ${queryName}`,
+        data: chartData,
+        query: selectedQueryId,
+        columnsMetadata: columnsMetadata, // Ajouter les métadonnées des colonnes
+        type: chartType, // Spécifier le type de graphique sélectionné
+      });
+      message.success(t('metrics.drawer.graph_added'));
     } else {
-      // Mode données statiques
-      if (
-        selectedQuery &&
-        selectedQuery.data &&
-        selectedQuery.data.length > 0 &&
-        selectedXAxis &&
-        selectedYAxes.length > 0
-      ) {
-        // Préparer les données pour le graphique avec les axes sélectionnés
-        const chartData = selectedQuery.data.map(item => {
-          const newItem = { name: item[selectedXAxis] };
-
-          selectedYAxes.forEach(yAxis => {
-            if (item[yAxis] !== undefined) {
-              newItem[yAxis] = parseFloat(item[yAxis]) || 0;
-            }
-          });
-
-          return newItem;
-        });
-
-        // Créer un objet metadata pour identifier les colonnes calculées
-        const columnsMetadata = {};
-        calculatedColumns.forEach(calc => {
-          if (selectedYAxes.includes(calc.name)) {
-            columnsMetadata[calc.name] = {
-              isCalculated: true,
-              format: calc.format,
-              expression: calc.expression,
-            };
-          }
-        });
-
-        addGraph({
-          title: chartTitle || selectedQuery.name,
-          description: selectedQuery.description || '',
-          data: chartData,
-          query: selectedQuery.query,
-          columnsMetadata: columnsMetadata, // Ajouter les métadonnées des colonnes
-          type: chartType, // Spécifier le type de graphique sélectionné
-        });
-        message.success(t('metrics.drawer.graph_added'));
-      } else {
-        message.error(t('metrics.drawer.missing_axes'));
-      }
+      message.error(t('metrics.drawer.missing_axes'));
     }
   };
 
@@ -1212,11 +651,6 @@ const GridControls = () => {
         const pivotColumn = pivotColumns[0]; // Pour simplifier, on ne gère qu'un seul pivot
 
         if (pivotColumn) {
-          // Obtenir les valeurs uniques de la colonne pivot
-          const pivotValues = Array.from(
-            new Set(processedData.map(item => item[pivotColumn])),
-          );
-
           // Créer un nouvel ensemble de données pivotées
           const pivotedData = [];
 
@@ -1291,11 +725,9 @@ const GridControls = () => {
                 <div className="grid-controls-header">
                   <div>
                     <span>
-                      {t('data_explorer.column_header', {
-                        column: key
-                          .replace(/_/g, ' ')
-                          .replace(/\b\w/g, l => l.toUpperCase()),
-                      })}
+                      {key
+                        .replace(/_/g, ' ')
+                        .replace(/\b\w/g, l => l.toUpperCase())}
                     </span>
                     {isPivot && (
                       <TableOutlined className="grid-controls-icon grid-controls-icon-primary" />
@@ -1352,7 +784,7 @@ const GridControls = () => {
               sorter: true,
               sortOrder:
                 sortInfo && sortInfo.column === key ? sortInfo.order : null,
-              render: (text, record) => {
+              render: text => {
                 // Formatage selon le type de colonne
                 if (calculatedColumn) {
                   // S'assurer que la valeur est un nombre
@@ -1454,7 +886,7 @@ const GridControls = () => {
     if (newCalculation.externalSource && newCalculation.externalCompanyId) {
       try {
         // Utiliser la même requête que celle sélectionnée actuellement
-        const queryId = selectedQuery ? selectedQuery.query : 'monthly_revenue';
+        const queryId = selectedQueryId;
         const externalData = await fetchExternalCompanyData(
           newCalculation.externalCompanyId,
           queryId,
@@ -1560,7 +992,7 @@ const GridControls = () => {
 
   // Fonction pour charger les données d'une entreprise externe
   const fetchExternalCompanyData = async (companyId, queryId) => {
-    if (!companyId || !queryId) return;
+    if (!companyId || !queryId) return null;
 
     try {
       const url = `/explorer/data/${companyId}/${queryId}`;
@@ -1580,13 +1012,6 @@ const GridControls = () => {
         console.error(data.error, data.details);
         return null;
       }
-
-      // Stocker les données avec une clé unique pour pouvoir les réutiliser
-      const key = `company_${companyId}_query_${queryId}`;
-      setExternalData(prev => ({
-        ...prev,
-        [key]: data.results || [],
-      }));
 
       return data.results || [];
     } catch (error) {
@@ -1622,10 +1047,6 @@ const GridControls = () => {
 
   // Améliorer le menu contextuel pour les colonnes
   const getColumnMenu = columnKey => {
-    // Vérifier si c'est une colonne calculée
-    const isCalculated = calculatedColumns.some(
-      calc => calc.name === columnKey,
-    );
     // Déterminer si c'est une colonne numérique
     const isNumeric =
       displayData &&
@@ -1927,9 +1348,11 @@ const GridControls = () => {
             >
               <FilterOutlined />{' '}
               <strong>
-                {t(`data_explorer.column_header`, { column: filter.column })}
+                {filter.column
+                  .replace(/_/g, ' ')
+                  .replace(/\b\w/g, l => l.toUpperCase())}
               </strong>{' '}
-              {operatorText} "{valueText}"
+              {operatorText} &quot;{valueText}&quot;
             </Tag>
           );
         })}
@@ -2271,19 +1694,16 @@ const GridControls = () => {
             value={selectedQueryId}
             onChange={handleQueryChange}
           >
-            {PREDEFINED_QUERIES.map(query => (
+            {AVAILABLE_QUERIES.map(query => (
               <Option key={query.id} value={query.id}>
-                {t('queries.' + query.id, query.name)}
+                {query.name}
               </Option>
             ))}
           </Select>
 
           <div className="bg-gray-50 p-3 rounded mt-2">
             <Text type="secondary">
-              {t(
-                'queries.descriptions.' + selectedQuery?.id,
-                selectedQuery?.description,
-              )}
+              {AVAILABLE_QUERIES.find(q => q.id === selectedQueryId)?.name}
             </Text>
           </div>
         </div>
@@ -2291,177 +1711,149 @@ const GridControls = () => {
         <div>
           <h4 className="mb-2 font-medium">{t('metrics.drawer.results')}</h4>
 
-          {USE_DIRECT_FETCH ? (
-            <div
-              className="data-results-container"
-              style={{ minHeight: '300px', position: 'relative' }}
-            >
-              {dataLoading && (
-                <div className="flex justify-center items-center absolute inset-0 bg-white bg-opacity-80 z-10">
-                  <Spin>
-                    <div className="p-5">{t('common.loading')}</div>
-                  </Spin>
-                </div>
-              )}
+          <div
+            className="data-results-container"
+            style={{ minHeight: '300px', position: 'relative' }}
+          >
+            {dataLoading && (
+              <div className="flex justify-center items-center absolute inset-0 bg-white bg-opacity-80 z-10">
+                <Spin>
+                  <div className="p-5">{t('common.loading')}</div>
+                </Spin>
+              </div>
+            )}
 
-              {errorMessage ? (
-                <div className="error-message p-4 border border-red-300 rounded bg-red-50">
-                  <Text type="danger">
-                    {t('errors.custom_error', { error: errorMessage })}
-                  </Text>
-                </div>
-              ) : queryResults && queryResults.length > 0 ? (
-                <div>
-                  {/* Barre d'outils pour les fonctionnalités avancées */}
-                  <div className="table-toolbar mb-3 flex justify-between items-center">
-                    <div className="toolbar-left flex items-center">
+            {errorMessage ? (
+              <div className="error-message p-4 border border-red-300 rounded bg-red-50">
+                <Text type="danger">
+                  {t('errors.custom_error', { error: errorMessage })}
+                </Text>
+              </div>
+            ) : queryResults && queryResults.length > 0 ? (
+              <div>
+                {/* Barre d'outils pour les fonctionnalités avancées */}
+                <div className="table-toolbar mb-3 flex justify-between items-center">
+                  <div className="toolbar-left flex items-center">
+                    <Button
+                      type="primary"
+                      ghost
+                      icon={<PlusOutlined />}
+                      size="small"
+                      onClick={handleAddCalculatedColumn}
+                      className="mr-2"
+                    >
+                      {t('data_explorer.add_column')}
+                    </Button>
+
+                    <Dropdown
+                      overlay={
+                        <Menu>
+                          {Object.keys(queryResults[0] || {}).map(key => (
+                            <Menu.Item
+                              key={key}
+                              onClick={() => toggleColumnPivot(key)}
+                            >
+                              {pivotColumns.includes(key) ? '✓ ' : ''}
+                              {key}
+                            </Menu.Item>
+                          ))}
+                        </Menu>
+                      }
+                    >
                       <Button
-                        type="primary"
                         ghost
-                        icon={<PlusOutlined />}
+                        icon={<TableOutlined />}
                         size="small"
-                        onClick={handleAddCalculatedColumn}
                         className="mr-2"
                       >
-                        {t('data_explorer.add_column')}
+                        {t('data_explorer.pivot')} <DownOutlined />
                       </Button>
+                    </Dropdown>
 
-                      <Dropdown
-                        overlay={
-                          <Menu>
-                            {Object.keys(queryResults[0] || {}).map(key => (
-                              <Menu.Item
-                                key={key}
-                                onClick={() => toggleColumnPivot(key)}
-                              >
-                                {pivotColumns.includes(key) ? '✓ ' : ''}
-                                {key}
-                              </Menu.Item>
-                            ))}
-                          </Menu>
-                        }
+                    <Dropdown
+                      overlay={
+                        <Menu>
+                          {Object.keys(queryResults[0] || {}).map(key => (
+                            <Menu.Item
+                              key={key}
+                              onClick={() => toggleColumnVisibility(key)}
+                            >
+                              {hiddenColumns.includes(key) ? '❌ ' : '✓ '}
+                              {key}
+                            </Menu.Item>
+                          ))}
+                        </Menu>
+                      }
+                    >
+                      <Button
+                        ghost
+                        icon={<EyeInvisibleOutlined />}
+                        size="small"
                       >
-                        <Button
-                          ghost
-                          icon={<TableOutlined />}
-                          size="small"
-                          className="mr-2"
-                        >
-                          {t('data_explorer.pivot')} <DownOutlined />
-                        </Button>
-                      </Dropdown>
-
-                      <Dropdown
-                        overlay={
-                          <Menu>
-                            {Object.keys(queryResults[0] || {}).map(key => (
-                              <Menu.Item
-                                key={key}
-                                onClick={() => toggleColumnVisibility(key)}
-                              >
-                                {hiddenColumns.includes(key) ? '❌ ' : '✓ '}
-                                {key}
-                              </Menu.Item>
-                            ))}
-                          </Menu>
-                        }
-                      >
-                        <Button
-                          ghost
-                          icon={<EyeInvisibleOutlined />}
-                          size="small"
-                        >
-                          {t('data_explorer.visibility')} <DownOutlined />
-                        </Button>
-                      </Dropdown>
-                    </div>
-
-                    <div className="toolbar-right">
-                      {sortInfo && (
-                        <Tag
-                          color="blue"
-                          closable
-                          onClose={() => setSortInfo(null)}
-                        >
-                          <SortAscendingOutlined /> {t('data_explorer.sort')}{' '}
-                          {sortInfo.column} (
-                          {sortInfo.order === 'ascend' ? '↑' : '↓'})
-                        </Tag>
-                      )}
-
-                      {/* Utilisation du nouveau composant pour afficher les filtres actifs */}
-                      {renderActiveFilters()}
-                    </div>
+                        {t('data_explorer.visibility')} <DownOutlined />
+                      </Button>
+                    </Dropdown>
                   </div>
 
-                  {/* Tableau de données avec colonnes enrichies */}
-                  <div className="overflow-auto max-h-96">
-                    <Table
-                      dataSource={displayData}
-                      columns={tableColumns.map(col => ({
-                        ...col,
-                        title: (
-                          <Dropdown
-                            overlay={getColumnMenu(col.dataIndex)}
-                            trigger={['click']}
-                          >
-                            <div className="column-header cursor-pointer flex items-center">
-                              {col.title} <SettingOutlined className="ml-1" />
-                            </div>
-                          </Dropdown>
-                        ),
-                      }))}
-                      rowKey={(record, index) => index}
-                      pagination={false}
-                      size="small"
-                      bordered
-                      onChange={(pagination, filters, sorter) => {
-                        if (sorter) {
-                          setSortInfo({
-                            column: sorter.field,
-                            order: sorter.order,
-                          });
-                        }
-                      }}
-                    />
+                  <div className="toolbar-right">
+                    {sortInfo && (
+                      <Tag
+                        color="blue"
+                        closable
+                        onClose={() => setSortInfo(null)}
+                      >
+                        <SortAscendingOutlined /> {t('data_explorer.sort')}{' '}
+                        {sortInfo.column} (
+                        {sortInfo.order === 'ascend' ? '↑' : '↓'})
+                      </Tag>
+                    )}
+
+                    {/* Utilisation du nouveau composant pour afficher les filtres actifs */}
+                    {renderActiveFilters()}
                   </div>
                 </div>
-              ) : (
-                <div className="no-data-message p-4 text-center text-gray-500">
-                  {t('metrics.drawer.execute_query')}
+
+                {/* Tableau de données avec colonnes enrichies */}
+                <div className="overflow-auto max-h-96">
+                  <Table
+                    dataSource={displayData}
+                    columns={tableColumns.map(col => ({
+                      ...col,
+                      title: (
+                        <Dropdown
+                          overlay={getColumnMenu(col.dataIndex)}
+                          trigger={['click']}
+                        >
+                          <div className="column-header cursor-pointer flex items-center">
+                            {col.title} <SettingOutlined className="ml-1" />
+                          </div>
+                        </Dropdown>
+                      ),
+                    }))}
+                    rowKey={(record, index) => index}
+                    pagination={false}
+                    size="small"
+                    bordered
+                    onChange={(pagination, filters, sorter) => {
+                      if (sorter) {
+                        setSortInfo({
+                          column: sorter.field,
+                          order: sorter.order,
+                        });
+                      }
+                    }}
+                  />
                 </div>
-              )}
-            </div>
-          ) : (
-            // Mode données statiques
-            <div className="overflow-auto max-h-96">
-              {selectedQuery && selectedQuery.data ? (
-                <Table
-                  dataSource={selectedQuery.data}
-                  columns={Object.keys(selectedQuery.data[0] || {}).map(
-                    key => ({
-                      title: key
-                        .replace(/_/g, ' ')
-                        .replace(/\b\w/g, l => l.toUpperCase()),
-                      dataIndex: key,
-                      key: key,
-                    }),
-                  )}
-                  rowKey={(record, index) => index}
-                  pagination={false}
-                  size="small"
-                  bordered
-                />
-              ) : (
-                <div className="no-data-message p-4 text-center text-gray-500">
-                  {t('metrics.drawer.select_and_execute')}
-                </div>
-              )}
-            </div>
-          )}
+              </div>
+            ) : (
+              <div className="no-data-message p-4 text-center text-gray-500">
+                {t('metrics.drawer.execute_query')}
+              </div>
+            )}
+          </div>
         </div>
 
-        {(queryResults.length > 0 || iframeUrl) && (
+        {queryResults.length > 0 && (
           <div className="mt-6 border-t pt-4">
             <h4 className="mb-4 font-medium">
               {t('metrics.drawer.add_chart')}
@@ -2522,7 +1914,9 @@ const GridControls = () => {
                     displayData.length > 0 &&
                     getNonNumericColumns(displayData).map(column => (
                       <Option key={column} value={column}>
-                        {t(`data_explorer.column_header`, { column })}
+                        {column
+                          .replace(/_/g, ' ')
+                          .replace(/\b\w/g, l => l.toUpperCase())}
                       </Option>
                     ))}
                 </Select>
@@ -2544,12 +1938,9 @@ const GridControls = () => {
                     displayData.length > 0 &&
                     getNumericColumns(displayData).map(column => (
                       <Option key={column} value={column}>
-                        {column}
-                        {calculatedColumns.some(
-                          calc => calc.name === column,
-                        ) && (
-                          <span className="grid-controls-icon-purple">ƒ</span>
-                        )}
+                        {column
+                          .replace(/_/g, ' ')
+                          .replace(/\b\w/g, l => l.toUpperCase())}
                       </Option>
                     ))}
                 </Select>

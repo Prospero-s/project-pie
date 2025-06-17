@@ -3,5 +3,7 @@
   "ok": "OK",
   "understood": "Compris",
   "cancel": "Annuler",
-  "validate": "Valider"
+  "validate": "Valider",
+  "close": "Fermer",
+  "loading": "Chargement..."
 }

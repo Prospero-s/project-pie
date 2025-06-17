@@ -44,10 +44,11 @@ const CustomChartComponent = ({ chartId }) => {
   const chartInfo = customCharts[id][chartId];
   const { data, type, columnsMetadata = {}, xAxisKey, yAxisKeys } = chartInfo;
 
-  // Utiliser les axes transmis s'ils existent, sinon déterminer dynamiquement
-  const yAxes =
-    yAxisKeys ||
-    (data.length > 0 ? Object.keys(data[0]).filter(key => key !== xAxisKey) : []);
+  // Déterminer automatiquement les clés de données si pas spécifiées
+  const dataKeys =
+    yAxisKeys.length > 0
+      ? yAxisKeys
+      : Object.keys(data[0]).filter(key => key !== xAxisKey);
 
   // Formateur pour les tooltips
   const tooltipFormatter = (value, name) => {
@@ -101,7 +102,7 @@ const CustomChartComponent = ({ chartId }) => {
               />
               <Tooltip formatter={tooltipFormatter} />
               <Legend />
-              {yAxes.map((key, index) => (
+              {dataKeys.map((key, index) => (
                 <Bar
                   key={key}
                   dataKey={key}
@@ -135,7 +136,7 @@ const CustomChartComponent = ({ chartId }) => {
               <YAxis />
               <Tooltip formatter={tooltipFormatter} />
               <Legend />
-              {yAxes.map((key, index) => (
+              {dataKeys.map((key, index) => (
                 <Line
                   key={key}
                   type="monotone"
@@ -171,7 +172,7 @@ const CustomChartComponent = ({ chartId }) => {
               <YAxis />
               <Tooltip formatter={tooltipFormatter} />
               <Legend />
-              {yAxes.map((key, index) => (
+              {dataKeys.map((key, index) => (
                 <Area
                   key={key}
                   type="monotone"
@@ -198,7 +199,7 @@ const CustomChartComponent = ({ chartId }) => {
 
       case 'pie':
         // Pour un camembert, nous utilisons la première colonne Y sélectionnée
-        if (yAxes.length > 0) {
+        if (dataKeys.length > 0) {
           return (
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -209,7 +210,7 @@ const CustomChartComponent = ({ chartId }) => {
                   labelLine={true}
                   outerRadius={80}
                   fill="#8884d8"
-                  dataKey={yAxes[0]}
+                  dataKey={dataKeys[0]}
                   nameKey="name"
                   label={entry => entry.name}
                 >
@@ -235,7 +236,7 @@ const CustomChartComponent = ({ chartId }) => {
               <PolarGrid />
               <PolarAngleAxis dataKey="name" />
               <Tooltip formatter={tooltipFormatter} />
-              {yAxes.map((key, index) => (
+              {dataKeys.map((key, index) => (
                 <Radar
                   key={key}
                   name={key}
