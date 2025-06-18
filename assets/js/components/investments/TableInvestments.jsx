@@ -13,6 +13,7 @@ import NoResultsState from '@/components/investments/table/NoResultsState';
 import UploadPopup from '@/components/common/upload/UploadPopup';
 import { formatDate, getDateLocale } from '@/lib/utils';
 import { fundingTypeTranslation } from '@/services/graphe/grapheService';
+import { getFundingTypeColor, getSectorTypeColor } from '@/lib/colors';
 
 const TableInvestments = ({
   i18n,
@@ -158,50 +159,6 @@ const TableInvestments = ({
       sortField: 'updatedAt',
       sortOrder: 'desc',
     });
-  };
-
-  const getFundingTypeColor = type => {
-    switch (type) {
-      case 'seed':
-        return 'green';
-      case 'serieA':
-        return 'blue';
-      case 'serieB':
-        return 'purple';
-      case 'serieC':
-        return 'magenta';
-      case 'growth':
-        return 'cyan';
-      case 'ipo':
-        return 'gold';
-      case 'debt':
-        return 'orange';
-      case 'grant':
-        return 'lime';
-      default:
-        return 'default';
-    }
-  };
-
-  const getSectorTypeColor = type => {
-    switch (type) {
-      case 'technology':
-        return 'geekblue';
-      case 'healthcare':
-        return 'volcano';
-      case 'finance':
-        return 'gold';
-      case 'retail':
-        return 'magenta';
-      case 'manufacturing':
-        return 'purple';
-      case 'energy':
-        return 'lime';
-      case 'education':
-        return 'cyan';
-      default:
-        return 'default';
-    }
   };
 
   const columns = [

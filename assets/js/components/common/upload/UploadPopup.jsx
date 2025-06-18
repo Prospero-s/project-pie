@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Modal,
@@ -19,6 +19,7 @@ import {
   CloseCircleOutlined,
   InfoCircleOutlined,
   LoadingOutlined,
+  FileSearchOutlined,
 } from '@ant-design/icons';
 import axios from 'axios';
 import { Auth } from 'aws-amplify';
@@ -44,6 +45,26 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
   const [selectedYear, setSelectedYear] = useState(null);
   const { setAnalyzedData } = useUser();
   const navigate = useNavigate();
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+  const [isVisible, setIsVisible] = useState(true);
+
+  const messages = [
+    t('upload.processing.title'), // "Traitement en cours..."
+    t('upload.processing.analyzing'), // "Analyse du document..."
+    t('upload.processing.extracting'), // "Extraction des données..."
+    t('upload.processing.finalizing'), // "Finalisation..."
+    t('upload.processing.validating'), // "Validation des données..."
+    t('upload.processing.processing'), // "Traitement des informations..."
+    t('upload.processing.organizing'), // "Organisation des données..."
+    t('upload.processing.preparing'), // "Préparation du rapport..."
+    t('upload.processing.uploading'), // "Téléchargement en cours..."
+    t('upload.processing.scanning'), // "Scan du document..."
+    t('upload.processing.parsing'), // "Analyse du contenu..."
+    t('upload.processing.structuring'), // "Structuration des données..."
+    t('upload.processing.verifying'), // "Vérification des informations..."
+    t('upload.processing.optimizing'), // "Optimisation..."
+    t('upload.processing.completing'), // "Finalisation en cours..."
+  ];
 
   // Mapping des KPI options avec leurs descriptions et tooltips
   const kpiOptions = [
@@ -338,11 +359,15 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
             color: '#202226',
             display: 'block',
             marginBottom: '12px',
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'translateY(0)' : 'translateY(10px)',
+            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
         >
-          {t('documents:upload.processing.title')}
+          {messages[currentMessageIndex]}
         </Text>
         <Text
+          className="font-degarism "
           style={{
             fontSize: '14px',
             color: '#666',
@@ -354,6 +379,7 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
           {t('documents:upload.processing.message')}
         </Text>
         <Text
+          className="font-degarism "
           style={{
             fontSize: '12px',
             color: '#999',
@@ -365,6 +391,19 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
       </div>
     </div>
   );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsVisible(false);
+
+      setTimeout(() => {
+        setCurrentMessageIndex(prevIndex => (prevIndex + 1) % messages.length);
+        setIsVisible(true);
+      }, 300); // Délai pour l'animation de fade
+    }, 3000); // Change toutes les 3 secondes
+
+    return () => clearInterval(interval);
+  }, [messages.length]);
 
   return (
     <Modal
@@ -513,6 +552,7 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
           </div>
 
           <Button
+            icon={<FileSearchOutlined />}
             type="primary"
             onClick={handleUpload}
             block

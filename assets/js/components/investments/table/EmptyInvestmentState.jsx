@@ -14,8 +14,7 @@ const EmptyInvestmentState = ({ t, onAddClick }) => {
       <p className="font-degarism text-gray-600 mb-4">
         {t('no_investments.description')}
       </p>
-      <Button type="primary" onClick={onAddClick}>
-        <FileOutlined />
+      <Button icon={<FileOutlined />} type="primary" onClick={onAddClick}>
         {t('common.add')}
       </Button>
     </div>

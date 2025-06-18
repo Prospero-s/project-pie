@@ -5,7 +5,7 @@ import logoProspero from '@img/logo/logo-icon-prospero-blue.svg';
 import { useUser } from '@/context/userContext';
 import FooterLayout from '@/components/common/layout/Footer';
 
-const AuthLayout = ({ i18n }) => {
+const AuthLayout = ({ children, i18n }) => {
   const { user, loading } = useUser();
 
   if (loading) {
@@ -28,9 +28,7 @@ const AuthLayout = ({ i18n }) => {
           </div>
         </div>
         <div className="flex-1 flex flex-col justify-center px-8 lg:px-12">
-          <div className="max-w-sm w-full mx-auto">
-            daidzaidhaziudhiuazduihiudzhiauhdiuhiudazh
-          </div>
+          <div className="max-w-sm w-full mx-auto">{children}</div>
         </div>
         <FooterLayout i18n={i18n} isDashboard={false} />
       </div>

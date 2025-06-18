@@ -27,12 +27,18 @@ const Investments = ({ i18n }) => {
 
         {!isTableEmpty && (
           <div className="flex gap-2 ml-auto">
-            <Button type="primary" onClick={() => setIsModalOpen(true)}>
-              <FileOutlined />
+            <Button
+              icon={<FileOutlined />}
+              type="primary"
+              onClick={() => setIsModalOpen(true)}
+            >
               {t('common.add')}
             </Button>
-            <Button type="default" onClick={() => null}>
-              <DownloadOutlined />
+            <Button
+              icon={<DownloadOutlined />}
+              type="default"
+              onClick={() => null}
+            >
               {t('common.exportXSLX')}
             </Button>
           </div>

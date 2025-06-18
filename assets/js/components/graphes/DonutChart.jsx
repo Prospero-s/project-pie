@@ -7,14 +7,9 @@ import {
   ResponsiveContainer,
   Label,
 } from 'recharts';
+import { DONUT_CHART_COLORS } from '@/lib/colors';
 
-const COLORS = [
-  '#297CF7', // Bleu
-  '#12B76A', // Vert
-  '#9f1239', // Rouge
-  '#FF8042', // Orange
-  '#1d4ed8', // Violet
-];
+const COLORS = DONUT_CHART_COLORS;
 
 const DonutChartComponent = ({
   data,
