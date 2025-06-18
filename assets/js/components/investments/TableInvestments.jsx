@@ -163,6 +163,21 @@ const TableInvestments = ({
 
   const columns = [
     {
+      title: '#',
+      dataIndex: 'index',
+      key: 'index',
+      render: (_, record, index) =>
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : (
+          <div className="flex items-center gap-4">
+            <span>
+              {(pagination.current - 1) * pagination.pageSize + index + 1}
+            </span>
+          </div>
+        ),
+    },
+    {
       title: t('company_details.company.name'),
       dataIndex: 'denomination',
       key: 'denomination',
@@ -370,6 +385,7 @@ const TableInvestments = ({
         ) : (
           <div className="overflow-x-auto">
             <Table
+              rowKey={(record, index) => index}
               columns={columns}
               dataSource={investments}
               onChange={handleTableChange}

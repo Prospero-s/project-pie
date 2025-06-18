@@ -99,8 +99,9 @@ class CompanyController extends AbstractController
             $companies = $this->companyRepository->findAll();
 
             $data = [];
-            foreach ($companies as $company) {
+            foreach ($companies as $key => $company) {
                 $data[] = [
+                    'index' => $key + 1,
                     'id' => $company->getId(),
                     'name' => $company->getDenomination(),
                     'sector' => $company->getSector(),

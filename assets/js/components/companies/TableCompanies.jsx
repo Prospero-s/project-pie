@@ -58,6 +58,21 @@ const TableCompanies = ({ i18n }) => {
 
   const columns = [
     {
+      title: '#',
+      dataIndex: 'index',
+      key: 'index',
+      sorter: (a, b) => a.index.localeCompare(b.index),
+      sortDirections: ['ascend', 'descend'],
+      render: index =>
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : (
+          <div className="flex items-center gap-4">
+            <span>{index}</span>
+          </div>
+        ),
+    },
+    {
       title: t('company.name'),
       dataIndex: 'name',
       key: 'name',
