@@ -96,7 +96,7 @@ class DocumentController extends AbstractController
                 $documents,
                 Response::HTTP_OK,
                 [],
-                ['groups' => 'document_list']
+                ['groups' => ['document_list']]
             );
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -148,8 +148,8 @@ class DocumentController extends AbstractController
         }
     }
     
-    #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
-    public function delete(string $id, Request $request): Response
+    #[Route('/{id}', name: 'delete_document', methods: ['DELETE'])]
+    public function deleteDocument(string $id, Request $request, EntityManagerInterface $em): Response
     {
         $cognitoId = $request->headers->get('X-Cognito-Id');
         
@@ -166,7 +166,7 @@ class DocumentController extends AbstractController
             }
             
             $userGroup = $user->getUserGroup();
-            
+
             if (!$userGroup) {
                 return $this->json(['error' => 'User group not found'], Response::HTTP_NOT_FOUND);
             }
@@ -182,16 +182,10 @@ class DocumentController extends AbstractController
                 return $this->json(['error' => 'Access denied'], Response::HTTP_FORBIDDEN);
             }
             
-            // Supprimer les KPIs associés
-            $kpis = $this->kpiRepository->findByDocument($document);
-            foreach ($kpis as $kpi) {
-                $this->entityManager->remove($kpi);
-            }
-            
             // Supprimer le document
-            $this->entityManager->remove($document);
-            $this->entityManager->flush();
-            
+            $em->remove($document);
+            $em->flush();
+
             return $this->json(['message' => 'Document deleted successfully'], Response::HTTP_OK);
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -353,6 +347,7 @@ class DocumentController extends AbstractController
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
 
     /**
      * Extrait la valeur numérique d'une chaîne

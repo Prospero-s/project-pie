@@ -103,3 +103,22 @@ export const fetchGlobalSectorInvestments = async () => {
     );
   }
 };
+
+export const deleteInvestment = async (id) => {
+  try {
+    const session = await Auth.currentSession();
+    const cognitoId = session.getIdToken().payload.sub;
+
+    const response = await axios.delete(`/api/investments/${id}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Cognito-Id': cognitoId,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      `Erreur: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`,
+    );
+  }
+};

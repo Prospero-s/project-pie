@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 #[Route('/api', name: 'api_')]
 class CompanyInvestmentController extends AbstractController
@@ -265,6 +266,38 @@ class CompanyInvestmentController extends AbstractController
             return new JsonResponse([
                 'error' => $e->getMessage(),
                 'details' => 'Une erreur est survenue lors de l\'exécution de la requête'
+            ], 400);
+        }
+    }
+
+    #[Route('/investments/{id}', methods: ['DELETE'])]
+    public function deleteInvestment(Request $request, int $id, EntityManagerInterface $em): JsonResponse
+    {
+        try {
+            $cognitoId = $request->headers->get('x-cognito-id');
+            $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
+            if (!$cognitoId || !$user) {
+                throw new \Exception('Utilisateur non authentifié ou non trouvé');
+            }
+
+            $investment = $this->companyInvestmentRepository->find($id);
+            if (!$investment) {
+                return new JsonResponse([
+                    'error' => 'Investissement non trouvé',
+                    'details' => 'Aucun investissement trouvé avec cet identifiant'
+                ], 404);
+            }
+
+            $em->remove($investment);
+            $em->flush();
+
+            return new JsonResponse([
+                'message' => 'Investissement supprimé avec succès'
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'error' => $e->getMessage(),
+                'details' => 'Une erreur est survenue lors de la suppression de l\'investissement'
             ], 400);
         }
     }

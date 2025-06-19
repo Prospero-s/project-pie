@@ -3,7 +3,7 @@ import { Skeleton, Table, message, Tag, Spin, Tooltip } from 'antd';
 import { FileAddOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { fetchInvestments } from '@/services/investment/investmentService';
+import { fetchInvestments, deleteInvestment } from '@/services/investment/investmentService';
 import AddCompanyModal from '@/components/investments/AddCompanyModal';
 import EmptyInvestmentState from '@/components/investments/table/EmptyInvestmentState';
 import NoResultsState from '@/components/investments/table/NoResultsState';
@@ -315,8 +315,24 @@ const TableInvestments = ({
     },
   ];
 
-  const handleDelete = id => {
-    console.error("Suppression de la startup avec l'ID:", id);
+  const handleDelete = async id => {
+    try {
+      await deleteInvestment(id);
+      message.success(t('common.success_delete'));
+      await loadInvestments({
+        page: pagination.current,
+        limit: pagination.pageSize,
+        sortField: sortedInfo.columnKey || 'updatedAt',
+        sortOrder: sortedInfo.order
+          ? sortedInfo.order === 'ascend'
+            ? 'asc'
+            : 'desc'
+          : 'desc',
+        ...activeFilters,
+      });
+    } catch (error) {
+      message.error(t('common.error_delete'));
+    }
   };
 
   const handleAdd = async () => {

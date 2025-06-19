@@ -34,7 +34,7 @@ const TableDocuments = ({ t, lng = 'en' }) => {
     try {
       await deleteDocument(id);
       message.success(t('messages.delete_success'));
-      setDocuments(prevDocuments => prevDocuments.filter(doc => doc.id !== id));
+      loadDocuments();
     } catch (error) {
       message.error(`${t('messages.delete_error')}: ${error.message || error}`);
     }
