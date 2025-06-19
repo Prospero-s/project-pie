@@ -152,6 +152,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                             path="documents"
                             element={<Documents i18n={i18n} />}
                           />
+                          <Route
+                            path="documents/edit/:id"
+                            element={<ExtractResult i18n={i18n} />}
+                          />
                         </Routes>
                       </AppLayout>
                     </ProtectedRoute>

@@ -9,7 +9,7 @@ const Documents = ({ i18n }) => {
   return (
     <div className="flex flex-col gap-4">
       <Breadcrumb pageName={t('title')} />
-      <TableDocuments t={t} lng={i18n.language} />
+      <TableDocuments t={t} i18n={i18n} />
     </div>
   );
 };

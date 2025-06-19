@@ -24,6 +24,8 @@
     "company": "Company name",
     "last_update": "Last update",
     "actions": "Actions",
+    "unknown_filename": "Unknown filename",
+    "unknown_company": "Unknown company",
     "statuses": {
       "draft": "Draft",
       "processed": "Processed",
@@ -195,5 +197,15 @@
     "file_removed": "File removed",
     "success": "Document analyzed successfully"
   },
-  "validate_document": "Validate document"
+  "validate_document": "Validate document",
+  "document_details": {
+    "title": "Document details",
+    "general_info": "General information",
+    "edit_document": "Edit document",
+    "view_pdf": "View PDF",
+    "status_updated": "Status updated successfully",
+    "status_update_error": "Error updating status",
+    "no_document": "No document found",
+    "add_date": "Date added"
+  }
 }

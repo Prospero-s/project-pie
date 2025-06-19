@@ -24,6 +24,8 @@
     "company": "Nom de l'entreprise",
     "last_update": "Dernière mise à jour",
     "actions": "Actions",
+    "unknown_filename": "Nom de fichier inconnu",
+    "unknown_company": "Entreprise inconnue",
     "statuses": {
       "draft": "Brouillon",
       "processed": "Traité",
@@ -195,5 +197,15 @@
     "file_removed": "Fichier supprimé",
     "success": "Document analysé avec succès"
   },
-  "validate_document": "Valider le document"
+  "validate_document": "Valider le document",
+  "document_details": {
+    "title": "Détails du document",
+    "general_info": "Informations générales",
+    "edit_document": "Modifier le document",
+    "view_pdf": "Voir le PDF",
+    "status_updated": "Statut mis à jour avec succès",
+    "status_update_error": "Erreur lors de la mise à jour du statut",
+    "no_document": "Aucun document trouvé",
+    "add_date": "Date d'ajout"
+  }
 }
