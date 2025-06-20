@@ -297,4 +297,35 @@ class CompanyInvestmentController extends AbstractController
             ], 400);
         }
     }
+
+    #[Route('/dashboard/stats', name: 'get_dashboard_stats', methods: ['GET'])]
+    public function stats(
+        Request $request,
+        CompanyInvestmentRepository $CompanyInvestmentRepository,
+    ): JsonResponse {
+        try {
+            $cognitoId = $request->headers->get('x-cognito-id');
+            $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
+            if (!$cognitoId || !$user) {
+                throw new \Exception('Utilisateur non authentifié ou non trouvé');
+            }
+
+            $totalInvestments = $CompanyInvestmentRepository->getTotalInvestmentsByGroup($user->getUserGroup()); // ex: 123.45 (en M€)
+            $companiesCount = $CompanyInvestmentRepository->countInvestedCompaniesByGroup($user->getUserGroup());
+            $averageInvestment = $CompanyInvestmentRepository->getAverageInvestmentByGroup($user->getUserGroup()); // ex: 10.29 (en K€)
+            $growthRate = $CompanyInvestmentRepository->getGrowthRateByGroup($user->getUserGroup()); // ex: 8.2
+            
+            return new JsonResponse([
+                'totalInvestments' => $totalInvestments,
+                'companiesCount' => $companiesCount,
+                'averageInvestment' => $averageInvestment,
+                'growthRate' => $growthRate,
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'error' => $e->getMessage(),
+                'details' => 'Une erreur est survenue lors de la récupération des investissements globaux'
+            ], 400);
+        }
+    }
 }

@@ -1,4 +1,10 @@
 {
   "message_start": "Welcome back",
-  "message_description": "Track, manage and forecast your investments and manage your companies."
+  "message_description": "Track, manage and forecast your investments and manage your companies.",
+  "stats": {
+    "total_investments": "Total investments",
+    "companies_count": "Number of companies",
+    "avg_investment": "Average investment",
+    "growth_rate": "Growth rate"
+  }
 }

@@ -71,7 +71,9 @@ const DropdownUser = ({ i18n, user }) => {
             <span className="block font-medium">
               {user?.user_metadata?.full_name}
             </span>
-            <span className="block text-sm lg:text-base">{user?.email}</span>
+            <span className="font-degarism block text-sm lg:text-base">
+              {user?.email}
+            </span>
           </div>
           <Avatar
             size="large"

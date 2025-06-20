@@ -383,26 +383,25 @@ const TableInvestments = ({
             onAddClick={onAddClick || (() => setIsModalOpen(true))}
           />
         ) : (
-          <div className="overflow-x-auto">
-            <Table
-              rowKey={(record, index) => index}
-              columns={columns}
-              dataSource={investments}
-              onChange={handleTableChange}
-              pagination={pagination}
-              sortDirections={['ascend', 'descend']}
-              rowClassName={(record, index) =>
-                index % 2 === 0
-                  ? '!bg-white hover:!bg-blue-50'
-                  : '!bg-slate-50 hover:!bg-blue-50'
-              }
-              locale={{
-                filterConfirm: t('common.confirm'),
-                filterReset: t('common.reset'),
-                emptyText: <NoResultsState t={t} onReset={handleReset} />,
-              }}
-            />
-          </div>
+          <Table
+            rowKey={(record, index) => index}
+            columns={columns}
+            dataSource={investments}
+            onChange={handleTableChange}
+            pagination={pagination}
+            sortDirections={['ascend', 'descend']}
+            scroll={{ x: 'max-content' }}
+            rowClassName={(record, index) =>
+              index % 2 === 0
+                ? '!bg-white hover:!bg-blue-50'
+                : '!bg-slate-50 hover:!bg-blue-50'
+            }
+            locale={{
+              filterConfirm: t('common.confirm'),
+              filterReset: t('common.reset'),
+              emptyText: <NoResultsState t={t} onReset={handleReset} />,
+            }}
+          />
         )}
       </div>
     </>

@@ -1,4 +1,10 @@
 {
   "message_start": "Content de te revoir",
-  "message_description": "Suivez, gérez et prévoyez vos investissements et gérez vos entreprises."
+  "message_description": "Suivez, gérez et prévoyez vos investissements et gérez vos entreprises.",
+  "stats": {
+    "total_investments": "Investissements totaux",
+    "companies_count": "Nombre d'entreprises",
+    "avg_investment": "Investissement moyen",
+    "growth_rate": "Taux de croissance"
+  }
 }

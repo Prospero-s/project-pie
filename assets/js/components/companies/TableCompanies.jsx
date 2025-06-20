@@ -9,9 +9,11 @@ const TableCompanies = ({ i18n }) => {
   const { t } = useTranslation('allCompanies', { i18n });
   const [loading, setLoading] = useState(true);
   const [companies, setCompanies] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalItems] = useState(0);
-  const [pageSize] = useState(10);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 500);
@@ -61,14 +63,14 @@ const TableCompanies = ({ i18n }) => {
       title: '#',
       dataIndex: 'index',
       key: 'index',
-      sorter: (a, b) => a.index.localeCompare(b.index),
-      sortDirections: ['ascend', 'descend'],
-      render: index =>
+      render: (_, record, index) =>
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : (
           <div className="flex items-center gap-4">
-            <span>{index}</span>
+            <span>
+              {(pagination.current - 1) * pagination.pageSize + index + 1}
+            </span>
           </div>
         ),
     },
@@ -164,18 +166,21 @@ const TableCompanies = ({ i18n }) => {
       <div className="bg-white rounded-lg border border-slate-300 flex flex-col w-full">
         <div className="overflow-x-auto">
           <Table
+            rowKey={(record, index) => index}
             columns={columns}
             dataSource={loading ? Array(5).fill({}) : companies}
             pagination={{
-              current: currentPage,
-              total: totalItems,
-              pageSize: pageSize,
-              onChange: page => setCurrentPage(page), // Met à jour la page courante
+              current: pagination.current,
+              total: pagination.total,
+              pageSize: pagination.pageSize,
+              onChange: page => setPagination({ ...pagination, current: page }),
             }}
+            sortDirections={['ascend', 'descend']}
             rowClassName={(record, index) =>
-              index % 2 === 0 ? '!bg-white' : '!bg-slate-50'
+              index % 2 === 0
+                ? '!bg-white hover:!bg-blue-50'
+                : '!bg-slate-50 hover:!bg-blue-50'
             }
-            size="middle"
           />
         </div>
       </div>
