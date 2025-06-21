@@ -241,7 +241,7 @@ class CompanyRepository extends ServiceEntityRepository
                     'updatedAt' => $result['last_investment_date'] ?
                         (new \DateTime($result['last_investment_date']))->format('Y-m-d H:i:s') : null,
                     'investment' => [
-                        'id' => $latestInvestment['id'], 
+                        'id' => $latestInvestment['id'],
                         'totalAmount' => (int)$result['group_total_amount'],
                         'fundingTypes' => array_column($fundingTypes, 'fundingType')
                     ]

@@ -174,7 +174,7 @@ class CompanyInvestmentController extends AbstractController
         try {
             // Récupérer l'ID Cognito depuis les headers
             $cognitoId = $request->headers->get('x-cognito-id');
-            
+
             // Log pour le débogage
             if (!$cognitoId) {
                 return new JsonResponse([
@@ -182,7 +182,7 @@ class CompanyInvestmentController extends AbstractController
                     'details' => 'L\'en-tête x-cognito-id est manquant ou vide'
                 ], 401);
             }
-            
+
             // Chercher l'utilisateur par son ID Cognito
             $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
             if (!$user) {
@@ -214,7 +214,7 @@ class CompanyInvestmentController extends AbstractController
         try {
             // Récupérer l'ID Cognito depuis les headers
             $cognitoId = $request->headers->get('x-cognito-id');
-            
+
             // Log pour le débogage
             if (!$cognitoId) {
                 return new JsonResponse([
@@ -222,7 +222,7 @@ class CompanyInvestmentController extends AbstractController
                     'details' => 'L\'en-tête x-cognito-id est manquant ou vide'
                 ], 401);
             }
-            
+
             // Chercher l'utilisateur par son ID Cognito
             $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
             if (!$user) {
@@ -233,14 +233,14 @@ class CompanyInvestmentController extends AbstractController
             }
 
             $data = json_decode($request->getContent(), true);
-            
+
             if (!isset($data['queryId'])) {
                 return new JsonResponse([
                     'error' => 'Identifiant de requête manquant',
                     'details' => 'Le paramètre queryId est requis'
                 ], 400);
             }
-            
+
             if (!isset($data['companyId'])) {
                 return new JsonResponse([
                     'error' => 'Identifiant d\'entreprise manquant',
@@ -279,7 +279,7 @@ class CompanyInvestmentController extends AbstractController
             }
 
             $deleted = $this->companyInvestmentRepository->deleteInvestmentById($id);
-            
+
             if (!$deleted) {
                 return new JsonResponse([
                     'error' => 'Investissement non trouvé',

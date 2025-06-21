@@ -33,7 +33,7 @@ class NotificationController extends AbstractController
     {
         $cognitoId = $request->headers->get('x-cognito-id');
         $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
-        
+
         if (!$cognitoId || !$user) {
             throw new \Exception('Utilisateur non authentifié');
         }
@@ -85,9 +85,9 @@ class NotificationController extends AbstractController
         if (!$cognitoId || !$user) {
             throw new \Exception('Utilisateur non authentifié');
         }
-        
+
         $data = json_decode($request->getContent(), true);
-        
+
         $title = $data['title'];
         $message = $data['message'];
         $type = $data['type'];
@@ -96,7 +96,7 @@ class NotificationController extends AbstractController
         if (!$to) {
             throw new \Exception('Utilisateur non existant');
         }
-        
+
         if (!in_array($type, array_column(NotificationType::cases(), 'value'))) {
             throw new \Exception('Type de notification non supporté');
         }

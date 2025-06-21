@@ -134,4 +134,4 @@ class VerificationCode
 
         return $this;
     }
-} 
+}

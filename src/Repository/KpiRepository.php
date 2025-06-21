@@ -133,4 +133,4 @@ class KpiRepository extends ServiceEntityRepository
 
         return array_map(fn($item) => $item['year'], $result);
     }
-} 
+}

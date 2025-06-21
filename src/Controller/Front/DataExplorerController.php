@@ -16,7 +16,7 @@ class DataExplorerController extends AbstractController
     private UserRepository $userRepository;
     private CompanyRepository $companyRepository;
     private CompanyInvestmentRepository $companyInvestmentRepository;
-    
+
     public function __construct(
         UserRepository $userRepository,
         CompanyRepository $companyRepository,
@@ -42,34 +42,34 @@ class DataExplorerController extends AbstractController
                 'details' => 'L\'entreprise demandée n\'existe pas'
             ], 404);
         }
-        
+
         // Récupérer n'importe quel utilisateur du groupe pour la démo (en dev uniquement)
         // En production, il faudrait utiliser l'authentification réelle
         $userFromDb = $this->userRepository->findOneBy([], ['id' => 'ASC']);
-        
+
         if (!$userFromDb || !$userFromDb->getUserGroup()) {
             return $this->json([
                 'error' => 'Aucun utilisateur disponible',
                 'details' => 'Aucun utilisateur trouvé dans la base de données'
             ], 404);
         }
-        
+
         $userGroup = $userFromDb->getUserGroup();
-        
+
         // Exécuter la requête spécifiée
         $data = $this->companyInvestmentRepository->executeQueryById(
-            $queryName, 
-            $companyId, 
+            $queryName,
+            $companyId,
             $userGroup
         );
-        
+
         // Retourner les données au format JSON
         if ($request->headers->get('Accept') === 'application/json' || $request->query->get('format') === 'json') {
             return $this->json([
                 'results' => $data
             ]);
         }
-        
+
         // Rendu de la vue Twig avec les données
         return $this->render('explorer/data.html.twig', [
             'data' => $data,
@@ -77,7 +77,7 @@ class DataExplorerController extends AbstractController
             'company' => $company
         ]);
     }
-    
+
     /**
      * Liste des requêtes prédéfinies disponibles
      */
@@ -86,17 +86,17 @@ class DataExplorerController extends AbstractController
     {
         // Récupérer la liste des requêtes prédéfinies
         $queries = $this->companyInvestmentRepository->getPredefinedQueries();
-        
+
         // Retourner les données au format JSON
         if ($request->headers->get('Accept') === 'application/json' || $request->query->get('format') === 'json') {
             return $this->json([
                 'queries' => $queries
             ]);
         }
-        
+
         // Rendu de la vue Twig avec les requêtes
         return $this->render('explorer/queries.html.twig', [
             'queries' => $queries
         ]);
     }
-} 
+}
