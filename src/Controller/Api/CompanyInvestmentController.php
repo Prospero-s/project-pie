@@ -310,11 +310,19 @@ class CompanyInvestmentController extends AbstractController
                 throw new \Exception('Utilisateur non authentifié ou non trouvé');
             }
 
-            $totalInvestments = $CompanyInvestmentRepository->getTotalInvestmentsByGroup($user->getUserGroup()); // ex: 123.45 (en M€)
-            $companiesCount = $CompanyInvestmentRepository->countInvestedCompaniesByGroup($user->getUserGroup());
-            $averageInvestment = $CompanyInvestmentRepository->getAverageInvestmentByGroup($user->getUserGroup()); // ex: 10.29 (en K€)
-            $growthRate = $CompanyInvestmentRepository->getGrowthRateByGroup($user->getUserGroup()); // ex: 8.2
-            
+            $totalInvestments = $CompanyInvestmentRepository->getTotalInvestmentsByGroup(
+                $user->getUserGroup()
+            ); // ex: 123.45 (en M€)
+            $companiesCount = $CompanyInvestmentRepository->countInvestedCompaniesByGroup(
+                $user->getUserGroup()
+            );
+            $averageInvestment = $CompanyInvestmentRepository->getAverageInvestmentByGroup(
+                $user->getUserGroup()
+            ); // ex: 10.29 (en K€)
+            $growthRate = $CompanyInvestmentRepository->getGrowthRateByGroup(
+                $user->getUserGroup()
+            ); // ex: 8.2
+
             return new JsonResponse([
                 'totalInvestments' => $totalInvestments,
                 'companiesCount' => $companiesCount,

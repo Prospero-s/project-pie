@@ -8,15 +8,15 @@ export function cn(...inputs) {
 // Utility function for locale-aware date formatting
 export function formatDate(date, locale = 'en-US', options = {}) {
   if (!date) return '-';
-  
+
   const defaultOptions = {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   };
-  
+
   const finalOptions = { ...defaultOptions, ...options };
-  
+
   try {
     return new Date(date).toLocaleDateString(locale, finalOptions);
   } catch (error) {

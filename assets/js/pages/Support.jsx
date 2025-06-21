@@ -1,10 +1,8 @@
 import React from 'react';
 import Breadcrumb from '@/components/common/breadcrumb/Breadcrumb';
 import { Button, Form, Input } from 'antd';
-import { useTranslation } from 'react-i18next';
 
-const Support = ({ i18n }) => {
-  const { t } = useTranslation('documents', { i18n });
+const Support = () => {
   const { TextArea } = Input;
 
   const onFinish = values => {

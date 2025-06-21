@@ -8,7 +8,7 @@ const DropdownNotification = ({ i18n, user }) => {
   const { t } = useTranslation('menu', { i18n });
   const [isMobile] = useState(window.innerWidth < 640);
   const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [setLoading] = useState(true);
   const [countNotifications, setCountNotifications] = useState(null);
 
   useEffect(() => {

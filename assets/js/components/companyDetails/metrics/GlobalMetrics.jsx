@@ -29,33 +29,6 @@ const chartContainerStyle = {
 };
 
 // Style CSS pour la classe qui définit la hauteur
-const chartContainerClass = `
-  .chart-container {
-    width: 100%;
-    height: 100%;
-    position: relative;
-  }
-  
-  .chart-close-btn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    z-index: 10;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.8);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  
-  .chart-close-btn:hover {
-    background-color: rgba(255, 0, 0, 0.1);
-  }
-`;
 
 const GlobalMetrics = () => {
   const dispatch = useDispatch();
