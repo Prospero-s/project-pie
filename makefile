@@ -155,6 +155,18 @@ lint-phpcs-fix: ## Corrige automatiquement les erreurs PHP Code Sniffer
 phpstan: ## Lance PHPStan
 	$(COMPOSER) phpstan
 
+.PHONY: test
+test: ## Exécuter les tests PHPUnit avec testdox et couverture de code
+	$(PHPUNIT) --testdox --coverage-text
+
+.PHONY: test-file
+test-file: ## Exécuter un test spécifique (usage: make test-file FILE=tests/Controllers/CompanyInvestmentControllerTest.php)
+	$(PHPUNIT) --testdox $(FILE)
+
+.PHONY: test-filter
+test-filter: ## Exécuter des tests avec un filtre (usage: make test-filter FILTER=CompanyInvestmentController)
+	$(PHPUNIT) --filter $(FILTER) --testdox
+
 .PHONY: run-tests
 run-tests: ## Lance tous les tests et vérifications de qualité de code
 	@echo "🔍 Lancement des vérifications de qualité de code..."

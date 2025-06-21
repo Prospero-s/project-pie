@@ -5,6 +5,7 @@ namespace App\Tests\Unit\Controller\Api;
 use App\Controller\Api\CompanyController;
 use App\Service\Company\CompanyServiceInterface;
 use App\Repository\CompanyRepository;
+use App\Repository\KpiRepository;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,19 +16,23 @@ class CompanyControllerTest extends TestCase
     private CompanyController $controller;
     private CompanyServiceInterface $companyService;
     private CompanyRepository $companyRepository;
+    private KpiRepository $kpiRepository;
     private LoggerInterface $logger;
 
     protected function setUp(): void
     {
         // Créer les mocks
-        $this->companyService = $this->createMock(CompanyServiceInterface::class);
+        $this->companyService = $this->getMockBuilder(CompanyServiceInterface::class)
+            ->getMock();
         $this->companyRepository = $this->createMock(CompanyRepository::class);
+        $this->kpiRepository = $this->createMock(KpiRepository::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         // Créer l'instance du contrôleur
         $this->controller = new CompanyController(
             $this->companyService,
             $this->companyRepository,
+            $this->kpiRepository,
             $this->logger
         );
     }
