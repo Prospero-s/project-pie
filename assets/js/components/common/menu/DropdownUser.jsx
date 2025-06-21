@@ -79,7 +79,7 @@ const DropdownUser = ({ i18n, user }) => {
             size="large"
             icon={!user?.user_metadata?.avatar_url && <UserOutlined />}
             src={user?.user_metadata?.avatar_url}
-            className="flex-shrink-0 w-12 h-12 lg:w-14 lg:h-14"
+            className="flex-shrink-0 w-12 h-12 lg:w-12 lg:h-12"
           />
         </div>
       </Dropdown>
