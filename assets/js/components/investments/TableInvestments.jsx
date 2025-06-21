@@ -307,7 +307,7 @@ const TableInvestments = ({
             <Tooltip title="Supprimer">
               <DeleteOutlined
                 className="!text-rose-500 hover:!text-rose-700 text-lg cursor-pointer"
-                onClick={() => handleDelete(record.id)}
+                onClick={() => handleDelete(record.investment.id)}
               />
             </Tooltip>
           </div>
