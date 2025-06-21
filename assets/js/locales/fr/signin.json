@@ -29,7 +29,7 @@
   "resend_error_message": "Une erreur s'est produite lors du renvoi de l'email de vérification. Veuillez réessayer plus tard.",
   "resend_verification_email": "Renvoyer l'email de vérification",
   "close": "Fermer",
-  "forgot_password_text": "Mot de passe oublié?",
+  "forgot_password_text": "Mot de passe oublié ?",
   "forgot_password": {
     "title": "Réinitialiser le mot de passe",
     "email": "Email",

@@ -21,6 +21,15 @@ import 'react-resizable/css/styles.css';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
+// Style pour les conteneurs de graphiques
+const chartContainerStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+};
+
+// Style CSS pour la classe qui définit la hauteur
+
 const GlobalMetrics = () => {
   const dispatch = useDispatch();
   const { id } = useParams(); // Get the company ID from URL
@@ -99,24 +108,28 @@ const GlobalMetrics = () => {
       >
         <div
           key="radar"
+          style={chartContainerStyle}
           className="chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm"
         >
           <RadarChartComponent />
         </div>
         <div
           key="barMixed"
+          style={chartContainerStyle}
           className="chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm"
         >
           <BarChartMixedComponent />
         </div>
         <div
           key="lineLabel"
+          style={chartContainerStyle}
           className="chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm"
         >
           <LineChartLabelComponent />
         </div>
         <div
           key="areaInteractive"
+          style={chartContainerStyle}
           className="chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm"
         >
           <AreaChartInteractiveComponent />
@@ -126,6 +139,7 @@ const GlobalMetrics = () => {
         {companyCustomCharts.map(chartId => (
           <div
             key={chartId}
+            style={chartContainerStyle}
             className="chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm"
           >
             <div

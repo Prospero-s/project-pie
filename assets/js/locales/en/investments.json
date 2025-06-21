@@ -1,5 +1,5 @@
 {
-  "my_portfolio": "My Portfolio",
+  "my_portfolio": "Portfolio",
   "common": {
     "error_invalid_data": "Unable to retrieve data",
     "add": "Add",
@@ -26,7 +26,8 @@
     "delete_success": "Investment deleted successfully",
     "delete_error": "Error deleting investment",
     "investment_not_found": "Investment not found",
-    "error_loading": "Error loading"
+    "error_loading": "Error loading",
+    "exportXSLX": "Export to XSLX"
   },
   "creation": {
     "title": "Company Creation",
@@ -38,6 +39,7 @@
   },
   "company_details": {
     "title": "Company Details",
+    "others_informations": "Others informations",
     "confirmation_title": "Company Details Confirmation",
     "siren": "SIREN number",
     "siren_placeholder": "Enter SIREN number (9 digits)",

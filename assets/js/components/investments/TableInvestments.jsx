@@ -13,6 +13,7 @@ import NoResultsState from '@/components/investments/table/NoResultsState';
 import UploadPopup from '@/components/common/upload/UploadPopup';
 import { formatDate, getDateLocale } from '@/lib/utils';
 import { fundingTypeTranslation } from '@/services/graphe/grapheService';
+import { getFundingTypeColor, getSectorTypeColor } from '@/lib/colors';
 
 const TableInvestments = ({
   i18n,
@@ -160,30 +161,22 @@ const TableInvestments = ({
     });
   };
 
-  const getFundingTypeColor = type => {
-    switch (type) {
-      case 'seed':
-        return 'green';
-      case 'serieA':
-        return 'blue';
-      case 'serieB':
-        return 'purple';
-      case 'serieC':
-        return 'magenta';
-      case 'growth':
-        return 'cyan';
-      case 'ipo':
-        return 'gold';
-      case 'debt':
-        return 'orange';
-      case 'grant':
-        return 'lime';
-      default:
-        return 'default';
-    }
-  };
-
   const columns = [
+    {
+      title: '#',
+      dataIndex: 'index',
+      key: 'index',
+      render: (_, record, index) =>
+        loading ? (
+          <Skeleton.Input block active size="small" />
+        ) : (
+          <div className="flex items-center gap-4">
+            <span>
+              {(pagination.current - 1) * pagination.pageSize + index + 1}
+            </span>
+          </div>
+        ),
+    },
     {
       title: t('company_details.company.name'),
       dataIndex: 'denomination',
@@ -195,7 +188,10 @@ const TableInvestments = ({
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : (
-          <Link to={`/${lng}/company/details/${record.id}`}>
+          <Link
+            to={`/${lng}/company/details/${record.id}`}
+            className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400"
+          >
             <div className="flex items-center gap-4">
               <img
                 src={
@@ -206,7 +202,7 @@ const TableInvestments = ({
                 alt={record?.company?.name ?? 'company-default-logo'}
                 className="w-10 h-10 rounded-full"
               />
-              <span>{text}</span>
+              <span className="font-degarism">{text}</span>
             </div>
           </Link>
         ),
@@ -232,7 +228,9 @@ const TableInvestments = ({
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : sector ? (
-          t(`company_details.sectors.${sector}`)
+          <Tag className="font-degarism" color={getSectorTypeColor(sector)}>
+            {t(`company_details.sectors.${sector}`)}
+          </Tag>
         ) : (
           '-'
         ),
@@ -247,7 +245,9 @@ const TableInvestments = ({
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : record.investment?.totalAmount ? (
-          `${Number(record.investment.totalAmount).toLocaleString()} €`
+          <span className="font-degarism">
+            {Number(record.investment.totalAmount).toLocaleString()} €
+          </span>
         ) : (
           '-'
         ),
@@ -271,7 +271,11 @@ const TableInvestments = ({
         ) : (
           <div className="flex flex-wrap gap-1">
             {record.investment?.fundingTypes?.map((type, index) => (
-              <Tag key={index} color={getFundingTypeColor(type)}>
+              <Tag
+                className="font-degarism"
+                key={index}
+                color={getFundingTypeColor(type)}
+              >
                 {fundingTypeTranslation(t, type)}
               </Tag>
             ))}
@@ -288,7 +292,9 @@ const TableInvestments = ({
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : date ? (
-          formatDate(date, getDateLocale(lng))
+          <span className="font-degarism">
+            {formatDate(date, getDateLocale(lng))}
+          </span>
         ) : (
           '-'
         ),
@@ -304,13 +310,13 @@ const TableInvestments = ({
           <div className="flex gap-2">
             <Tooltip title="Upload un fichier">
               <FileAddOutlined
-                className="!text-blue-500 hover:!text-blue-700 text-lg cursor-pointer"
+                className="!text-blue-500 dark:!text-blue-400 hover:!text-blue-700 dark:hover:!text-blue-300 text-lg cursor-pointer"
                 onClick={() => handleOpenPopup(record)}
               />
             </Tooltip>
             <Tooltip title="Supprimer">
               <DeleteOutlined
-                className="!text-rose-500 hover:!text-rose-700 text-lg cursor-pointer"
+                className="!text-rose-500 dark:!text-rose-400 hover:!text-rose-700 dark:hover:!text-rose-300 text-lg cursor-pointer"
                 onClick={() => handleDelete(record.investment.id)}
               />
             </Tooltip>
@@ -357,7 +363,7 @@ const TableInvestments = ({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-8">
+      <div className="flex items-center justify-center p-8 bg-white dark:bg-gray-800 rounded-lg border border-slate-300 dark:border-gray-600">
         <Spin />
       </div>
     );
@@ -380,7 +386,7 @@ const TableInvestments = ({
           lng={lng}
         />
       )}
-      <div className="bg-white rounded-lg border border-slate-300 flex flex-col w-full">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-slate-300 dark:border-gray-600 flex flex-col w-full">
         {investments.length === 0 &&
         !Object.values(activeFilters).some(filter => filter.length > 0) ? (
           <EmptyInvestmentState
@@ -388,25 +394,25 @@ const TableInvestments = ({
             onAddClick={onAddClick || (() => setIsModalOpen(true))}
           />
         ) : (
-          <div className="overflow-x-auto">
-            <Table
-              columns={columns}
-              dataSource={investments}
-              onChange={handleTableChange}
-              pagination={pagination}
-              sortDirections={['ascend', 'descend']}
-              rowClassName={(record, index) =>
-                index % 2 === 0
-                  ? '!bg-white hover:!bg-blue-50'
-                  : '!bg-slate-50 hover:!bg-blue-50'
-              }
-              locale={{
-                filterConfirm: t('common.confirm'),
-                filterReset: t('common.reset'),
-                emptyText: <NoResultsState t={t} onReset={handleReset} />,
-              }}
-            />
-          </div>
+          <Table
+            rowKey={(record, index) => index}
+            columns={columns}
+            dataSource={investments}
+            onChange={handleTableChange}
+            pagination={pagination}
+            sortDirections={['ascend', 'descend']}
+            scroll={{ x: 'max-content' }}
+            rowClassName={(record, index) =>
+              index % 2 === 0
+                ? 'bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700'
+                : 'bg-slate-50 dark:bg-gray-700 hover:bg-blue-50 dark:hover:bg-gray-600'
+            }
+            locale={{
+              filterConfirm: t('common.confirm'),
+              filterReset: t('common.reset'),
+              emptyText: <NoResultsState t={t} onReset={handleReset} />,
+            }}
+          />
         )}
       </div>
     </>

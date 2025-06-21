@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Alert, Card, Select } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import CompanyDetails from './CompanyDetails';
 import { fetchCompanyDetails } from '@/services/company/companyService';
 
 const { Option } = Select;
 
-const AutomaticCompanyForm = ({ onNext }) => {
+const AutomaticCompanyForm = ({ onNext, onBack }) => {
   const { t } = useTranslation('investments');
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -61,55 +62,69 @@ const AutomaticCompanyForm = ({ onNext }) => {
           title={t('company_details.confirmation_title')}
           className="mb-4"
           styles={{
-            header: { padding: '12px 16px', fontSize: '16px' },
+            header: { padding: '12px 16px', fontSize: '1rem' },
             body: { padding: '12px 16px' },
           }}
         >
           <CompanyDetails company={companyData} />
-          <Form onFinish={handleConfirm} className="mt-4">
-            <Form.Item
-              name="sector"
-              label={t('company_details.company.sector')}
-              rules={[
-                {
-                  required: true,
-                  message: t('company_details.sector_required'),
-                },
-              ]}
-              labelCol={{ span: 24 }}
-              wrapperCol={{ span: 24 }}
-            >
-              <Select
-                placeholder={t('company_details.select_sector')}
-                popupMatchSelectWidth={false}
+          <Card
+            title={
+              <div className="flex items-center space-x-2 text-navy text-sm sm:text-base">
+                <InfoCircleOutlined className="text-blue-primary" />
+                <span>{t('company_details.others_informations')}</span>
+              </div>
+            }
+            loading={loading}
+            className="shadow-lg rounded-lg border-gray-light h-full mt-6"
+            styles={{
+              body: { padding: '12px 16px' },
+            }}
+          >
+            <Form onFinish={handleConfirm} className="mt-4">
+              <Form.Item
+                name="sector"
+                label={t('company_details.company.sector')}
+                rules={[
+                  {
+                    required: true,
+                    message: t('company_details.sector_required'),
+                  },
+                ]}
+                labelCol={{ span: 24 }}
+                wrapperCol={{ span: 24 }}
               >
-                {sectors.map(sector => (
-                  <Option key={sector.value} value={sector.value}>
-                    {sector.label}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <div className="flex flex-col sm:flex-row justify-end gap-3 mt-4">
-              <Button
-                onClick={() => {
-                  setShowConfirmation(false);
-                  setCompanyData(null);
-                  form.resetFields();
-                }}
-                className="w-full sm:w-auto mb-2 sm:mb-0"
-              >
-                {t('common.back')}
-              </Button>
-              <Button
-                type="primary"
-                htmlType="submit"
-                className="w-full sm:w-auto"
-              >
-                {t('common.confirm')}
-              </Button>
-            </div>
-          </Form>
+                <Select
+                  placeholder={t('company_details.select_sector')}
+                  popupMatchSelectWidth={false}
+                >
+                  {sectors.map(sector => (
+                    <Option key={sector.value} value={sector.value}>
+                      {sector.label}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <div className="flex flex-col sm:flex-row justify-end gap-3 mt-4">
+                <Button
+                  onClick={() => {
+                    setShowConfirmation(false);
+                    setCompanyData(null);
+                    form.resetFields();
+                  }}
+                  className="w-full sm:w-auto mb-2 sm:mb-0"
+                >
+                  {t('common.back')}
+                </Button>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  className="w-full sm:w-auto"
+                >
+                  {t('common.confirm')}
+                </Button>
+              </div>
+            </Form>
+          </Card>
         </Card>
       </div>
     );
@@ -144,6 +159,7 @@ const AutomaticCompanyForm = ({ onNext }) => {
       >
         <Input
           placeholder={t('company_details.siren_placeholder')}
+          minLength={9}
           maxLength={9}
           disabled={loading}
           onChange={e => {
@@ -174,14 +190,24 @@ const AutomaticCompanyForm = ({ onNext }) => {
             <p className="text-base sm:text-lg font-medium text-blue-700 mb-2">
               {t('company_details.loading.title')}
             </p>
-            <p className="text-xs sm:text-sm text-blue-600">
+            <p className="font-degarism text-xs sm:text-sm text-blue-600">
               {t('company_details.loading.description')}
             </p>
           </div>
         </div>
       ) : (
-        <Form.Item className="flex justify-end">
-          <Button type="primary" htmlType="submit" className="w-full sm:w-auto">
+        <Form.Item className="flex justify-end gap-3 flex-nowrap sm:flex-nowrap">
+          <Button
+            className="mx-2"
+            onClick={() => {
+              setShowConfirmation(false);
+              setCompanyData(null);
+              onBack();
+            }}
+          >
+            {t('common.back')}
+          </Button>
+          <Button className="mx-2" type="primary" htmlType="submit">
             {t('common.search')}
           </Button>
         </Form.Item>

@@ -7,7 +7,7 @@ const SignUpLink = ({ t, lng }) => {
 
   return (
     <div className="mt-6 text-center">
-      <p className="text-sm text-gray-600">
+      <p className="font-degarism text-sm text-gray-600">
         {t('already_have_account')}{' '}
         <Button
           type="link"

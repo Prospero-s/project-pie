@@ -47,27 +47,39 @@ const DropdownUser = ({ i18n, user }) => {
     },
     {
       key: 'logout',
-      icon: <LogoutOutlined className="!text-base" />,
-      label: <div className="text-base">{t('logout')}</div>,
+      icon: <LogoutOutlined className="!text-base text-red-600" />,
+      label: <div className="text-base text-red-600">{t('logout')}</div>,
       onClick: handleLogout,
     },
   ];
 
   return (
     <>
-      <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
+      <Dropdown
+        menu={{ items }}
+        trigger={['click']}
+        placement="bottomRight"
+        arrow
+        dropdownRender={menuNode => (
+          <div className="ring-1 ring-black/5 rounded-md bg-white shadow-md w-80">
+            {menuNode}
+          </div>
+        )}
+      >
         <div className="flex items-center gap-4 cursor-pointer text-lg">
           <div className="hidden lg:block text-right">
             <span className="block font-medium">
               {user?.user_metadata?.full_name}
             </span>
-            <span className="block text-sm lg:text-base">{user?.email}</span>
+            <span className="font-degarism block text-sm lg:text-base">
+              {user?.email}
+            </span>
           </div>
           <Avatar
             size="large"
             icon={!user?.user_metadata?.avatar_url && <UserOutlined />}
             src={user?.user_metadata?.avatar_url}
-            className="flex-shrink-0 w-12 h-12 lg:w-14 lg:h-14"
+            className="flex-shrink-0 w-12 h-12 lg:w-12 lg:h-12"
           />
         </div>
       </Dropdown>

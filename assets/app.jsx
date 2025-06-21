@@ -29,6 +29,7 @@ import GroupSelection from '@/pages/GroupSelection';
 import CompanyDetails from '@/pages/CompanyDetails';
 import ExtractResult from '@/pages/ExtractResult';
 import Documents from '@/pages/Documents';
+import Support from '@/pages/Support';
 
 import AuthLayout from '@/components/common/layout/AuthLayout';
 import ProtectedRoute from '@/components/common/auth/ProtectedRoute';
@@ -151,6 +152,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                           <Route
                             path="documents"
                             element={<Documents i18n={i18n} />}
+                          />
+                          <Route
+                            path="support"
+                            element={<Support i18n={i18n} />}
                           />
                         </Routes>
                       </AppLayout>

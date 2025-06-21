@@ -56,6 +56,54 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
 
     /**
      * @param UserGroup $userGroup
+     * @return int
+     */
+    public function countInvestedCompaniesByGroup(UserGroup $userGroup): int
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT COUNT(DISTINCT ci.company_id) AS invested_companies
+            FROM company_investment ci
+            WHERE ci.user_group_id = :userGroupId
+        ';
+
+        $stmt = $conn->prepare($sql);
+        $result = $stmt->executeQuery([
+            'userGroupId' => $userGroup->getId(),
+        ])->fetchOne();
+
+        return $result !== null ? (int) $result : 0;
+    }
+
+    /**
+     * @param UserGroup $userGroup
+     * @return float
+     */
+    public function getAverageInvestmentByGroup(UserGroup $userGroup): float
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT 
+                CASE 
+                    WHEN COUNT(DISTINCT ci.company_id) = 0 THEN 0
+                    ELSE SUM(ci.amount) / COUNT(DISTINCT ci.company_id)
+                END AS average_investment
+            FROM company_investment ci
+            WHERE ci.user_group_id = :userGroupId
+        ';
+
+        $stmt = $conn->prepare($sql);
+        $result = $stmt->executeQuery([
+            'userGroupId' => $userGroup->getId(),
+        ])->fetchOne();
+
+        return $result !== null ? (float) $result : 0.0;
+    }
+
+    /**
+     * @param UserGroup $userGroup
      * @return list<array<string, mixed>>
      */
     public function fetchGlobalInvestments(UserGroup $userGroup): array
@@ -82,6 +130,28 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
         ]);
 
         return $result->fetchAllAssociative();
+    }
+
+    /**
+     * @param UserGroup $userGroup
+     * @return float
+     */
+    public function getTotalInvestmentsByGroup(UserGroup $userGroup): float
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT SUM(ci.amount) AS total
+            FROM company_investment ci
+            WHERE ci.user_group_id = :userGroupId
+        ';
+
+        $stmt = $conn->prepare($sql);
+        $result = $stmt->executeQuery([
+            'userGroupId' => $userGroup->getId(),
+        ])->fetchOne();
+
+        return $result !== null ? (float) $result : 0.0;
     }
 
     /**
@@ -497,5 +567,52 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
         $em->flush();
 
         return true;
+    }
+
+    /**
+     * @param UserGroup $userGroup
+     * @param int $year
+     * @return float
+     */
+    public function getGrowthRateByGroup(UserGroup $userGroup, int $year = null): float
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        if ($year === null) {
+            $year = (int) (new \DateTime())->format('Y');
+        }
+        $lastYear = $year - 1;
+
+        // Montant total investi année N
+        $sqlCurrent = '
+            SELECT SUM(ci.amount) 
+            FROM company_investment ci
+            WHERE ci.user_group_id = :userGroupId
+            AND EXTRACT(YEAR FROM ci.invested_at) = :year
+        ';
+        $current = $conn->prepare($sqlCurrent)->executeQuery([
+            'userGroupId' => $userGroup->getId(),
+            'year' => $year,
+        ])->fetchOne();
+        $current = $current ? (float) $current : 0.0;
+
+        // Montant total investi année N-1
+        $sqlLast = '
+            SELECT SUM(ci.amount) 
+            FROM company_investment ci
+            WHERE ci.user_group_id = :userGroupId
+            AND EXTRACT(YEAR FROM ci.invested_at) = :year
+        ';
+        $previous = $conn->prepare($sqlLast)->executeQuery([
+            'userGroupId' => $userGroup->getId(),
+            'year' => $lastYear,
+        ])->fetchOne();
+        $previous = $previous ? (float) $previous : 0.0;
+
+        if ($previous == 0) {
+            return 0.0;
+        }
+
+        return round((($current - $previous) / $previous) * 100, 2);
     }
 }
