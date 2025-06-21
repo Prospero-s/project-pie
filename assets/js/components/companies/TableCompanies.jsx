@@ -59,8 +59,9 @@ const TableCompanies = ({ i18n }) => {
             >
               <img
                 src={
-                  record.logo ??
-                  'https://www.adaptivewfs.com/wp-content/uploads/2020/07/logo-placeholder-image.png'
+                  record.logo && record.logo.trim() !== ''
+                    ? record.logo
+                    : 'https://www.adaptivewfs.com/wp-content/uploads/2020/07/logo-placeholder-image.png'
                 }
                 alt={record.name ?? 'company-default-logo'}
                 className="w-10 h-10 rounded-full"

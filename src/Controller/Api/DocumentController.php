@@ -4,9 +4,6 @@ namespace App\Controller\Api;
 
 use App\Entity\Document;
 use App\Entity\Kpi;
-use App\Entity\Company;
-use App\Entity\UserGroup;
-use App\Entity\User;
 use App\Repository\DocumentRepository;
 use App\Repository\KpiRepository;
 use App\Repository\CompanyRepository;
@@ -16,14 +13,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Uid\Uuid;
 
 #[Route('/api/documents', name: 'api_documents_')]
 class DocumentController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
     private DocumentRepository $documentRepository;
-    private KpiRepository $kpiRepository;
     private CompanyRepository $companyRepository;
     private UserService $userService;
 
@@ -36,7 +31,6 @@ class DocumentController extends AbstractController
     ) {
         $this->entityManager = $entityManager;
         $this->documentRepository = $documentRepository;
-        $this->kpiRepository = $kpiRepository;
         $this->companyRepository = $companyRepository;
         $this->userService = $userService;
     }
@@ -148,8 +142,8 @@ class DocumentController extends AbstractController
         }
     }
     
-    #[Route('/{id}', name: 'delete_document', methods: ['DELETE'])]
-    public function deleteDocument(string $id, Request $request, EntityManagerInterface $em): Response
+    #[Route('/delete/{id}', name: 'delete_document', methods: ['DELETE'])]
+    public function deleteDocument(string $id, Request $request): Response
     {
         $cognitoId = $request->headers->get('X-Cognito-Id');
         
@@ -182,9 +176,12 @@ class DocumentController extends AbstractController
                 return $this->json(['error' => 'Access denied'], Response::HTTP_FORBIDDEN);
             }
             
-            // Supprimer le document
-            $em->remove($document);
-            $em->flush();
+            // Supprimer le document via le repository
+            $deleted = $this->documentRepository->deleteDocumentByUuid($id);
+            
+            if (!$deleted) {
+                return $this->json(['error' => 'Document not found'], Response::HTTP_NOT_FOUND);
+            }
 
             return $this->json(['message' => 'Document deleted successfully'], Response::HTTP_OK);
         } catch (\Exception $e) {

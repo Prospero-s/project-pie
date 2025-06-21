@@ -477,4 +477,25 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
             ];
         }
     }
+
+    /**
+     * Supprime un investissement par son ID
+     * 
+     * @param int $id ID de l'investissement à supprimer
+     * @return bool True si l'investissement a été supprimé, false sinon
+     */
+    public function deleteInvestmentById(int $id): bool
+    {
+        $investment = $this->find($id);
+        
+        if (!$investment) {
+            return false;
+        }
+        
+        $em = $this->getEntityManager();
+        $em->remove($investment);
+        $em->flush();
+        
+        return true;
+    }
 }

@@ -35,7 +35,7 @@ export const deleteDocument = async id => {
     const session = await Auth.currentSession();
     const cognitoId = session.getIdToken().payload.sub;
 
-    const response = await axios.delete(`${API_URL}/${id}`, {
+    const response = await axios.delete(`${API_URL}/delete/${id}`, {
       headers: {
         'Content-Type': 'application/json',
         'X-Cognito-Id': cognitoId,

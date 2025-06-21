@@ -104,12 +104,12 @@ export const fetchGlobalSectorInvestments = async () => {
   }
 };
 
-export const deleteInvestment = async (id) => {
+export const deleteInvestment = async id => {
   try {
     const session = await Auth.currentSession();
     const cognitoId = session.getIdToken().payload.sub;
 
-    const response = await axios.delete(`/api/investments/${id}`, {
+    const response = await axios.delete(`/api/investments/delete/${id}`, {
       headers: {
         'Content-Type': 'application/json',
         'X-Cognito-Id': cognitoId,

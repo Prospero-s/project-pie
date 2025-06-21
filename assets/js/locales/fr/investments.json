@@ -20,7 +20,13 @@
     "amount_raised": "Montant levé",
     "funding_type": "Type de levée",
     "last_update": "Dernière mise à jour",
-    "actions": "Actions"
+    "actions": "Actions",
+    "delete": "Supprimer",
+    "delete_confirmation": "Êtes-vous sûr de vouloir supprimer cet investissement ?",
+    "delete_success": "Investissement supprimé avec succès",
+    "delete_error": "Erreur lors de la suppression de l'investissement",
+    "investment_not_found": "Investissement non trouvé",
+    "error_loading": "Erreur lors du chargement"
   },
   "creation": {
     "title": "Création d'entreprise",
