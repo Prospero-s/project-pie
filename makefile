@@ -26,14 +26,13 @@ help:
 	@echo "  cache-clear       - Vider le cache Symfony"
 	@echo ""
 	@echo "Tests et Qualité de code:"
-	@echo "  test              - Exécuter les tests PHPUnit"
+	@echo "  test              - Exécuter les tests PHPUnit avec testdox et couverture de code"
 	@echo "  run-tests         - Lance tous les tests et vérifications de qualité de code"
 	@echo "  lint              - Lance ESLint"
 	@echo "  lint-fix          - Corrige automatiquement les erreurs ESLint"
 	@echo "  lint-phpcs        - Lance PHP Code Sniffer"
 	@echo "  lint-phpcs-fix    - Corrige automatiquement les erreurs PHP Code Sniffer"
 	@echo "  phpstan           - Lance PHPStan"
-	@echo "  test     		   - Exécuter les tests PHPUnit avec testdox et couverture de code"
 	@echo ""
 	@echo "Base de données:"
 	@echo "  migrations        - Exécuter les migrations de base de données"
@@ -81,9 +80,6 @@ install:
 cache-clear:
 	$(SYMFONY) cache:clear
 
-test:
-	$(PHPUNIT) --testdox --coverage-text
-
 test-db-local:
 	$(SYMFONY) doctrine:schema:validate
 	$(SYMFONY) doctrine:migrations:status
@@ -99,14 +95,14 @@ hooks:
 	chmod +x ./scripts/install-hooks.sh
 	./scripts/install-hooks.sh
 
-# Commandes pour les migrations
-
+# Commandes pour les fixtures
 load-dev-fixtures:
 	$(SYMFONY) doctrine:f:load -n
 
 load-demo-fixtures:
 	$(SYMFONY) doctrine:fixtures:load --group=demo --append --no-interaction
 
+# Commandes pour les migrations
 test-demo-account:
 	$(DOCKER_COMPOSE) exec php php scripts/test-demo-account.php
 
@@ -166,9 +162,7 @@ run-tests: ## Lance tous les tests et vérifications de qualité de code
 	$(COMPOSER) cs-check
 	$(COMPOSER) phpstan
 	@echo "🧪 Lancement des tests unitaires..."
-	$(DOCKER_COMPOSE) exec $(PHP_CONTAINER) ./vendor/bin/phpunit
+	$(PHPUNIT) --testdox --coverage-text
 	@echo "📦 Build du frontend..."
 	$(NPM) run build
 	@echo "✅ Tous les tests et vérifications sont terminés !"
-test:
-	$(PHPUNIT) --testdox --coverage-text
