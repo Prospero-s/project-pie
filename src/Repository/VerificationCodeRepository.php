@@ -68,7 +68,7 @@ class VerificationCodeRepository extends ServiceEntityRepository
             ->andWhere('v.type = :type')
             ->setParameter('email', $email)
             ->setParameter('type', $type);
-        
+
         $qb->getQuery()->execute();
     }
 
@@ -76,24 +76,24 @@ class VerificationCodeRepository extends ServiceEntityRepository
     {
         // Supprime les codes précédents pour cet email
         $this->removeAllPreviousCodes($email, $type);
-        
+
         // Génère un code à 6 chiffres
         $code = sprintf('%06d', random_int(0, 999999));
-        
+
         $verificationCode = new VerificationCode();
         $verificationCode->setEmail($email);
         $verificationCode->setFullName($fullName);
         $verificationCode->setCode($code);
         $verificationCode->setType($type);
-        
+
         $this->save($verificationCode, true);
-        
+
         return $verificationCode;
     }
 
     /**
      * Supprime tous les codes de vérification expirés
-     * 
+     *
      * @return int Le nombre de codes supprimés
      */
     public function removeExpiredCodes(): int
@@ -102,9 +102,9 @@ class VerificationCodeRepository extends ServiceEntityRepository
             ->delete()
             ->where('v.expiresAt < :now')
             ->setParameter('now', new \DateTimeImmutable());
-        
+
         $result = $qb->getQuery()->execute();
-        
+
         return $result;
     }
 
@@ -125,7 +125,7 @@ class VerificationCodeRepository extends ServiceEntityRepository
             ->setParameter('now', new \DateTimeImmutable())
             ->getQuery()
             ->getSingleScalarResult();
-        
+
         return $result > 0;
     }
-} 
+}

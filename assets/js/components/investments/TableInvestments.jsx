@@ -3,7 +3,10 @@ import { Skeleton, Table, message, Tag, Spin, Tooltip } from 'antd';
 import { FileAddOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { fetchInvestments } from '@/services/investment/investmentService';
+import {
+  fetchInvestments,
+  deleteInvestment,
+} from '@/services/investment/investmentService';
 import AddCompanyModal from '@/components/investments/AddCompanyModal';
 import EmptyInvestmentState from '@/components/investments/table/EmptyInvestmentState';
 import NoResultsState from '@/components/investments/table/NoResultsState';
@@ -196,8 +199,9 @@ const TableInvestments = ({
             <div className="flex items-center gap-4">
               <img
                 src={
-                  record?.company?.logo ??
-                  'https://www.adaptivewfs.com/wp-content/uploads/2020/07/logo-placeholder-image.png'
+                  record?.company?.logo && record.company.logo.trim() !== ''
+                    ? record.company.logo
+                    : 'https://www.adaptivewfs.com/wp-content/uploads/2020/07/logo-placeholder-image.png'
                 }
                 alt={record?.company?.name ?? 'company-default-logo'}
                 className="w-10 h-10 rounded-full"
@@ -307,7 +311,7 @@ const TableInvestments = ({
             <Tooltip title="Supprimer">
               <DeleteOutlined
                 className="!text-rose-500 hover:!text-rose-700 text-lg cursor-pointer"
-                onClick={() => handleDelete(record.id)}
+                onClick={() => handleDelete(record.investment.id)}
               />
             </Tooltip>
           </div>
@@ -315,8 +319,25 @@ const TableInvestments = ({
     },
   ];
 
-  const handleDelete = id => {
-    console.error("Suppression de la startup avec l'ID:", id);
+  const handleDelete = async id => {
+    try {
+      await deleteInvestment(id);
+      message.success(t('common.delete_success'));
+      await loadInvestments({
+        page: pagination.current,
+        limit: pagination.pageSize,
+        sortField: sortedInfo.columnKey || 'updatedAt',
+        sortOrder: sortedInfo.order
+          ? sortedInfo.order === 'ascend'
+            ? 'asc'
+            : 'desc'
+          : 'desc',
+        ...activeFilters,
+      });
+    } catch (error) {
+      message.error(t('common.delete_error'));
+      console.error(error);
+    }
   };
 
   const handleAdd = async () => {

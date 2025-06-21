@@ -25,7 +25,7 @@ class DemoUserFixture
     public function createDemoUser(ObjectManager $manager): User
     {
         $userData = $this->userData['user'];
-        
+
         $user = new User();
         $user->setCognitoId($userData['cognitoId'])
              ->setName($userData['name'])
@@ -41,7 +41,7 @@ class DemoUserFixture
     public function createDemoGroup(ObjectManager $manager, User $owner): UserGroup
     {
         $groupData = $this->userData['group'];
-        
+
         $group = new UserGroup();
         $group->setName($groupData['name'])
               ->setOwner($owner);
@@ -52,7 +52,7 @@ class DemoUserFixture
     public function createNotificationSettings(ObjectManager $manager, User $user): NotificationSettings
     {
         $notifData = $this->userData['notificationSettings'];
-        
+
         $notificationSettings = new NotificationSettings();
         $notificationSettings->setUserId($user)
                             ->setEmailEnabled($notifData['emailEnabled'])
@@ -72,4 +72,4 @@ class DemoUserFixture
     {
         return $this->userData['group']['name'];
     }
-} 
+}

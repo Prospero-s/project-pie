@@ -1,61 +1,50 @@
 {
-  "periods": ["Q1", "Q2", "Q3", "Q4", "YTD"],
+  "periods": ["Q2 Reforecast TOTAL H2", "Q3 Reforecast TOTAL H2", "DELTA H2"],
   "kpi": {
-    "Net Bookings": {
-      "Q1": "5.8m",
-      "Q2": "3.9m",
-      "Q3": "2.6m",
-      "YTD": "12.4m"
+    "Marketing FR budget": {
+      "Q2 Reforecast TOTAL H2": "€1845k",
+      "Q3 Reforecast TOTAL H2": "€924k",
+      "DELTA H2": "-€921k"
     },
-    "Churn": {
-      "Q1": "10.3%",
-      "Q2": "11.0%",
-      "Q3": "14.2%",
-      "YTD": "11.8%"
+    "People FR budget": {
+      "Q2 Reforecast TOTAL H2": "€689k",
+      "Q3 Reforecast TOTAL H2": "€536k",
+      "DELTA H2": "-€153k"
     },
-    "Net ARR": {
-      "Q1": "+4.8m",
-      "Q2": "+2.7m",
-      "Q3": "+1.2m",
-      "YTD": "+8.7m"
+    "Ops, Legal & Finance FR budget": {
+      "Q2 Reforecast TOTAL H2": "€534k",
+      "Q3 Reforecast TOTAL H2": "€359k",
+      "DELTA H2": "-€175k"
     },
-    "Enterprise NRR": {
-      "Q1": "104.4%",
-      "Q2": "102.7%",
-      "Q3": "94.9%",
-      "YTD": "100.7%"
+    "Tech & Product budget": {
+      "Q2 Reforecast TOTAL H2": "€1080k",
+      "Q3 Reforecast TOTAL H2": "€759k",
+      "DELTA H2": "-€322k"
     },
-    "ARR base": {
-      "Q1": "40.9m",
-      "Q2": "43.6m",
-      "Q3": "44.8m"
+    "Content budget": {
+      "Q2 Reforecast TOTAL H2": "€762k",
+      "Q3 Reforecast TOTAL H2": "€441k",
+      "DELTA H2": "-€322k"
     },
-    "Organic ARR growth": {
-      "Q1": "+23%",
-      "Q2": "+29%",
-      "Q3": "+31%"
+    "Content FR": {
+      "Q2 Reforecast TOTAL H2": "€392k",
+      "Q3 Reforecast TOTAL H2": "€281k",
+      "DELTA H2": "-€112k"
     },
-    "EBITDA": {
-      "Q1": "(2.1m)",
-      "Q2": "(1.1m)",
-      "Q3": "0.4m",
-      "YTD": "(2.8m)"
+    "Content US": {
+      "Q2 Reforecast TOTAL H2": "€370k",
+      "Q3 Reforecast TOTAL H2": "€160k",
+      "DELTA H2": "-€210k"
     },
-    "CAC ratio": {
-      "Q1": "0.7x",
-      "Q2": "1.0x",
-      "Q3": "1.2x",
-      "YTD": "1.0x"
+    "Business FR budget": {
+      "Q2 Reforecast TOTAL H2": "€109k",
+      "Q3 Reforecast TOTAL H2": "€110k",
+      "DELTA H2": "€2k"
     },
-    "Headcount": {
-      "Q1": "273",
-      "Q2": "275",
-      "Q3": "279"
-    },
-    "Cash balance": {
-      "Q1": "7.7m",
-      "Q2": "7.1m",
-      "Q3": "7.7m"
+    "TOTAL": {
+      "Q2 Reforecast TOTAL H2": "€5020k",
+      "Q3 Reforecast TOTAL H2": "€3129k",
+      "DELTA H2": "-€1890k"
     }
   }
 }

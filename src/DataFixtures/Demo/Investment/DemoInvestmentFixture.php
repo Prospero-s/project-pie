@@ -28,16 +28,16 @@ class DemoInvestmentFixture
      * @return CompanyInvestment[]
      */
     public function createInvestmentsForCompanies(
-        ObjectManager $manager, 
-        array $companies, 
-        User $user, 
+        ObjectManager $manager,
+        array $companies,
+        User $user,
         UserGroup $group
     ): array {
         $investments = [];
-        
+
         foreach ($companies as $company) {
             $companyInvestments = $this->createInvestmentsForCompany($company, $user, $group);
-            
+
             foreach ($companyInvestments as $investment) {
                 $manager->persist($investment);
                 $investments[] = $investment;
@@ -54,12 +54,12 @@ class DemoInvestmentFixture
     {
         $rules = $this->investmentConfig['investmentRules'];
         $numberOfInvestments = mt_rand(
-            $rules['minInvestmentsPerCompany'], 
+            $rules['minInvestmentsPerCompany'],
             $rules['maxInvestmentsPerCompany']
         );
-        
+
         $investments = [];
-        
+
         for ($i = 0; $i < $numberOfInvestments; $i++) {
             $investment = $this->createInvestment($company, $user, $group, $i);
             $investments[] = $investment;
@@ -71,12 +71,12 @@ class DemoInvestmentFixture
     private function createInvestment(Company $company, User $user, UserGroup $group, int $round): CompanyInvestment
     {
         $investment = new CompanyInvestment();
-        
+
         // Montants réalistes selon le type de financement et la taille de l'entreprise
         $baseAmount = $this->getBaseAmountForSector($company->getSector());
         $roundMultiplier = $this->investmentConfig['investmentRules']['roundMultiplier'];
         $amount = $baseAmount * (1 + $round * $roundMultiplier);
-        
+
         // Date d'investissement réaliste
         $rules = $this->investmentConfig['investmentRules'];
         $daysAgo = mt_rand($rules['minDaysAgo'], $rules['maxDaysAgo']);
@@ -125,4 +125,4 @@ class DemoInvestmentFixture
     {
         return $this->investmentConfig['fundingTypes'];
     }
-} 
+}

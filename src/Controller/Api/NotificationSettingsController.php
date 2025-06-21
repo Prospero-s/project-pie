@@ -29,7 +29,7 @@ class NotificationSettingsController extends AbstractController
         try {
             $cognitoId = $request->headers->get('x-cognito-id');
             $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
-    
+
             if (!$cognitoId || !$user) {
                 throw new \Exception('Utilisateur non authentifié');
             }
@@ -108,5 +108,4 @@ class NotificationSettingsController extends AbstractController
             return new JsonResponse(['error' => 'Erreur : ' . $e->getMessage()], 500);
         }
     }
-
 }

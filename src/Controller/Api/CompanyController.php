@@ -179,7 +179,7 @@ class CompanyController extends AbstractController
                         'unit' => $unit
                     ];
                 }
-                
+
                 // Formater la valeur avec l'unité si elle existe
                 $formattedValue = $value;
                 if ($unit && $value !== null) {
@@ -187,7 +187,7 @@ class CompanyController extends AbstractController
                 } elseif ($value !== null) {
                     $formattedValue = number_format($value, 2, ',', ' ');
                 }
-                
+
                 $organizedData[$metricName][$period] = $formattedValue;
             }
 

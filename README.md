@@ -150,6 +150,14 @@ Ce projet combine **Symfony** pour la partie backend et **React** pour la partie
    - http://localhost : Web App
    - http://localhost:5050/ : PgAdmin
 
+## Avant chaque commit
+
+Avant chaque commit, n'oubliez pas d'exécuter les analyseurs statiques et les tests unitaires avec :
+
+```bash
+make run-tests
+```
+
 ## Structure du Projet
 
 ```
