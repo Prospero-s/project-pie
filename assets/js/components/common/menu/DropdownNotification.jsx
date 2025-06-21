@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { BellOutlined, SunOutlined, MoonOutlined } from '@ant-design/icons';
-import { Badge, Dropdown, Spin } from 'antd';
+import { BellOutlined } from '@ant-design/icons';
+import { Badge, Dropdown } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { fetchNotifications } from '@/services/notification/notificationService';
 
@@ -10,20 +10,6 @@ const DropdownNotification = ({ i18n, user }) => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [countNotifications, setCountNotifications] = useState(null);
-
-  // État du thème, récupère depuis localStorage ou par défaut 'light'
-  const [theme, setTheme] = useState(
-    () => localStorage.getItem('theme') || 'light',
-  );
-
-  useEffect(() => {
-    // Appliquer la classe thème sur body
-    document.body.classList.remove('light', 'dark');
-    document.body.classList.add(theme);
-
-    // Sauvegarder dans localStorage
-    localStorage.setItem('theme', theme);
-  }, [theme]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -101,11 +87,6 @@ const DropdownNotification = ({ i18n, user }) => {
           },
         ];
 
-  // Fonction toggle thème
-  const toggleTheme = () => {
-    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
-  };
-
   return (
     <div className="flex items-center gap-4">
       {/* Dropdown notification */}
@@ -126,20 +107,6 @@ const DropdownNotification = ({ i18n, user }) => {
           </Badge>
         </div>
       </Dropdown>
-
-      {/* Toggle theme (hors dropdown) */}
-      <button
-        onClick={toggleTheme}
-        className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 hover:ring-1 hover:ring-black/10 transition-all duration-300 cursor-pointer select-none"
-        aria-label="Toggle theme"
-        type="button"
-      >
-        {theme === 'light' ? (
-          <SunOutlined className="text-2xl text-yellow-400" />
-        ) : (
-          <MoonOutlined className="text-2xl text-indigo-700" />
-        )}
-      </button>
     </div>
   );
 };

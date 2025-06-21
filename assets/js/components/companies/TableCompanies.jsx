@@ -87,7 +87,7 @@ const TableCompanies = ({ i18n }) => {
           <div className="flex items-center gap-4">
             <Link
               to={`/company/details/${record.id}`}
-              className="flex items-center gap-4"
+              className="flex items-center gap-4 text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400"
             >
               <img
                 src={
@@ -98,7 +98,7 @@ const TableCompanies = ({ i18n }) => {
                 alt={record.name ?? 'company-default-logo'}
                 className="w-10 h-10 rounded-full"
               />
-              <span>{text}</span>
+              <span className="font-degarism">{text}</span>
             </Link>
           </div>
         ),
@@ -114,7 +114,7 @@ const TableCompanies = ({ i18n }) => {
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : businessStructures ? (
-          businessStructures
+          <span className="font-degarism">{businessStructures}</span>
         ) : (
           '-'
         ),
@@ -139,7 +139,7 @@ const TableCompanies = ({ i18n }) => {
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : sector ? (
-          <Tag color={getSectorTypeColor(sector)}>
+          <Tag className="font-degarism" color={getSectorTypeColor(sector)}>
             {t(`company_details.sectors.${sector}`)}
           </Tag>
         ) : (
@@ -156,14 +156,16 @@ const TableCompanies = ({ i18n }) => {
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : (
-          formatDate(date, getDateLocale(i18n.language))
+          <span className="font-degarism">
+            {formatDate(date, getDateLocale(i18n.language))}
+          </span>
         ),
     },
   ];
 
   return (
     <>
-      <div className="bg-white rounded-lg border border-slate-300 flex flex-col w-full">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-slate-300 dark:border-gray-600 flex flex-col w-full">
         <div className="overflow-x-auto">
           <Table
             rowKey={(record, index) => index}
@@ -178,8 +180,8 @@ const TableCompanies = ({ i18n }) => {
             sortDirections={['ascend', 'descend']}
             rowClassName={(record, index) =>
               index % 2 === 0
-                ? '!bg-white hover:!bg-blue-50'
-                : '!bg-slate-50 hover:!bg-blue-50'
+                ? 'bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700'
+                : 'bg-slate-50 dark:bg-gray-700 hover:bg-blue-50 dark:hover:bg-gray-600'
             }
           />
         </div>

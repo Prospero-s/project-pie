@@ -114,7 +114,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, i18n, user }) => {
 
   return (
     <Sider
-      className="!bg-gray_100 flex flex-col h-full"
+      className="bg-gray_100 flex flex-col h-full"
       width={240}
       collapsible={!isMobile}
       collapsed={isMobile || !sidebarOpen}

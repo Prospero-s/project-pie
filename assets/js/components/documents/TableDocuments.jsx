@@ -93,7 +93,7 @@ const TableDocuments = ({ t, lng = 'en' }) => {
           <Skeleton.Input block active size="small" />
         ) : (
           <span
-            className="text-blue-600 hover:text-blue-800 cursor-pointer underline"
+            className="font-degarism text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer underline"
             onClick={() => openDocumentInNewWindow(record.id)}
           >
             {text || record.pdfUrl || t('table.unknown_filename')}
@@ -108,7 +108,7 @@ const TableDocuments = ({ t, lng = 'en' }) => {
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : company && company.denomination ? (
-          company.denomination
+          <span className="font-degarism">company.denomination</span>
         ) : (
           t('table.unknown_company')
         ),
@@ -121,14 +121,16 @@ const TableDocuments = ({ t, lng = 'en' }) => {
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : (
-          date &&
-          formatDate(date, getDateLocale(lng), {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-          })
+          <span className="font-degarism">
+            {date &&
+              formatDate(date, getDateLocale(lng), {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+          </span>
         ),
     },
     {
@@ -142,7 +144,7 @@ const TableDocuments = ({ t, lng = 'en' }) => {
             {record.status === 'draft' && (
               <Tooltip title={t('table.tooltips.edit')}>
                 <Button
-                  className="!text-blue-500 hover:!text-blue-700 text-lg cursor-pointer"
+                  className="!text-blue-500 dark:!text-blue-400 hover:!text-blue-700 dark:hover:!text-blue-300 text-lg cursor-pointer"
                   icon={<EditOutlined />}
                   onClick={() => navigate(`/documents/edit/${record.id}`)}
                 />
@@ -150,14 +152,14 @@ const TableDocuments = ({ t, lng = 'en' }) => {
             )}
             <Tooltip title={t('table.tooltips.view')}>
               <Button
-                className="!text-blue-500 hover:!text-blue-700 text-lg cursor-pointer"
+                className="!text-blue-500 dark:!text-blue-400 hover:!text-blue-700 dark:hover:!text-blue-300 text-lg cursor-pointer"
                 icon={<EyeOutlined />}
                 onClick={() => handleViewDetails(record.kpi)}
               />
             </Tooltip>
             <Tooltip title={t('table.tooltips.delete')}>
               <Button
-                className="!text-rose-500 hover:!text-rose-700 text-lg cursor-pointer"
+                className="!text-rose-500 dark:!text-rose-400 hover:!text-rose-700 dark:hover:!text-rose-300 text-lg cursor-pointer"
                 icon={<DeleteOutlined />}
                 onClick={() => handleDelete(record.id)}
               />
@@ -169,7 +171,7 @@ const TableDocuments = ({ t, lng = 'en' }) => {
 
   return (
     <>
-      <div className="bg-white rounded-lg border border-slate-300 flex flex-col w-full">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-slate-300 dark:border-gray-600 flex flex-col w-full">
         <div className="overflow-x-auto">
           <Table
             columns={columns}
@@ -177,7 +179,9 @@ const TableDocuments = ({ t, lng = 'en' }) => {
             pagination={pagination}
             onChange={handleTableChange}
             rowClassName={(record, index) =>
-              index % 2 === 0 ? '!bg-white' : '!bg-slate-50'
+              index % 2 === 0
+                ? 'bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700'
+                : 'bg-slate-50 dark:bg-gray-700 hover:bg-blue-50 dark:hover:bg-gray-600'
             }
             size="middle"
             locale={{

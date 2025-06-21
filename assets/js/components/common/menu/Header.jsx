@@ -2,6 +2,7 @@ import React from 'react';
 import { Layout } from 'antd';
 import DropdownNotification from './DropdownNotification';
 import DropdownUser from './DropdownUser';
+import ToggleMode from './ToggleMode';
 import logoProspero from '@img/logo/logo-prospero-blue.svg';
 
 const { Header } = Layout;
@@ -20,6 +21,7 @@ const AppHeader = ({ user, setUser, i18n }) => {
 
         <div className="flex items-center gap-6">
           <DropdownNotification i18n={i18n} user={user} />
+          <ToggleMode />
           <DropdownUser i18n={i18n} user={user} setUser={setUser} />
         </div>
       </div>

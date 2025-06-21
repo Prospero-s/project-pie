@@ -318,7 +318,7 @@ class CompanyInvestmentController extends AbstractController
             return new JsonResponse([
                 'totalInvestments' => $totalInvestments,
                 'companiesCount' => $companiesCount,
-                'averageInvestment' => $averageInvestment,
+                'averageInvestment' => round($averageInvestment, 2),
                 'growthRate' => $growthRate,
             ]);
         } catch (\Exception $e) {

@@ -6,7 +6,6 @@ import AppHeader from '@/components/common/menu/Header';
 import { useUser } from '@/context/userContext';
 import { useParams } from 'react-router-dom';
 import { LoadingOutlined } from '@ant-design/icons';
-import logoProspero from '@img/logo/logo-icon-prospero-blue.svg';
 import FooterLayout from '@/components/common/layout/Footer';
 
 const { Content } = Layout;
@@ -32,7 +31,7 @@ export default function AppLayout({ i18n, children }) {
   // Afficher uniquement l'écran de chargement initial, pas à chaque redirection
   if (initialLoading) {
     return (
-      <div className="h-screen w-screen flex flex-col items-center justify-center gap-8 fixed top-0 left-0 bg-white z-50">
+      <div className="h-screen w-screen flex flex-col items-center justify-center gap-8 fixed top-0 left-0 bg-white dark:bg-gray-900 z-50">
         <div style={{ position: 'relative', marginBottom: '32px' }}>
           {/* Spinner de chargement autour du logo */}
           <div
@@ -99,25 +98,20 @@ export default function AppLayout({ i18n, children }) {
   }
 
   return (
-    <Layout style={{ minHeight: '100vh', height: '100vh', overflow: 'hidden' }}>
+    <Layout className="min-h-screen h-screen overflow-hidden bg-white dark:bg-gray-900">
       <Sidebar
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
         i18n={i18n}
         user={user}
       />
-      <Layout className="site-layout">
+      <Layout className="site-layout bg-white dark:bg-gray-900">
         <AppHeader user={user} setUser={setUser} i18n={i18n} />
         <Content
-          style={{
-            margin: '16px 16px',
-            overflow: 'auto',
-            height: 'calc(100vh - 64px - 69px)',
-          }}
+          className="m-4 overflow-auto"
+          style={{ height: 'calc(100vh - 64px - 69px)' }}
         >
-          <div className="rounded-md h-full" style={{ padding: 24 }}>
-            {children}
-          </div>
+          <div className="rounded-md h-full p-6">{children}</div>
         </Content>
         <FooterLayout i18n={i18n} isDashboard={true} />
       </Layout>
