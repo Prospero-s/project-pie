@@ -14,7 +14,7 @@ const FooterLayout = ({ i18n, isDashboard }) => {
   }, [lng, i18n]);
 
   return isDashboard ? (
-    <Footer style={{ textAlign: 'center' }}>
+    <Footer className="shadow-sm" style={{ textAlign: 'center' }}>
       <span className="font-degarism text-sm text-gray-500">
         © 2024 - {new Date().getFullYear()} | {t('copyright')}
       </span>

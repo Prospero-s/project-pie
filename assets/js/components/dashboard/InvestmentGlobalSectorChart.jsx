@@ -128,7 +128,7 @@ const InvestmentGlobalSectorChart = () => {
   return (
     <Card className="w-full h-[400px]">
       <CardHeader className="text-center pb-2">
-        <CardTitle className="text-2xl font-bold text-gray-900">
+        <CardTitle className="text-xl font-bold text-gray-900">
           {charts('investmentGlobalSectorChart.title')}
         </CardTitle>
         <CardDescription className="text-gray-500 mt-1">

@@ -7,7 +7,7 @@ import InvestmentGlobalFundingChart from '@/components/dashboard/InvestmentGloba
 import InvestmentGlobalSectorChart from '@/components/dashboard/InvestmentGlobalSectorChart';
 import TableInvestments from '@/components/investments/TableInvestments';
 import axios from 'axios';
-import { Card, Spin, Statistic } from 'antd';
+import { Card, Divider, Spin, Statistic } from 'antd';
 import {
   ArrowDownOutlined,
   ArrowUpOutlined,
@@ -88,12 +88,22 @@ const Dashboard = ({ i18n }) => {
 
   return (
     <>
-      <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-        {t('message_start')}, {user.user_metadata.full_name ?? user.email}
-      </h2>
-      <p className="font-degarism text-base mt-4 mb-8 text-gray-500">
-        {t('message_description')}
-      </p>
+      <div className="h-[140px]">
+        <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          {t('message_start')}, {user.user_metadata.full_name ?? user.email}
+        </h2>
+        <p className="font-degarism text-base mt-4 mb-8 text-gray-500">
+          {t('message_description')}
+        </p>
+      </div>
+
+      <div className="mt-8 mb-8">
+        <Divider orientation="left" orientationMargin="0">
+          <h3 className="text-xl font-bold text-gray-900">
+            {t('sections.general_stats')}
+          </h3>
+        </Divider>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-lg shadow-sm">
@@ -182,6 +192,14 @@ const Dashboard = ({ i18n }) => {
         </div>
       </div>
 
+      <div className="mt-8 mb-8">
+        <Divider orientation="left" orientationMargin="0">
+          <h3 className="text-xl font-bold text-gray-900">
+            {t('sections.investment_charts')} - {new Date().getFullYear()}
+          </h3>
+        </Divider>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white rounded-lg shadow-sm">
           <InvestmentGlobalChart />
@@ -192,6 +210,14 @@ const Dashboard = ({ i18n }) => {
         <div className="bg-white rounded-lg shadow-sm">
           <InvestmentGlobalSectorChart />
         </div>
+      </div>
+
+      <div className="mt-8 mb-8">
+        <Divider orientation="left" orientationMargin="0">
+          <h3 className="text-xl font-bold text-gray-900">
+            {t('sections.investment_list')}
+          </h3>
+        </Divider>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm">

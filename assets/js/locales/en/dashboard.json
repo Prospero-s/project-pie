@@ -6,5 +6,10 @@
     "companies_count": "Number of companies",
     "avg_investment": "Average investment",
     "growth_rate": "Growth rate"
+  },
+  "sections": {
+    "general_stats": "General Statistics",
+    "investment_charts": "Investment Charts",
+    "investment_list": "Investment List"
   }
 }

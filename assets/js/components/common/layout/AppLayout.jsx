@@ -108,7 +108,7 @@ export default function AppLayout({ i18n, children }) {
       <Layout className="site-layout bg-white dark:bg-gray-900">
         <AppHeader user={user} setUser={setUser} i18n={i18n} />
         <Content
-          className="m-4 overflow-auto"
+          className="p-4 mb-6 overflow-auto"
           style={{ height: 'calc(100vh - 64px - 69px)' }}
         >
           <div className="rounded-md h-full p-6">{children}</div>

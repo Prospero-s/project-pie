@@ -9,7 +9,7 @@ const { Header } = Layout;
 
 const AppHeader = ({ user, setUser, i18n }) => {
   return (
-    <Header className="site-layout-background bg-white h-16 p-6">
+    <Header className="site-layout-background bg-white h-16 p-6 shadow-sm">
       <div className="flex justify-between items-center h-full mr-4 ml-4">
         <div className="flex items-center gap-12">
           <img
