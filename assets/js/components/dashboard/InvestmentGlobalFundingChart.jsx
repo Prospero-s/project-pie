@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import PieChartComponent from '@/components/graphes/PieChart';
+import { ChartBarLabelCustom } from '@/components/graphes/BarChartCustomLabel';
 import { useTranslation } from 'react-i18next';
 import { PieChartOutlined } from '@ant-design/icons';
 import { fundingTypeTranslation } from '@/services/graphe/grapheService';
@@ -25,11 +25,11 @@ const InvestmentGlobalFundingChart = () => {
       setIsLoading(true);
       const response = await fetchGlobalFundingInvestments();
       const formattedData = response.map(item => ({
-        name: fundingTypeTranslation(t, item.funding_type),
-        value: Number(item.total_investment),
+        month: fundingTypeTranslation(t, item.funding_type),
+        investissements: Number(item.total_investment),
       }));
 
-      const total = formattedData.reduce((sum, item) => sum + item.value, 0);
+      const total = formattedData.reduce((sum, item) => sum + item.desktop, 0);
       setTotalInvestment(total);
       setChartData(formattedData);
       setError(null);
@@ -142,11 +142,12 @@ const InvestmentGlobalFundingChart = () => {
       </CardHeader>
       <CardContent className="h-[320px]">
         <div className="w-full h-full">
-          <PieChartComponent
+          <ChartBarLabelCustom
             data={chartData}
-            height="100%"
-            totalValue={totalInvestment}
             totalLabel={t('investmentGlobalFundingChart.totalInvestment')}
+            title={charts('investmentGlobalFundingChart.title')}
+            description={`${new Date().getFullYear()}`}
+            trendText={`Total: ${totalInvestment.toLocaleString()}€`}
           />
         </div>
       </CardContent>

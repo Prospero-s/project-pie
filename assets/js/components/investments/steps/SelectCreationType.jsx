@@ -25,8 +25,10 @@ const SelectCreationType = ({ onSelect, onNext, t }) => {
           <h3 className="text-lg font-medium">
             {t('creation.automatic_creation')}
           </h3>
-          <p>{t('creation.automatic_description')}</p>
+          <p className="font-degarism">{t('creation.automatic_description')}</p>
         </Card>
+
+        <span>OU</span>
 
         <Card
           hoverable
@@ -37,7 +39,7 @@ const SelectCreationType = ({ onSelect, onNext, t }) => {
           <h3 className="text-lg font-medium">
             {t('creation.manual_creation')}
           </h3>
-          <p>{t('creation.manual_description')}</p>
+          <p className="font-degarism">{t('creation.manual_description')}</p>
         </Card>
       </Space>
     </div>
