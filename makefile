@@ -4,6 +4,7 @@ SYMFONY = docker-compose exec php bin/console
 COMPOSER = docker-compose exec php composer
 NPM = docker-compose exec node npm
 PHP_CONTAINER = php
+PHPUNIT = docker-compose exec $(PHP_CONTAINER) ./vendor/bin/phpunit
 
 # Inclure les variables d'environnement
 include .env
@@ -25,7 +26,7 @@ help:
 	@echo "  cache-clear       - Vider le cache Symfony"
 	@echo ""
 	@echo "Tests et Qualité de code:"
-	@echo "  test              - Exécuter les tests PHPUnit"
+	@echo "  test              - Exécuter les tests PHPUnit avec testdox et couverture de code"
 	@echo "  run-tests         - Lance tous les tests et vérifications de qualité de code"
 	@echo "  lint              - Lance ESLint"
 	@echo "  lint-fix          - Corrige automatiquement les erreurs ESLint"
@@ -34,6 +35,7 @@ help:
 	@echo "  phpstan           - Lance PHPStan"
 	@echo ""
 	@echo "Base de données:"
+	@echo "  migrations        - Exécuter les migrations de base de données"
 	@echo "  test-db-local     - Vérifier la connexion à la base de données locale"
 	@echo "  test-db-aws       - Vérifier la connexion à la base de données AWS"
 	@echo "  test-all-db       - Vérifier les deux bases de données"
@@ -78,9 +80,6 @@ install:
 cache-clear:
 	$(SYMFONY) cache:clear
 
-test:
-	$(DOCKER_COMPOSE) exec $(PHP_CONTAINER) ./vendor/bin/phpunit
-
 test-db-local:
 	$(SYMFONY) doctrine:schema:validate
 	$(SYMFONY) doctrine:migrations:status
@@ -96,14 +95,14 @@ hooks:
 	chmod +x ./scripts/install-hooks.sh
 	./scripts/install-hooks.sh
 
-# Commandes pour les migrations
-
+# Commandes pour les fixtures
 load-dev-fixtures:
 	$(SYMFONY) doctrine:f:load -n
 
 load-demo-fixtures:
 	$(SYMFONY) doctrine:fixtures:load --group=demo --append --no-interaction
 
+# Commandes pour les migrations
 test-demo-account:
 	$(DOCKER_COMPOSE) exec php php scripts/test-demo-account.php
 
@@ -156,6 +155,18 @@ lint-phpcs-fix: ## Corrige automatiquement les erreurs PHP Code Sniffer
 phpstan: ## Lance PHPStan
 	$(COMPOSER) phpstan
 
+.PHONY: test
+test: ## Exécuter les tests PHPUnit avec testdox et couverture de code
+	$(PHPUNIT) --testdox --coverage-text
+
+.PHONY: test-file
+test-file: ## Exécuter un test spécifique (usage: make test-file FILE=tests/Controllers/CompanyInvestmentControllerTest.php)
+	$(PHPUNIT) --testdox $(FILE)
+
+.PHONY: test-filter
+test-filter: ## Exécuter des tests avec un filtre (usage: make test-filter FILTER=CompanyInvestmentController)
+	$(PHPUNIT) --filter $(FILTER) --testdox
+
 .PHONY: run-tests
 run-tests: ## Lance tous les tests et vérifications de qualité de code
 	@echo "🔍 Lancement des vérifications de qualité de code..."
@@ -163,7 +174,7 @@ run-tests: ## Lance tous les tests et vérifications de qualité de code
 	$(COMPOSER) cs-check
 	$(COMPOSER) phpstan
 	@echo "🧪 Lancement des tests unitaires..."
-	$(DOCKER_COMPOSE) exec $(PHP_CONTAINER) ./vendor/bin/phpunit
+	$(PHPUNIT) --testdox --coverage-text
 	@echo "📦 Build du frontend..."
 	$(NPM) run build
 	@echo "✅ Tous les tests et vérifications sont terminés !"
