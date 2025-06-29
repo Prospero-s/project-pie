@@ -6,6 +6,7 @@ use App\Entity\Document;
 use App\Entity\Kpi;
 use App\Repository\DocumentRepository;
 use App\Repository\CompanyRepository;
+use App\Repository\KpiRepository;
 use App\Service\User\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,21 +17,13 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api/documents', name: 'api_documents_')]
 class DocumentController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-    private DocumentRepository $documentRepository;
-    private CompanyRepository $companyRepository;
-    private UserService $userService;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        DocumentRepository $documentRepository,
-        CompanyRepository $companyRepository,
-        UserService $userService
+        private EntityManagerInterface $entityManager,
+        private DocumentRepository $documentRepository,
+        private CompanyRepository $companyRepository,
+        private UserService $userService,
+        private KpiRepository $kpiRepository
     ) {
-        $this->entityManager = $entityManager;
-        $this->documentRepository = $documentRepository;
-        $this->companyRepository = $companyRepository;
-        $this->userService = $userService;
     }
 
     #[Route('', name: 'list', methods: ['GET'])]
