@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import illustrationLogin from '@img/illustration/illustration-login-v1.png';
+import illustrationLogin from '@img/illustration/illustration-login-v2.2.png';
 import logoProspero from '@img/logo/logo-icon-prospero-blue.svg';
 import { useUser } from '@/context/userContext';
 import FooterLayout from '@/components/common/layout/Footer';
@@ -22,7 +22,7 @@ const AuthLayout = ({ children, i18n }) => {
         <div className="px-8 py-6 lg:px-12">
           <div className="flex items-center gap-2">
             <img src={logoProspero} alt="Prospero Logo" className="h-8 w-8" />
-            <span className="text-2xl font-semibold text-gray-900">
+            <span className="text-3xl font-semibold text-gray-900">
               Prospero
             </span>
           </div>
@@ -33,13 +33,13 @@ const AuthLayout = ({ children, i18n }) => {
         <FooterLayout i18n={i18n} isDashboard={false} />
       </div>
       <div className="hidden lg:block lg:w-1/2 relative bg-gray-50">
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[90%] aspect-[16/10] rounded-lg rounded-r-none shadow-xl overflow-hidden border-4 border-r-0 border-black">
-          <img
-            src={illustrationLogin}
-            alt="Prospero Dashboard"
-            className="w-full h-full object-cover object-left"
-          />
-        </div>
+        {/* <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[90%] aspect-[16/10] rounded-lg rounded-r-none shadow-xl overflow-hidden border-4 border-r-0 border-black"> */}
+        <img
+          src={illustrationLogin}
+          alt="Prospero Dashboard"
+          className="w-full h-full object-cover object-left"
+        />
+        {/* </div> */}
       </div>
     </div>
   );

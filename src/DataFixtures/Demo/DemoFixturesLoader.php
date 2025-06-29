@@ -39,31 +39,31 @@ class DemoFixturesLoader extends Fixture implements FixtureGroupInterface
         $demoUser = $this->userFixture->createDemoUser($manager);
         $manager->persist($demoUser);
         $manager->flush(); // Flush pour obtenir l'ID de l'utilisateur
-        
+
         // 3. Créer le groupe demo
         $demoGroup = $this->userFixture->createDemoGroup($manager, $demoUser);
         $manager->persist($demoGroup);
         $manager->flush(); // Flush pour obtenir l'ID du groupe
-        
+
         // 4. Assigner l'utilisateur au groupe
         $demoUser->setUserGroup($demoGroup);
         $demoGroup->addUser($demoUser);
-        
+
         // 5. Créer les paramètres de notification
         $notificationSettings = $this->userFixture->createNotificationSettings($manager, $demoUser);
         $manager->persist($notificationSettings);
-        
+
         // 6. Créer les entreprises avec leurs détails
         $companies = $this->companyFixture->createCompaniesWithDetails($manager);
-        
+
         // 7. Créer les investissements
         $investments = $this->investmentFixture->createInvestmentsForCompanies(
-            $manager, 
-            $companies, 
-            $demoUser, 
+            $manager,
+            $companies,
+            $demoUser,
             $demoGroup
         );
-        
+
         // 8. Sauvegarder tout
         $manager->flush();
 
@@ -98,4 +98,4 @@ class DemoFixturesLoader extends Fixture implements FixtureGroupInterface
     {
         return ['demo'];
     }
-} 
+}

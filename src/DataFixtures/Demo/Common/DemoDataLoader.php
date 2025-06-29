@@ -18,7 +18,7 @@ class DemoDataLoader
     public function loadJsonData(string $category, string $filename): array
     {
         $filePath = $this->dataPath . "/{$category}/{$filename}";
-        
+
         if (!file_exists($filePath)) {
             throw new \RuntimeException("Data file not found: {$filePath}");
         }
@@ -27,7 +27,7 @@ class DemoDataLoader
         if ($content === false) {
             throw new \RuntimeException("Cannot read file: {$filePath}");
         }
-        
+
         $data = json_decode($content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -63,4 +63,4 @@ class DemoDataLoader
     {
         return $this->loadJsonData('Investment', 'demo-investments.json');
     }
-} 
+}

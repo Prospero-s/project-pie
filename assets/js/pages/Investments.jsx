@@ -4,6 +4,7 @@ import Breadcrumb from '@/components/common/breadcrumb/Breadcrumb';
 import TableInvestments from '@/components/investments/TableInvestments';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Button } from 'antd';
+import { DownloadOutlined, FileOutlined } from '@ant-design/icons';
 
 const Investments = ({ i18n }) => {
   const { t } = useTranslation('investments', { i18n });
@@ -25,9 +26,22 @@ const Investments = ({ i18n }) => {
         <Breadcrumb pageName={t('my_portfolio')} />
 
         {!isTableEmpty && (
-          <Button type="primary" onClick={() => setIsModalOpen(true)}>
-            {t('common.add')}
-          </Button>
+          <div className="flex gap-2 ml-auto">
+            <Button
+              icon={<FileOutlined />}
+              type="primary"
+              onClick={() => setIsModalOpen(true)}
+            >
+              {t('common.add')}
+            </Button>
+            <Button
+              icon={<DownloadOutlined />}
+              type="default"
+              onClick={() => null}
+            >
+              {t('common.exportXSLX')}
+            </Button>
+          </div>
         )}
       </div>
 

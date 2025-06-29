@@ -200,7 +200,7 @@ const SignUp = ({ i18n }) => {
     <>
       <div className="w-full" ref={formRef}>
         <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-3xl font-semibold text-gray-900 mb-2">
             {t('title')}
           </h2>
           <h4 className="text-gray-600 text-md mb-6">{t('subtitle')}</h4>

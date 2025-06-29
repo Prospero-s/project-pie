@@ -16,7 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
 class UserNotificationsRepository extends ServiceEntityRepository
 {
     private EntityManagerInterface $em;
-    
+
     public function __construct(ManagerRegistry $registry, EntityManagerInterface $em)
     {
         parent::__construct($registry, UserNotifications::class);
@@ -25,7 +25,7 @@ class UserNotificationsRepository extends ServiceEntityRepository
 
     public function send(User $to, Notifications $notification): void
     {
-        $userNotification = new UserNotifications;
+        $userNotification = new UserNotifications();
         $userNotification->setUserId($to);
         $userNotification->setNotification($notification);
         $userNotification->setStatus(NotificationStatus::SENT->getValue());

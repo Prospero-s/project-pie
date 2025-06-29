@@ -1,13 +1,6 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-
-const COLORS = [
-  '#297CF7', // Bleu
-  '#12B76A', // Vert
-  '#9f1239', // Rouge
-  '#FF8042', // Orange
-  '#1d4ed8', // Violet
-];
+import { PIE_CHART_COLORS } from '@/lib/colors';
 
 const PieChartComponent = ({ data, height = '100%' }) => {
   return (
@@ -25,10 +18,7 @@ const PieChartComponent = ({ data, height = '100%' }) => {
             style={{ outline: 'none' }}
           >
             {data.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
-              />
+              <Cell key={`cell-${index}`} fill={PIE_CHART_COLORS(entry.name)} />
             ))}
           </Pie>
           <Tooltip

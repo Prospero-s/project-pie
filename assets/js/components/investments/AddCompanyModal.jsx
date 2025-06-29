@@ -80,6 +80,7 @@ const AddCompanyModal = ({ visible, onCancel, onAdd, t }) => {
               setCompanyData(data);
               setCurrentStep(2);
             }}
+            onBack={() => setCurrentStep(0)}
             t={t}
           />
         ) : (
@@ -88,6 +89,7 @@ const AddCompanyModal = ({ visible, onCancel, onAdd, t }) => {
               setCompanyData(data);
               setCurrentStep(2);
             }}
+            onBack={() => setCurrentStep(0)}
             t={t}
           />
         ),

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from 'antd';
-import { InboxOutlined } from '@ant-design/icons';
+import { InboxOutlined, FileOutlined } from '@ant-design/icons';
 
 const EmptyInvestmentState = ({ t, onAddClick }) => {
   return (
@@ -11,8 +11,10 @@ const EmptyInvestmentState = ({ t, onAddClick }) => {
       <h3 className="text-lg font-medium text-gray-900 mb-2">
         {t('no_investments.title')}
       </h3>
-      <p className="text-gray-600 mb-4">{t('no_investments.description')}</p>
-      <Button type="primary" onClick={onAddClick}>
+      <p className="font-degarism text-gray-600 mb-4">
+        {t('no_investments.description')}
+      </p>
+      <Button icon={<FileOutlined />} type="primary" onClick={onAddClick}>
         {t('common.add')}
       </Button>
     </div>

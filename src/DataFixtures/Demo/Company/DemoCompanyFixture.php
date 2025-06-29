@@ -28,7 +28,7 @@ class DemoCompanyFixture
     public function createCompaniesWithDetails(ObjectManager $manager): array
     {
         $companies = [];
-        
+
         foreach ($this->companiesData['companies'] as $companyData) {
             // Créer l'entreprise
             $company = $this->createCompany($companyData);
@@ -100,4 +100,4 @@ class DemoCompanyFixture
     {
         return count($this->companiesData['companies']);
     }
-} 
+}

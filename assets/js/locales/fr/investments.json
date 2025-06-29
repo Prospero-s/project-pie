@@ -20,7 +20,14 @@
     "amount_raised": "Montant levé",
     "funding_type": "Type de levée",
     "last_update": "Dernière mise à jour",
-    "actions": "Actions"
+    "actions": "Actions",
+    "delete": "Supprimer",
+    "delete_confirmation": "Êtes-vous sûr de vouloir supprimer cet investissement ?",
+    "delete_success": "Investissement supprimé avec succès",
+    "delete_error": "Erreur lors de la suppression de l'investissement",
+    "investment_not_found": "Investissement non trouvé",
+    "error_loading": "Erreur lors du chargement",
+    "exportXSLX": "Export en XSLX"
   },
   "creation": {
     "title": "Création d'entreprise",
@@ -32,6 +39,7 @@
   },
   "company_details": {
     "title": "Détails de l'entreprise",
+    "others_informations": "Autres informations",
     "confirmation_title": "Confirmation des détails de l'entreprise",
     "siren": "Numéro SIREN",
     "siren_placeholder": "Entrez le numéro SIREN (9 chiffres)",

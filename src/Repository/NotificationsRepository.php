@@ -19,10 +19,10 @@ class NotificationsRepository extends ServiceEntityRepository
         parent::__construct($registry, Notifications::class);
         $this->em = $em;
     }
-    
+
     public function add(string $title, string $message, string $type): Notifications
     {
-        $notification = new Notifications;
+        $notification = new Notifications();
         $notification->setTitle($title);
         $notification->setMessage($message);
         $notification->setType($type);

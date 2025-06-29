@@ -166,10 +166,12 @@ const SignIn = ({ i18n }) => {
   return (
     <div className="w-full" ref={formRef}>
       <div className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+        <h2 className="text-3xl font-semibold text-gray-900 mb-2">
           {t('login_title')}
         </h2>
-        <h4 className="text-gray-600 text-md mb-6">{t('login_subtitle')}</h4>
+        <h3 className="font-degarism text-gray-600 text-lg mb-6">
+          {t('login_subtitle')}
+        </h3>
       </div>
       <SignInForm
         t={t}

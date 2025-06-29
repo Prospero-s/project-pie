@@ -32,6 +32,8 @@ import {
   SaveOutlined,
   DeleteOutlined,
   PlusOutlined,
+  RollbackOutlined,
+  FormOutlined,
 } from '@ant-design/icons';
 import { useUser } from '@/context/userContext';
 import axios from 'axios';
@@ -1154,7 +1156,11 @@ const ExtractResult = ({ i18n }) => {
             </div>
 
             <Space>
-              <Button onClick={() => navigate(-1)}>
+              <Button
+                type="default"
+                icon={<RollbackOutlined />}
+                onClick={() => navigate(-1)}
+              >
                 {t('analyze.cancel')}
               </Button>
               <Button
@@ -1489,6 +1495,8 @@ const ExtractResult = ({ i18n }) => {
                 <Space direction="vertical" size="small">
                   <Space>
                     <Button
+                      type="default"
+                      icon={<RollbackOutlined />}
                       onClick={() => navigate(-1)}
                       disabled={isValidating}
                     >
@@ -1498,8 +1506,7 @@ const ExtractResult = ({ i18n }) => {
                       type="default"
                       onClick={() => handleSubmit(true)}
                       loading={isValidating}
-                      icon={<SaveOutlined />}
-                      size="large"
+                      icon={<FormOutlined />}
                     >
                       {t('extractresult:save_as_draft')}
                     </Button>
@@ -1508,7 +1515,6 @@ const ExtractResult = ({ i18n }) => {
                       onClick={() => handleSubmit(false)}
                       loading={isValidating}
                       icon={<SaveOutlined />}
-                      size="large"
                     >
                       {t('extractresult:validate_document')}
                     </Button>

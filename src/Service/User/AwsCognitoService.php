@@ -12,7 +12,7 @@ class AwsCognitoService
     private string $userPoolId;
 
     public function __construct(
-        string $region, 
+        string $region,
         string $userPoolId,
         string $accessKeyId = null,
         string $secretAccessKey = null
@@ -42,9 +42,9 @@ class AwsCognitoService
                 'Filter' => 'email = "' . $email . '"',
                 'Limit' => 1
             ];
-            
+
             $result = $this->client->listUsers($params);
-            
+
             // Si la liste des utilisateurs n'est pas vide, l'utilisateur existe
             return !empty($result['Users']);
         } catch (AwsException $e) {
@@ -63,17 +63,17 @@ class AwsCognitoService
                 'UserPoolId' => $this->userPoolId,
                 'Username' => $username,
             ]);
-            
+
             return true;
         } catch (AwsException $e) {
             if ($e->getAwsErrorCode() === 'UserNotFoundException') {
                 throw new \Exception('Utilisateur non trouvé');
             }
-            
+
             if ($e->getAwsErrorCode() === 'NotAuthorizedException') {
                 throw new \Exception('Vous n\'êtes pas autorisé à effectuer cette action');
             }
-            
+
             throw new \Exception('Erreur lors de la confirmation du compte: ' . $e->getMessage());
         }
     }
@@ -88,7 +88,7 @@ class AwsCognitoService
                 'UserPoolId' => $this->userPoolId,
                 'Username' => $username,
             ]);
-            
+
             return true;
         } catch (AwsException $e) {
             throw new \Exception('Erreur lors de la réinitialisation du mot de passe: ' . $e->getMessage());
@@ -107,10 +107,10 @@ class AwsCognitoService
                 'Password' => $password,
                 'Permanent' => true
             ]);
-            
+
             return true;
         } catch (AwsException $e) {
             throw new \Exception('Erreur lors de la définition du mot de passe: ' . $e->getMessage());
         }
     }
-} 
+}

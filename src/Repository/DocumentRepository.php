@@ -77,4 +77,25 @@ class DocumentRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
-} 
+
+    /**
+     * Supprime un document par son UUID
+     *
+     * @param string $uuid UUID du document à supprimer
+     * @return bool True si le document a été supprimé, false sinon
+     */
+    public function deleteDocumentByUuid(string $uuid): bool
+    {
+        $document = $this->findOneByUuid($uuid);
+
+        if (!$document) {
+            return false;
+        }
+
+        $em = $this->getEntityManager();
+        $em->remove($document);
+        $em->flush();
+
+        return true;
+    }
+}

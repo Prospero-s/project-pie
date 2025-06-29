@@ -65,7 +65,7 @@ const CompanyDetails = ({ i18n }) => {
             },
             {
               key: '5',
-              label: metrics('info'),
+              label: metrics('all_metrics'),
               children: <AllMetrics />,
             },
           ]}

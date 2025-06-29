@@ -56,6 +56,54 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
 
     /**
      * @param UserGroup $userGroup
+     * @return int
+     */
+    public function countInvestedCompaniesByGroup(UserGroup $userGroup): int
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT COUNT(DISTINCT ci.company_id) AS invested_companies
+            FROM company_investment ci
+            WHERE ci.user_group_id = :userGroupId
+        ';
+
+        $stmt = $conn->prepare($sql);
+        $result = $stmt->executeQuery([
+            'userGroupId' => $userGroup->getId(),
+        ])->fetchOne();
+
+        return $result !== null ? (int) $result : 0;
+    }
+
+    /**
+     * @param UserGroup $userGroup
+     * @return float
+     */
+    public function getAverageInvestmentByGroup(UserGroup $userGroup): float
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT 
+                CASE 
+                    WHEN COUNT(DISTINCT ci.company_id) = 0 THEN 0
+                    ELSE SUM(ci.amount) / COUNT(DISTINCT ci.company_id)
+                END AS average_investment
+            FROM company_investment ci
+            WHERE ci.user_group_id = :userGroupId
+        ';
+
+        $stmt = $conn->prepare($sql);
+        $result = $stmt->executeQuery([
+            'userGroupId' => $userGroup->getId(),
+        ])->fetchOne();
+
+        return $result !== null ? (float) $result : 0.0;
+    }
+
+    /**
+     * @param UserGroup $userGroup
      * @return list<array<string, mixed>>
      */
     public function fetchGlobalInvestments(UserGroup $userGroup): array
@@ -82,6 +130,28 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
         ]);
 
         return $result->fetchAllAssociative();
+    }
+
+    /**
+     * @param UserGroup $userGroup
+     * @return float
+     */
+    public function getTotalInvestmentsByGroup(UserGroup $userGroup): float
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT SUM(ci.amount) AS total
+            FROM company_investment ci
+            WHERE ci.user_group_id = :userGroupId
+        ';
+
+        $stmt = $conn->prepare($sql);
+        $result = $stmt->executeQuery([
+            'userGroupId' => $userGroup->getId(),
+        ])->fetchOne();
+
+        return $result !== null ? (float) $result : 0.0;
     }
 
     /**
@@ -142,7 +212,7 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
 
     /**
      * Récupère la liste des requêtes prédéfinies disponibles pour l'explorateur de données
-     * 
+     *
      * @return list<array<string, mixed>>
      */
     public function getPredefinedQueries(): array
@@ -201,7 +271,7 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
 
     /**
      * Exécute une requête prédéfinie en fonction de son ID
-     * 
+     *
      * @param string $queryId ID de la requête prédéfinie ou nom de la requête
      * @param int $companyId ID de l'entreprise
      * @param UserGroup $userGroup Groupe utilisateur
@@ -231,7 +301,7 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
                     LIMIT 20;
                 ";
                 break;
-                
+
             case 'clients_by_sector':
             case '2':
                 // Clients par secteur - basé sur les entreprises dans le portefeuille
@@ -248,7 +318,7 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
                     ORDER BY client_count DESC, total_invested DESC;
                 ";
                 break;
-                
+
             case 'burn_rate_evolution':
             case '3':
                 // Évolution Argent brûlé - basée sur les KPI réels
@@ -271,7 +341,7 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
                     LIMIT 8;
                 ";
                 break;
-                
+
             case 'top_clients':
             case '4':
                 // Top 10 clients - basé sur les investissements réels
@@ -291,7 +361,7 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
                     LIMIT 10;
                 ";
                 break;
-                
+
             case 'headcount':
             case '5':
                 // Évolution du nombre d'employés - basée sur les KPI réels
@@ -311,7 +381,7 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
                     LIMIT 15;
                 ";
                 break;
-                
+
             case 'quarterly_investments':
             case '6':
                 // Investissements trimestriels - données réelles d'investissement
@@ -332,7 +402,7 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
                     LIMIT 8;
                 ";
                 break;
-                
+
             case 'total_investment':
             case '7':
                 // Total investi - synthèse des investissements
@@ -365,7 +435,7 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
                     ORDER BY total_amount DESC;
                 ";
                 break;
-                
+
             case 'kpi_analysis_by_period':
             case '8':
                 // Analyse KPI par période - reproduit EXACTEMENT le format de "Tous les metrics"
@@ -476,5 +546,73 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
                 ]
             ];
         }
+    }
+
+    /**
+     * Supprime un investissement par son ID
+     *
+     * @param int $id ID de l'investissement à supprimer
+     * @return bool True si l'investissement a été supprimé, false sinon
+     */
+    public function deleteInvestmentById(int $id): bool
+    {
+        $investment = $this->find($id);
+
+        if (!$investment) {
+            return false;
+        }
+
+        $em = $this->getEntityManager();
+        $em->remove($investment);
+        $em->flush();
+
+        return true;
+    }
+
+    /**
+     * @param UserGroup $userGroup
+     * @param int $year
+     * @return float
+     */
+    public function getGrowthRateByGroup(UserGroup $userGroup, int $year = null): float
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        if ($year === null) {
+            $year = (int) (new \DateTime())->format('Y');
+        }
+        $lastYear = $year - 1;
+
+        // Montant total investi année N
+        $sqlCurrent = '
+            SELECT SUM(ci.amount) 
+            FROM company_investment ci
+            WHERE ci.user_group_id = :userGroupId
+            AND EXTRACT(YEAR FROM ci.invested_at) = :year
+        ';
+        $current = $conn->prepare($sqlCurrent)->executeQuery([
+            'userGroupId' => $userGroup->getId(),
+            'year' => $year,
+        ])->fetchOne();
+        $current = $current ? (float) $current : 0.0;
+
+        // Montant total investi année N-1
+        $sqlLast = '
+            SELECT SUM(ci.amount) 
+            FROM company_investment ci
+            WHERE ci.user_group_id = :userGroupId
+            AND EXTRACT(YEAR FROM ci.invested_at) = :year
+        ';
+        $previous = $conn->prepare($sqlLast)->executeQuery([
+            'userGroupId' => $userGroup->getId(),
+            'year' => $lastYear,
+        ])->fetchOne();
+        $previous = $previous ? (float) $previous : 0.0;
+
+        if ($previous == 0) {
+            return 0.0;
+        }
+
+        return round((($current - $previous) / $previous) * 100, 2);
     }
 }

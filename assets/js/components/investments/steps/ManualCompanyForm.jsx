@@ -3,7 +3,8 @@ import { Form, Input, Button, Select } from 'antd';
 
 const { Option } = Select;
 
-const ManualCompanyForm = ({ onNext, t }) => {
+const ManualCompanyForm = ({ onNext, onBack, t }) => {
+  const [form] = Form.useForm();
   const sectors = [
     { value: 'technology', label: t('company_details.sectors.technology') },
     { value: 'healthcare', label: t('company_details.sectors.healthcare') },
@@ -33,7 +34,12 @@ const ManualCompanyForm = ({ onNext, t }) => {
   };
 
   return (
-    <Form layout="vertical" onFinish={onFinish}>
+    <Form
+      form={form}
+      layout="vertical"
+      className="px-1 sm:px-2"
+      onFinish={onFinish}
+    >
       <Form.Item
         name="denomination"
         label={t('company_details.company.name')}
@@ -52,14 +58,24 @@ const ManualCompanyForm = ({ onNext, t }) => {
         label={t('company_details.siren')}
         rules={[
           { required: true, message: t('company_details.siren_required') },
-          { min: 9, message: t('company_details.siren_invalid') },
-          { max: 9, message: t('company_details.siren_invalid') },
+          { pattern: /^\d{9}$/, message: t('company_details.siren_invalid') },
         ]}
       >
         <Input
           placeholder={t('company_details.siren_placeholder')}
-          minLength={9}
           maxLength={9}
+          inputMode="numeric"
+          onPaste={e => {
+            const pasted = e.clipboardData.getData('Text') || '';
+            const cleaned = pasted.replace(/\D/g, '').slice(0, 9); // Supprime non-chiffres, max 9
+
+            e.preventDefault();
+            form.setFieldsValue({ siren: cleaned });
+          }}
+          onChange={e => {
+            const cleaned = e.target.value.replace(/\D/g, '').slice(0, 9);
+            form.setFieldsValue({ siren: cleaned });
+          }}
         />
       </Form.Item>
 
@@ -79,8 +95,11 @@ const ManualCompanyForm = ({ onNext, t }) => {
         </Select>
       </Form.Item>
 
-      <Form.Item>
-        <Button type="primary" htmlType="submit" block>
+      <Form.Item className="flex justify-end gap-3 flex-nowrap sm:flex-nowrap">
+        <Button className="mx-2" onClick={onBack}>
+          {t('common.back')}
+        </Button>
+        <Button className="mx-2" type="primary" htmlType="submit">
           {t('common.next')}
         </Button>
       </Form.Item>

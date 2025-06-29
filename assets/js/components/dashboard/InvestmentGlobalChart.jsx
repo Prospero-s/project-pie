@@ -49,10 +49,10 @@ export default function InvestmentGlobalChart() {
     return (
       <Card className="w-full h-[400px]">
         <CardHeader className="text-center pb-2">
-          <CardTitle className="text-2xl font-bold text-gray-900">
+          <CardTitle className="text-xl font-bold text-gray-900">
             {charts('investmentGlobalChart.title')}
           </CardTitle>
-          <CardDescription className="text-sm text-gray-500 mt-1">
+          <CardDescription className="text-gray-500 mt-1">
             {new Date().getFullYear()}
           </CardDescription>
         </CardHeader>
@@ -91,7 +91,7 @@ export default function InvestmentGlobalChart() {
           <CardTitle className="text-2xl font-bold text-gray-900">
             {charts('investmentGlobalChart.title')}
           </CardTitle>
-          <CardDescription className="text-sm text-gray-500 mt-1">
+          <CardDescription className="text-gray-500 mt-1">
             {new Date().getFullYear()}
           </CardDescription>
         </CardHeader>
@@ -156,7 +156,7 @@ export default function InvestmentGlobalChart() {
         <CardTitle className="text-2xl font-bold text-gray-900">
           {charts('investmentGlobalChart.title')}
         </CardTitle>
-        <CardDescription className="text-sm text-gray-500 mt-1">
+        <CardDescription className="text-gray-500 mt-1">
           {new Date().getFullYear()}
         </CardDescription>
       </CardHeader>

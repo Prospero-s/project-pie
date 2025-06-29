@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Auth } from 'aws-amplify';
 
 const API_URL = '/api/documents';
 
@@ -8,7 +9,15 @@ const API_URL = '/api/documents';
  */
 export const fetchDocuments = async () => {
   try {
-    const response = await axios.get(`${API_URL}`);
+    const session = await Auth.currentSession();
+    const cognitoId = session.getIdToken().payload.sub;
+
+    const response = await axios.get(`${API_URL}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Cognito-Id': cognitoId,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Erreur lors de la récupération des documents:', error);
@@ -23,7 +32,15 @@ export const fetchDocuments = async () => {
  */
 export const deleteDocument = async id => {
   try {
-    const response = await axios.delete(`${API_URL}/${id}`);
+    const session = await Auth.currentSession();
+    const cognitoId = session.getIdToken().payload.sub;
+
+    const response = await axios.delete(`${API_URL}/delete/${id}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Cognito-Id': cognitoId,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Erreur lors de la suppression du document:', error);

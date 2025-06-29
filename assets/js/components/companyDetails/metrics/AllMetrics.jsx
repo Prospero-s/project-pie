@@ -181,7 +181,7 @@ const AllMetrics = () => {
   }
 
   return (
-    <div>
+    <div style={{ overflowX: 'auto' }}>
       {/* Sélecteur d'année avec navigation */}
       <div className="metrics-header">
         <Space size="middle">

@@ -7,14 +7,15 @@ import {
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
+  Cell,
 } from 'recharts';
+import { SECTOR_TYPE_CHART_COLORS } from '@/lib/colors';
 
 const BarChartComponent = ({
   data,
   dataKey,
   nameKey,
   height,
-  barColor = '#297CF7',
   margin = { top: 20, right: 20, left: 50, bottom: 70 },
   tooltipFormatter = value => `${value.toLocaleString()}€`,
   tooltipLabelFormatter = label => `${label}`,
@@ -88,10 +89,18 @@ const BarChartComponent = ({
           <Bar
             dataKey={dataKey}
             name={barName}
-            fill={barColor}
             radius={[4, 4, 0, 0]}
             maxBarSize={50}
-          />
+          >
+            {data.map((entry, index) => {
+              return (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={SECTOR_TYPE_CHART_COLORS(entry[nameKey])}
+                />
+              );
+            })}
+          </Bar>
         </RechartsBarChart>
       </ResponsiveContainer>
     </div>

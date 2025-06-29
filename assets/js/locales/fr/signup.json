@@ -10,7 +10,7 @@
   "confirm_password": "Confirmer le mot de passe",
   "reenter_password": "Réentrer votre mot de passe",
   "create_account": "Créer un compte",
-  "already_have_account": "Vous avez déjà un compte?",
+  "already_have_account": "Vous avez déjà un compte ?",
   "sign_in": "Se connecter",
   "registration_error": "Échec de l'inscription. Veuillez vérifier vos informations et réessayer.",
   "registration_error_title": "Erreur d'inscription",

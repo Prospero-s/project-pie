@@ -16,7 +16,7 @@ const SignInForm = ({
 }) => (
   <form onSubmit={handleSignIn} className="space-y-4">
     <div className="space-y-1.5">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-base font-medium text-gray-700">
         {t('email')}
       </label>
       <InputField
@@ -27,7 +27,7 @@ const SignInForm = ({
       />
     </div>
     <div className="space-y-1.5">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-base font-medium text-gray-700">
         {t('password')}
       </label>
       <PasswordField
@@ -38,7 +38,9 @@ const SignInForm = ({
       />
     </div>
     <div className="flex items-center justify-between">
-      <Checkbox className="text-sm text-gray-600">{t('remember_me')}</Checkbox>
+      <Checkbox className="font-degarism text-sm text-gray-600">
+        {t('remember_me')}
+      </Checkbox>
       <Button
         onClick={handleForgotPassword}
         type="link"

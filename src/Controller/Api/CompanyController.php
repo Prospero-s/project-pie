@@ -99,11 +99,13 @@ class CompanyController extends AbstractController
             $companies = $this->companyRepository->findAll();
 
             $data = [];
-            foreach ($companies as $company) {
+            foreach ($companies as $key => $company) {
                 $data[] = [
+                    'index' => $key + 1,
                     'id' => $company->getId(),
                     'name' => $company->getDenomination(),
                     'sector' => $company->getSector(),
+                    'businessStructures' => $company->getBusinessStructures(),
                     'created_at' => $company->getCreatedAt()->format('Y-m-d'),
                 ];
             }
@@ -179,7 +181,7 @@ class CompanyController extends AbstractController
                         'unit' => $unit
                     ];
                 }
-                
+
                 // Formater la valeur avec l'unité si elle existe
                 $formattedValue = $value;
                 if ($unit && $value !== null) {
@@ -187,7 +189,7 @@ class CompanyController extends AbstractController
                 } elseif ($value !== null) {
                     $formattedValue = number_format($value, 2, ',', ' ');
                 }
-                
+
                 $organizedData[$metricName][$period] = $formattedValue;
             }
 
