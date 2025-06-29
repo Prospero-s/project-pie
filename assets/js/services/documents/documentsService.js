@@ -230,11 +230,95 @@ const documentsService = {
     };
   },
 
-  // Ajouter les fonctions exportées nommément pour compatibilité
-  fetchDocuments,
-  deleteDocument,
-  getDocumentViewUrl: getDocumentViewUrl,
-  openDocumentInNewWindow: openDocumentInNewWindow,
+  /**
+   * Met à jour un document existant et ses KPIs
+   * @param {string} documentId - Identifiant du document
+   * @param {Object} documentData - Données du document à mettre à jour
+   * @returns {Promise} Promise contenant la réponse de l'API
+   */
+  updateDocument: async (documentId, documentData) => {
+    const response = await axios.put(`${API_URL}/${documentId}`, documentData);
+    return response.data;
+  },
+
+  /**
+   * Transforme un document existant en format compatible avec ExtractResult
+   * @param {Object} document - Document existant avec ses KPIs
+   * @returns {Object} Données formatées pour ExtractResult
+   */
+  transformDocumentForEdit: async document => {
+    if (!document || !document.kpis) {
+      throw new Error('Document incomplet pour la modification');
+    }
+
+    // Organiser les KPIs par nom et période
+    const kpiData = {};
+    const numericKpiData = {};
+    const periods = new Set();
+
+    document.kpis.forEach(kpi => {
+      const kpiName = kpi.name;
+      const period = kpi.period;
+      const value = kpi.value;
+      const unit = kpi.unit || '';
+
+      // Ajouter la période à notre set
+      periods.add(period);
+
+      // Initialiser la structure si nécessaire
+      if (!kpiData[kpiName]) {
+        kpiData[kpiName] = {};
+        numericKpiData[kpiName] = {};
+      }
+
+      // Stocker les données textuelles et numériques
+      kpiData[kpiName][period] = value || 'N.A';
+      numericKpiData[kpiName][period] = {
+        value: value || 0,
+        unit: unit,
+        is_numeric: true,
+      };
+    });
+
+    // Convertir le Set en Array et trier
+    const periodsArray = Array.from(periods).sort();
+
+    // Récupérer le PDF et créer un blob URL
+    let pdfUrl = null;
+    try {
+      const response = await axios.get(`${API_URL}/${document.id}/view`, {
+        responseType: 'blob',
+        headers: {
+          'X-Cognito-Id': await getCognitoId(),
+        },
+      });
+
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      pdfUrl = window.URL.createObjectURL(blob);
+    } catch (error) {
+      console.error('Erreur lors du chargement du PDF:', error);
+      // On continue sans PDF si erreur
+    }
+
+    // Retourner un objet compatible avec ExtractResult
+    return {
+      company: document.company,
+      periodicity: document.periodicity,
+      year: document.year,
+      pdfUrl: pdfUrl, // Utiliser le blob URL au lieu de l'URL API
+      data: {
+        kpi: kpiData,
+        numeric_kpi: numericKpiData,
+        periods: periodsArray,
+      },
+      periods: periodsArray,
+      // Informations supplémentaires pour l'édition
+      documentId: document.id,
+      status: document.status,
+      filename: document.filename,
+      isEditMode: true,
+    };
+  },
 };
 
 export default documentsService;

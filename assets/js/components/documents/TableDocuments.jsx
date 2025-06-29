@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Tooltip, Table, Skeleton, message, Modal } from 'antd';
+import { Button, Tooltip, Table, Skeleton, message } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import {
   fetchDocuments,
@@ -8,18 +8,20 @@ import {
 } from '@/services/documents/documentsService';
 import { useNavigate } from 'react-router-dom';
 import EmptyDocumentState from './EmptyDocumentState';
+import DocumentDetailsModal from './DocumentDetailsModal';
 import { formatDate, getDateLocale } from '@/lib/utils';
 
-const TableDocuments = ({ t, lng = 'en' }) => {
+const TableDocuments = ({ t, i18n }) => {
   const [loading, setLoading] = useState(true);
   const [documents, setDocuments] = useState([]);
+  const lng = i18n.language;
   const navigate = useNavigate();
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
   });
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [modalContent, setModalContent] = useState('');
+  const [selectedDocumentId, setSelectedDocumentId] = useState(null);
 
   useEffect(() => {
     loadDocuments();
@@ -40,13 +42,18 @@ const TableDocuments = ({ t, lng = 'en' }) => {
     }
   };
 
-  const handleViewDetails = content => {
-    setModalContent(JSON.stringify(content, null, 2));
+  const handleViewDetails = record => {
+    setSelectedDocumentId(record.id);
     setIsModalVisible(true);
   };
 
   const handleModalClose = () => {
     setIsModalVisible(false);
+    setSelectedDocumentId(null);
+  };
+
+  const handleDocumentUpdated = () => {
+    loadDocuments(); // Recharger la liste après mise à jour
   };
 
   const loadDocuments = async () => {
@@ -114,7 +121,7 @@ const TableDocuments = ({ t, lng = 'en' }) => {
         ),
     },
     {
-      title: t('table.last_update'),
+      title: t('document_details.add_date'),
       dataIndex: 'addDate',
       key: 'addDate',
       render: date =>
@@ -146,7 +153,9 @@ const TableDocuments = ({ t, lng = 'en' }) => {
                 <Button
                   className="!text-blue-500 dark:!text-blue-400 hover:!text-blue-700 dark:hover:!text-blue-300 text-lg cursor-pointer"
                   icon={<EditOutlined />}
-                  onClick={() => navigate(`/documents/edit/${record.id}`)}
+                  onClick={() =>
+                    navigate(`/${lng}/documents/edit/${record.id}`)
+                  }
                 />
               </Tooltip>
             )}
@@ -154,7 +163,7 @@ const TableDocuments = ({ t, lng = 'en' }) => {
               <Button
                 className="!text-blue-500 dark:!text-blue-400 hover:!text-blue-700 dark:hover:!text-blue-300 text-lg cursor-pointer"
                 icon={<EyeOutlined />}
-                onClick={() => handleViewDetails(record.kpi)}
+                onClick={() => handleViewDetails(record)}
               />
             </Tooltip>
             <Tooltip title={t('table.tooltips.delete')}>
@@ -194,23 +203,14 @@ const TableDocuments = ({ t, lng = 'en' }) => {
         </div>
       </div>
 
-      <Modal
-        title="Détails"
+      <DocumentDetailsModal
         visible={isModalVisible}
         onCancel={handleModalClose}
-        footer={null}
-      >
-        <textarea
-          value={modalContent}
-          readOnly
-          style={{
-            width: '100%',
-            height: '480px',
-            resize: 'none',
-            fontFamily: 'monospace',
-          }}
-        />
-      </Modal>
+        onDocumentUpdated={handleDocumentUpdated}
+        documentId={selectedDocumentId}
+        t={t}
+        i18n={i18n}
+      />
     </>
   );
 };

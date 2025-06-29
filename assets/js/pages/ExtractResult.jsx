@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Button,
   Typography,
@@ -45,9 +45,46 @@ const { Title, Text } = Typography;
 
 const ExtractResult = ({ i18n }) => {
   const navigate = useNavigate();
+  const { id: documentId } = useParams(); // Récupérer l'ID du document depuis l'URL pour le mode édition
   const { analyzedData } = useUser();
   const { t } = useTranslation(['documents', 'extractresult'], { i18n });
-  const company = analyzedData?.company || null;
+
+  // Déterminer le mode : création (analyzedData) ou édition (documentId)
+  const isEditMode = !!documentId;
+
+  // Pour le mode édition, on utilise un state local au lieu d'analyzedData
+  const [editModeData, setEditModeData] = useState(null);
+  const [loadingDocument, setLoadingDocument] = useState(false);
+
+  // Utiliser les données appropriées selon le mode
+  const currentData = isEditMode ? editModeData : analyzedData;
+  const company = currentData?.company || null;
+
+  // Charger le document en mode édition
+  useEffect(() => {
+    if (isEditMode && documentId) {
+      loadDocumentForEdit();
+    }
+  }, [isEditMode, documentId]);
+
+  const loadDocumentForEdit = async () => {
+    try {
+      setLoadingDocument(true);
+      const document = await documentsService.getDocumentById(documentId);
+      const transformedData =
+        await documentsService.transformDocumentForEdit(document);
+      setEditModeData(transformedData);
+    } catch (error) {
+      message.error(t('messages.loading_error'));
+      console.error(
+        'Erreur lors du chargement du document pour édition:',
+        error,
+      );
+      navigate('/documents');
+    } finally {
+      setLoadingDocument(false);
+    }
+  };
 
   // Fonction pour générer un ID unique
   const generateUniqueId = (prefix = 'id') => {
@@ -81,15 +118,15 @@ const ExtractResult = ({ i18n }) => {
     { value: '', label: t('extractresult:no_unit', 'Sans unité') },
   ];
 
-  const periodicity = analyzedData?.periodicity || 'Q';
+  const periodicity = currentData?.periodicity || 'Q';
   const [selectedYear, setSelectedYear] = useState(
-    analyzedData &&
-      Object.prototype.hasOwnProperty.call(analyzedData, 'year') &&
-      analyzedData.year
-      ? analyzedData.year
+    currentData &&
+      Object.prototype.hasOwnProperty.call(currentData, 'year') &&
+      currentData.year
+      ? currentData.year
       : null,
   );
-  const processingId = analyzedData?.processingId || null;
+  const processingId = currentData?.processingId || null;
 
   const [isValidating, setIsValidating] = useState(false);
   const [yearSelectionRequired, setYearSelectionRequired] = useState(false);
@@ -174,9 +211,18 @@ const ExtractResult = ({ i18n }) => {
 
   useEffect(() => {
     return () => {
+      // Nettoyer les blob URLs créées pour le PDF en mode édition
+      if (
+        isEditMode &&
+        editModeData?.pdfUrl &&
+        editModeData.pdfUrl.startsWith('blob:')
+      ) {
+        window.URL.revokeObjectURL(editModeData.pdfUrl);
+      }
+      // Nettoyage existant pour le processing
       cleanupProcessingResources();
     };
-  }, [processingId]);
+  }, [isEditMode, editModeData, processingId]);
 
   const processKpiData = useCallback(
     data => {
@@ -460,13 +506,13 @@ const ExtractResult = ({ i18n }) => {
   }, []);
 
   useEffect(() => {
-    if (analyzedData) {
-      processKpiData(analyzedData);
+    if (currentData) {
+      processKpiData(currentData);
       setLoading(false);
     } else {
       setLoading(false);
     }
-  }, [analyzedData, processKpiData]);
+  }, [currentData, processKpiData]);
 
   // Effet séparé pour mettre à jour les titres des colonnes quand selectedYear ou periodsFound changent
   useEffect(() => {
@@ -726,86 +772,116 @@ const ExtractResult = ({ i18n }) => {
     try {
       setIsValidating(true);
 
-      // Vérification que toutes les données nécessaires sont présentes
-      if (!analyzedData || !analyzedData.pdfUrl) {
-        Modal.error({
-          title: t('extractresult:validation.missing_data_title'),
-          content: t('extractresult:validation.missing_pdf_message'),
-          okText: t('common.ok', 'OK'),
+      // Préparer les données modifiées pour l'API
+      const { kpis: modifiedKpis, units: kpiUnits } =
+        convertTableDataToKpiFormat();
+      const status = saveAsDraft ? 'draft' : 'validated';
+
+      if (isEditMode) {
+        // Mode édition : mettre à jour le document existant
+        const updateData = {
+          kpis: modifiedKpis,
+          units: kpiUnits,
+          status: status,
+          year: selectedYear,
+        };
+
+        await documentsService.updateDocument(documentId, updateData);
+
+        const successMessage = saveAsDraft
+          ? t('extractresult:validation.draft_success_message')
+          : t('extractresult:validation.success_message');
+
+        notification.success({
+          message: t('extractresult:validation.success_title'),
+          description: successMessage,
         });
+
         setIsValidating(false);
-        return;
-      }
 
-      // Récupérer le contenu du PDF en base64
-      const pdfResponse = await axios.get(analyzedData.pdfUrl, {
-        responseType: 'blob',
-      });
-
-      // Convertir le blob en base64
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        try {
-          const base64data = reader.result.split(',')[1];
-
-          // Préparer les données modifiées pour l'API
-          const { kpis: modifiedKpis, units: kpiUnits } =
-            convertTableDataToKpiFormat();
-          const status = saveAsDraft ? 'draft' : 'validated';
-
-          const documentData = documentsService.prepareDocumentData(
-            {
-              ...analyzedData,
-              year: selectedYear,
-            },
-            base64data,
-            status,
-            modifiedKpis,
-            kpiUnits,
-          );
-
-          // Appeler l'API pour sauvegarder
-          await documentsService.saveDocument(documentData);
-
-          const successMessage = saveAsDraft
-            ? t('extractresult:validation.draft_success_message')
-            : t('extractresult:validation.success_message');
-
-          notification.success({
-            message: t('extractresult:validation.success_title'),
-            description: successMessage,
-          });
-
-          setIsValidating(false);
-
-          // Rediriger vers la page des documents
-          setTimeout(() => {
-            navigate('/documents');
-          }, 1500);
-        } catch (error) {
+        // Rediriger vers la page des documents
+        setTimeout(() => {
+          navigate('/documents');
+        }, 1500);
+      } else {
+        // Mode création : logique existante
+        if (!currentData || !currentData.pdfUrl) {
           Modal.error({
-            title: t('extractresult:validation.error_title'),
-            content: t('extractresult:validation.error_message', {
-              error: error.message,
-            }),
+            title: t('extractresult:validation.missing_data_title'),
+            content: t('extractresult:validation.missing_pdf_message'),
             okText: t('common.ok', 'OK'),
           });
           setIsValidating(false);
+          return;
         }
-      };
-      reader.onerror = () => {
-        Modal.error({
-          title: t('extractresult:validation.error_title'),
-          content: t('extractresult:validation.pdf_read_error'),
-          okText: t('common.ok', 'OK'),
+
+        // Récupérer le contenu du PDF en base64
+        const pdfResponse = await axios.get(currentData.pdfUrl, {
+          responseType: 'blob',
         });
-        setIsValidating(false);
-      };
-      reader.readAsDataURL(pdfResponse.data);
-    } catch {
+
+        // Convertir le blob en base64
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          try {
+            const base64data = reader.result.split(',')[1];
+
+            const documentData = documentsService.prepareDocumentData(
+              {
+                ...currentData,
+                year: selectedYear,
+              },
+              base64data,
+              status,
+              modifiedKpis,
+              kpiUnits,
+            );
+
+            // Appeler l'API pour sauvegarder
+            await documentsService.saveDocument(documentData);
+
+            const successMessage = saveAsDraft
+              ? t('extractresult:validation.draft_success_message')
+              : t('extractresult:validation.success_message');
+
+            notification.success({
+              message: t('extractresult:validation.success_title'),
+              description: successMessage,
+            });
+
+            setIsValidating(false);
+
+            // Rediriger vers la page des documents
+            setTimeout(() => {
+              navigate('/documents');
+            }, 1500);
+          } catch (error) {
+            Modal.error({
+              title: t('extractresult:validation.error_title'),
+              content: t('extractresult:validation.error_message', {
+                error: error.message,
+              }),
+              okText: t('common.ok', 'OK'),
+            });
+            setIsValidating(false);
+          }
+        };
+        reader.onerror = () => {
+          Modal.error({
+            title: t('extractresult:validation.error_title'),
+            content: t('extractresult:validation.pdf_read_error'),
+            okText: t('common.ok', 'OK'),
+          });
+          setIsValidating(false);
+        };
+        reader.readAsDataURL(pdfResponse.data);
+      }
+    } catch (error) {
       Modal.error({
         title: t('extractresult:validation.error_title'),
-        content: t('extractresult:validation.network_error'),
+        content: t('extractresult:validation.error_message', {
+          error: error.message,
+        }),
         okText: t('common.ok', 'OK'),
       });
       setIsValidating(false);
@@ -1008,7 +1084,7 @@ const ExtractResult = ({ i18n }) => {
     addColumnForm.resetFields();
   };
 
-  if (loading) {
+  if (loading || loadingDocument) {
     return (
       <div
         style={{
@@ -1134,7 +1210,7 @@ const ExtractResult = ({ i18n }) => {
 
   return (
     <>
-      {!analyzedData ? (
+      {!currentData ? (
         <div style={{ padding: 20 }}>
           <Title level={4}>{t('extractresult:noResults')}</Title>
           <Button onClick={() => navigate(-1)}>
@@ -1172,7 +1248,7 @@ const ExtractResult = ({ i18n }) => {
                           <span>
                             {t('documents:textract_results.document_source')}
                           </span>
-                          {analyzedData.pdfUrl && (
+                          {currentData.pdfUrl && (
                             <Tag color="success">
                               {t('documents:textract_results.pdf_available')}
                             </Tag>
@@ -1191,7 +1267,7 @@ const ExtractResult = ({ i18n }) => {
                         padding: 0,
                       }}
                     >
-                      {analyzedData.pdfUrl ? (
+                      {currentData.pdfUrl ? (
                         <div
                           style={{
                             display: 'flex',
@@ -1200,7 +1276,7 @@ const ExtractResult = ({ i18n }) => {
                           }}
                         >
                           <iframe
-                            src={analyzedData.pdfUrl}
+                            src={currentData.pdfUrl}
                             title={t('extractresult:pdfPreview')}
                             style={{
                               width: '100%',
@@ -1221,7 +1297,7 @@ const ExtractResult = ({ i18n }) => {
                           />
 
                           <object
-                            data={analyzedData.pdfUrl}
+                            data={currentData.pdfUrl}
                             type="application/pdf"
                             width="100%"
                             height="100%"
@@ -1239,15 +1315,15 @@ const ExtractResult = ({ i18n }) => {
                             }}
                           >
                             <embed
-                              src={analyzedData.pdfUrl}
+                              src={currentData.pdfUrl}
                               type="application/pdf"
                               width="100%"
                               height="100%"
                             />
                           </object>
                         </div>
-                      ) : analyzedData.imageUrls &&
-                        analyzedData.imageUrls.length > 0 ? (
+                      ) : currentData.imageUrls &&
+                        currentData.imageUrls.length > 0 ? (
                         <div
                           style={{
                             height: '100%',
@@ -1264,11 +1340,11 @@ const ExtractResult = ({ i18n }) => {
                             }}
                           >
                             <Text>
-                              {analyzedData.imageUrls.length}{' '}
+                              {currentData.imageUrls.length}{' '}
                               {t('extractresult:imagesAvailable')}
                             </Text>
                           </div>
-                          {analyzedData.imageUrls.map((url, index) => (
+                          {currentData.imageUrls.map((url, index) => (
                             <div key={index} style={{ marginBottom: '20px' }}>
                               <div style={{ marginBottom: '5px' }}>
                                 <Space>
