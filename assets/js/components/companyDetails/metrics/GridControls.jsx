@@ -22,12 +22,7 @@ import {
   Popconfirm,
 } from 'antd';
 import { useTranslation } from 'react-i18next';
-import {
-  updateCols,
-  toggleDraggable,
-  toggleResizable,
-  addCustomChart,
-} from '../../../redux/slices/layoutSlice';
+import { updateCols, addCustomChart } from '../../../redux/slices/layoutSlice';
 import {
   DownOutlined,
   FilterOutlined,
@@ -86,7 +81,7 @@ const GridControls = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { id } = useParams(); // Get the company ID from URL
-  const { cols, isDraggable, isResizable } = useSelector(state => state.layout);
+  const { cols } = useSelector(state => state.layout);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedQueryId, setSelectedQueryId] = useState('monthly_revenue');
   const [queryResults, setQueryResults] = useState([]);
@@ -1644,23 +1639,7 @@ const GridControls = () => {
       </div>
 
       <div className="flex items-center">
-        <button
-          onClick={() => dispatch(toggleDraggable())}
-          className={`px-2 py-1 rounded text-xs border ${
-            isDraggable ? 'border-blue-400 bg-blue-50' : 'border-gray-300'
-          } mr-2`}
-        >
-          {isDraggable ? `✓ ${t('layout.move')}` : t('layout.move')}
-        </button>
-
-        <button
-          onClick={() => dispatch(toggleResizable())}
-          className={`px-2 py-1 rounded text-xs border ${
-            isResizable ? 'border-blue-400 bg-blue-50' : 'border-gray-300'
-          } mr-2`}
-        >
-          {isResizable ? `✓ ${t('layout.resize')}` : t('layout.resize')}
-        </button>
+        {/* Les fonctionnalités Move et Resize sont automatiques selon le mode édition */}
 
         <button
           onClick={showDrawer}
