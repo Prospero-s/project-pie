@@ -13,7 +13,15 @@
   "layout": {
     "columns": "Columns",
     "move": "Move",
-    "resize": "Resize"
+    "resize": "Resize",
+    "edit_layout": "Edit Layout",
+    "edit_mode_activated": "Edit mode activated - You can now rearrange blocks",
+    "layout_saved_successfully": "Layout saved successfully",
+    "error_saving_layout": "Error saving layout",
+    "changes_cancelled": "Changes cancelled",
+    "save": "Save",
+    "reset": "Reset",
+    "drag_drop_instruction": "Drag and drop blocks to rearrange the layout, then click \"Save\"."
   },
   
   "drawer": {

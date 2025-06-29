@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import { Button, message } from 'antd';
 import { EditOutlined, SaveOutlined, UndoOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import {
   removeCustomChart,
   setDraggable,
@@ -69,6 +70,7 @@ const chartContainerStyle = {
 const GlobalMetrics = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
+  const { t } = useTranslation();
   const { customCharts } = useSelector(state => state.layout);
 
   // États locaux pour la gestion de la disposition
@@ -144,10 +146,10 @@ const GlobalMetrics = () => {
       // Désactiver automatiquement draggable et resizable dans Redux
       dispatch(setDraggable(false));
       dispatch(setResizable(false));
-      message.success('Disposition sauvegardée avec succès');
+      message.success(t('layout.layout_saved_successfully'));
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
-      message.error('Erreur lors de la sauvegarde de la disposition');
+      message.error(t('layout.error_saving_layout'));
     }
   };
 
@@ -164,9 +166,7 @@ const GlobalMetrics = () => {
       isDraggable: true,
       isResizable: true,
     }));
-    message.info(
-      'Mode édition activé - Vous pouvez maintenant réorganiser les blocs',
-    );
+    message.info(t('layout.edit_mode_activated'));
   };
 
   // Annuler les modifications
@@ -183,7 +183,7 @@ const GlobalMetrics = () => {
       isDraggable: false,
       isResizable: false,
     }));
-    message.info('Modifications annulées');
+    message.info(t('layout.changes_cancelled'));
   };
 
   // Handle layout changes (seulement en mode édition)
@@ -235,16 +235,16 @@ const GlobalMetrics = () => {
               icon={<EditOutlined />}
               onClick={enterEditMode}
             >
-              Modifier la disposition
+              {t('layout.edit_layout')}
             </Button>
           ) : (
             <div className="flex items-center gap-2">
               <Button onClick={resetToDefault} disabled={!hasUnsavedChanges}>
-                Réinitialiser
+                {t('layout.reset')}
               </Button>
 
               <Button icon={<UndoOutlined />} onClick={cancelEdit}>
-                Annuler
+                {t('common.cancel')}
               </Button>
 
               <Button
@@ -253,7 +253,7 @@ const GlobalMetrics = () => {
                 onClick={saveLayout}
                 disabled={!hasUnsavedChanges}
               >
-                Sauvegarder
+                {t('layout.save')}
               </Button>
             </div>
           )}
@@ -274,8 +274,7 @@ const GlobalMetrics = () => {
             )}
           </div>
           <p className="text-blue-700 text-sm mt-1">
-            Glissez-déposez les blocs pour réorganiser la disposition, puis
-            cliquez sur &quot;Sauvegarder&quot;.
+            {t('layout.drag_drop_instruction')}
           </p>
         </div>
       )}

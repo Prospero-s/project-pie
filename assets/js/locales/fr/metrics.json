@@ -15,7 +15,15 @@
   "layout": {
     "columns": "Colonnes",
     "move": "Déplacer",
-    "resize": "Redimensionner"
+    "resize": "Redimensionner",
+    "edit_layout": "Modifier la disposition",
+    "edit_mode_activated": "Mode édition activé - Vous pouvez maintenant réorganiser les blocs",
+    "layout_saved_successfully": "Disposition sauvegardée avec succès",
+    "error_saving_layout": "Erreur lors de la sauvegarde de la disposition",
+    "changes_cancelled": "Modifications annulées",
+    "save": "Sauvegarder",
+    "reset": "Réinitialiser",
+    "drag_drop_instruction": "Glissez-déposez les blocs pour réorganiser la disposition, puis cliquez sur \"Sauvegarder\"."
   },
   
   "drawer": {
