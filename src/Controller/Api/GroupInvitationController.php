@@ -7,6 +7,7 @@ use App\Entity\GroupRole;
 use App\Repository\GroupInvitationRepository;
 use App\Repository\UserRepository;
 use App\Service\User\UserService;
+use App\Service\Mail\MailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,7 +21,8 @@ class GroupInvitationController extends AbstractController
     public function __construct(
         private EntityManagerInterface $entityManager,
         private GroupInvitationRepository $invitationRepository,
-        private UserService $userService
+        private UserService $userService,
+        private MailService $mailService
     ) {
     }
 
@@ -89,6 +91,18 @@ class GroupInvitationController extends AbstractController
                 $role
             );
             $this->entityManager->flush();
+
+            // Construire le lien d'invitation
+            $baseUrl = $request->getSchemeAndHttpHost();
+            $invitationLink = $baseUrl . '/fr/group-selection'; // TODO: adapter selon la langue de l'utilisateur
+
+            // Envoyer l'email d'invitation
+            $this->mailService->sendGroupInvitationEmail(
+                $data['email'],
+                $group->getName(),
+                $name ?? $email,
+                $invitationLink
+            );
 
             return $this->json([
                 'id' => $invitation->getId(),

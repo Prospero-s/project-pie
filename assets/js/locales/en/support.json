@@ -1,0 +1,13 @@
+{
+  "title": "Support",
+  "title_label": "Title of your request",
+  "title_placeholder": "Briefly describe your issue",
+  "title_required": "Title is required",
+  "describe_issue": "Detailed description of the issue",
+  "description_placeholder": "Describe in detail the problem you are experiencing...",
+  "description_required": "Description is required",
+  "submit": "Submit",
+  "success": "Your request has been sent successfully",
+  "error": "An error occurred while sending",
+  "validation_error": "Please check the required fields"
+}

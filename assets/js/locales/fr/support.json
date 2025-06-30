@@ -1,0 +1,13 @@
+{
+  "title": "Support",
+  "title_label": "Titre de votre demande",
+  "title_placeholder": "Décrivez brièvement votre problème",
+  "title_required": "Le titre est obligatoire",
+  "describe_issue": "Description détaillée du problème",
+  "description_placeholder": "Décrivez en détail le problème que vous rencontrez...",
+  "description_required": "La description est obligatoire",
+  "submit": "Envoyer",
+  "success": "Votre demande a été envoyée avec succès",
+  "error": "Une erreur est survenue lors de l'envoi",
+  "validation_error": "Veuillez vérifier les champs obligatoires"
+}

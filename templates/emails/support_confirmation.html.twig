@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirmation de votre demande de support - {{ title }}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; background-color: #f5f5f5; color: #313847; width: 100% !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+    <!-- Table principale centrée -->
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto;">
+        <tr>
+            <td align="center" style="padding: 20px;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin: 0 auto;">
+                    <!-- En-tête avec logo -->
+                    <tr>
+                        <td align="center" style="padding: 30px 30px 20px 30px; background-color: #52c41a; border-radius: 8px 8px 0 0;">
+                            <img src="https://raw.githubusercontent.com/Prospero-s/project-pie/rebase-dev/assets/img/logo/logo-icon-prospero-white.png" alt="Prospero" width="180" style="display: block; margin: 0 auto; border: 0; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;" />
+                        </td>
+                    </tr>
+                    
+                    <!-- Titre -->
+                    <tr>
+                        <td align="center" style="padding: 30px 30px 0 30px; color: #52c41a; font-size: 24px; font-weight: bold;">
+                            ✅ Demande de support reçue
+                        </td>
+                    </tr>
+                    
+                    <!-- Contenu -->
+                    <tr>
+                        <td align="left" style="padding: 20px 30px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td style="padding: 10px 0; color: #313847; font-size: 16px; line-height: 24px;">
+                                        Bonjour {{ userName }},
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px 0; color: #313847; font-size: 16px; line-height: 24px;">
+                                        Nous avons bien reçu votre demande de support et nous vous remercions de nous avoir contactés.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 15px; background-color: #f6ffed; border-radius: 4px; border-left: 4px solid #52c41a;">
+                                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                            <tr>
+                                                <td style="padding: 5px 0; color: #313847; font-size: 14px; font-weight: bold;">
+                                                    📅 Date de soumission :
+                                                </td>
+                                                <td style="padding: 5px 0; color: #313847; font-size: 14px;">
+                                                    {{ submittedAt|date('d/m/Y à H:i') }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 5px 0; color: #313847; font-size: 14px; font-weight: bold;">
+                                                    🎫 Référence :
+                                                </td>
+                                                <td style="padding: 5px 0; color: #313847; font-size: 14px;">
+                                                    SUP-{{ submittedAt|date('YmdHis') }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 5px 0; color: #313847; font-size: 14px; font-weight: bold;">
+                                                    📋 Titre :
+                                                </td>
+                                                <td style="padding: 5px 0; color: #313847; font-size: 14px;">
+                                                    {{ title }}
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 20px 0 10px 0; color: #313847; font-size: 16px; line-height: 24px; font-weight: bold;">
+                                        📋 Récapitulatif de votre demande :
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 15px; background-color: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef;">
+                                        <div style="color: #313847; font-size: 14px; line-height: 20px; white-space: pre-wrap;">{{ description }}</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 20px 0 10px 0; color: #313847; font-size: 16px; line-height: 24px;">
+                                        <strong>Que va-t-il se passer maintenant ?</strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px 0; color: #313847; font-size: 14px; line-height: 20px;">
+                                        • Notre équipe de support technique va examiner votre demande
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px 0; color: #313847; font-size: 14px; line-height: 20px;">
+                                        • Vous recevrez une réponse dans les plus brefs délais (généralement sous 24h)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px 0; color: #313847; font-size: 14px; line-height: 20px;">
+                                        • Si des informations supplémentaires sont nécessaires, nous vous contacterons
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 20px 0 10px 0; color: #313847; font-size: 16px; line-height: 24px;">
+                                        En attendant, n'hésitez pas à consulter notre documentation ou à nous contacter si vous avez d'autres questions.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px 0; color: #313847; font-size: 16px; line-height: 24px;">
+                                        Cordialement,<br />
+                                        L'équipe Support Prospero
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Pied de page -->
+                    <tr>
+                        <td align="center" style="padding: 20px 30px; border-top: 1px solid #E2E7EA; background-color: #f8f9fa; border-radius: 0 0 8px 8px; text-align: center; color: #666666; font-size: 14px;">
+                            &copy; {{ "now"|date("Y") }} Prospero. Tous droits réservés.
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html> 

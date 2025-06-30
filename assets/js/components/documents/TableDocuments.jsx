@@ -115,7 +115,7 @@ const TableDocuments = ({ t, i18n }) => {
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : company && company.denomination ? (
-          <span className="font-degarism">company.denomination</span>
+          <span className="font-degarism">{company.denomination}</span>
         ) : (
           t('table.unknown_company')
         ),
