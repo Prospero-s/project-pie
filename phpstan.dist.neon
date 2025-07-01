@@ -1,0 +1,17 @@
+parameters:
+    level: 7
+    paths:
+        - bin/
+        - config/
+        - public/
+        - src/
+    scanDirectories:
+        - vendor/
+    ignoreErrors:
+        # Pour ignorer toutes les erreurs dans le dossier Entity
+        - message: '#.*#'
+          path: src/Entity/*
+
+        -
+          message: '#Method App\\Service\\Company\\Scraper\\InpiCompanyScraper::extractRepresentants\(\) should return array<string, array<string, string\|null>> but returns list<array<string, string\|null>>#'
+          path: src/Service/Company/Scraper/InpiCompanyScraper.php

@@ -1,0 +1,225 @@
+{
+  "all_metrics": "All Metrics",
+  "global_metrics": "Global Metrics",
+  "documents": "Documents",
+  "investment_details": "Investment Details",
+  "info": "Info",
+  
+  "data": "Data",
+  "no_data": "No data available",
+  "custom_chart": "Custom Chart",
+  "unsupported_chart_type": "Unsupported chart type",
+  
+  "layout": {
+    "columns": "Columns",
+    "move": "Move",
+    "resize": "Resize"
+  },
+  
+  "drawer": {
+    "title": "Data Explorer",
+    "execute": "Execute",
+    "select_query": "Select a predefined query",
+    "results": "Results",
+    "add_chart": "Add a Chart",
+    "chart_title": "Chart Title",
+    "chart_title_placeholder": "Enter a title for the chart",
+    "chart_type": "Chart Type",
+    "add_chart_button": "Add this chart",
+    "execute_query": "Execute a query to see results",
+    "select_and_execute": "Select and execute a query",
+    "graph_added": "Chart added to dashboard",
+    "no_data": "No data available to create a chart",
+    "x_axis": "X Axis",
+    "y_axes": "Y Axis(es)",
+    "select_x_axis": "Select a column for X axis",
+    "select_y_axes": "Select one or more columns for Y axis",
+    "chart_preview": "Chart Preview",
+    "missing_axes": "You must select an X axis and at least one Y axis"
+  },
+  
+  "chart_types": {
+    "bar": "Bar",
+    "line": "Line",
+    "area": "Area",
+    "pie": "Pie",
+    "radar": "Radar"
+  },
+  
+  "chart_preview": {
+    "no_data": "Select axes to see preview",
+    "invalid_type": "Invalid chart type"
+  },
+  
+  "queries": {
+    "monthly_revenue": {
+      "name": "Monthly Revenue",
+      "description": "Shows monthly revenue for the last 12 months"
+    },
+    "clients_by_sector": {
+      "name": "Clients by Sector",
+      "description": "Distribution of clients by business sector"
+    },
+    "arr_growth": {
+      "name": "ARR Growth",
+      "description": "Annual Recurring Revenue evolution by quarter"
+    },
+    "top_clients": {
+      "name": "Top 10 Clients",
+      "description": "List of top 10 clients by value"
+    },
+    "headcount": {
+      "name": "Headcount Evolution",
+      "description": "Number of employees by quarter"
+    },
+    "investments": {
+      "name": "Investments",
+      "description": "Investment value by quarter"
+    },
+    "total_investment": {
+      "name": "Total Investment",
+      "description": "Total amount invested in the company"
+    }
+  },
+  
+  "default_query": {
+    "name": "Default Query",
+    "description": "A default query"
+  },
+  
+  "errors": {
+    "cannot_load_queries": "Unable to load predefined queries. Using default queries.",
+    "select_query": "Please select a query to execute",
+    "invalid_format": "Invalid result format",
+    "query_execution": "Error executing query",
+    "unknown": "Unknown error",
+    "cannot_transform_data": "Cannot transform data for the chart",
+    "cannot_create_chart": "Cannot create chart: ",
+    "custom_error": "{{error}}"
+  },
+  
+  "info": {
+    "no_results": "The query returned no results"
+  },
+  
+  "warnings": {
+    "execute_query_first": "Please execute a query to get data first"
+  },
+  
+  "success": {
+    "chart_added": "Chart added successfully"
+  },
+  
+  "common": {
+    "loading": "Loading...",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No"
+  },
+  
+  "data_explorer": {
+    "add_column": "Add Column",
+    "pivot": "Pivot",
+    "visibility": "Visibility",
+    "create_calculated_column": "Create Calculated Column",
+    "column_name": "Column Name",
+    "column_name_placeholder": "e.g. Gross Margin",
+    "expression": "Expression",
+    "expression_placeholder": "e.g. revenue * 0.7",
+    "display_format": "Display Format",
+    "available_columns": "Available Columns:",
+    "operators": "Operators: +, -, *, /, >, <, ==, !=, &&, ||, ?",
+    "format_default": "Default",
+    "format_percentage": "Percentage",
+    "format_currency": "Currency (€)",
+    "name_expression_required": "Name and expression are required",
+    "name_required": "Column name is required",
+    "expression_required": "Expression is required",
+    "column_added": "Calculated column added",
+    "column_updated": "Calculated column updated",
+    "column_removed": "Calculated column removed",
+    "edit_column": "Edit column",
+    "delete_column": "Delete column",
+    "confirm_delete_column": "Delete this column?",
+    "delete_column_warning": "This action cannot be undone.",
+    "column_name_required": "Column name is required",
+    "show_in_visualization": "Show in visualization",
+    "hide_from_visualization": "Hide from visualization",
+    "remove_pivot": "Remove pivot",
+    "add_pivot": "Pivot this column",
+    "filter": "Filter",
+    "equals": "Equals...",
+    "not_equals": "Not equals...",
+    "contains": "Contains...",
+    "not_contains": "Does not contain...",
+    "greater_than": "Greater than...",
+    "greater_equal": "Greater than or equal to...",
+    "less_than": "Less than...",
+    "less_equal": "Less than or equal to...",
+    "between": "Between...",
+    "between_min": "Minimum value",
+    "between_max": "Maximum value",
+    "starts_with": "Starts with...",
+    "ends_with": "Ends with...",
+    "equals_number": "Equals (number)...",
+    "contains_short": "contains",
+    "not_contains_short": "doesn't contain",
+    "between_short": "between",
+    "starts_with_short": "starts with",
+    "ends_with_short": "ends with",
+    "clear_all_filters": "Clear all filters",
+    "sort_ascending": "Sort ascending",
+    "sort_descending": "Sort descending",
+    "sort": "Sort:",
+    "filter_label": "Filter:",
+    "column_header": "{{column}}",
+    "data_source": "Data Source",
+    "external_company": "External Company",
+    "formula": "Formula",
+    "external_company_help": "Choose another company as data source",
+    "formula_help": "Create a formula with existing columns",
+    "select_company": "Select a Company",
+    "select_company_help": "Choose a company whose data you want to use",
+    "select_company_placeholder": "Select a company...",
+    "company_required": "A company must be selected",
+    "no_external_data": "No data available for this company",
+    "external_data_error": "Error retrieving external data"
+  },
+  
+  "type_fixed_for_total_investment": "Bar chart recommended for this visualization",
+  
+  "predefined_queries": {
+    "1": {
+      "name": "Monthly Revenue",
+      "description": "Revenue evolution by month"
+    },
+    "2": {
+      "name": "Clients by Sector", 
+      "description": "Client distribution by business sector"
+    },
+    "3": {
+      "name": "ARR Growth",
+      "description": "Annual Recurring Revenue evolution by quarter"
+    },
+    "4": {
+      "name": "Top 10 Clients",
+      "description": "List of top 10 clients by value"
+    },
+    "5": {
+      "name": "Headcount Evolution",
+      "description": "Employee count evolution by quarter"
+    },
+    "6": {
+      "name": "Investments",
+      "description": "Investment value by quarter"
+    },
+    "7": {
+      "name": "Total Invested",
+      "description": "Total amount invested in the company"
+    },
+    "8": {
+      "name": "KPI Analysis by Period",
+      "description": "Overview of main KPIs with period-over-period evolution"
+    }
+  }
+}

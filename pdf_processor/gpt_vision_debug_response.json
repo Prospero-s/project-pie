@@ -1,0 +1,50 @@
+{
+  "periods": ["Q2 Reforecast TOTAL H2", "Q3 Reforecast TOTAL H2", "DELTA H2"],
+  "kpi": {
+    "Marketing FR budget": {
+      "Q2 Reforecast TOTAL H2": "€1845k",
+      "Q3 Reforecast TOTAL H2": "€924k",
+      "DELTA H2": "-€921k"
+    },
+    "People FR budget": {
+      "Q2 Reforecast TOTAL H2": "€689k",
+      "Q3 Reforecast TOTAL H2": "€536k",
+      "DELTA H2": "-€153k"
+    },
+    "Ops, Legal & Finance FR budget": {
+      "Q2 Reforecast TOTAL H2": "€534k",
+      "Q3 Reforecast TOTAL H2": "€359k",
+      "DELTA H2": "-€175k"
+    },
+    "Tech & Product budget": {
+      "Q2 Reforecast TOTAL H2": "€1080k",
+      "Q3 Reforecast TOTAL H2": "€759k",
+      "DELTA H2": "-€322k"
+    },
+    "Content budget": {
+      "Q2 Reforecast TOTAL H2": "€762k",
+      "Q3 Reforecast TOTAL H2": "€441k",
+      "DELTA H2": "-€322k"
+    },
+    "Content FR": {
+      "Q2 Reforecast TOTAL H2": "€392k",
+      "Q3 Reforecast TOTAL H2": "€281k",
+      "DELTA H2": "-€112k"
+    },
+    "Content US": {
+      "Q2 Reforecast TOTAL H2": "€370k",
+      "Q3 Reforecast TOTAL H2": "€160k",
+      "DELTA H2": "-€210k"
+    },
+    "Business FR budget": {
+      "Q2 Reforecast TOTAL H2": "€109k",
+      "Q3 Reforecast TOTAL H2": "€110k",
+      "DELTA H2": "€2k"
+    },
+    "TOTAL": {
+      "Q2 Reforecast TOTAL H2": "€5020k",
+      "Q3 Reforecast TOTAL H2": "€3129k",
+      "DELTA H2": "-€1890k"
+    }
+  }
+}

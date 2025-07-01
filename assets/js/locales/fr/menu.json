@@ -1,0 +1,21 @@
+{
+  "profile": "Profil",
+  "settings": "Paramètres",
+  "logout": "Déconnexion",
+  "logoutSuccess": "Déconnexion réussie",
+  "logoutSuccessMessage": "Vous êtes maintenant déconnecté.",
+  "logoutError": "Erreur de déconnexion",
+  "logoutErrorMessage": "Une erreur est survenue lors de la déconnexion.",
+  "notification_title": "Notification",
+  "notification_message": "Vous avez 5 nouvelles notifications",
+  "notification_time": "Il y a 2 minutes",
+  "view_all": "Voir tout",
+  "read_all": "Marquer lu tout",
+  "delete_all": "Supprimer tout",
+  "no_notifications": "Aucun notifications",
+  "portfolio": "Mon portefeuille",
+  "dashboard": "Tableau de bord",
+  "companies": "Les entreprises",
+  "documents": "Les documents",
+  "financial_extraction": "Extraction financière"
+}

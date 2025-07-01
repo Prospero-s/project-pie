@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+# Vérifier que bash est bien utilisé (plus portable)
+if [ -z "$BASH" ]; then
+    echo "❌ Ce script doit être exécuté avec bash."
+    exit 1
+fi
+
+# Regex pour les noms de branches (compatible macOS)
+branch_regex='^(feat|fix|docs|style|refactor|test|chore)/PROS-[0-9]+(-[a-zA-Z0-9]+)+$'
+
+z40=0000000000000000000000000000000000000000
+
+while read local_ref local_sha remote_ref remote_sha; do
+    if [ "$local_sha" = $z40 ]; then
+        # Handle delete
+        continue
+    fi
+
+    if [ "$remote_sha" = $z40 ]; then
+        # New branch
+        branch_name=${remote_ref#refs/heads/}
+    else
+        # Update to existing branch
+        branch_name=${remote_ref#refs/heads/}
+    fi
+
+    if [ -n "$branch_name" ]; then
+        if ! echo "$branch_name" | grep -E "$branch_regex" > /dev/null 2>&1; then
+            echo "--------------------------------"
+            echo "❌ Le format du nom de la branche '$branch_name' est invalide."
+            echo "Format attendu: <type>/PROS-<ticket-id>-<description>"
+            echo "Types autorisés: feat, fix, docs, style, refactor, test, chore"
+            echo "👀 Exemple: feat/PROS-123-ajout-de-la-fonctionnalite-de-login"
+            echo "⚠️ Pour renommer la branche, utilisez la commande suivante:"
+            echo "git branch -m <ancien_nom> <nouveau_nom>"
+            echo "--------------------------------"
+            exit 1
+        fi
+    fi
+done
+
+echo "--------------------------------"
+echo "✅ Le format du nom de la branche est valide"
+echo "--------------------------------"
+exit 0

@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+# Vérifier que bash est bien utilisé (plus portable)
+if [ -z "$BASH" ]; then
+    echo "❌ Ce script doit être exécuté avec bash."
+    exit 1
+fi
+
+# Fichiers à vérifier
+FILES=$(git diff --cached --name-only --diff-filter=ACM "*.js" "*.jsx")
+
+# Version compatible macOS sans -P (Perl regex)
+# Script adapté pour détecter les balises contenant du texte sans traduction
+find_untranslated_text() {
+    local file="$1"
+    local untranslated=false
+    local line_number=0
+    
+    # Utilise awk pour analyser le fichier ligne par ligne
+    awk '{
+        line_number += 1
+        # Cherche les balises avec du texte mais sans t()
+        if (match($0, /<[^>]+>[^<]*[a-zA-ZÀ-ÿ][^<]*<\/[^>]+>/) && !match($0, /t\([^)]*\)/)) {
+            # Évite les cas particuliers comme les balises vides et les importations
+            if (!match($0, /<\/?(>|self|br|hr|img|input)[^>]*>/i) && !match($0, /import|from/)) {
+                print line_number ":" $0
+                found = 1
+            }
+        }
+    }' "$file"
+    
+    return $([ "$found" == "1" ] && echo 1 || echo 0)
+}
+
+ERRORS=0
+
+for FILE in $FILES; do
+    # Vérifier si le fichier contient du texte brut non traduit
+    UNTRANSLATED=$(find_untranslated_text "$FILE")
+    
+    if [ -n "$UNTRANSLATED" ]; then
+        echo "------------------------------------------------------------------------------------------------"
+        echo "❌ Fichier 【 $FILE 】 contient du texte non traduit :"
+        echo ""
+        
+        # Afficher les lignes problématiques
+        echo "$UNTRANSLATED" | while read -r LINE; do
+            echo "Ligne $LINE"
+        done
+        
+        echo ""
+        echo "⚠️ Veuillez utiliser la fonction de traduction 【 t() 】 pour tout texte affiché à l'utilisateur."
+        echo "👀 Exemple : <p>{t('mon.texte')}</p>"
+        echo "------------------------------------------------------------------------------------------------"
+        ERRORS=$((ERRORS + 1))
+    fi
+done
+
+if [ $ERRORS -gt 0 ]; then
+    echo "❌ $ERRORS fichier(s) contiennent du texte non traduit. Commit bloqué."
+    echo "------------------------------------------------------------------------------------------------"
+    exit 1
+fi
+
+echo "--------------------------------"
+echo "✅ Tous les textes sont correctement traduits"
+echo "--------------------------------"
+exit 0 

@@ -1,0 +1,22 @@
+{
+  "profile": "Profile",
+  "settings": "Settings",
+  "logout": "Logout",
+  "logoutSuccess": "Logout success",
+  "logoutSuccessMessage": "You are now logged out.",
+  "logoutError": "Logout error",
+  "logoutErrorMessage": "An error occurred while logging out.",
+  "notifications": "Notifications",
+  "view_all": "View all",
+  "read_all": "Read all",
+  "delete_all": "Delete all",
+  "no_notifications": "No notifications",
+  "notification_title": "Notification",
+  "notification_message": "You have 5 new notifications",
+  "notification_time": "2 minutes ago",
+  "portfolio": "Portfolio",
+  "dashboard": "Dashboard",
+  "companies": "Companies",
+  "documents": "Documents",
+  "financial_extraction": "Financial Extraction"
+}

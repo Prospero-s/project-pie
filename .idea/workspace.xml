@@ -6,9 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="b381f351-098d-4490-b638-f16ae4dea788" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/auth/signin/client.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/auth/signin/client.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/auth/signup/client.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/auth/signup/client.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Header/DropdownUser.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Header/DropdownUser.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Entreprise/StartupDetails.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Entreprise/StartupDetails.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,11 +46,13 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "auth/firebase-v2",
+    "git-widget-placeholder": "feat/add-fav",
     "last_opened_file_path": "/Users/raphaeltruong/Documents/project-pie",
     "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.standard": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.standard": "",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "preferences.pluginManager",
@@ -60,10 +60,15 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/components/Entreprise" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-1d06a55b98c1-91d5c284f522-JavaScript-WS-241.15989.105" />
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-WS-241.18034.50" />
       </set>
     </attachedChunks>
   </component>
@@ -80,6 +85,7 @@
       <workItem from="1719223211114" duration="230000" />
       <workItem from="1719223445467" duration="1136000" />
       <workItem from="1719224591806" duration="15386000" />
+      <workItem from="1721294828807" duration="14374000" />
     </task>
     <servers />
   </component>

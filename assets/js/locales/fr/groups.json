@@ -1,0 +1,44 @@
+{
+    "create-group-title": "Créer un nouveau groupe",
+    "group-name-placeholder": "Nom du groupe",
+    "invite-email": "Inviter des membres",
+    "add-member": "Ajouter un membre",
+    "remove-member": "Retirer",
+    "invite-email-placeholder": "email@exemple.com",
+    "pending-invitations": "Invitations en attente",
+    "invited-by": "Invité par",
+    "no-invitations": "Aucune invitation en attente",
+    "accept": "Accepter",
+    "join-existing": "Rejoindre un groupe",
+    "create-new": "Créer un groupe",
+    "create": "Créer",
+    "name": "Nom",
+    "name-required": "Le nom du groupe est requis",
+    "notifications": {
+        "loading": "Chargement...",
+        "error": {
+            "title": "Erreur",
+            "auth_headers": "Erreur d'authentification. Veuillez vous reconnecter.",
+            "load_invitations": "Erreur lors du chargement des invitations. Veuillez réessayer."
+        },
+        "create_success": {
+            "title": "Groupe créé",
+            "description": "Le groupe a été créé avec succès"
+        },
+        "create_error": {
+            "title": "Erreur",
+            "description": "Une erreur est survenue lors de la création du groupe"
+        }
+    },
+    "error": {
+        "invalid-email": "L'adresse email n'est pas valide",
+        "invitation-exists": "Une invitation a déjà été envoyée à cet utilisateur"
+    },
+    "refresh": "Rafraîchir",
+    "role": "Rôle",
+    "role-placeholder": "Sélectionner un rôle",
+    "roles": {
+        "ROLE_ADMIN": "Administrateur",
+        "ROLE_MEMBER": "Membre"
+    }
+}
