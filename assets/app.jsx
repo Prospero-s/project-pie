@@ -76,7 +76,7 @@ Amplify.configure({
       providers: ['Google', 'Microsoft'],
     },
     cookieStorage: {
-      domain: 'localhost',
+      domain: import.meta.env.VITE_APP_ENV === 'prod' ? 'tryprospero.fr' : 'localhost',
       path: '/',
       expires: 365,
       secure: true,
