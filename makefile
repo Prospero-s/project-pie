@@ -19,6 +19,7 @@ help:
 	@echo "  up                - Lancer les conteneurs en arrière-plan"
 	@echo "  down              - Arrêter les conteneurs"
 	@echo "  restart           - Redémarrer les conteneurs"
+	@echo "  restart-prod      - Redémarrer les conteneurs en production"
 	@echo "  build             - Construire les conteneurs Docker"
 	@echo "  logs              - Afficher les logs des conteneurs"
 	@echo "  shell             - Ouvrir un shell dans le conteneur PHP"
@@ -65,6 +66,9 @@ delete containers:
 
 restart: down up
 
+restart-prod:
+        $(DOCKER_COMPOSE) restart php postgres pgadmin mailer pdf_processor
+
 build:
 	$(DOCKER_COMPOSE) build
 
@@ -95,14 +99,14 @@ hooks:
 	chmod +x ./scripts/install-hooks.sh
 	./scripts/install-hooks.sh
 
-# Commandes pour les fixtures
+# Commandes pour les migrations
+
 load-dev-fixtures:
 	$(SYMFONY) doctrine:f:load -n
 
 load-demo-fixtures:
 	$(SYMFONY) doctrine:fixtures:load --group=demo --append --no-interaction
 
-# Commandes pour les migrations
 test-demo-account:
 	$(DOCKER_COMPOSE) exec php php scripts/test-demo-account.php
 
