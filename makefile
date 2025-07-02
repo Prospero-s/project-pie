@@ -95,14 +95,14 @@ hooks:
 	chmod +x ./scripts/install-hooks.sh
 	./scripts/install-hooks.sh
 
-# Commandes pour les fixtures
+# Commandes pour les migrations
+
 load-dev-fixtures:
 	$(SYMFONY) doctrine:f:load -n
 
 load-demo-fixtures:
 	$(SYMFONY) doctrine:fixtures:load --group=demo --append --no-interaction
 
-# Commandes pour les migrations
 test-demo-account:
 	$(DOCKER_COMPOSE) exec php php scripts/test-demo-account.php
 
