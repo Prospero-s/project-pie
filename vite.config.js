@@ -38,7 +38,7 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     hmr: {
-      host: 'localhost',
+      host: process.env.APP_ENV === 'prod' ? 'tryprospero.fr' : 'localhost'
     },
     proxy: {
       '/api/pdf-processor': {
