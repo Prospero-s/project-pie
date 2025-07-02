@@ -19,6 +19,7 @@ help:
 	@echo "  up                - Lancer les conteneurs en arrière-plan"
 	@echo "  down              - Arrêter les conteneurs"
 	@echo "  restart           - Redémarrer les conteneurs"
+	@echo "  restart-prod      - Redémarrer les conteneurs en production"
 	@echo "  build             - Construire les conteneurs Docker"
 	@echo "  logs              - Afficher les logs des conteneurs"
 	@echo "  shell             - Ouvrir un shell dans le conteneur PHP"
@@ -64,6 +65,9 @@ delete containers:
 	$(DOCKER_COMPOSE) down --volumes
 
 restart: down up
+
+restart-prod:
+	$(DOCKER_COMPOSE) restart php postgres pgadmin mailer pdf_processor
 
 build:
 	$(DOCKER_COMPOSE) build

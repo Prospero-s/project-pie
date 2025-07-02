@@ -76,7 +76,7 @@ Amplify.configure({
       providers: ['Google', 'Microsoft'],
     },
     cookieStorage: {
-      domain: 'localhost',
+      domain: 'tryprospero.fr',
       path: '/',
       expires: 365,
       secure: true,
