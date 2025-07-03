@@ -243,9 +243,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [frontend-build]
     if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/prod') ||
-      (github.event_name == 'push' && github.ref == 'refs/heads/rebase-dev') ||
       (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.base_ref == 'prod') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.base_ref == 'rebase-dev') ||
       (github.event_name == 'workflow_dispatch')
     
     steps:
@@ -265,9 +264,9 @@ jobs:
         
         COMMAND_ID=$(aws ssm send-command \
           --document-name "AWS-RunShellScript" \
-          --parameters 'commands=["cd /home/ec2-user && ./update-prod.sh"]' \
+          --parameters 'commands=["echo \"🔥 SSM Connection Test - $(date)\" && whoami && pwd && ls -la /home/ec2-user/update-prod.sh || echo \"❌ Script not found\""]' \
           --targets "Key=instanceids,Values=i-09c6302b593fcda25" \
-          --comment "Auto deployment from CI Pipeline" \
+          --comment "Test SSM connection from CI Pipeline" \
           --query 'Command.CommandId' \
           --output text)
         
