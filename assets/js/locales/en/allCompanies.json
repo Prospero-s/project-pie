@@ -19,11 +19,12 @@
     "sector": "Business sector",
     "siren": "SIREN",
     "siret": "SIRET",
-    "created_at": "Created at"
+    "created_at": "Created at",
+    "details": "Company Details"
   },
   "loading": {
-      "title": "Retrieving company details...",
-      "description": "We are retrieving the company details from official registers"
+    "title": "Retrieving company details...",
+    "description": "We are retrieving the company details from official registers"
   },
   "actions": {
     "title": "Actions",

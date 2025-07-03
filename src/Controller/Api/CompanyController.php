@@ -5,6 +5,9 @@ namespace App\Controller\Api;
 use App\Service\Company\CompanyServiceInterface;
 use App\Repository\CompanyRepository;
 use App\Repository\KpiRepository;
+use App\Service\Notification\NotificationService;
+use App\Service\User\UserService;
+use App\Enum\NotificationType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +21,9 @@ class CompanyController extends AbstractController
         private readonly CompanyServiceInterface $companyService,
         private readonly CompanyRepository $companyRepository,
         private readonly KpiRepository $kpiRepository,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly NotificationService $notificationService,
+        private readonly UserService $userService
     ) {
     }
 
@@ -72,6 +77,31 @@ class CompanyController extends AbstractController
             }
 
             $result = $this->companyRepository->saveCompany($cognitoId, $email, $data);
+
+            // Envoyer une notification à tous les membres du groupe
+            $user = $this->userService->findUserByCognitoId($cognitoId);
+            if ($user && $user->getUserGroup()) {
+                $userGroup = $user->getUserGroup();
+                $companyName = $data['denomination'] ?? 'Une entreprise';
+                $amount = $data['amountRaised'] ?? 0;
+                $currency = $data['currency'] ?? 'EUR';
+                $fundingType = $data['fundingType'] ?? 'investissement';
+                
+                $this->notificationService->sendNotificationToGroup(
+                    $userGroup,
+                    'Nouvel investissement',
+                    sprintf(
+                        '%s a ajouté un investissement de %s %s (%s) dans %s',
+                        $user->getName() ?: $user->getEmail(),
+                        number_format($amount, 0, ',', ' '),
+                        $currency,
+                        $fundingType,
+                        $companyName
+                    ),
+                    NotificationType::NEW_INVESTMENT_ADDED->value,
+                    $user // Exclure l'utilisateur qui a créé l'investissement
+                );
+            }
 
             return new JsonResponse($result);
         } catch (\Exception $e) {
@@ -131,18 +161,48 @@ class CompanyController extends AbstractController
         try {
             $company = $this->companyRepository->findOneBy(['id' => $id]);
             if (!$company) {
-                throw new \Exception('Entreprise non trouvé');
+                throw new \Exception('Entreprise non trouvée');
+            }
+
+            // Préparer les données de l'adresse
+            $addressData = null;
+            if ($company->getAddress()) {
+                $address = $company->getAddress();
+                $addressData = [
+                    'streetNumber' => $address->getStreetNumber(),
+                    'streetTypes' => $address->getStreetTypes(),
+                    'voie' => $address->getVoie(),
+                    'codePostal' => $address->getCodePostal(),
+                    'commune' => $address->getCommune(),
+                    'pays' => $address->getPays()
+                ];
+            }
+
+            // Préparer les données des représentants
+            $representantsData = [];
+            foreach ($company->getRepresentatives() as $representative) {
+                $representantsData[] = [
+                    'nom' => $representative->getNom(),
+                    'qualite' => $representative->getQualite()
+                ];
             }
 
             return new JsonResponse([
                 'id' => $company->getId(),
                 'denomination' => $company->getDenomination(),
-                'sector' => $company->getSector()
+                'siren' => $company->getSiren(),
+                'siret' => $company->getSiret(),
+                'businessStructures' => $company->getBusinessStructures(),
+                'codeApe' => $company->getCodeApe(),
+                'sector' => $company->getSector(),
+                'adresse' => $addressData,
+                'representants' => $representantsData,
+                'updatedAt' => $company->getUpdatedAt() ? $company->getUpdatedAt()->format('d/m/Y') : null,
             ], 200);
         } catch (\Exception $e) {
             return new JsonResponse([
                 'error' => $e->getMessage(),
-                'details' => 'Une erreur est survenue lors de la récupération des investissements globaux'
+                'details' => 'Une erreur est survenue lors de la récupération des détails de l\'entreprise'
             ], 400);
         }
     }
