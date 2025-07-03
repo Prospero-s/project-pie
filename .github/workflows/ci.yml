@@ -2,9 +2,10 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [main, dev, rebase-dev]
+    branches: [main, dev, rebase-dev, prod]
   pull_request:
-    branches: [main, dev, rebase-dev]
+    branches: [main, dev, rebase-dev, prod]
+  workflow_dispatch:
 
 jobs:
   docker-lint:
@@ -243,7 +244,8 @@ jobs:
     needs: [frontend-build]
     if: |
       (github.event_name == 'push' && github.ref == 'refs/heads/prod') ||
-      (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.base_ref == 'prod')
+      (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.base_ref == 'prod') ||
+      (github.event_name == 'workflow_dispatch')
     
     steps:
     - name: 🔑 Configure AWS credentials
@@ -256,6 +258,9 @@ jobs:
     - name: 🔄 Execute deployment script on EC2
       run: |
         echo "🚀 Déploiement vers la production..."
+        echo "📋 Event: ${{ github.event_name }}"
+        echo "📋 Ref: ${{ github.ref }}"
+        echo "📋 Branch: ${{ github.ref_name }}"
         
         COMMAND_ID=$(aws ssm send-command \
           --document-name "AWS-RunShellScript" \
