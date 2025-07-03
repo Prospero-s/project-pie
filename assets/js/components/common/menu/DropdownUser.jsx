@@ -22,15 +22,6 @@ const DropdownUser = ({ i18n, user }) => {
 
   const items = [
     {
-      key: 'profile',
-      icon: <UserOutlined className="!text-base" />,
-      label: (
-        <a href={`/${lng}/profile`} className="text-base">
-          {t('profile')}
-        </a>
-      ),
-    },
-    {
       key: 'settings',
       icon: <SettingOutlined className="!text-base" />,
       label: (
