@@ -27,10 +27,11 @@ class SentryTestController extends AbstractController
     #[Route_('/_sentry-test-error', name: 'sentry_test_error')]
     public function testError(HubInterface $sentryHub)
     {
-        try {
-            throw new \RuntimeException('Example exception.');
-        } catch (\Throwable $e) {
-            $sentryHub->captureException($e);
-        }
+         try {
+        throw new \RuntimeException('Example exception.');
+    } catch (\Throwable $e) {
+        $sentryHub->captureException($e);
+        throw $e;
+    }
     }
 }

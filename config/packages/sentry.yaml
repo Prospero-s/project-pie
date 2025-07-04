@@ -1,0 +1,4 @@
+sentry:
+  dsn: "%env(SYMFONY_SENTRY_DSN)%"
+  options:
+    max_breadcrumbs: 50
