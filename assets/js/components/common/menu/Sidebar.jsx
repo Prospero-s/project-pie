@@ -7,6 +7,7 @@ import {
   FolderOpenOutlined,
   AppstoreOutlined,
   ToolOutlined,
+  HistoryOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Divider, notification } from 'antd';
 import { Link } from 'react-router-dom';
@@ -95,6 +96,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, i18n, user }) => {
       label: (
         <Link className="text-base" to={`/${lng}/documents`}>
           {t('documents')}
+        </Link>
+      ),
+    },
+    {
+      key: 'event-log',
+      icon: <HistoryOutlined className="!text-2xl lg:text-xl" />,
+      label: (
+        <Link className="text-base" to={`/${lng}/event-log`}>
+          {t('event_log')}
         </Link>
       ),
     },

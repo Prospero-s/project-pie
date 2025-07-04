@@ -18,5 +18,6 @@
   "dashboard": "Dashboard",
   "companies": "Companies",
   "documents": "Documents",
+  "event_log": "Event Log",
   "financial_extraction": "Financial Extraction"
 }
