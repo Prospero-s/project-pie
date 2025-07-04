@@ -67,7 +67,7 @@ delete containers:
 restart: down up
 
 restart-prod:
-        $(DOCKER_COMPOSE) restart php postgres pgadmin mailer pdf_processor
+    $(DOCKER_COMPOSE) restart php postgres pgadmin mailer pdf_processor
 
 build:
 	$(DOCKER_COMPOSE) build
