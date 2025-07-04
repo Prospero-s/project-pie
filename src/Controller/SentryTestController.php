@@ -24,8 +24,6 @@ class SentryTestController extends AbstractController
         // the following code will test if an uncaught exception logs to sentry
         throw new \RuntimeException('Example exception.');
 
-        // pour pipeline
-        return new Response('ok');
     }
 
     #[Route('/_sentry-test-error', name: 'sentry_test_error')]
