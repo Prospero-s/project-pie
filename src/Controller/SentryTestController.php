@@ -15,7 +15,7 @@ class SentryTestController extends AbstractController
     }
 
     #[Route('/_sentry-test', name: 'sentry_test')]
-    public function testLog()
+    public function testLog(): Response
     {
         // the following code will test if monolog integration logs to sentry
         $this->logger->error('My custom logged error.', ['some' => 'Context Data']);
@@ -27,8 +27,8 @@ class SentryTestController extends AbstractController
         return new Response('ok');
     }
 
-    #[Route_('/_sentry-test-error', name: 'sentry_test_error')]
-    public function testError(HubInterface $sentryHub)
+    #[Route('/_sentry-test-error', name: 'sentry_test_error')]
+    public function testError(HubInterface $sentryHub):Response
     {
          try {
         throw new \RuntimeException('Example exception.');
