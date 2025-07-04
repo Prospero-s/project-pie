@@ -87,3 +87,9 @@ services:
       $userPoolId: '%aws_user_pool_id%'
       $accessKeyId: '%aws_access_key_id%'
       $secretAccessKey: '%aws_secret_access_key%'
+
+  # Service de notifications
+  App\Service\Notification\NotificationService:
+    arguments:
+      $notificationsRepository: '@App\Repository\NotificationsRepository'
+      $userNotificationsRepository: '@App\Repository\UserNotificationsRepository'

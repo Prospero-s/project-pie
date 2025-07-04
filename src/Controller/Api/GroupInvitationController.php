@@ -7,6 +7,9 @@ use App\Entity\GroupRole;
 use App\Repository\GroupInvitationRepository;
 use App\Repository\UserRepository;
 use App\Service\User\UserService;
+use App\Service\Mail\MailService;
+use App\Service\Notification\NotificationService;
+use App\Enum\NotificationType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,7 +23,9 @@ class GroupInvitationController extends AbstractController
     public function __construct(
         private EntityManagerInterface $entityManager,
         private GroupInvitationRepository $invitationRepository,
-        private UserService $userService
+        private UserService $userService,
+        private MailService $mailService,
+        private NotificationService $notificationService
     ) {
     }
 
@@ -90,6 +95,18 @@ class GroupInvitationController extends AbstractController
             );
             $this->entityManager->flush();
 
+            // Construire le lien d'invitation
+            $baseUrl = $request->getSchemeAndHttpHost();
+            $invitationLink = $baseUrl . '/fr/group-selection'; // TODO: adapter selon la langue de l'utilisateur
+
+            // Envoyer l'email d'invitation
+            $this->mailService->sendGroupInvitationEmail(
+                $data['email'],
+                $group->getName(),
+                $name ?? $email,
+                $invitationLink
+            );
+
             return $this->json([
                 'id' => $invitation->getId(),
                 'email' => $invitation->getEmail(),
@@ -126,6 +143,18 @@ class GroupInvitationController extends AbstractController
 
         $this->invitationRepository->acceptInvitation($invitation, $user);
         $this->entityManager->flush();
+
+        // Envoyer une notification à tous les membres du groupe
+        $group = $invitation->getGroup();
+        $userName = $user->getName() ?: $user->getEmail();
+        
+        $this->notificationService->sendNotificationToGroup(
+            $group,
+            'Nouveau membre',
+            sprintf('%s a rejoint le groupe %s', $userName, $group->getName()),
+            NotificationType::NEW_MEMBER_JOINED->value,
+            $user // Exclure le nouveau membre de la notification
+        );
 
         return $this->json([
             'group' => [

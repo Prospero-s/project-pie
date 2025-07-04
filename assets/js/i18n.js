@@ -28,6 +28,8 @@ import enMetrics from './locales/en/metrics.json';
 import frMetrics from './locales/fr/metrics.json';
 import enExtractResult from './locales/en/extractresult.json';
 import frExtractResult from './locales/fr/extractresult.json';
+import enSupport from './locales/en/support.json';
+import frSupport from './locales/fr/support.json';
 import frCommon from './locales/fr/common.json';
 import enCommon from './locales/en/common.json';
 import enEventLog from './locales/en/eventLog.json';
@@ -54,6 +56,7 @@ i18n.use(initReactI18next).init({
       documents: frDocuments,
       metrics: frMetrics,
       extractresult: frExtractResult,
+      support: frSupport,
       common: frCommon,
       eventLog: frEventLog,
     },
@@ -76,6 +79,7 @@ i18n.use(initReactI18next).init({
       documents: enDocuments,
       metrics: enMetrics,
       extractresult: enExtractResult,
+      support: enSupport,
       common: enCommon,
       eventLog: enEventLog,
     },

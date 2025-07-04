@@ -2,26 +2,72 @@ import React, { useEffect, useState } from 'react';
 import { BellOutlined } from '@ant-design/icons';
 import { Badge, Dropdown } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { fetchNotifications } from '@/services/notification/notificationService';
+import {
+  fetchNotifications,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
+} from '@/services/notification/notificationService';
 
 const DropdownNotification = ({ i18n, user }) => {
   const { t } = useTranslation('menu', { i18n });
   const [isMobile] = useState(window.innerWidth < 640);
   const [notifications, setNotifications] = useState([]);
-  const [setLoading] = useState(true);
   const [countNotifications, setCountNotifications] = useState(null);
+
+  const handleMarkAsRead = async notificationId => {
+    try {
+      await markNotificationAsRead(user, notificationId);
+      // Mettre à jour localement la notification
+      setNotifications(prevNotifications =>
+        prevNotifications.map(notification =>
+          notification.id === notificationId
+            ? { ...notification, read_at: { date: new Date().toISOString() } }
+            : notification,
+        ),
+      );
+      // Recalculer le compteur
+      const updatedNotifications = notifications.map(notification =>
+        notification.id === notificationId
+          ? { ...notification, read_at: { date: new Date().toISOString() } }
+          : notification,
+      );
+      const unreadCount = updatedNotifications.filter(
+        notification => !notification.read_at,
+      ).length;
+      setCountNotifications(unreadCount);
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await markAllNotificationsAsRead(user);
+      // Marquer toutes les notifications comme lues localement
+      setNotifications(prevNotifications =>
+        prevNotifications.map(notification => ({
+          ...notification,
+          read_at: notification.read_at || { date: new Date().toISOString() },
+        })),
+      );
+      setCountNotifications(0);
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+    }
+  };
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        setLoading(true);
         const data = await fetchNotifications(user);
         setNotifications(data.notifications);
-        setCountNotifications(data.notifications.length);
+        // Compter seulement les notifications non lues
+        const unreadCount = data.notifications.filter(
+          notification => !notification.read_at,
+        ).length;
+        setCountNotifications(unreadCount);
       } catch (error) {
         console.error('Error fetching notification settings:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -43,22 +89,47 @@ const DropdownNotification = ({ i18n, user }) => {
                     <span className="text-sm font-medium text_gray_900">
                       {t('notifications')}
                     </span>
-                    <span className="text-xs font-medium text-primary">
-                      {t('view_all')}
-                    </span>
+                    <div className="flex gap-2">
+                      {countNotifications > 0 && (
+                        <button
+                          onClick={handleMarkAllAsRead}
+                          className="text-xs font-medium text-primary hover:underline"
+                        >
+                          {t('read_all')}
+                        </button>
+                      )}
+                      <span className="text-xs font-medium text-primary">
+                        {t('view_all')}
+                      </span>
+                    </div>
                   </div>
                 )}
                 <ul className="flex flex-col gap-4">
                   {notifications.map(notification => (
                     <li
                       key={notification.id}
-                      className="flex items-center gap-4 border-b border-stroke px-2 pt-2 pb-4 lg:px-4 hover:bg-gray-2"
+                      className={`flex items-center gap-4 border-b border-stroke px-2 pt-2 pb-4 lg:px-4 hover:bg-gray-2 cursor-pointer ${
+                        !notification.read_at ? 'bg-blue-50' : ''
+                      }`}
+                      onClick={() =>
+                        !notification.read_at &&
+                        handleMarkAsRead(notification.id)
+                      }
                     >
                       <div className="flex flex-1 items-center justify-between">
-                        <div>
-                          <h6 className="text-sm font-medium text_gray_900">
-                            {notification.title}
-                          </h6>
+                        {!notification.read_at && (
+                          <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
+                        )}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <h6
+                              className={`text-sm font-medium text_gray_900 ${
+                                !notification.read_at ? 'font-bold' : ''
+                              }`}
+                            >
+                              {notification.title}
+                            </h6>
+                          </div>
                           <p className="text-sm text_gray_900">
                             {notification.message}
                           </p>

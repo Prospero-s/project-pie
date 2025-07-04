@@ -17,6 +17,9 @@ enum NotificationType: string
     case PASSWORD_CHANGED = 'password_changed';
     case SECURITY_ALERT = 'security_alert';
     case SUBSCRIPTION_EXPIRING = 'subscription_expiring';
+    case NEW_MEMBER_JOINED = 'new_member_joined';
+    case NEW_INVESTMENT_ADDED = 'new_investment_added';
+    case NEW_DOCUMENT_UPLOADED = 'new_document_uploaded';
 
     public function getValue(): string
     {

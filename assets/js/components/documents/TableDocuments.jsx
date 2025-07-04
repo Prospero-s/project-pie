@@ -11,7 +11,7 @@ import EmptyDocumentState from './EmptyDocumentState';
 import DocumentDetailsModal from './DocumentDetailsModal';
 import { formatDate, getDateLocale } from '@/lib/utils';
 
-const TableDocuments = ({ t, i18n }) => {
+const TableDocuments = ({ t, i18n, companyId = null }) => {
   const [loading, setLoading] = useState(true);
   const [documents, setDocuments] = useState([]);
   const lng = i18n.language;
@@ -25,7 +25,7 @@ const TableDocuments = ({ t, i18n }) => {
 
   useEffect(() => {
     loadDocuments();
-  }, []);
+  }, [companyId]);
 
   const handleTableChange = pagination => {
     setPagination(pagination);
@@ -59,7 +59,7 @@ const TableDocuments = ({ t, i18n }) => {
   const loadDocuments = async () => {
     try {
       setLoading(true);
-      const response = await fetchDocuments();
+      const response = await fetchDocuments(companyId);
       setDocuments(response);
       setPagination({
         current: 1,
@@ -115,7 +115,7 @@ const TableDocuments = ({ t, i18n }) => {
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : company && company.denomination ? (
-          <span className="font-degarism">company.denomination</span>
+          <span className="font-degarism">{company.denomination}</span>
         ) : (
           t('table.unknown_company')
         ),
