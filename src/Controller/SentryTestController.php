@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Sentry\State\HubInterface;
 use Sentry\Exception\ExceptionInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 class SentryTestController extends AbstractController
 {
@@ -23,8 +24,6 @@ class SentryTestController extends AbstractController
         // the following code will test if an uncaught exception logs to sentry
         throw new \RuntimeException('Example exception.');
 
-        // pour pipeline
-        return new Response('ok');
     }
 
     #[Route('/_sentry-test-error', name: 'sentry_test_error')]
