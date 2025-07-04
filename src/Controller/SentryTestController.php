@@ -38,4 +38,5 @@ class SentryTestController extends AbstractController
     }
     // pour pipeline
     return new Response('ok');
+    }
 }
