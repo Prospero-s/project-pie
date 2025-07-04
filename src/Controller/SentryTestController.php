@@ -38,6 +38,4 @@ class SentryTestController extends AbstractController
             throw $e;
         }
     }
-    // pour pipeline
-    return new Response('ok');
 }
