@@ -36,7 +36,6 @@ class SentryTestController extends AbstractController
         $sentryHub->captureException($e);
         throw $e;
     }
-    }
-    // pour pipeline
     return new Response('ok');
+    }
 }
