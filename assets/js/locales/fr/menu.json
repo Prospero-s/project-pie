@@ -13,6 +13,12 @@
   "read_all": "Marquer lu tout",
   "delete_all": "Supprimer tout",
   "no_notifications": "Aucun notifications",
+  "notifications": "Notifications",
+  "notification_types": {
+    "new_member_joined": "Nouveau membre",
+    "new_investment_added": "Nouvel investissement",
+    "new_document_uploaded": "Nouveau document"
+  },
   "portfolio": "Mon portefeuille",
   "dashboard": "Tableau de bord",
   "companies": "Les entreprises",

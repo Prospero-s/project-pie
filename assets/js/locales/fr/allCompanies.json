@@ -19,11 +19,12 @@
     "sector": "Secteur d'activité",
     "siren": "SIREN",
     "siret": "SIRET",
-    "created_at": "Date de création"
+    "created_at": "Date de création",
+    "details": "Détails de l'entreprise"
   },
   "loading": {
-      "title": "Récupération des informations en cours...",
-      "description": "Nous recherchons les détails de l'entreprise auprès des registres officiels"
+    "title": "Récupération des informations en cours...",
+    "description": "Nous recherchons les détails de l'entreprise auprès des registres officiels"
   },
   "actions": {
     "title": "Actions",

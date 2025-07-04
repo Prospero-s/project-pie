@@ -8,6 +8,8 @@ use App\Repository\DocumentRepository;
 use App\Repository\CompanyRepository;
 use App\Repository\KpiRepository;
 use App\Service\User\UserService;
+use App\Service\Notification\NotificationService;
+use App\Enum\NotificationType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +24,8 @@ class DocumentController extends AbstractController
         private DocumentRepository $documentRepository,
         private CompanyRepository $companyRepository,
         private UserService $userService,
-        private KpiRepository $kpiRepository
+        private KpiRepository $kpiRepository,
+        private NotificationService $notificationService
     ) {
     }
 
@@ -275,6 +278,23 @@ class DocumentController extends AbstractController
             }
 
             $this->entityManager->flush();
+
+            // Envoyer une notification à tous les membres du groupe
+            $filename = $document->getFilename() ?: 'Document';
+            $companyName = $company->getDenomination();
+            
+            $this->notificationService->sendNotificationToGroup(
+                $userGroup,
+                'Nouveau document uploadé',
+                sprintf(
+                    '%s a uploadé le document "%s" pour %s',
+                    $user->getName() ?: $user->getEmail(),
+                    $filename,
+                    $companyName
+                ),
+                NotificationType::NEW_DOCUMENT_UPLOADED->value,
+                $user // Exclure l'utilisateur qui a uploadé le document
+            );
 
             return $this->json(
                 ['id' => $document->getId(), 'message' => 'Document saved successfully'],
