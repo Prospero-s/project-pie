@@ -226,7 +226,7 @@ class AuthController extends AbstractController
             ], 500);
         }
     }
-
+    
     #[Route('/auth/update-password', name: 'update_password', methods: ['POST'])]
     public function updatePassword(Request $request): JsonResponse
     {
