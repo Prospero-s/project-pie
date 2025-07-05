@@ -9,6 +9,9 @@ use App\DataFixtures\Demo\Common\DemoDataLoader;
 use App\DataFixtures\Demo\User\DemoUserFixture;
 use App\DataFixtures\Demo\Company\DemoCompanyFixture;
 use App\DataFixtures\Demo\Investment\DemoInvestmentFixture;
+use App\DataFixtures\Demo\Common\DemoKpiFixture;
+use App\Entity\Document;
+use App\Entity\Kpi;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -55,6 +58,10 @@ class DemoFixturesLoader extends Fixture implements FixtureGroupInterface
 
         // 6. Créer les entreprises avec leurs détails
         $companies = $this->companyFixture->createCompaniesWithDetails($manager);
+
+        // 6b. Créer les documents et KPI pour chaque entreprise
+        $kpiFixture = new DemoKpiFixture();
+        $kpiFixture->createKpisForCompanies($manager, $companies);
 
         // 7. Créer les investissements
         $investments = $this->investmentFixture->createInvestmentsForCompanies(
