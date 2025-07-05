@@ -34,6 +34,9 @@ import {
   SortDescendingOutlined,
   EditOutlined,
   DeleteOutlined,
+  PieChartOutlined,
+  CloseOutlined,
+  RightSquareOutlined,
 } from '@ant-design/icons';
 import {
   BarChart,
@@ -77,12 +80,7 @@ const AVAILABLE_QUERIES = [
   { id: 'kpi_analysis_by_period', name: 'Analyse KPI globale' },
 ];
 
-const GridControls = ({
-  drawerOpen,
-  onShowDrawer,
-  onCloseDrawer,
-  ...props
-}) => {
+const GridControls = ({ drawerOpen, onShowDrawer, onCloseDrawer }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { id } = useParams(); // Get the company ID from URL
@@ -1653,8 +1651,15 @@ const GridControls = ({
         open={drawerOpen}
         extra={
           <Space>
-            <Button onClick={onCloseDrawer}>{t('common.close')}</Button>
-            <Button type="primary" onClick={executeQuery} loading={dataLoading}>
+            {/* <Button icon={<CloseOutlined />} onClick={onCloseDrawer}>
+              {t('common.close')}
+            </Button> */}
+            <Button
+              icon={<RightSquareOutlined />}
+              type="primary"
+              onClick={executeQuery}
+              loading={dataLoading}
+            >
               {t('metrics.drawer.execute')}
             </Button>
           </Space>
@@ -1932,7 +1937,11 @@ const GridControls = ({
               </div>
             </div>
 
-            <Button type="primary" onClick={addGraphFromCurrentData}>
+            <Button
+              icon={<PieChartOutlined />}
+              type="primary"
+              onClick={addGraphFromCurrentData}
+            >
               {t('metrics.drawer.add_chart_button')}
             </Button>
           </div>
