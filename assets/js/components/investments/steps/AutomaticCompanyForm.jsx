@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Alert, Card, Select } from 'antd';
-import { InfoCircleOutlined } from '@ant-design/icons';
+import {
+  FileSearchOutlined,
+  InfoCircleOutlined,
+  UndoOutlined,
+} from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import CompanyDetails from './CompanyDetails';
 import { fetchCompanyDetails } from '@/services/company/companyService';
@@ -106,6 +110,7 @@ const AutomaticCompanyForm = ({ onNext, onBack }) => {
               </Form.Item>
               <div className="flex flex-col sm:flex-row justify-end gap-3 mt-4">
                 <Button
+                  icon={<UndoOutlined />}
                   onClick={() => {
                     setShowConfirmation(false);
                     setCompanyData(null);
@@ -198,6 +203,7 @@ const AutomaticCompanyForm = ({ onNext, onBack }) => {
       ) : (
         <Form.Item className="flex justify-end gap-3 flex-nowrap sm:flex-nowrap">
           <Button
+            icon={<UndoOutlined />}
             className="mx-2"
             onClick={() => {
               setShowConfirmation(false);
@@ -207,7 +213,12 @@ const AutomaticCompanyForm = ({ onNext, onBack }) => {
           >
             {t('common.back')}
           </Button>
-          <Button className="mx-2" type="primary" htmlType="submit">
+          <Button
+            icon={<FileSearchOutlined />}
+            className="mx-2"
+            type="primary"
+            htmlType="submit"
+          >
             {t('common.search')}
           </Button>
         </Form.Item>

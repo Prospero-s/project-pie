@@ -154,6 +154,12 @@ export const layoutSlice = createSlice({
     toggleResizable: state => {
       state.isResizable = !state.isResizable;
     },
+    setDraggable: (state, action) => {
+      state.isDraggable = action.payload;
+    },
+    setResizable: (state, action) => {
+      state.isResizable = action.payload;
+    },
   },
 });
 
@@ -165,6 +171,8 @@ export const {
   updateRowHeight,
   toggleDraggable,
   toggleResizable,
+  setDraggable,
+  setResizable,
 } = layoutSlice.actions;
 
 export default layoutSlice.reducer;
