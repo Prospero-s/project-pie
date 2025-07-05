@@ -236,6 +236,7 @@
     "superior": "Supérieur",
     "inferior": "Inférieur",
     "similar": "Similaire",
+    "type_view": "Changer de vue",
     "table_view": "Vue tableau",
     "chart_view": "Vue graphique",
     "chart_type": "Type de graphique",
