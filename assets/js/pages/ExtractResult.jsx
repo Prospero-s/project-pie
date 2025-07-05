@@ -32,7 +32,7 @@ import {
   SaveOutlined,
   DeleteOutlined,
   PlusOutlined,
-  RollbackOutlined,
+  UndoOutlined,
   FormOutlined,
 } from '@ant-design/icons';
 import { useUser } from '@/context/userContext';
@@ -1496,7 +1496,7 @@ const ExtractResult = ({ i18n }) => {
                   <Space>
                     <Button
                       type="default"
-                      icon={<RollbackOutlined />}
+                      icon={<UndoOutlined />}
                       onClick={() => navigate(-1)}
                       disabled={isValidating}
                     >

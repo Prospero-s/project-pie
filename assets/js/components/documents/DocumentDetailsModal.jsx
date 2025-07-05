@@ -22,6 +22,7 @@ import {
   CalendarOutlined,
   CheckCircleOutlined,
   FormOutlined,
+  UndoOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import documentsService, {
@@ -192,7 +193,7 @@ const DocumentDetailsModal = ({
   return (
     <Modal
       title={
-        <Space>
+        <Space className="mb-8">
           <FileTextOutlined />
           {t('document_details.title')}
         </Space>
@@ -201,7 +202,7 @@ const DocumentDetailsModal = ({
       onCancel={onCancel}
       width={1200}
       footer={[
-        <Button key="cancel" onClick={onCancel}>
+        <Button icon={<UndoOutlined />} key="cancel" onClick={onCancel}>
           {t('extractresult:cancel')}
         </Button>,
         document?.status === 'draft' && (
