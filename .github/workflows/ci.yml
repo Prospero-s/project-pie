@@ -74,14 +74,6 @@ jobs:
       - name: Install Frontend Dependencies
         run: npm install --no-cache
 
-      - name: Restore Node Modules Cache
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
   backend-code-quality:
     name: 🎨 Backend Code Quality
     runs-on: ubuntu-latest
@@ -197,26 +189,28 @@ jobs:
     needs: setup-frontend
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Restore Node Modules Cache
-      uses: actions/cache@v3
-      with:
-        path:  ./node_modules
-        key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: ./
 
-    - name: Check if node_modules is restored
-      run: |
-        echo "Listing node_modules directory"
-        ls -l  ./node_modules || echo "node_modules not found"
-      
-    - name: Run ESLint Fix
-      run: npm run lint-fix || true
-      
-    - name: Run ESLint Check
-      run: npm run lint
+      - name: Install Frontend Dependencies
+        run: npm install
+
+      - name: Check if node_modules is present
+        run: |
+          echo "Listing node_modules directory"
+          ls -l  ./node_modules || echo "node_modules not found"
+        
+      - name: Run ESLint Fix
+        run: npm run lint-fix || true
+        
+      - name: Run ESLint Check
+        run: npm run lint
 
   frontend-build:
     name: 🏗️ Build Frontend
@@ -227,13 +221,15 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Restore Node Modules Cache
-        uses: actions/cache@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          path:  ./node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: ./
+
+      - name: Install Frontend Dependencies
+        run: npm install
 
       - name: Build Frontend
         run: npm run build
