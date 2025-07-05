@@ -79,10 +79,6 @@ class DemoCleanupService
             'DELETE FROM "user" WHERE id = ?',
             [$userId]
         );
-
-        // 8. Supprimer les entreprises demo
-        // Supprimer toutes les entreprises et leurs dépendances
-        $connection->executeStatement('TRUNCATE company CASCADE');
     }
 
     /**
