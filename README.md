@@ -158,6 +158,10 @@ Avant chaque commit, n'oubliez pas d'exécuter les analyseurs statiques et les t
 make run-tests
 ```
 
+## Lancer les fixtures
+
+Voir le fichier README_DEMO_FIXTURES.md pour avec une base de donnée pré-remplie.
+
 ## Structure du Projet
 
 ```
