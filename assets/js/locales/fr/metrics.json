@@ -11,6 +11,12 @@
   "no_data": "Aucune donnée disponible",
   "custom_chart": "Graphique Personnalisé",
   "unsupported_chart_type": "Type de graphique non pris en charge",
+
+  "empty": {
+    "title": "Aucun metric",
+    "description": "Vous n'avez pas encore ajouté de graphes. Commencez par ajouter votre premier graphe.",
+    "action": "Ajouter un graphe"
+  },
   
   "layout": {
     "columns": "Colonnes",
@@ -129,7 +135,8 @@
     "loading_years": "Chargement des années disponibles...",
     "close": "Fermer",
     "yes": "Oui",
-    "no": "Non"
+    "no": "Non",
+    "cancel": "Annuler"
   },
   
   "data_explorer": {

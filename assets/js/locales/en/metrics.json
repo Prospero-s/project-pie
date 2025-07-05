@@ -9,6 +9,12 @@
   "no_data": "No data available",
   "custom_chart": "Custom Chart",
   "unsupported_chart_type": "Unsupported chart type",
+
+  "empty": {
+    "title": "No metrics",
+    "description": "You haven't added any charts yet. Start by adding your first chart.",
+    "action": "Add a chart"
+  },
   
   "layout": {
     "columns": "Columns",
@@ -122,7 +128,8 @@
     "loading": "Loading...",
     "close": "Close",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "cancel": "Cancel"
   },
   
   "data_explorer": {

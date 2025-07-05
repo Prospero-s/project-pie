@@ -10,11 +10,8 @@ import {
   setDraggable,
   setResizable,
 } from '../../../redux/slices/layoutSlice';
-import RadarChartComponent from '@/components/graphes/RadarChartComponent';
-import BarChartMixedComponent from '@/components/graphes/BarChartMixedComponent';
-import AreaChartInteractiveComponent from '@/components/graphes/AreaChartInteractiveComponent';
-import LineChartLabelComponent from '@/components/graphes/LineChartLabel';
 import CustomChartComponent from './customCharts/CustomChartComponent';
+import EmptyMetricsGraphesState from '../../documents/EmptyMetricsGraphesState';
 import { CloseOutlined } from '@ant-design/icons';
 import GridControls from './GridControls';
 import '../../../../css/components/metrics.css';
@@ -78,6 +75,11 @@ const GlobalMetrics = () => {
   const [currentLayout, setCurrentLayout] = useState(defaultLayoutConfig);
   const [tempLayout, setTempLayout] = useState(defaultLayoutConfig);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const showDrawer = () => setDrawerOpen(true);
+  const closeDrawer = () => setDrawerOpen(false);
 
   // Configuration de la grille
   const [gridConfig, setGridConfig] = useState({
@@ -226,7 +228,11 @@ const GlobalMetrics = () => {
     <>
       <div className="mb-4 flex justify-between items-center">
         {/* Grid Controls */}
-        <GridControls />
+        <GridControls
+          drawerOpen={drawerOpen}
+          onShowDrawer={showDrawer}
+          onCloseDrawer={closeDrawer}
+        />
 
         <div className="flex items-center gap-2">
           {!isEditMode ? (
@@ -260,7 +266,7 @@ const GlobalMetrics = () => {
         </div>
       </div>
 
-      {isEditMode && (
+      {companyCustomCharts.length !== 0 && isEditMode && (
         <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
           <div className="flex items-center gap-2">
             <EditOutlined className="text-blue-600" />
@@ -279,67 +285,41 @@ const GlobalMetrics = () => {
         </div>
       )}
 
-      <ResponsiveGridLayout
-        className="layout"
-        layouts={{ lg: layoutArray }}
-        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-        cols={{ lg: gridConfig.cols, md: 3, sm: 2, xs: 1, xxs: 1 }}
-        rowHeight={gridConfig.rowHeight}
-        isDraggable={gridConfig.isDraggable}
-        isResizable={gridConfig.isResizable}
-        onLayoutChange={handleLayoutChange}
-        compactType="vertical"
-        useCSSTransforms={true}
-      >
-        <div
-          key="radar"
-          style={chartContainerStyle}
-          className={`chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm ${isEditMode ? 'ring-2 ring-blue-200 ring-opacity-50' : ''}`}
+      {companyCustomCharts.length === 0 ? (
+        <EmptyMetricsGraphesState t={t} onAddClick={showDrawer} />
+      ) : (
+        <ResponsiveGridLayout
+          className="layout"
+          layouts={{ lg: layoutArray }}
+          breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+          cols={{ lg: gridConfig.cols, md: 3, sm: 2, xs: 1, xxs: 1 }}
+          rowHeight={gridConfig.rowHeight}
+          isDraggable={gridConfig.isDraggable}
+          isResizable={gridConfig.isResizable}
+          onLayoutChange={handleLayoutChange}
+          compactType="vertical"
+          useCSSTransforms={true}
         >
-          <RadarChartComponent />
-        </div>
-        <div
-          key="barMixed"
-          style={chartContainerStyle}
-          className={`chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm ${isEditMode ? 'ring-2 ring-blue-200 ring-opacity-50' : ''}`}
-        >
-          <BarChartMixedComponent />
-        </div>
-        <div
-          key="lineLabel"
-          style={chartContainerStyle}
-          className={`chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm ${isEditMode ? 'ring-2 ring-blue-200 ring-opacity-50' : ''}`}
-        >
-          <LineChartLabelComponent />
-        </div>
-        <div
-          key="areaInteractive"
-          style={chartContainerStyle}
-          className={`chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm ${isEditMode ? 'ring-2 ring-blue-200 ring-opacity-50' : ''}`}
-        >
-          <AreaChartInteractiveComponent />
-        </div>
-
-        {/* Render custom charts */}
-        {companyCustomCharts.map(chartId => (
-          <div
-            key={chartId}
-            style={chartContainerStyle}
-            className={`chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm ${isEditMode ? 'ring-2 ring-blue-200 ring-opacity-50' : ''}`}
-          >
+          {companyCustomCharts.map(chartId => (
             <div
-              className="chart-close-btn"
-              onClick={e => {
-                e.stopPropagation();
-                handleRemoveChart(chartId);
-              }}
+              key={chartId}
+              style={chartContainerStyle}
+              className={`chart-container rounded-lg border bg-card border-slate-300 text-card-foreground shadow-sm ${isEditMode ? 'ring-2 ring-blue-200 ring-opacity-50' : ''}`}
             >
-              <CloseOutlined />
+              <div
+                className="chart-close-btn"
+                onClick={e => {
+                  e.stopPropagation();
+                  handleRemoveChart(chartId);
+                }}
+              >
+                <CloseOutlined />
+              </div>
+              <CustomChartComponent chartId={chartId} />
             </div>
-            <CustomChartComponent chartId={chartId} />
-          </div>
-        ))}
-      </ResponsiveGridLayout>
+          ))}
+        </ResponsiveGridLayout>
+      )}
     </>
   );
 };
