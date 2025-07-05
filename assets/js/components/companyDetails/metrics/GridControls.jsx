@@ -35,7 +35,6 @@ import {
   EditOutlined,
   DeleteOutlined,
   PieChartOutlined,
-  CloseOutlined,
   RightSquareOutlined,
 } from '@ant-design/icons';
 import {

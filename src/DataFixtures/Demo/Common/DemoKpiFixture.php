@@ -42,7 +42,7 @@ class DemoKpiFixture
                     $kpi = new Kpi();
                     $kpi->setDocument($document);
                     $kpi->setName('Argent brûlé');
-                    $kpi->setPeriod($period);
+                    $kpi->setPeriod('Q' . $period);
                     $kpi->setValue(mt_rand(10000, 50000)); // Valeur aléatoire
                     $kpi->setUnit('€');
                     $manager->persist($kpi);
@@ -51,7 +51,7 @@ class DemoKpiFixture
                     $kpiHeadcount = new Kpi();
                     $kpiHeadcount->setDocument($document);
                     $kpiHeadcount->setName("Nombre d'employés");
-                    $kpiHeadcount->setPeriod($period);
+                    $kpiHeadcount->setPeriod('Q' . $period);
                     $kpiHeadcount->setValue(mt_rand(10, 500));
                     $kpiHeadcount->setUnit('personnes');
                     $manager->persist($kpiHeadcount);
@@ -60,7 +60,7 @@ class DemoKpiFixture
                     $kpiRevenue = new Kpi();
                     $kpiRevenue->setDocument($document);
                     $kpiRevenue->setName('Revenu Annuel Récurrent');
-                    $kpiRevenue->setPeriod($period);
+                    $kpiRevenue->setPeriod('Q' . $period);
                     $kpiRevenue->setValue(mt_rand(100000, 1000000));
                     $kpiRevenue->setUnit('€');
                     $manager->persist($kpiRevenue);
