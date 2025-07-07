@@ -55,16 +55,61 @@ log_message "🐳 Démarrage des containers Docker pour la production..."
 if make restart-prod; then
     log_message "✅ Containers Docker de production démarrés"
     
-    # Attendre que les containers soient prêts
+    # Attendre que les containers soient prêts avec vérification
     log_message "⏳ Attente que les containers soient prêts..."
-    sleep 30
+    max_attempts=30
+    attempt=0
     
-    # 5. Setup complet du projet avec make (selon le workflow habituel)
-    log_message "🚀 Setup complet du projet avec make setup-project..."
-    if make shell && composer install && npm install && npm run build; then
-        log_message "✅ Projet configuré avec succès"
+    while [ $attempt -lt $max_attempts ]; do
+        if docker-compose ps | grep -q "Up"; then
+            log_message "✅ Containers détectés comme démarrés"
+            break
+        fi
+        log_message "⏳ Attente des containers... ($((attempt + 1))/$max_attempts)"
+        sleep 10
+        attempt=$((attempt + 1))
+    done
+    
+    if [ $attempt -eq $max_attempts ]; then
+        log_message "❌ Timeout : Les containers ne sont pas prêts après 5 minutes"
+        exit 1
+    fi
+    
+    # Attendre encore un peu pour que les services internes soient prêts
+    log_message "⏳ Attente supplémentaire pour les services internes..."
+    sleep 20
+    
+    # 5. Vérifier que le container PHP est accessible
+    log_message "🔍 Vérification que le container PHP est accessible..."
+    if ! docker-compose exec -T php php --version; then
+        log_message "❌ Le container PHP n'est pas accessible"
+        exit 1
+    fi
+    
+    # 6. Installation des dépendances dans le container (workflow habituel)
+    log_message "📦 Installation des dépendances Composer dans le container..."
+    if docker-compose exec -T php composer install --no-dev --optimize-autoloader --no-interaction; then
+        log_message "✅ Dépendances Composer installées"
     else
-        log_message "⚠️ Échec du setup du projet"
+        log_message "❌ Échec de l'installation Composer"
+        exit 1
+    fi
+    
+    # 7. Installation des dépendances npm dans le container
+    log_message "📦 Installation des dépendances npm dans le container..."
+    if docker-compose exec -T php npm install --production --no-cache; then
+        log_message "✅ Dépendances npm installées"
+    else
+        log_message "❌ Échec de l'installation npm"
+        exit 1
+    fi
+    
+    # 8. Build des assets dans le container
+    log_message "🏗️ Build des assets dans le container..."
+    if docker-compose exec -T php npm run build; then
+        log_message "✅ Assets buildés avec succès"
+    else
+        log_message "❌ Échec du build des assets"
         exit 1
     fi
     
