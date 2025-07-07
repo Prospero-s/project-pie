@@ -60,6 +60,21 @@ if command -v docker &> /dev/null && command -v docker-compose &> /dev/null; the
         log_message "⚠️ Certains services peuvent ne pas être actifs"
     fi
     
+    # Build des assets automatiquement
+    log_message "🏗️ Build des assets..."
+    if make build-assets; then
+        log_message "✅ Build terminé avec succès"
+    else
+        log_message "❌ Échec du build, tentative alternative..."
+        # Fallback : utiliser docker-compose directement
+        if docker-compose exec php npm run build; then
+            log_message "✅ Build terminé avec succès (méthode alternative)"
+        else
+            log_message "❌ Échec du build avec toutes les méthodes"
+            exit 1
+        fi
+    fi
+    
 else
     log_message "⚠️ Docker non disponible, démarrage en mode standalone"
     
