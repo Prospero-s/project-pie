@@ -20,6 +20,9 @@ log_error() {
 sudo mkdir -p "${LOG_DIR}"
 sudo chown ec2-user:ec2-user "${LOG_DIR}"
 
+# Créer le fichier de log s'il n'existe pas
+touch "${LOG_FILE}"
+
 # Rediriger toutes les sorties vers le fichier de log en plus de la console
 exec > >(tee -a "${LOG_FILE}")
 exec 2>&1
@@ -46,8 +49,16 @@ else
     exit 1
 fi
 
+# Arrêter les services
+log_message "🛑 Arrêt des services..."
+if make down; then
+    log_message "✅ Services arrêtés avec succès"
+else
+    log_message "⚠️ Aucun service à arrêter"
+fi
+
+# Redémarrer les services production
 log_message "🔄 Redémarrage des services production..."
-# Utiliser la nouvelle commande restart-prod
 if make restart-prod; then
     log_message "✅ Services redémarrés avec succès"
 else
@@ -55,8 +66,12 @@ else
     exit 1
 fi
 
+# Attendre que les services soient prêts
+log_message "⏳ Attente que les services soient prêts..."
+sleep 10
+
+# Build des assets dans le conteneur PHP
 log_message "📦 Build des assets..."
-# Build dans le container PHP
 if make shell -c "npm run build"; then
     log_message "✅ Build des assets réussi"
 else
@@ -65,5 +80,4 @@ else
 fi
 
 log_message "✅ DÉPLOIEMENT TERMINÉ AVEC SUCCÈS - $(date)"
-log_message "=================================================="
-echo "" 
+log_message "==================================================" 
