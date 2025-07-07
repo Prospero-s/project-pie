@@ -169,10 +169,15 @@ const SignIn = ({ i18n }) => {
         <h2 className="text-3xl font-semibold text-gray-900 mb-2">
           {t('login_title')}
         </h2>
+
+        {/* bouton pour test sentry */}
+
+        {/* <Button      className="w-full h-10 flex items-center justify-center gap-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors text-sm font-medium"
+  onClick={() => {throw new Error("This is your first error!");}}>Break the world</Button>; */}
+
         <h3 className="font-degarism text-gray-600 text-lg mb-6">
           {t('login_subtitle')}
-        </h3>
-      </div>
+        </h3>      </div>
       <SignInForm
         t={t}
         email={email}
