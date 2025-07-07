@@ -20,8 +20,8 @@ cd /home/ec2-user/project-pie
 
 # Afficher la version Git déployée
 if command -v git &> /dev/null; then
-    CURRENT_COMMIT=$(git rev-parse HEAD)
-    log_message "📋 Version déployée: $CURRENT_COMMIT"
+CURRENT_COMMIT=$(git rev-parse HEAD)
+log_message "📋 Version déployée: $CURRENT_COMMIT"
 else
     log_message "⚠️ Git non disponible pour afficher la version"
 fi
@@ -33,9 +33,9 @@ if command -v docker &> /dev/null && command -v docker-compose &> /dev/null; the
     # Méthode 1 : Utiliser le Makefile si disponible
     if [ -f Makefile ] && command -v make &> /dev/null; then
         log_message "🎯 Utilisation du Makefile..."
-        if make restart-prod; then
+if make restart-prod; then
             log_message "✅ Services redémarrés avec succès via Makefile"
-        else
+else
             log_message "⚠️ Échec du redémarrage via Makefile, tentative alternative..."
             # Fallback : utiliser docker-compose directement
             docker-compose -f compose.yaml -f compose.prod.yaml down || true
@@ -47,10 +47,10 @@ if command -v docker &> /dev/null && command -v docker-compose &> /dev/null; the
         docker-compose -f compose.yaml -f compose.prod.yaml down || true
         docker-compose -f compose.yaml -f compose.prod.yaml up -d --build
         log_message "✅ Services redémarrés avec succès via docker-compose"
-    fi
-    
-    # Attendre que les services soient prêts
-    log_message "⏳ Attente que les services soient prêts..."
+fi
+
+# Attendre que les services soient prêts
+log_message "⏳ Attente que les services soient prêts..."
     sleep 20
     
     # Vérifier l'état des services
@@ -59,22 +59,22 @@ if command -v docker &> /dev/null && command -v docker-compose &> /dev/null; the
     else
         log_message "⚠️ Certains services peuvent ne pas être actifs"
     fi
-    
+
     # Build des assets automatiquement
-    log_message "🏗️ Build des assets..."
+log_message "🏗️ Build des assets..."
     if make build-assets; then
-        log_message "✅ Build terminé avec succès"
-    else
-        log_message "❌ Échec du build, tentative alternative..."
+    log_message "✅ Build terminé avec succès"
+else
+    log_message "❌ Échec du build, tentative alternative..."
         # Fallback : utiliser docker-compose directement
-        if docker-compose exec php npm run build; then
-            log_message "✅ Build terminé avec succès (méthode alternative)"
-        else
-            log_message "❌ Échec du build avec toutes les méthodes"
-            exit 1
-        fi
+    if docker-compose exec php npm run build; then
+        log_message "✅ Build terminé avec succès (méthode alternative)"
+    else
+        log_message "❌ Échec du build avec toutes les méthodes"
+        exit 1
     fi
-    
+fi
+
 else
     log_message "⚠️ Docker non disponible, démarrage en mode standalone"
     
