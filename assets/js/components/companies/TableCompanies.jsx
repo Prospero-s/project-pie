@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Skeleton, Table, Tag } from 'antd';
-import { Link } from 'react-router-dom';
+import { Skeleton, Table, Tag, Modal } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { getAllCompanies } from '@/services/company/companyService';
+import {
+  getAllCompanies,
+  getCompanyDetailsById,
+} from '@/services/company/companyService';
 import { formatDate, getDateLocale } from '@/lib/utils';
+import CompanyDetails from '../investments/steps/CompanyDetails';
 
 const TableCompanies = ({ i18n }) => {
   const { t } = useTranslation('allCompanies', { i18n });
@@ -14,6 +17,9 @@ const TableCompanies = ({ i18n }) => {
     pageSize: 10,
     total: 0,
   });
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [companyDetailsLoading, setCompanyDetailsLoading] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 500);
@@ -58,6 +64,28 @@ const TableCompanies = ({ i18n }) => {
     }
   };
 
+  const handleCompanyClick = async company => {
+    try {
+      setCompanyDetailsLoading(true);
+      setModalVisible(true);
+
+      // Récupérer les détails complets de l'entreprise
+      const companyDetails = await getCompanyDetailsById(company.id);
+      setSelectedCompany(companyDetails);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des détails:', error);
+      // En cas d'erreur, utiliser les données de base disponibles
+      setSelectedCompany(company);
+    } finally {
+      setCompanyDetailsLoading(false);
+    }
+  };
+
+  const handleModalClose = () => {
+    setModalVisible(false);
+    setSelectedCompany(null);
+  };
+
   const columns = [
     {
       title: '#',
@@ -85,9 +113,9 @@ const TableCompanies = ({ i18n }) => {
           <Skeleton.Input block active size="small" />
         ) : (
           <div className="flex items-center gap-4">
-            <Link
-              to={`/company/details/${record.id}`}
-              className="flex items-center gap-4 text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400"
+            <div
+              onClick={() => handleCompanyClick(record)}
+              className="flex items-center gap-4 text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer"
             >
               <img
                 src={
@@ -99,7 +127,7 @@ const TableCompanies = ({ i18n }) => {
                 className="w-10 h-10 rounded-full"
               />
               <span className="font-degarism">{text}</span>
-            </Link>
+            </div>
           </div>
         ),
     },
@@ -186,6 +214,23 @@ const TableCompanies = ({ i18n }) => {
           />
         </div>
       </div>
+
+      <Modal
+        title={selectedCompany?.name || t('company.details')}
+        open={modalVisible}
+        onCancel={handleModalClose}
+        footer={null}
+        width="90vw"
+        style={{ maxWidth: '1200px', minWidth: '800px' }}
+        className="company-details-modal"
+      >
+        {selectedCompany && (
+          <CompanyDetails
+            company={selectedCompany}
+            loading={companyDetailsLoading}
+          />
+        )}
+      </Modal>
     </>
   );
 };

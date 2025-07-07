@@ -236,7 +236,7 @@ const AllMetrics = () => {
             {t('kpi_comparison.button_text')}
           </Button>
 
-          <div className="metrics-info-text">
+          <div className="font-degarism metrics-info-text">
             {availableYears.length} année{availableYears.length > 1 ? 's' : ''}{' '}
             disponible{availableYears.length > 1 ? 's' : ''}
           </div>

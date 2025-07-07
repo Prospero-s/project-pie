@@ -1,5 +1,6 @@
 import React from 'react';
 import { Form, Input, Button, Select } from 'antd';
+import { CheckOutlined, UndoOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 
@@ -96,10 +97,15 @@ const ManualCompanyForm = ({ onNext, onBack, t }) => {
       </Form.Item>
 
       <Form.Item className="flex justify-end gap-3 flex-nowrap sm:flex-nowrap">
-        <Button className="mx-2" onClick={onBack}>
+        <Button icon={<UndoOutlined />} className="mx-2" onClick={onBack}>
           {t('common.back')}
         </Button>
-        <Button className="mx-2" type="primary" htmlType="submit">
+        <Button
+          icon={<CheckOutlined />}
+          className="mx-2"
+          type="primary"
+          htmlType="submit"
+        >
           {t('common.next')}
         </Button>
       </Form.Item>

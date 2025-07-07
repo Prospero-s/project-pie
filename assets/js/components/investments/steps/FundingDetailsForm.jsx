@@ -1,6 +1,7 @@
 import React from 'react';
 import { Form, InputNumber, Select, Button } from 'antd';
 import InvestorSelection from './InvestorSelection';
+import { CheckOutlined } from '@ant-design/icons';
 
 const FundingDetailsForm = ({ companyData, onFinish, t }) => {
   const [form] = Form.useForm();
@@ -91,7 +92,7 @@ const FundingDetailsForm = ({ companyData, onFinish, t }) => {
       </div>
 
       <Form.Item>
-        <Button type="primary" htmlType="submit" block>
+        <Button icon={<CheckOutlined />} type="primary" htmlType="submit" block>
           {t('common.finish')}
         </Button>
       </Form.Item>

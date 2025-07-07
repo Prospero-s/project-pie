@@ -6,10 +6,12 @@ import { Card, Tabs } from 'antd';
 import AllMetrics from '@/components/companyDetails/metrics/AllMetrics';
 import InvestmentDetails from '@/components/companyDetails/metrics/InvestmentDetails';
 import GlobalMetrics from '@/components/companyDetails/metrics/GlobalMetrics';
+import TableDocuments from '@/components/documents/TableDocuments';
 
 const CompanyDetails = ({ i18n }) => {
   const { t } = useTranslation('investments', { i18n });
   const { t: metrics } = useTranslation('metrics', { i18n });
+  const { t: documents } = useTranslation('documents', { i18n });
   const { id } = useParams();
   const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -56,17 +58,14 @@ const CompanyDetails = ({ i18n }) => {
             {
               key: '3',
               label: metrics('documents'),
-              children: <AllMetrics />,
+              children: (
+                <TableDocuments t={documents} i18n={i18n} companyId={id} />
+              ),
             },
             {
               key: '4',
               label: metrics('investment_details'),
               children: <InvestmentDetails />,
-            },
-            {
-              key: '5',
-              label: metrics('all_metrics'),
-              children: <AllMetrics />,
             },
           ]}
         />
