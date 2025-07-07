@@ -50,42 +50,27 @@ if ! command -v docker-compose &> /dev/null; then
     exit 1
 fi
 
-# 4. Installer les dépendances Composer en local si possible
-log_message "📦 Installation des dépendances Composer..."
-if command -v composer &> /dev/null; then
-    log_message "🎯 Installation Composer locale..."
-    if composer install --no-dev --optimize-autoloader --no-interaction; then
-        log_message "✅ Dépendances Composer installées (local)"
+# 4. Démarrer les containers Docker d'abord avec make restart-prod
+log_message "🐳 Démarrage des containers Docker pour la production..."
+if make restart-prod; then
+    log_message "✅ Containers Docker de production démarrés"
+    
+    # Attendre que les containers soient prêts
+    log_message "⏳ Attente que les containers soient prêts..."
+    sleep 30
+    
+    # 5. Setup complet du projet avec make (selon le workflow habituel)
+    log_message "🚀 Setup complet du projet avec make setup-project..."
+    if make shell && composer install --no-dev --optimize-autoloader --no-interaction && npm install && npm run build; then
+        log_message "✅ Projet configuré avec succès"
     else
-        log_message "⚠️ Échec de l'installation Composer locale"
+        log_message "⚠️ Échec du setup du projet"
+        exit 1
     fi
+    
 else
-    log_message "⚠️ Composer non disponible localement"
-fi
-
-# 5. Installer les dépendances Node.js en local si possible
-log_message "📦 Installation des dépendances Node.js..."
-if command -v npm &> /dev/null; then
-    log_message "🎯 Installation npm locale..."
-    if npm install --production --no-cache; then
-        log_message "✅ Dépendances Node.js installées (local)"
-    else
-        log_message "⚠️ Échec de l'installation npm locale"
-    fi
-else
-    log_message "⚠️ npm non disponible localement"
-fi
-
-# 6. Build des assets si possible
-log_message "🏗️ Build des assets..."
-if command -v npm &> /dev/null; then
-    if npm run build; then
-        log_message "✅ Build des assets terminé"
-    else
-        log_message "⚠️ Échec du build des assets"
-    fi
-else
-    log_message "⚠️ npm non disponible pour le build"
+    log_message "❌ Échec du démarrage des containers Docker"
+    exit 1
 fi
 
 log_message "✅ Installation des dépendances terminée" 
