@@ -20,18 +20,18 @@ cd /home/ec2-user/project-pie
 
 # Vérifier si Docker est disponible et les containers sont démarrés
 if command -v docker &> /dev/null && command -v docker-compose &> /dev/null; then
-    log_message "📊 Vérification des services Docker..."
+log_message "📊 Vérification des services Docker..."
     
     # Vérifier si des services Docker sont actifs
     if docker-compose ps --quiet | grep -q .; then
-        if docker-compose ps | grep -q "Up"; then
-            log_message "✅ Services Docker actifs"
+if docker-compose ps | grep -q "Up"; then
+    log_message "✅ Services Docker actifs"
             DOCKER_RUNNING=true
         else
             log_message "⚠️ Services Docker présents mais pas tous actifs"
             DOCKER_RUNNING=false
         fi
-    else
+else
         log_message "⚠️ Aucun service Docker détecté"
         DOCKER_RUNNING=false
     fi
@@ -122,8 +122,8 @@ fi
 # Vérifier la version Git si disponible
 if command -v git &> /dev/null; then
     if git rev-parse --git-dir > /dev/null 2>&1; then
-        CURRENT_COMMIT=$(git rev-parse HEAD)
-        log_message "📋 Version finale: $CURRENT_COMMIT"
+CURRENT_COMMIT=$(git rev-parse HEAD)
+log_message "📋 Version finale: $CURRENT_COMMIT"
     else
         log_message "⚠️ Pas de repository Git détecté"
     fi
