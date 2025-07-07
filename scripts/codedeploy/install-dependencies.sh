@@ -88,10 +88,4 @@ else
     log_message "⚠️ npm non disponible pour le build"
 fi
 
-# 7. Définir les permissions appropriées
-log_message "🔐 Configuration des permissions..."
-chown -R ec2-user:ec2-user /home/ec2-user/project-pie
-chmod +x scripts/codedeploy/*.sh
-log_message "✅ Permissions configurées"
-
 log_message "✅ Installation des dépendances terminée" 
