@@ -263,7 +263,7 @@ jobs:
         echo "📋 Création du package de déploiement..."
         
         # Créer le package avec les fichiers nécessaires
-        # Utiliser --warning=no-file-changed pour éviter les erreurs sur les fichiers temporaires
+        # Utiliser --warning=no-file-changed et ignorer les erreurs de exit code 1
         tar --warning=no-file-changed -czf deployment-package.tar.gz \
           --exclude='node_modules' \
           --exclude='.git' \
@@ -285,7 +285,21 @@ jobs:
           --exclude='*.swp' \
           --exclude='*.swo' \
           --exclude='*~' \
-          .
+          . || { 
+            # Si tar échoue, vérifier si c'est juste à cause de fichiers qui changent
+            if [ $? -eq 1 ]; then
+              echo "⚠️ Tar a signalé des fichiers qui ont changé, mais l'archive est créée"
+            else
+              echo "❌ Erreur grave lors de la création de l'archive"
+              exit 1
+            fi
+          }
+        
+        # Vérifier que le package a été créé
+        if [ ! -f deployment-package.tar.gz ]; then
+          echo "❌ Le package n'a pas été créé"
+          exit 1
+        fi
         
         echo "📦 Package créé: $(ls -lh deployment-package.tar.gz)"
         
