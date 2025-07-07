@@ -17,6 +17,7 @@
         "easycorp/easyadmin-bundle": "^4.10",
         "nelmio/cors-bundle": "^2.5",
         "pentatrion/vite-bundle": "^7.0",
+        "sentry/sentry-symfony": "^5.3",
         "symfony/console": "7.1.*",
         "symfony/css-selector": "7.1.*",
         "symfony/dom-crawler": "7.1.*",

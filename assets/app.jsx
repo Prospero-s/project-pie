@@ -7,6 +7,7 @@
 
 // any CSS you import will output into a single css file (app.css in this case)
 import React from 'react';
+import './instrument';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ReactDOM, { createRoot } from 'react-dom/client';
 import './css/app.css';
