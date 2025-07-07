@@ -23,6 +23,7 @@ help:
 	@echo "  build             - Construire les conteneurs Docker"
 	@echo "  logs              - Afficher les logs des conteneurs"
 	@echo "  shell             - Ouvrir un shell dans le conteneur PHP"
+	@echo "  build-assets      - Builder les assets avec npm run build"
 	@echo "  install           - Installer les dépendances avec Composer"
 	@echo "  cache-clear       - Vider le cache Symfony"
 	@echo ""
@@ -67,7 +68,8 @@ delete containers:
 restart: down up
 
 restart-prod:
-    $(DOCKER_COMPOSE) restart php postgres pgadmin mailer pdf_processor
+	$(DOCKER_COMPOSE) -f compose.yaml -f compose.prod.yaml down
+	$(DOCKER_COMPOSE) -f compose.yaml -f compose.prod.yaml up -d php postgres pgadmin mailer pdf_processor
 
 build:
 	$(DOCKER_COMPOSE) build
@@ -77,6 +79,9 @@ logs:
 
 shell:
 	$(DOCKER_COMPOSE) exec $(PHP_CONTAINER) /bin/bash
+
+build-assets:
+	$(DOCKER_COMPOSE) exec $(PHP_CONTAINER) npm run build
 
 install:
 	$(COMPOSER) install
