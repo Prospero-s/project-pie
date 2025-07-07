@@ -61,7 +61,7 @@ if make restart-prod; then
     
     # 5. Setup complet du projet avec make (selon le workflow habituel)
     log_message "🚀 Setup complet du projet avec make setup-project..."
-    if make shell && composer install --no-dev --optimize-autoloader --no-interaction && npm install && npm run build; then
+    if make shell && composer install && npm install && npm run build; then
         log_message "✅ Projet configuré avec succès"
     else
         log_message "⚠️ Échec du setup du projet"
