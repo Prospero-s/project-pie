@@ -10,11 +10,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<CompanyInvestment>
- *
- * @method CompanyInvestment|null find($id, $lockMode = null, $lockVersion = null)
- * @method CompanyInvestment|null findOneBy(array<string, mixed> $criteria, array<string, mixed>|null $orderBy = null)
- * @method CompanyInvestment[]    findAll()
- * @method CompanyInvestment[]    findBy(array<string, mixed> $criteria, array<string, mixed>|null $orderBy = null, $limit = null, $offset = null)
  */
 class CompanyInvestmentRepository extends ServiceEntityRepository
 {
@@ -573,9 +568,9 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
 
         $company = $investment->getCompany();
         $userGroup = $investment->getUserGroup();
-        
+
         $em = $this->getEntityManager();
-        
+
         // Compter et supprimer les documents liés à cette compagnie pour ce groupe
         $documentsToDelete = $this->documentRepository->createQueryBuilder('d')
             ->where('d.company = :company')
@@ -584,20 +579,20 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
             ->setParameter('userGroup', $userGroup)
             ->getQuery()
             ->getResult();
-        
+
         $documentsDeletedCount = count($documentsToDelete);
-        
+
         // Supprimer les documents
         foreach ($documentsToDelete as $document) {
             $em->remove($document);
         }
-        
+
         // Supprimer l'investissement
         $em->remove($investment);
         $em->flush();
 
         return [
-            'success' => true, 
+            'success' => true,
             'documentsDeleted' => $documentsDeletedCount,
             'companyName' => $company->getDenomination()
         ];
