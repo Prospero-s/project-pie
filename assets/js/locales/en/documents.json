@@ -40,6 +40,10 @@
   "messages": {
     "delete_success": "Document successfully deleted!",
     "delete_error": "Error while deleting document.",
+    "delete_confirmation_title": "Confirm deletion",
+    "delete_confirmation_content": "Are you sure you want to delete this document? This action is irreversible.",
+    "delete_confirmation_cancel": "Cancel",
+    "delete_confirmation_confirm": "Delete",
     "loading_error": "Error while loading documents"
   },
   "textract_results": {

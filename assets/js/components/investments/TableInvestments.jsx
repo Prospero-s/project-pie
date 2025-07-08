@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Skeleton, Table, message, Tag, Spin, Tooltip } from 'antd';
-import { FileAddOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Skeleton, Table, message, Tag, Spin, Tooltip, Modal } from 'antd';
+import {
+  FileAddOutlined,
+  DeleteOutlined,
+  ExclamationCircleOutlined,
+} from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -14,6 +18,8 @@ import UploadPopup from '@/components/common/upload/UploadPopup';
 import { formatDate, getDateLocale } from '@/lib/utils';
 import { fundingTypeTranslation } from '@/services/graphe/grapheService';
 import { getFundingTypeColor, getSectorTypeColor } from '@/lib/colors';
+
+const { confirm } = Modal;
 
 const TableInvestments = ({
   i18n,
@@ -326,24 +332,34 @@ const TableInvestments = ({
   ];
 
   const handleDelete = async id => {
-    try {
-      await deleteInvestment(id);
-      message.success(t('common.delete_success'));
-      await loadInvestments({
-        page: pagination.current,
-        limit: pagination.pageSize,
-        sortField: sortedInfo.columnKey || 'updatedAt',
-        sortOrder: sortedInfo.order
-          ? sortedInfo.order === 'ascend'
-            ? 'asc'
-            : 'desc'
-          : 'desc',
-        ...activeFilters,
-      });
-    } catch (error) {
-      message.error(t('common.delete_error'));
-      console.error(error);
-    }
+    confirm({
+      title: t('common.delete_confirmation_title'),
+      icon: <ExclamationCircleOutlined />,
+      content: t('common.delete_confirmation_content'),
+      okText: t('common.delete_confirmation_confirm'),
+      okType: 'danger',
+      cancelText: t('common.delete_confirmation_cancel'),
+      onOk: async () => {
+        try {
+          await deleteInvestment(id);
+          message.success(t('common.delete_success_with_documents'));
+          await loadInvestments({
+            page: pagination.current,
+            limit: pagination.pageSize,
+            sortField: sortedInfo.columnKey || 'updatedAt',
+            sortOrder: sortedInfo.order
+              ? sortedInfo.order === 'ascend'
+                ? 'asc'
+                : 'desc'
+              : 'desc',
+            ...activeFilters,
+          });
+        } catch (error) {
+          message.error(t('common.delete_error'));
+          console.error(error);
+        }
+      },
+    });
   };
 
   const handleAdd = async () => {

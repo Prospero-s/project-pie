@@ -5,7 +5,9 @@
   "no_events": "Aucun événement à afficher pour le moment.",
   "event_types": {
     "investment_added": "Investissement ajouté",
+    "investment_deleted": "Investissement supprimé",
     "document_added": "Document ajouté",
+    "document_deleted": "Document supprimé",
     "member_added": "Membre ajouté au groupe"
   },
   "funding_types": {

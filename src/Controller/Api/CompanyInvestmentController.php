@@ -2,26 +2,24 @@
 
 namespace App\Controller\Api;
 
-use App\Repository\CompanyRepository;
 use App\Repository\CompanyInvestmentRepository;
+use App\Repository\CompanyRepository;
+use App\Repository\UserRepository;
+use App\Repository\EventLogRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Repository\UserRepository;
 
 #[Route('/api', name: 'api_')]
 class CompanyInvestmentController extends AbstractController
 {
-    private CompanyInvestmentRepository $companyInvestmentRepository;
-    private UserRepository $userRepository;
-
     public function __construct(
-        CompanyInvestmentRepository $companyInvestmentRepository,
-        UserRepository $userRepository
+        private readonly CompanyInvestmentRepository $companyInvestmentRepository,
+        private readonly UserRepository $userRepository,
+        private readonly EventLogRepository $eventLogRepository,
     ) {
-        $this->companyInvestmentRepository = $companyInvestmentRepository;
-        $this->userRepository = $userRepository;
     }
 
     #[Route('/investments', name: 'get_investments', methods: ['GET'])]
@@ -278,17 +276,47 @@ class CompanyInvestmentController extends AbstractController
                 throw new \Exception('Utilisateur non authentifié ou non trouvé');
             }
 
-            $deleted = $this->companyInvestmentRepository->deleteInvestmentById($id);
-
-            if (!$deleted) {
+            // Récupérer les informations de l'investissement avant suppression
+            $investment = $this->companyInvestmentRepository->find($id);
+            if (!$investment) {
                 return new JsonResponse([
                     'error' => 'Investissement non trouvé',
                     'details' => 'Aucun investissement trouvé avec cet identifiant'
                 ], 404);
             }
 
+            $investmentDetails = [
+                'company_name' => $investment->getCompany()->getDenomination(),
+                'amount' => $investment->getAmount(),
+                'currency' => $investment->getCurrency(),
+                'funding_type' => $investment->getFundingType()
+            ];
+
+            $result = $this->companyInvestmentRepository->deleteInvestmentById($id);
+
+            if (!$result['success']) {
+                return new JsonResponse([
+                    'error' => 'Investissement non trouvé',
+                    'details' => 'Aucun investissement trouvé avec cet identifiant'
+                ], 404);
+            }
+
+            // Enregistrer l'événement de suppression
+            $this->eventLogRepository->logInvestmentDeletion(
+                $user->getUserGroup()->getId(),
+                $user->getEmail(),
+                $investmentDetails
+            );
+
+            $message = 'Investissement supprimé avec succès';
+            if ($result['documentsDeleted'] > 0) {
+                $message .= sprintf(' (%d document(s) associé(s) également supprimé(s))', $result['documentsDeleted']);
+            }
+
             return new JsonResponse([
-                'message' => 'Investissement supprimé avec succès'
+                'message' => $message,
+                'documentsDeleted' => $result['documentsDeleted'],
+                'companyName' => $result['companyName']
             ]);
         } catch (\Exception $e) {
             return new JsonResponse([

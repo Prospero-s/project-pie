@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Tooltip, Table, Skeleton, message } from 'antd';
-import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { Button, Tooltip, Table, Skeleton, message, Modal } from 'antd';
+import {
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  ExclamationCircleOutlined,
+} from '@ant-design/icons';
 import {
   fetchDocuments,
   deleteDocument,
@@ -10,6 +15,8 @@ import { useNavigate } from 'react-router-dom';
 import EmptyDocumentState from './EmptyDocumentState';
 import DocumentDetailsModal from './DocumentDetailsModal';
 import { formatDate, getDateLocale } from '@/lib/utils';
+
+const { confirm } = Modal;
 
 const TableDocuments = ({ t, i18n, companyId = null }) => {
   const [loading, setLoading] = useState(true);
@@ -33,13 +40,25 @@ const TableDocuments = ({ t, i18n, companyId = null }) => {
   };
 
   const handleDelete = async id => {
-    try {
-      await deleteDocument(id);
-      message.success(t('messages.delete_success'));
-      loadDocuments();
-    } catch (error) {
-      message.error(`${t('messages.delete_error')}: ${error.message || error}`);
-    }
+    confirm({
+      title: t('messages.delete_confirmation_title'),
+      icon: <ExclamationCircleOutlined />,
+      content: t('messages.delete_confirmation_content'),
+      okText: t('messages.delete_confirmation_confirm'),
+      okType: 'danger',
+      cancelText: t('messages.delete_confirmation_cancel'),
+      onOk: async () => {
+        try {
+          await deleteDocument(id);
+          message.success(t('messages.delete_success'));
+          loadDocuments();
+        } catch (error) {
+          message.error(
+            `${t('messages.delete_error')}: ${error.message || error}`,
+          );
+        }
+      },
+    });
   };
 
   const handleViewDetails = record => {

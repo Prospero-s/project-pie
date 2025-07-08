@@ -76,8 +76,12 @@ const EventLog = ({ i18n }) => {
     switch (type) {
       case 'investment_added':
         return <DollarOutlined style={{ color: '#52c41a' }} />;
+      case 'investment_deleted':
+        return <DollarOutlined style={{ color: '#ff4d4f' }} />;
       case 'document_added':
         return <FileTextOutlined style={{ color: '#1890ff' }} />;
+      case 'document_deleted':
+        return <FileTextOutlined style={{ color: '#ff4d4f' }} />;
       case 'member_added':
         return <UserAddOutlined style={{ color: '#722ed1' }} />;
       default:
@@ -89,8 +93,12 @@ const EventLog = ({ i18n }) => {
     switch (type) {
       case 'investment_added':
         return 'green';
+      case 'investment_deleted':
+        return 'red';
       case 'document_added':
         return 'blue';
+      case 'document_deleted':
+        return 'red';
       case 'member_added':
         return 'purple';
       default:
@@ -140,6 +148,26 @@ const EventLog = ({ i18n }) => {
           </Card>
         );
 
+      case 'investment_deleted':
+        return (
+          <Card size="small" className="mt-2">
+            <Space direction="vertical" className="w-full">
+              <div className="flex justify-between items-center">
+                <Text strong>{event.details.company_name}</Text>
+                <Tag color="red">
+                  {formatAmount(event.details.amount, event.details.currency)}
+                </Tag>
+              </div>
+              <div className="flex items-center gap-2">
+                <BankOutlined className="text-gray-500" />
+                <Text type="secondary">
+                  {t(`funding_types.${event.details.funding_type}`)}
+                </Text>
+              </div>
+            </Space>
+          </Card>
+        );
+
       case 'document_added':
         return (
           <Card size="small" className="mt-2">
@@ -147,6 +175,26 @@ const EventLog = ({ i18n }) => {
               <div className="flex justify-between items-center">
                 <Text strong>{event.details.company_name}</Text>
                 <Tag color="blue">{event.details.year}</Tag>
+              </div>
+              <div>
+                <Text type="secondary">{event.details.filename}</Text>
+              </div>
+              <div>
+                <Text type="secondary">
+                  {t(`periodicity.${event.details.periodicity}`)}
+                </Text>
+              </div>
+            </Space>
+          </Card>
+        );
+
+      case 'document_deleted':
+        return (
+          <Card size="small" className="mt-2">
+            <Space direction="vertical" className="w-full">
+              <div className="flex justify-between items-center">
+                <Text strong>{event.details.company_name}</Text>
+                <Tag color="red">{event.details.year}</Tag>
               </div>
               <div>
                 <Text type="secondary">{event.details.filename}</Text>

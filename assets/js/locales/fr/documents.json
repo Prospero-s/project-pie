@@ -40,6 +40,10 @@
   "messages": {
     "delete_success": "Document supprimé avec succès !",
     "delete_error": "Erreur lors de la suppression du document.",
+    "delete_confirmation_title": "Confirmer la suppression",
+    "delete_confirmation_content": "Êtes-vous sûr de vouloir supprimer ce document ? Cette action est irréversible.",
+    "delete_confirmation_cancel": "Annuler",
+    "delete_confirmation_confirm": "Supprimer",
     "loading_error": "Erreur lors du chargement des documents"
   },
   "textract_results": {

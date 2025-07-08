@@ -7,6 +7,7 @@ use App\Entity\Kpi;
 use App\Repository\DocumentRepository;
 use App\Repository\CompanyRepository;
 use App\Repository\KpiRepository;
+use App\Repository\EventLogRepository;
 use App\Service\User\UserService;
 use App\Service\Notification\NotificationService;
 use App\Enum\NotificationType;
@@ -20,12 +21,13 @@ use Symfony\Component\Routing\Annotation\Route;
 class DocumentController extends AbstractController
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private DocumentRepository $documentRepository,
-        private CompanyRepository $companyRepository,
-        private UserService $userService,
-        private KpiRepository $kpiRepository,
-        private NotificationService $notificationService
+        private readonly DocumentRepository $documentRepository,
+        private readonly CompanyRepository $companyRepository,
+        private readonly KpiRepository $kpiRepository,
+        private readonly EventLogRepository $eventLogRepository,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly UserService $userService,
+        private readonly NotificationService $notificationService
     ) {
     }
 
@@ -170,12 +172,27 @@ class DocumentController extends AbstractController
                 return $this->json(['error' => 'Access denied'], Response::HTTP_FORBIDDEN);
             }
 
+            // Préparer les détails pour l'événement de suppression
+            $documentDetails = [
+                'company_name' => $document->getCompany()->getDenomination(),
+                'filename' => $document->getFilename() ?: 'Document sans nom',
+                'year' => $document->getYear(),
+                'periodicity' => $document->getPeriodicity()
+            ];
+
             // Supprimer le document via le repository
             $deleted = $this->documentRepository->deleteDocumentByUuid($id);
 
             if (!$deleted) {
                 return $this->json(['error' => 'Document not found'], Response::HTTP_NOT_FOUND);
             }
+
+            // Enregistrer l'événement de suppression
+            $this->eventLogRepository->logDocumentDeletion(
+                $userGroup->getId(),
+                $user->getEmail(),
+                $documentDetails
+            );
 
             return $this->json(['message' => 'Document deleted successfully'], Response::HTTP_OK);
         } catch (\Exception $e) {
