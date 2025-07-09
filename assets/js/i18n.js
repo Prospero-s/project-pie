@@ -32,6 +32,8 @@ import enSupport from './locales/en/support.json';
 import frSupport from './locales/fr/support.json';
 import frCommon from './locales/fr/common.json';
 import enCommon from './locales/en/common.json';
+import enEventLog from './locales/en/eventLog.json';
+import frEventLog from './locales/fr/eventLog.json';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -56,6 +58,7 @@ i18n.use(initReactI18next).init({
       extractresult: frExtractResult,
       support: frSupport,
       common: frCommon,
+      eventLog: frEventLog,
     },
     en: {
       translation: {
@@ -78,6 +81,7 @@ i18n.use(initReactI18next).init({
       extractresult: enExtractResult,
       support: enSupport,
       common: enCommon,
+      eventLog: enEventLog,
     },
   },
   lng: 'fr',
@@ -105,6 +109,7 @@ i18n.use(initReactI18next).init({
     'documents',
     'metrics',
     'common',
+    'eventLog',
   ],
   initImmediate: true,
 });

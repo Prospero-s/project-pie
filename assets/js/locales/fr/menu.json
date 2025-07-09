@@ -23,5 +23,6 @@
   "dashboard": "Tableau de bord",
   "companies": "Les entreprises",
   "documents": "Les documents",
+  "event_log": "Journal des événements",
   "financial_extraction": "Extraction financière"
 }
