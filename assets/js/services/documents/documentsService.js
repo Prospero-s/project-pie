@@ -4,15 +4,21 @@ import { Auth } from 'aws-amplify';
 const API_URL = '/api/documents';
 
 /**
- * Récupère tous les documents
+ * Récupère tous les documents ou les documents d'une entreprise spécifique
+ * @param {string} companyId - Identifiant optionnel de l'entreprise pour filtrer
  * @returns {Promise} Promise contenant la liste des documents
  */
-export const fetchDocuments = async () => {
+export const fetchDocuments = async (companyId = null) => {
   try {
     const session = await Auth.currentSession();
     const cognitoId = session.getIdToken().payload.sub;
 
-    const response = await axios.get(`${API_URL}`, {
+    let url = API_URL;
+    if (companyId) {
+      url += `?companyId=${companyId}`;
+    }
+
+    const response = await axios.get(url, {
       headers: {
         'Content-Type': 'application/json',
         'X-Cognito-Id': cognitoId,

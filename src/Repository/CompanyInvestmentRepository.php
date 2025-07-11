@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\CompanyInvestment;
 use App\Entity\UserGroup;
+use App\Repository\DocumentRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -12,9 +13,12 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class CompanyInvestmentRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private DocumentRepository $documentRepository;
+
+    public function __construct(ManagerRegistry $registry, DocumentRepository $documentRepository)
     {
         parent::__construct($registry, CompanyInvestment::class);
+        $this->documentRepository = $documentRepository;
     }
 
     /**
@@ -549,24 +553,49 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
     }
 
     /**
-     * Supprime un investissement par son ID
+     * Supprime un investissement par son ID et tous les documents liés à la compagnie pour le groupe
      *
      * @param int $id ID de l'investissement à supprimer
-     * @return bool True si l'investissement a été supprimé, false sinon
+     * @return array<string, mixed> Résultat de la suppression avec nombre de documents supprimés
      */
-    public function deleteInvestmentById(int $id): bool
+    public function deleteInvestmentById(int $id): array
     {
         $investment = $this->find($id);
 
         if (!$investment) {
-            return false;
+            return ['success' => false, 'documentsDeleted' => 0];
         }
 
+        $company = $investment->getCompany();
+        $userGroup = $investment->getUserGroup();
+
         $em = $this->getEntityManager();
+
+        // Compter et supprimer les documents liés à cette compagnie pour ce groupe
+        $documentsToDelete = $this->documentRepository->createQueryBuilder('d')
+            ->where('d.company = :company')
+            ->andWhere('d.userGroup = :userGroup')
+            ->setParameter('company', $company)
+            ->setParameter('userGroup', $userGroup)
+            ->getQuery()
+            ->getResult();
+
+        $documentsDeletedCount = count($documentsToDelete);
+
+        // Supprimer les documents
+        foreach ($documentsToDelete as $document) {
+            $em->remove($document);
+        }
+
+        // Supprimer l'investissement
         $em->remove($investment);
         $em->flush();
 
-        return true;
+        return [
+            'success' => true,
+            'documentsDeleted' => $documentsDeletedCount,
+            'companyName' => $company->getDenomination()
+        ];
     }
 
     /**

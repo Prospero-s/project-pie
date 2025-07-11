@@ -11,6 +11,11 @@
   "read_all": "Read all",
   "delete_all": "Delete all",
   "no_notifications": "No notifications",
+  "notification_types": {
+    "new_member_joined": "New member",
+    "new_investment_added": "New investment",
+    "new_document_uploaded": "New document"
+  },
   "notification_title": "Notification",
   "notification_message": "You have 5 new notifications",
   "notification_time": "2 minutes ago",
@@ -18,5 +23,6 @@
   "dashboard": "Dashboard",
   "companies": "Companies",
   "documents": "Documents",
+  "event_log": "Event Log",
   "financial_extraction": "Financial Extraction"
 }

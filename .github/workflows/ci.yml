@@ -2,9 +2,10 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [main, dev, rebase-dev]
+    branches: [main, dev, rebase-dev, prod]
   pull_request:
-    branches: [main, dev, rebase-dev]
+    branches: [main, dev, rebase-dev, prod]
+  workflow_dispatch:
 
 jobs:
   docker-lint:
@@ -72,14 +73,6 @@ jobs:
 
       - name: Install Frontend Dependencies
         run: npm install --no-cache
-
-      - name: Restore Node Modules Cache
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
   backend-code-quality:
     name: 🎨 Backend Code Quality
@@ -196,26 +189,28 @@ jobs:
     needs: setup-frontend
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Restore Node Modules Cache
-      uses: actions/cache@v3
-      with:
-        path:  ./node_modules
-        key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: ./
 
-    - name: Check if node_modules is restored
-      run: |
-        echo "Listing node_modules directory"
-        ls -l  ./node_modules || echo "node_modules not found"
-      
-    - name: Run ESLint Fix
-      run: npm run lint-fix || true
-      
-    - name: Run ESLint Check
-      run: npm run lint
+      - name: Install Frontend Dependencies
+        run: npm install
+
+      - name: Check if node_modules is present
+        run: |
+          echo "Listing node_modules directory"
+          ls -l  ./node_modules || echo "node_modules not found"
+        
+      - name: Run ESLint Fix
+        run: npm run lint-fix || true
+        
+      - name: Run ESLint Check
+        run: npm run lint
 
   frontend-build:
     name: 🏗️ Build Frontend
@@ -226,57 +221,172 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Restore Node Modules Cache
-        uses: actions/cache@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          path:  ./node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: ./
+
+      - name: Install Frontend Dependencies
+        run: npm install
 
       - name: Build Frontend
         run: npm run build
 
-  deploy-production:
-    name: 🚀 Deploy to Production
-    runs-on: ubuntu-latest
-    needs: [frontend-build]
-    if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/prod') ||
-      (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.base_ref == 'prod')
-    
-    steps:
-    - name: 🔑 Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: eu-west-3
+  # deploy-production:
+  #   name: 🚀 Deploy with CodeDeploy
+  #   runs-on: ubuntu-latest
+  #   #needs: [frontend-build]
+  #   # Se déclenche quand une PR est mergée vers rebase-dev
+  #   if: |
+  #     (github.event_name == 'push' && github.ref == 'refs/heads/rebase-dev') ||
+  #     (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'rebase-dev')
+  #   
+  #   steps:
+  #   - name: Checkout Repository
+  #     uses: actions/checkout@v4
 
-    - name: 🔄 Execute deployment script on EC2
-      run: |
-        echo "🚀 Déploiement vers la production..."
-        
-        COMMAND_ID=$(aws ssm send-command \
-          --document-name "AWS-RunShellScript" \
-          --parameters 'commands=["cd /home/ec2-user && ./update-prod.sh"]' \
-          --targets "Key=instanceids,Values=i-09c6302b593fcda25" \
-          --comment "Auto deployment from CI Pipeline" \
-          --query 'Command.CommandId' \
-          --output text)
-        
-        echo "📋 Command ID: $COMMAND_ID"
-        
-        aws ssm wait command-executed \
-          --command-id $COMMAND_ID \
-          --instance-id i-09c6302b593fcda25 \
-          --cli-read-timeout 300
-        
-        echo "📊 Résultat du déploiement:"
-        aws ssm get-command-invocation \
-          --command-id $COMMAND_ID \
-          --instance-id i-09c6302b593fcda25 \
-          --query 'StandardOutputContent' \
-          --output text
-        
-        echo "✅ Déploiement terminé!"
+  #   - name: Setup Node.js
+  #     uses: actions/setup-node@v3
+  #     with:
+  #       node-version: "18"
+  #       cache: "npm"
+  #       cache-dependency-path: ./
+
+  #   - name: Install Frontend Dependencies
+  #     run: npm install
+
+  #   - name: Build Frontend Assets
+  #     run: npm run build
+
+  #   - name: 🔑 Configure AWS credentials
+  #     uses: aws-actions/configure-aws-credentials@v4
+  #     with:
+  #       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #       aws-region: eu-west-3
+
+  #   - name: 📦 Create deployment package
+  #     run: |
+  #       echo "📋 Création du package de déploiement..."
+  #       
+  #       # Créer le package avec les fichiers nécessaires
+  #       # Utiliser --warning=no-file-changed et ignorer les erreurs de exit code 1
+  #       tar --warning=no-file-changed -czf deployment-package.tar.gz \
+  #         --exclude='node_modules' \
+  #         --exclude='.git' \
+  #         --exclude='vendor' \
+  #         --exclude='var' \
+  #         --exclude='*.log' \
+  #         --exclude='.env' \
+  #         --exclude='deployment-package.tar.gz' \
+  #         --exclude='.github' \
+  #         --exclude='tests' \
+  #         --exclude='*.md' \
+  #         --exclude='.gitignore' \
+  #         --exclude='tmp' \
+  #         --exclude='temp' \
+  #         --exclude='storage/logs' \
+  #         --exclude='storage/cache' \
+  #         --exclude='public/uploads' \
+  #         --exclude='*.tmp' \
+  #         --exclude='*.swp' \
+  #         --exclude='*.swo' \
+  #         --exclude='*~' \
+  #         . || { 
+  #           # Si tar échoue, vérifier si c'est juste à cause de fichiers qui changent
+  #           if [ $? -eq 1 ]; then
+  #             echo "⚠️ Tar a signalé des fichiers qui ont changé, mais l'archive est créée"
+  #           else
+  #             echo "❌ Erreur grave lors de la création de l'archive"
+  #             exit 1
+  #           fi
+  #         }
+  #       
+  #       # Vérifier que le package a été créé
+  #       if [ ! -f deployment-package.tar.gz ]; then
+  #         echo "❌ Le package n'a pas été créé"
+  #         exit 1
+  #       fi
+  #       
+  #       echo "📦 Package créé: $(ls -lh deployment-package.tar.gz)"
+  #       
+  #       # Vérifier le contenu du package
+  #       echo "📋 Contenu du package:"
+  #       tar -tzf deployment-package.tar.gz | head -20
+
+  #   - name: 📤 Upload to S3
+  #     run: |
+  #       # Créer un nom unique pour le déploiement
+  #       DEPLOYMENT_ID="project-pie-$(date +%Y%m%d-%H%M%S)-${GITHUB_SHA:0:8}"
+  #       
+  #       echo "📤 Upload vers S3..."
+  #       aws s3 cp deployment-package.tar.gz s3://project-pie-deployments/${DEPLOYMENT_ID}.tar.gz
+  #       
+  #       # Vérifier l'upload
+  #       if aws s3 ls s3://project-pie-deployments/${DEPLOYMENT_ID}.tar.gz; then
+  #         echo "✅ Upload réussi"
+  #       else
+  #         echo "❌ Échec de l'upload"
+  #         exit 1
+  #       fi
+  #       
+  #       # Sauvegarder l'ID pour l'étape suivante
+  #       echo "DEPLOYMENT_ID=${DEPLOYMENT_ID}" >> $GITHUB_ENV
+  #       echo "📋 Deployment ID: ${DEPLOYMENT_ID}"
+
+  #   - name: 🚀 Deploy with CodeDeploy
+  #     run: |
+  #       echo "🚀 Déploiement via CodeDeploy..."
+  #       
+  #       # Vérifier que l'application et le groupe de déploiement existent
+  #       if ! aws deploy get-application --application-name project-pie; then
+  #         echo "❌ L'application CodeDeploy 'project-pie' n'existe pas"
+  #         exit 1
+  #       fi
+  #       
+  #       if ! aws deploy get-deployment-group --application-name project-pie --deployment-group-name project-pie-production; then
+  #         echo "❌ Le groupe de déploiement 'project-pie-production' n'existe pas"
+  #         exit 1
+  #       fi
+  #       
+  #       # Créer le déploiement
+  #       DEPLOYMENT_ID_AWS=$(aws deploy create-deployment \
+  #         --application-name project-pie \
+  #         --deployment-group-name project-pie-production \
+  #         --s3-location bucket=project-pie-deployments,key=${DEPLOYMENT_ID}.tar.gz,bundleType=tgz \
+  #         --file-exists-behavior OVERWRITE \
+  #         --description "Deployment from GitHub Actions - ${GITHUB_SHA:0:8}" \
+  #         --query 'deploymentId' \
+  #         --output text)
+  #       
+  #       echo "📋 AWS Deployment ID: ${DEPLOYMENT_ID_AWS}"
+  #       
+  #       # Attendre la fin du déploiement avec timeout
+  #       echo "⏳ Attente de la fin du déploiement..."
+  #       if aws deploy wait deployment-successful --deployment-id ${DEPLOYMENT_ID_AWS}; then
+  #         echo "✅ Déploiement terminé avec succès!"
+  #       else
+  #         echo "❌ Échec du déploiement"
+  #         
+  #         # Afficher les détails de l'échec
+  #         echo "📋 Détails du déploiement:"
+  #         aws deploy get-deployment --deployment-id ${DEPLOYMENT_ID_AWS} --query 'deploymentInfo.errorInformation' --output text
+  #         
+  #         exit 1
+  #       fi
+  #       
+  #       # Afficher le résultat final
+  #       echo "📊 Statut final du déploiement:"
+  #       aws deploy get-deployment --deployment-id ${DEPLOYMENT_ID_AWS} --query 'deploymentInfo.status' --output text
+
+  #   - name: 📋 Deployment Summary
+  #     run: |
+  #       echo "## 🎉 Déploiement Réussi" >> $GITHUB_STEP_SUMMARY
+  #       echo "- **Commit:** ${GITHUB_SHA:0:8}" >> $GITHUB_STEP_SUMMARY
+  #       echo "- **Branche:** ${GITHUB_REF_NAME}" >> $GITHUB_STEP_SUMMARY
+  #       echo "- **Deployment ID:** ${DEPLOYMENT_ID}" >> $GITHUB_STEP_SUMMARY
+  #       echo "- **Région AWS:** eu-west-3" >> $GITHUB_STEP_SUMMARY
+  #       echo "- **Application:** project-pie" >> $GITHUB_STEP_SUMMARY
+  #       echo "- **Groupe de déploiement:** project-pie-production" >> $GITHUB_STEP_SUMMARY

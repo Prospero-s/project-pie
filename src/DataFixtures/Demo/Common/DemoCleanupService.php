@@ -88,6 +88,20 @@ class DemoCleanupService
     {
         $placeholders = str_repeat('?,', count($companyIds) - 1) . '?';
 
+        // Supprimer les KPI liés aux documents des entreprises
+        $connection->executeStatement(
+            "DELETE FROM kpi WHERE document_id IN (
+                SELECT id FROM document WHERE company_id IN ($placeholders)
+            )",
+            $companyIds
+        );
+
+        // Supprimer les documents liés aux entreprises
+        $connection->executeStatement(
+            "DELETE FROM document WHERE company_id IN ($placeholders)",
+            $companyIds
+        );
+
         // Supprimer les représentants
         $connection->executeStatement(
             "DELETE FROM representative WHERE company_id IN ($placeholders)",

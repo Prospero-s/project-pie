@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Tooltip, Table, Skeleton, message } from 'antd';
-import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { Button, Tooltip, Table, Skeleton, message, Modal } from 'antd';
+import {
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  ExclamationCircleOutlined,
+} from '@ant-design/icons';
 import {
   fetchDocuments,
   deleteDocument,
@@ -11,7 +16,9 @@ import EmptyDocumentState from './EmptyDocumentState';
 import DocumentDetailsModal from './DocumentDetailsModal';
 import { formatDate, getDateLocale } from '@/lib/utils';
 
-const TableDocuments = ({ t, i18n }) => {
+const { confirm } = Modal;
+
+const TableDocuments = ({ t, i18n, companyId = null }) => {
   const [loading, setLoading] = useState(true);
   const [documents, setDocuments] = useState([]);
   const lng = i18n.language;
@@ -25,7 +32,7 @@ const TableDocuments = ({ t, i18n }) => {
 
   useEffect(() => {
     loadDocuments();
-  }, []);
+  }, [companyId]);
 
   const handleTableChange = pagination => {
     setPagination(pagination);
@@ -33,13 +40,25 @@ const TableDocuments = ({ t, i18n }) => {
   };
 
   const handleDelete = async id => {
-    try {
-      await deleteDocument(id);
-      message.success(t('messages.delete_success'));
-      loadDocuments();
-    } catch (error) {
-      message.error(`${t('messages.delete_error')}: ${error.message || error}`);
-    }
+    confirm({
+      title: t('messages.delete_confirmation_title'),
+      icon: <ExclamationCircleOutlined />,
+      content: t('messages.delete_confirmation_content'),
+      okText: t('messages.delete_confirmation_confirm'),
+      okType: 'danger',
+      cancelText: t('messages.delete_confirmation_cancel'),
+      onOk: async () => {
+        try {
+          await deleteDocument(id);
+          message.success(t('messages.delete_success'));
+          loadDocuments();
+        } catch (error) {
+          message.error(
+            `${t('messages.delete_error')}: ${error.message || error}`,
+          );
+        }
+      },
+    });
   };
 
   const handleViewDetails = record => {
@@ -59,7 +78,7 @@ const TableDocuments = ({ t, i18n }) => {
   const loadDocuments = async () => {
     try {
       setLoading(true);
-      const response = await fetchDocuments();
+      const response = await fetchDocuments(companyId);
       setDocuments(response);
       setPagination({
         current: 1,
@@ -115,7 +134,7 @@ const TableDocuments = ({ t, i18n }) => {
         loading ? (
           <Skeleton.Input block active size="small" />
         ) : company && company.denomination ? (
-          <span className="font-degarism">company.denomination</span>
+          <span className="font-degarism">{company.denomination}</span>
         ) : (
           t('table.unknown_company')
         ),

@@ -22,12 +22,7 @@ import {
   Popconfirm,
 } from 'antd';
 import { useTranslation } from 'react-i18next';
-import {
-  updateCols,
-  toggleDraggable,
-  toggleResizable,
-  addCustomChart,
-} from '../../../redux/slices/layoutSlice';
+import { updateCols, addCustomChart } from '../../../redux/slices/layoutSlice';
 import {
   DownOutlined,
   FilterOutlined,
@@ -39,6 +34,8 @@ import {
   SortDescendingOutlined,
   EditOutlined,
   DeleteOutlined,
+  PieChartOutlined,
+  RightSquareOutlined,
 } from '@ant-design/icons';
 import {
   BarChart,
@@ -82,12 +79,11 @@ const AVAILABLE_QUERIES = [
   { id: 'kpi_analysis_by_period', name: 'Analyse KPI globale' },
 ];
 
-const GridControls = () => {
+const GridControls = ({ drawerOpen, onShowDrawer, onCloseDrawer }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { id } = useParams(); // Get the company ID from URL
-  const { cols, isDraggable, isResizable } = useSelector(state => state.layout);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const { cols } = useSelector(state => state.layout);
   const [selectedQueryId, setSelectedQueryId] = useState('monthly_revenue');
   const [queryResults, setQueryResults] = useState([]);
   const [dataLoading, setDataLoading] = useState(false);
@@ -147,14 +143,6 @@ const GridControls = () => {
       fetchCompanies();
     }
   }, [isCalculationModalVisible, id]);
-
-  const showDrawer = () => {
-    setDrawerOpen(true);
-  };
-
-  const closeDrawer = () => {
-    setDrawerOpen(false);
-  };
 
   const handleQueryChange = value => {
     setSelectedQueryId(value);
@@ -297,7 +285,7 @@ const GridControls = () => {
       );
 
       message.success(t('metrics.success.chart_added'));
-      closeDrawer();
+      onCloseDrawer();
     } catch (error) {
       console.error('Erreur lors de la création du graphique:', error);
       message.error(t('metrics.errors.cannot_create_chart') + error.message);
@@ -1644,26 +1632,10 @@ const GridControls = () => {
       </div>
 
       <div className="flex items-center">
-        <button
-          onClick={() => dispatch(toggleDraggable())}
-          className={`px-2 py-1 rounded text-xs border ${
-            isDraggable ? 'border-blue-400 bg-blue-50' : 'border-gray-300'
-          } mr-2`}
-        >
-          {isDraggable ? `✓ ${t('layout.move')}` : t('layout.move')}
-        </button>
+        {/* Les fonctionnalités Move et Resize sont automatiques selon le mode édition */}
 
         <button
-          onClick={() => dispatch(toggleResizable())}
-          className={`px-2 py-1 rounded text-xs border ${
-            isResizable ? 'border-blue-400 bg-blue-50' : 'border-gray-300'
-          } mr-2`}
-        >
-          {isResizable ? `✓ ${t('layout.resize')}` : t('layout.resize')}
-        </button>
-
-        <button
-          onClick={showDrawer}
+          onClick={onShowDrawer}
           className="px-2 py-1 rounded text-xs border border-purple-400 bg-purple-50"
         >
           {t('data')}
@@ -1674,12 +1646,19 @@ const GridControls = () => {
         title={t('metrics.drawer.title')}
         placement="right"
         width={720}
-        onClose={closeDrawer}
+        onClose={onCloseDrawer}
         open={drawerOpen}
         extra={
           <Space>
-            <Button onClick={closeDrawer}>{t('common.close')}</Button>
-            <Button type="primary" onClick={executeQuery} loading={dataLoading}>
+            {/* <Button icon={<CloseOutlined />} onClick={onCloseDrawer}>
+              {t('common.close')}
+            </Button> */}
+            <Button
+              icon={<RightSquareOutlined />}
+              type="primary"
+              onClick={executeQuery}
+              loading={dataLoading}
+            >
               {t('metrics.drawer.execute')}
             </Button>
           </Space>
@@ -1957,7 +1936,11 @@ const GridControls = () => {
               </div>
             </div>
 
-            <Button type="primary" onClick={addGraphFromCurrentData}>
+            <Button
+              icon={<PieChartOutlined />}
+              type="primary"
+              onClick={addGraphFromCurrentData}
+            >
               {t('metrics.drawer.add_chart_button')}
             </Button>
           </div>

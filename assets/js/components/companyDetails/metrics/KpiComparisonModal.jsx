@@ -1050,7 +1050,7 @@ const KpiComparisonModal = ({ visible, onClose }) => {
     ).length;
 
     return (
-      <Row gutter={16} className="kpi-comparison-container">
+      <Row gutter={16} className="kpi-comparison-container mt-4">
         <Col span={6}>
           <Card>
             <Statistic
@@ -1098,7 +1098,7 @@ const KpiComparisonModal = ({ visible, onClose }) => {
   return (
     <Modal
       title={
-        <Space>
+        <Space className="mb-8">
           <BarChartOutlined />
           {t('kpi_comparison.title')}
         </Space>
@@ -1208,6 +1208,9 @@ const KpiComparisonModal = ({ visible, onClose }) => {
           )}
 
           <div>
+            <label style={{ marginRight: '10px', fontWeight: 'bold' }}>
+              {t('kpi_comparison.chart_type')}:
+            </label>
             <Button.Group>
               <Button
                 type={viewMode === 'table' ? 'primary' : 'default'}

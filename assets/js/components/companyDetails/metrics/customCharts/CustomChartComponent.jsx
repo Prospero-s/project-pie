@@ -42,11 +42,26 @@ const CustomChartComponent = ({ chartId }) => {
   }
 
   const chartInfo = customCharts[id][chartId];
-  const { data, type, columnsMetadata = {}, xAxisKey, yAxisKeys } = chartInfo;
+  const {
+    data,
+    type,
+    columnsMetadata = {},
+    xAxisKey,
+    yAxisKeys = [],
+  } = chartInfo;
+
+  // Vérifier que data existe et n'est pas vide
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <p className="text-gray-400">{t('metrics.no_data')}</p>
+      </div>
+    );
+  }
 
   // Déterminer automatiquement les clés de données si pas spécifiées
   const dataKeys =
-    yAxisKeys.length > 0
+    yAxisKeys && yAxisKeys.length > 0
       ? yAxisKeys
       : Object.keys(data[0]).filter(key => key !== xAxisKey);
 
