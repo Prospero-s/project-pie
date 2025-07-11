@@ -1,5 +1,8 @@
 {
 	{$CADDY_GLOBAL_OPTIONS}
+	
+	# Désactiver HTTPS automatique
+	auto_https off
 
 	frankenphp {
 		{$FRANKENPHP_CONFIG}
@@ -8,7 +11,8 @@
 
 {$CADDY_EXTRA_CONFIG}
 
-{$SERVER_NAME:localhost} {
+# Configuration HTTP seulement (port 80) - accepte toutes les requêtes
+:80 {
 	log {
 		{$CADDY_SERVER_LOG_OPTIONS}
 		# Redact the authorization query parameter that can be set by Mercure
@@ -26,6 +30,11 @@
 	handle /api/pdf-processor/* {
 		uri strip_prefix /api/pdf-processor
 		reverse_proxy pdf_processor:5000
+	}
+
+	# Health check endpoint
+	handle /health {
+		respond "OK" 200
 	}
 
 	mercure {
