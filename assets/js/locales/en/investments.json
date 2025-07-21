@@ -183,5 +183,33 @@
   },
   "no_data": {
     "title": "No data found"
+  },
+  "company_investments": {
+    "title": "Company Investments",
+    "list_title": "List of investments for this company",
+    "table": {
+      "amount": "Amount",
+      "currency": "Currency",
+      "funding_type": "Funding Type",
+      "date": "Date",
+      "investor": "Investor",
+      "actions": "Actions"
+    },
+    "edit": {
+      "title": "Edit Investment",
+      "amount_label": "Amount",
+      "currency_label": "Currency",
+      "funding_type_label": "Funding Type",
+      "save": "Save",
+      "cancel": "Cancel",
+      "success": "Investment updated successfully",
+      "error": "Error updating investment"
+    },
+    "no_investments": {
+      "title": "No investments",
+      "description": "No investments have been made for this company yet."
+    },
+    "loading": "Loading investments...",
+    "error_loading": "Error loading investments"
   }
 }

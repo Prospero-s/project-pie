@@ -212,6 +212,16 @@
       "analysis_error": "Error analyzing the document",
       "no_response": "Server did not respond. Please try again"
     },
+    "gpt_errors": {
+      "quota_exceeded_title": "GPT Quota Exceeded",
+      "quota_exceeded_message": "GPT credits have been exhausted. Please contact your administrator or try again later.",
+      "auth_error_title": "GPT Authentication Error",
+      "auth_error_message": "Authentication problem with GPT service. Please contact your administrator.",
+      "rate_limit_title": "Rate Limit Exceeded",
+      "rate_limit_message": "Too many requests sent to GPT service. Please wait a few minutes before trying again.",
+      "service_unavailable_title": "GPT Service Unavailable",
+      "service_unavailable_message": "GPT service is temporarily unavailable. Please try again in a few moments."
+    },
     "file_removed": "File removed",
     "success": "Document analyzed successfully"
   },

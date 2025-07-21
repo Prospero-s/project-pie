@@ -122,3 +122,56 @@ export const deleteInvestment = async id => {
     );
   }
 };
+
+/**
+ * Récupère tous les investissements d'une entreprise spécifique
+ * @param {number} companyId - ID de l'entreprise
+ * @returns {Promise<Array>} Liste des investissements
+ */
+export const fetchCompanyInvestments = async companyId => {
+  try {
+    const session = await Auth.currentSession();
+    const cognitoId = session.getIdToken().payload.sub;
+
+    const response = await axios.get(`/api/company/${companyId}/investments`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-cognito-id': cognitoId,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      `Erreur: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`,
+    );
+  }
+};
+
+/**
+ * Met à jour un investissement
+ * @param {number} investmentId - ID de l'investissement
+ * @param {Object} data - Données à mettre à jour (amount, currency, fundingType)
+ * @returns {Promise<Object>} Investissement mis à jour
+ */
+export const updateInvestment = async (investmentId, data) => {
+  try {
+    const session = await Auth.currentSession();
+    const cognitoId = session.getIdToken().payload.sub;
+
+    const response = await axios.put(
+      `/api/investments/update/${investmentId}`,
+      data,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-cognito-id': cognitoId,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      `Erreur: ${error.message} ${error.response?.data ? `(${JSON.stringify(error.response.data)})` : ''} [Status: ${error.response?.status || 'N/A'}]`,
+    );
+  }
+};

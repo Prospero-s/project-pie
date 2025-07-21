@@ -62,14 +62,18 @@ up:
 down:
 	$(DOCKER_COMPOSE) down
 
-delete containers:
+delete-containers:
 	$(DOCKER_COMPOSE) down --volumes
 
 restart: down up
 
 restart-prod:
+<<<<<<< Updated upstream
 	$(DOCKER_COMPOSE) -f compose.yaml -f compose.prod.yaml down
 	$(DOCKER_COMPOSE) -f compose.yaml -f compose.prod.yaml up -d php postgres pgadmin mailer pdf_processor
+=======
+	$(DOCKER_COMPOSE) restart php postgres pgadmin mailer pdf_processor
+>>>>>>> Stashed changes
 
 build:
 	$(DOCKER_COMPOSE) build

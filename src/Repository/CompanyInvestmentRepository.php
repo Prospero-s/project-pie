@@ -553,6 +553,96 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
     }
 
     /**
+     * Récupère tous les investissements d'une entreprise spécifique pour un groupe donné
+     *
+     * @param int $companyId ID de l'entreprise
+     * @param UserGroup $userGroup Groupe utilisateur
+     * @return list<array<string, mixed>>
+     */
+    public function findInvestmentsByCompanyId(int $companyId, UserGroup $userGroup): array
+    {
+        $qb = $this->createQueryBuilder('ci')
+            ->select('ci', 'u', 'c')
+            ->leftJoin('ci.user', 'u')
+            ->leftJoin('ci.company', 'c')
+            ->where('ci.company = :companyId')
+            ->andWhere('ci.userGroup = :userGroup')
+            ->orderBy('ci.investedAt', 'DESC')
+            ->setParameter('companyId', $companyId)
+            ->setParameter('userGroup', $userGroup);
+
+        $results = $qb->getQuery()->getResult();
+
+        return array_map(function ($investment) {
+            return [
+                'id' => $investment->getId(),
+                'amount' => $investment->getAmount(),
+                'currency' => $investment->getCurrency(),
+                'fundingType' => $investment->getFundingType(),
+                'investedAt' => $investment->getInvestedAt()->format('Y-m-d H:i:s'),
+                'investor' => [
+                    'id' => $investment->getUser()->getId(),
+                    'email' => $investment->getUser()->getEmail(),
+                    'name' => $investment->getUser()->getName() ?: $investment->getUser()->getEmail()
+                ]
+            ];
+        }, $results);
+    }
+
+    /**
+     * Met à jour un investissement
+     *
+     * @param int $investmentId ID de l'investissement
+     * @param array<string, mixed> $data Données à mettre à jour
+     * @param UserGroup $userGroup Groupe utilisateur
+     * @return array<string, mixed>
+     */
+    public function updateInvestment(int $investmentId, array $data, UserGroup $userGroup): array
+    {
+        $investment = $this->createQueryBuilder('ci')
+            ->where('ci.id = :investmentId')
+            ->andWhere('ci.userGroup = :userGroup')
+            ->setParameter('investmentId', $investmentId)
+            ->setParameter('userGroup', $userGroup)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if (!$investment) {
+            throw new \Exception('Investissement non trouvé ou non autorisé');
+        }
+
+        $em = $this->getEntityManager();
+
+        // Mise à jour des champs autorisés
+        if (isset($data['amount'])) {
+            $investment->setAmount((int)$data['amount']);
+        }
+
+        if (isset($data['currency'])) {
+            $investment->setCurrency($data['currency']);
+        }
+
+        if (isset($data['fundingType'])) {
+            $investment->setFundingType($data['fundingType']);
+        }
+
+        $em->flush();
+
+        return [
+            'id' => $investment->getId(),
+            'amount' => $investment->getAmount(),
+            'currency' => $investment->getCurrency(),
+            'fundingType' => $investment->getFundingType(),
+            'investedAt' => $investment->getInvestedAt()->format('Y-m-d H:i:s'),
+            'investor' => [
+                'id' => $investment->getUser()->getId(),
+                'email' => $investment->getUser()->getEmail(),
+                'name' => $investment->getUser()->getName() ?: $investment->getUser()->getEmail()
+            ]
+        ];
+    }
+
+    /**
      * Supprime un investissement par son ID et tous les documents liés à la compagnie pour le groupe
      *
      * @param int $id ID de l'investissement à supprimer
