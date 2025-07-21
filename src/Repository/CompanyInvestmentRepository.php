@@ -573,7 +573,7 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
 
         $results = $qb->getQuery()->getResult();
 
-        return array_map(function ($investment) {
+        return array_values(array_map(function ($investment) {
             return [
                 'id' => $investment->getId(),
                 'amount' => $investment->getAmount(),
@@ -586,7 +586,7 @@ class CompanyInvestmentRepository extends ServiceEntityRepository
                     'name' => $investment->getUser()->getName() ?: $investment->getUser()->getEmail()
                 ]
             ];
-        }, $results);
+        }, $results));
     }
 
     /**
