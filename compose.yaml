@@ -110,16 +110,26 @@ services:
     build:
       context: ./pdf_processor
       dockerfile: Dockerfile
+    restart: unless-stopped
     volumes:
       - ./pdf_processor:/app
+      - ./storage:/app/storage
       - ./storage/uploads:/app/uploads
       - ./storage/processed:/app/processed
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - FLASK_ENV=production
+      - FLASK_DEBUG=0
     depends_on:
       - php
     ports:
       - '5000:5000'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:5000/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     networks:
       - symfony-vite-network
 
@@ -131,8 +141,8 @@ volumes:
   ###> doctrine/doctrine-bundle ###
   postgres_data:
   pgadmin_data:
-###< doctrine/doctrine-bundle ###
-###< symfony/mercure-bundle ###
+  ###< doctrine/doctrine-bundle ###
+  ###< symfony/mercure-bundle ###
 
   storage_uploads:
   storage_processed:

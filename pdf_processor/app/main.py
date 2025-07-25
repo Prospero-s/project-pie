@@ -18,6 +18,10 @@ app = Flask(__name__)
 # Activer CORS pour toutes les routes
 CORS(app, resources={r"/*": {"origins": "*"}})
 
+# Configuration sécurisée
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+app.config['TESTING'] = False
+
 # Utiliser des chemins absolus garantis pour les dossiers
 project_root = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), ".."))
 storage_dir = os.path.join(project_root, 'storage')
@@ -101,7 +105,81 @@ def serve_processed(filename):
 
 @app.route('/health', methods=['GET'])
 def health_check():
-    return jsonify({"status": "healthy"}), 200
+    """Endpoint de santé pour vérifier que le service fonctionne."""
+    try:
+        # Vérifier que les dossiers essentiels existent
+        upload_ok = os.path.exists(app.config['UPLOAD_FOLDER']) and os.access(app.config['UPLOAD_FOLDER'], os.W_OK)
+        processed_ok = os.path.exists(app.config['PROCESSED_FOLDER']) and os.access(app.config['PROCESSED_FOLDER'], os.W_OK)
+        
+        # Vérifier la clé OpenAI
+        openai_key_ok = bool(os.environ.get('OPENAI_API_KEY'))
+        
+        status = {
+            "status": "healthy" if all([upload_ok, processed_ok, openai_key_ok]) else "degraded",
+            "timestamp": datetime.now().isoformat(),
+            "checks": {
+                "upload_folder": "ok" if upload_ok else "error",
+                "processed_folder": "ok" if processed_ok else "error", 
+                "openai_key": "ok" if openai_key_ok else "missing",
+            },
+            "folders": {
+                "upload": app.config['UPLOAD_FOLDER'],
+                "processed": app.config['PROCESSED_FOLDER']
+            }
+        }
+        
+        return jsonify(status), 200 if status["status"] == "healthy" else 503
+        
+    except Exception as e:
+        return jsonify({
+            "status": "error", 
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@app.route('/status', methods=['GET'])
+def status_check():
+    """Endpoint de statut détaillé pour le debugging."""
+    try:
+        import platform
+        
+        status = {
+            "service": "PDF Processor",
+            "version": "1.0.0",
+            "timestamp": datetime.now().isoformat(),
+            "system": {
+                "platform": platform.platform(),
+                "python_version": platform.python_version(),
+                "architecture": platform.architecture()[0]
+            },
+            "environment": {
+                "flask_env": os.environ.get('FLASK_ENV', 'not_set'),
+                "flask_debug": os.environ.get('FLASK_DEBUG', 'not_set'),
+                "openai_key_configured": bool(os.environ.get('OPENAI_API_KEY'))
+            },
+            "folders": {
+                "upload": {
+                    "path": app.config['UPLOAD_FOLDER'],
+                    "exists": os.path.exists(app.config['UPLOAD_FOLDER']),
+                    "writable": os.access(app.config['UPLOAD_FOLDER'], os.W_OK) if os.path.exists(app.config['UPLOAD_FOLDER']) else False,
+                    "files_count": len(os.listdir(app.config['UPLOAD_FOLDER'])) if os.path.exists(app.config['UPLOAD_FOLDER']) else 0
+                },
+                "processed": {
+                    "path": app.config['PROCESSED_FOLDER'],
+                    "exists": os.path.exists(app.config['PROCESSED_FOLDER']),
+                    "writable": os.access(app.config['PROCESSED_FOLDER'], os.W_OK) if os.path.exists(app.config['PROCESSED_FOLDER']) else False,
+                    "files_count": len(os.listdir(app.config['PROCESSED_FOLDER'])) if os.path.exists(app.config['PROCESSED_FOLDER']) else 0
+                }
+            }
+        }
+        
+        return jsonify(status), 200
+        
+    except Exception as e:
+        return jsonify({
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
