@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     tesseract-ocr-eng \
     poppler-utils \
     curl \
+    procps \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -19,11 +20,20 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copie des fichiers de l'application
 COPY . .
 
-# Création des répertoires pour les fichiers
-RUN mkdir -p uploads processed
+# Création des répertoires pour les fichiers avec permissions
+RUN mkdir -p uploads processed storage storage/uploads storage/processed && \
+    chmod -R 777 uploads processed storage
 
 # Exposition du port
 EXPOSE 5000
+
+# Variables d'environnement par défaut
+ENV FLASK_ENV=production
+ENV FLASK_DEBUG=0
+ENV PYTHONUNBUFFERED=1
+
+# Script de santé pour Docker healthcheck
+RUN echo '#!/bin/bash\ncurl -f http://localhost:5000/health || exit 1' > /healthcheck.sh && chmod +x /healthcheck.sh
 
 # Démarrage de l'application
 CMD ["python", "app/main.py"] 
