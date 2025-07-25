@@ -228,7 +228,6 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
         formData,
         {
           headers,
-          timeout: 600000, // 10 minutes pour les gros PDFs
         },
       );
 

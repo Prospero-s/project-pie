@@ -519,15 +519,12 @@ def analyze_images_with_gpt(
              raise ValueError("Aucune image valide à envoyer à l'API.")
 
         # Appel à l'API OpenAI avec température réduite pour plus de précision
-        api_timeout = 180  # 3 minutes
-
         response = client.chat.completions.create(
             model="gpt-4.1", 
             messages=messages,
             response_format={"type": "json_object"},
             max_tokens=4000,
-            temperature=0.0,  # Réduire la température pour des résultats plus déterministes
-            timeout=api_timeout  # Timeout configurable pour l'API OpenAI
+            temperature=0.0  # Réduire la température pour des résultats plus déterministes
         )
 
         result_text = response.choices[0].message.content

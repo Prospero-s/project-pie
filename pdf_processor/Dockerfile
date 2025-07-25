@@ -17,9 +17,6 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Installation de Gunicorn pour la production
-RUN pip install gunicorn==21.2.0
-
 # Copie des fichiers de l'application
 COPY . .
 
@@ -38,5 +35,5 @@ ENV PYTHONUNBUFFERED=1
 # Script de santé pour Docker healthcheck
 RUN echo '#!/bin/bash\ncurl -f http://localhost:5000/health || exit 1' > /healthcheck.sh && chmod +x /healthcheck.sh
 
-# Démarrage de l'application avec Gunicorn
-CMD ["gunicorn", "--config", "gunicorn.conf.py", "app.main:app"] 
+# Démarrage de l'application
+CMD ["python", "app/main.py"] 
