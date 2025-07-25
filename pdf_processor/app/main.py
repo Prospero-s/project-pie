@@ -1,6 +1,8 @@
 import os
 import json
 import logging
+import signal
+import threading
 from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory, send_file
 from werkzeug.utils import secure_filename
@@ -14,6 +16,42 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+class TimeoutException(Exception):
+    """Exception levée quand une opération dépasse le timeout"""
+    pass
+
+def timeout_handler(signum, frame):
+    """Gestionnaire de signal pour les timeouts"""
+    raise TimeoutException("Operation timed out")
+
+def run_with_timeout(func, timeout_seconds, *args, **kwargs):
+    """
+    Execute une fonction avec un timeout
+    """
+    result = [None]
+    exception = [None]
+    
+    def target():
+        try:
+            result[0] = func(*args, **kwargs)
+        except Exception as e:
+            exception[0] = e
+    
+    thread = threading.Thread(target=target)
+    thread.daemon = True
+    thread.start()
+    thread.join(timeout_seconds)
+    
+    if thread.is_alive():
+        # Le thread est encore actif, donc timeout
+        logger.error(f"Timeout après {timeout_seconds} secondes")
+        raise TimeoutException(f"Operation timed out after {timeout_seconds} seconds")
+    
+    if exception[0]:
+        raise exception[0]
+    
+    return result[0]
+
 app = Flask(__name__)
 # Activer CORS pour toutes les routes
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -21,6 +59,14 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 # Configuration sécurisée
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 app.config['TESTING'] = False
+
+# Configuration des timeouts pour les requêtes longues
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 31536000  # 1 an pour les fichiers statiques
+app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 heure pour les sessions
+
+# Configuration pour gérer les gros uploads et les traitements longs
+app.config['REQUEST_TIMEOUT'] = 600  # 10 minutes
+app.config['PROCESSING_TIMEOUT'] = 600  # 10 minutes pour le traitement
 
 # Utiliser des chemins absolus garantis pour les dossiers
 project_root = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), ".."))
@@ -251,17 +297,25 @@ def upload_file():
         logger.info(f"PDF reçu et sauvegardé: {pdf_path} ({file_size} octets)")
         
         try:
-            # Traitement du PDF avec tous les paramètres
+            # Traitement du PDF avec tous les paramètres et timeout
             logger.info(f"Début du traitement du PDF: {pdf_path}")
-            processing_result = pdf_processor.process_pdf(
-                pdf_path=pdf_path,
-                output_folder=app.config['PROCESSED_FOLDER'],
-                requested_language=language,
-                periodicity=periodicity,
-                selected_kpis=selected_kpis,
-                year=year
-            )
-            logger.info(f"Traitement du PDF terminé: {pdf_path}")
+            timeout_seconds = app.config.get('PROCESSING_TIMEOUT', 600)  # 10 minutes par défaut
+            
+            try:
+                processing_result = run_with_timeout(
+                    pdf_processor.process_pdf,
+                    timeout_seconds,
+                    pdf_path=pdf_path,
+                    output_folder=app.config['PROCESSED_FOLDER'],
+                    requested_language=language,
+                    periodicity=periodicity,
+                    selected_kpis=selected_kpis,
+                    year=year
+                )
+                logger.info(f"Traitement du PDF terminé: {pdf_path}")
+            except TimeoutException as e:
+                logger.error(f"Timeout du traitement PDF après {timeout_seconds} secondes: {e}")
+                return jsonify({"error": f"Le traitement du PDF a pris trop de temps (>{timeout_seconds}s). Essayez avec un PDF plus petit ou contactez le support."}), 408
 
             # Vérifier les fichiers générés
             if os.path.exists(app.config['PROCESSED_FOLDER']):
