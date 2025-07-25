@@ -32,8 +32,16 @@ const { Text } = Typography;
 const { Option } = Select;
 
 // URL du service Python PDF Processor
-const PDF_PROCESSOR_URL =
-  import.meta.env.VITE_PDF_PROCESSOR_URL || 'http://localhost:5000';
+const PDF_PROCESSOR_URL = (() => {
+  if (
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1'
+  ) {
+    return 'http://localhost:5000';
+  }
+  // Pour la production, utiliser le même domaine avec le port 5000
+  return `${window.location.protocol}//${window.location.hostname}:5000`;
+})();
 
 const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
   const [fileList, setFileList] = useState([]);
