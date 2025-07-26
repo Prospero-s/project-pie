@@ -6,18 +6,12 @@ monolog:
       level: info
       channels: ['!event']
 
-    mail:
-      type: stream
-      path: '%kernel.logs_dir%/mail.log'
-      level: debug
-      channels: ['app.mail']
-
     error:
       type: stream
       path: '%kernel.logs_dir%/error.log'
       level: error
 
-    # Handler pour les erreurs critiques (email d'alerte)
+    # Handler pour les erreurs critiques
     critical:
       type: stream
       path: '%kernel.logs_dir%/critical.log'
