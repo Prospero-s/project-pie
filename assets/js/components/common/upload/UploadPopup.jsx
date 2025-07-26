@@ -39,7 +39,13 @@ const PDF_PROCESSOR_URL = (() => {
   ) {
     return 'http://localhost:5000';
   }
-  // Pour la production
+
+  // Pour la production, utiliser une variable d'environnement ou le port 5000 par défaut
+  if (window.REACT_APP_PDF_PROCESSOR_URL) {
+    return window.REACT_APP_PDF_PROCESSOR_URL;
+  }
+
+  // Fallback pour la production avec port spécifique
   return `${window.location.protocol}//${window.location.hostname}`;
 })();
 
@@ -200,6 +206,11 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
     }
     formData.append('language', i18n.language);
 
+    console.warn("🚀 Début de l'upload - URL:", PDF_PROCESSOR_URL);
+    console.warn('📄 Fichier:', file.name, 'Taille:', file.size);
+    console.warn('🎯 KPIs sélectionnés:', selectedKpis);
+    console.warn('📅 Périodicité:', periodicity, 'Année:', selectedYear);
+
     try {
       setLoading(true);
       setError(null);
@@ -209,8 +220,9 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
       try {
         const session = await Auth.currentSession();
         cognitoToken = session.getIdToken().getJwtToken();
+        console.warn('🔐 Token Cognito obtenu');
       } catch (authError) {
-        console.warn('Session Cognito non disponible:', authError);
+        console.warn('⚠️ Session Cognito non disponible:', authError);
       }
 
       // Définir les headers
@@ -222,6 +234,11 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
         headers['X-Cognito-Id'] = cognitoToken;
       }
 
+      console.warn(
+        '📡 Envoi de la requête vers:',
+        `${PDF_PROCESSOR_URL}/upload`,
+      );
+
       // Appel vers le service Python PDF Processor au lieu de l'API Textract
       const response = await axios.post(
         `${PDF_PROCESSOR_URL}/upload`,
@@ -232,7 +249,10 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
         },
       );
 
-      if (response.data) {
+      console.warn('✅ Réponse reçue:', response.status, response.statusText);
+      console.warn('📊 Données de réponse:', response.data);
+
+      if (response.data && response.data.extracted_data) {
         // Stocker l'ID de traitement pour le nettoyage ultérieur si nécessaire
         const processingId = response.data.processing_id;
 
@@ -254,32 +274,55 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
           processingId: processingId,
         };
 
-        setAnalyzedData(analyzedData);
-        navigate(`/${lng}/extract-results`);
-        setFileList([]);
-        onClose();
+        console.warn('📋 Données analysées préparées:', analyzedData);
+
+        // Vérifier que nous avons des données valides avant de rediriger
+        const hasValidData =
+          analyzedData.extracted_data &&
+          (analyzedData.extracted_data.kpi || analyzedData.extracted_data.data);
+
+        if (hasValidData) {
+          setAnalyzedData(analyzedData);
+          console.warn('🔄 Redirection vers extract-results');
+          navigate(`/${lng}/extract-results`);
+          setFileList([]);
+          onClose();
+        } else {
+          console.error('❌ Données extraites invalides ou vides');
+          setError(t('documents:upload.errors.no_data'));
+          message.error(t('documents:upload.errors.no_data'));
+        }
       } else {
+        console.error('❌ Réponse invalide - pas de données extraites');
         setError(t('documents:upload.errors.no_data'));
         message.error(t('documents:upload.errors.no_data'));
       }
     } catch (error) {
-      console.error('Erreur lors du téléchargement:', error);
+      console.error('💥 Erreur lors du téléchargement:', error);
 
       if (error.response) {
         // Erreur avec réponse du serveur
+        console.error(
+          "📤 Réponse d'erreur du serveur:",
+          error.response.status,
+          error.response.data,
+        );
         setError(
           `${t('documents:upload.errors.analysis_error')}: ${error.response.data?.error || error.message}`,
         );
       } else if (error.request) {
         // Aucune réponse reçue
+        console.error('📡 Aucune réponse reçue:', error.request);
         setError(t('documents:upload.errors.no_response'));
       } else {
         // Autre erreur
+        console.error('⚠️ Erreur de configuration:', error.message);
         setError(t('documents:upload.errors.analysis_error'));
       }
 
       message.error(t('documents:upload.errors.analysis_error'));
     } finally {
+      console.warn("🏁 Fin du processus d'upload");
       setLoading(false);
     }
   };

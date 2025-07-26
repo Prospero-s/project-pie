@@ -53,8 +53,17 @@ def run_with_timeout(func, timeout_seconds, *args, **kwargs):
     return result[0]
 
 app = Flask(__name__)
-# Activer CORS pour toutes les routes
-CORS(app, resources={r"/*": {"origins": "*"}})
+
+# Configuration CORS en fonction de l'environnement
+ALLOWED_ORIGINS = os.environ.get('ALLOWED_ORIGINS', '*').split(',')
+if ALLOWED_ORIGINS == ['*']:
+    # Développement - autoriser toutes les origines
+    logger.info("Mode développement - CORS autorisé pour toutes les origines")
+    CORS(app, resources={r"/*": {"origins": "*"}})
+else:
+    # Production - origines spécifiques
+    logger.info(f"Mode production - CORS autorisé pour: {ALLOWED_ORIGINS}")
+    CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGINS}})
 
 # Configuration sécurisée
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
@@ -229,12 +238,21 @@ def status_check():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    # Logs de débogage pour diagnostiquer les problèmes en production
+    logger.info("=" * 50)
+    logger.info("🚀 NOUVELLE REQUÊTE D'UPLOAD REÇUE")
+    logger.info(f"📍 Origin: {request.headers.get('Origin', 'Non spécifié')}")
+    logger.info(f"🌐 User-Agent: {request.headers.get('User-Agent', 'Non spécifié')}")
+    logger.info(f"🔗 Referer: {request.headers.get('Referer', 'Non spécifié')}")
+    logger.info(f"📊 Content-Type: {request.headers.get('Content-Type', 'Non spécifié')}")
+    logger.info(f"📏 Content-Length: {request.headers.get('Content-Length', 'Non spécifié')}")
+    
     if 'file' not in request.files:
-        logger.error("Aucun fichier dans la requête")
+        logger.error("❌ Aucun fichier dans la requête")
         return jsonify({"error": "No file part"}), 400
     
     file = request.files['file']
-    logger.info(f"Fichier reçu: {file.filename}")
+    logger.info(f"📄 Fichier reçu: {file.filename} (taille: {file.content_length if hasattr(file, 'content_length') else 'inconnue'})")
     
     # Récupérer tous les paramètres du formulaire
     language = request.form.get('language', 'en')
@@ -251,10 +269,11 @@ def upload_file():
     except:
         selected_kpis = []
     
-    logger.info(f"Paramètres reçus: langue={language}, périodicité={periodicity}, année={year}, KPIs={selected_kpis}")
+    logger.info(f"🎯 Paramètres reçus: langue={language}, périodicité={periodicity}, année={year}")
+    logger.info(f"📋 KPIs sélectionnés: {selected_kpis}")
 
     if file.filename == '':
-        logger.error("Nom de fichier vide")
+        logger.error("❌ Nom de fichier vide")
         return jsonify({"error": "No selected file"}), 400
     
     if file and file.filename.lower().endswith('.pdf'):

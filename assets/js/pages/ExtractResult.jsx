@@ -510,9 +510,18 @@ const ExtractResult = ({ i18n }) => {
       processKpiData(currentData);
       setLoading(false);
     } else {
+      // Si aucune donnée n'est disponible et qu'on n'est pas en mode édition
+      if (!isEditMode) {
+        console.error(
+          '❌ Aucune donnée analysée disponible - redirection vers documents',
+        );
+        message.error(t('extractresult:no_analyzed_data'));
+        navigate('/documents');
+        return;
+      }
       setLoading(false);
     }
-  }, [currentData, processKpiData]);
+  }, [currentData, processKpiData, isEditMode, navigate, t]);
 
   // Effet séparé pour mettre à jour les titres des colonnes quand selectedYear ou periodsFound changent
   useEffect(() => {
