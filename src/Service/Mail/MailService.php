@@ -2,6 +2,7 @@
 
 namespace App\Service\Mail;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
@@ -11,16 +12,19 @@ class MailService
 {
     private MailerInterface $mailer;
     private Environment $twig;
+    private LoggerInterface $logger;
     private string $sender;
     private Address $fromAddress;
     private string $supportEmail;
 
     public function __construct(
         MailerInterface $mailer,
-        Environment $twig
+        Environment $twig,
+        LoggerInterface $logger
     ) {
         $this->mailer = $mailer;
         $this->twig = $twig;
+        $this->logger = $logger;
         $this->sender = 'postmaster@tryprospero.fr';
         $this->fromAddress = new Address('no-reply@tryprospero.fr', 'Prospero');
         $this->supportEmail = 'tryprospero@gmail.com';
@@ -79,28 +83,61 @@ class MailService
         string $title,
         string $description
     ): void {
-        // Email à l'équipe support
-        $supportSubject = 'Nouvelle demande de support - ' . $title;
-        $supportHtmlContent = $this->twig->render('emails/support_team.html.twig', [
-            'userName' => $userName,
-            'userEmail' => $userEmail,
-            'title' => $title,
-            'description' => $description,
-            'submittedAt' => new \DateTime()
-        ]);
+        try {
+            $this->logger->info('Starting to send support request emails', [
+                'userEmail' => $userEmail,
+                'userName' => $userName,
+                'title' => $title,
+                'supportEmail' => $this->supportEmail
+            ]);
 
-        $this->sendEmail($this->supportEmail, $supportSubject, $supportHtmlContent);
+            // Email à l'équipe support
+            $supportSubject = 'Nouvelle demande de support - ' . $title;
+            $supportHtmlContent = $this->twig->render('emails/support_team.html.twig', [
+                'userName' => $userName,
+                'userEmail' => $userEmail,
+                'title' => $title,
+                'description' => $description,
+                'submittedAt' => new \DateTime()
+            ]);
 
-        // Email de confirmation à l'utilisateur
-        $userSubject = 'Confirmation de votre demande de support - ' . $title;
-        $userHtmlContent = $this->twig->render('emails/support_confirmation.html.twig', [
-            'userName' => $userName,
-            'title' => $title,
-            'description' => $description,
-            'submittedAt' => new \DateTime()
-        ]);
+            $this->logger->info('Sending support team email', [
+                'to' => $this->supportEmail,
+                'subject' => $supportSubject
+            ]);
 
-        $this->sendEmail($userEmail, $userSubject, $userHtmlContent);
+            $this->sendEmail($this->supportEmail, $supportSubject, $supportHtmlContent);
+
+            $this->logger->info('Support team email sent successfully');
+
+            // Email de confirmation à l'utilisateur
+            $userSubject = 'Confirmation de votre demande de support - ' . $title;
+            $userHtmlContent = $this->twig->render('emails/support_confirmation.html.twig', [
+                'userName' => $userName,
+                'title' => $title,
+                'description' => $description,
+                'submittedAt' => new \DateTime()
+            ]);
+
+            $this->logger->info('Sending user confirmation email', [
+                'to' => $userEmail,
+                'subject' => $userSubject
+            ]);
+
+            $this->sendEmail($userEmail, $userSubject, $userHtmlContent);
+
+            $this->logger->info('User confirmation email sent successfully');
+
+        } catch (\Exception $e) {
+            $this->logger->error('Failed to send support request emails', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'userEmail' => $userEmail,
+                'userName' => $userName,
+                'title' => $title
+            ]);
+            throw $e;
+        }
     }
 
     public function sendBoardPackReminderEmail(
@@ -141,13 +178,38 @@ class MailService
 
     private function sendEmail(string $to, string $subject, string $htmlContent): void
     {
-        $email = (new Email())
-            ->from($this->fromAddress)
-            ->sender($this->sender)
-            ->to($to)
-            ->subject($subject)
-            ->html($htmlContent);
+        try {
+            $this->logger->info('Preparing to send email', [
+                'to' => $to,
+                'subject' => $subject,
+                'from' => $this->fromAddress->getAddress(),
+                'sender' => $this->sender
+            ]);
 
-        $this->mailer->send($email);
+            $email = (new Email())
+                ->from($this->fromAddress)
+                ->sender($this->sender)
+                ->to($to)
+                ->subject($subject)
+                ->html($htmlContent);
+
+            $this->mailer->send($email);
+
+            $this->logger->info('Email sent successfully', [
+                'to' => $to,
+                'subject' => $subject
+            ]);
+
+        } catch (\Exception $e) {
+            $this->logger->error('Failed to send email', [
+                'to' => $to,
+                'subject' => $subject,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'from' => $this->fromAddress->getAddress(),
+                'sender' => $this->sender
+            ]);
+            throw $e;
+        }
     }
 }

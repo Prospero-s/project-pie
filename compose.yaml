@@ -16,6 +16,7 @@ services:
       # The two next lines can be removed after initial installation
       SYMFONY_VERSION: ${SYMFONY_VERSION:-}
       STABILITY: ${STABILITY:-stable}
+      MAILER_DSN: ${MAILER_DSN:-}
     volumes:
       - caddy_data:/data
       - caddy_config:/config
