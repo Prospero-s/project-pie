@@ -259,7 +259,10 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
           : response.data,
       );
 
-      if (response.data && response.data.extracted_data) {
+      if (
+        response.data &&
+        response.data.message === 'File processed successfully'
+      ) {
         // Stocker l'ID de traitement pour le nettoyage ultérieur si nécessaire
         const processingId = response.data.processing_id;
 
@@ -268,7 +271,7 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
         // Construction de l'objet de données analysées dans le format attendu par TextractResults
         const analyzedData = {
           // Données fournies par le PDF Processor
-          ...response.data,
+          extracted_data: response.data.data, // Les données sont dans response.data.data
           // Métadonnées supplémentaires
           company,
           selectedKpis,
@@ -279,6 +282,9 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
           imageUrls: response.data.image_urls || [],
           // ID de traitement pour référence future
           processingId: processingId,
+          // Ajouter d'autres champs utiles
+          periods: response.data.periods || [],
+          text: response.data.text || '',
         };
 
         console.warn('📋 Données analysées préparées:', analyzedData);
@@ -286,7 +292,8 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
         // Vérifier que nous avons des données valides avant de rediriger
         const hasValidData =
           analyzedData.extracted_data &&
-          (analyzedData.extracted_data.kpi || analyzedData.extracted_data.data);
+          (analyzedData.extracted_data.kpi ||
+            analyzedData.extracted_data.periods);
 
         if (hasValidData) {
           setAnalyzedData(analyzedData);
@@ -296,11 +303,13 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
           onClose();
         } else {
           console.error('❌ Données extraites invalides ou vides');
+          console.error('📊 Structure des données reçues:', response.data);
           setError(t('documents:upload.errors.no_data'));
           message.error(t('documents:upload.errors.no_data'));
         }
       } else {
-        console.error('❌ Réponse invalide - pas de données extraites');
+        console.error('❌ Réponse invalide - pas de message de succès');
+        console.error('📊 Structure complète de la réponse:', response.data);
         setError(t('documents:upload.errors.no_data'));
         message.error(t('documents:upload.errors.no_data'));
       }
