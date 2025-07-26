@@ -168,6 +168,72 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
     setSelectedYear(date ? date.year() : null);
   };
 
+  // Fonction pour détecter et gérer les erreurs GPT/OpenAI
+  const handleGptError = error => {
+    const errorMessage = error.message || '';
+    const errorResponse = error.response?.data?.error || '';
+    const fullErrorText = `${errorMessage} ${errorResponse}`.toLowerCase();
+
+    // Détecter les erreurs de crédit GPT
+    if (
+      fullErrorText.includes('credit') ||
+      fullErrorText.includes('quota') ||
+      fullErrorText.includes('billing') ||
+      fullErrorText.includes('insufficient_quota') ||
+      errorResponse.includes('quota_exceeded')
+    ) {
+      openNotificationWithIcon(
+        'error',
+        t('documents:upload.gpt_errors.quota_exceeded_title'),
+        t('documents:upload.gpt_errors.quota_exceeded_message'),
+      );
+      return true;
+    }
+
+    // Détecter les erreurs d'API Key
+    if (
+      fullErrorText.includes('api_key') ||
+      fullErrorText.includes('unauthorized') ||
+      fullErrorText.includes('authentication')
+    ) {
+      openNotificationWithIcon(
+        'error',
+        t('documents:upload.gpt_errors.auth_error_title'),
+        t('documents:upload.gpt_errors.auth_error_message'),
+      );
+      return true;
+    }
+
+    // Détecter les erreurs de rate limit
+    if (
+      fullErrorText.includes('rate_limit') ||
+      fullErrorText.includes('too_many_requests')
+    ) {
+      openNotificationWithIcon(
+        'error',
+        t('documents:upload.gpt_errors.rate_limit_title'),
+        t('documents:upload.gpt_errors.rate_limit_message'),
+      );
+      return true;
+    }
+
+    // Détecter les erreurs de service indisponible
+    if (
+      fullErrorText.includes('service_unavailable') ||
+      fullErrorText.includes('server_error') ||
+      error.response?.status >= 500
+    ) {
+      openNotificationWithIcon(
+        'error',
+        t('documents:upload.gpt_errors.service_unavailable_title'),
+        t('documents:upload.gpt_errors.service_unavailable_message'),
+      );
+      return true;
+    }
+
+    return false; // Erreur non reconnue comme étant liée à GPT
+  };
+
   const handleUpload = async () => {
     if (fileList.length === 0) {
       setError(t('documents:upload.errors.no_file'));
@@ -284,20 +350,26 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
     } catch (error) {
       console.error('Erreur lors du téléchargement:', error);
 
-      if (error.response) {
-        // Erreur avec réponse du serveur
-        setError(
-          `${t('documents:upload.errors.analysis_error')}: ${error.response.data?.error || error.message}`,
-        );
-      } else if (error.request) {
-        // Aucune réponse reçue
-        setError(t('documents:upload.errors.no_response'));
-      } else {
-        // Autre erreur
-        setError(t('documents:upload.errors.analysis_error'));
-      }
+      // Essayer de gérer l'erreur GPT spécifiquement
+      const isGptError = handleGptError(error);
 
-      message.error(t('documents:upload.errors.analysis_error'));
+      if (!isGptError) {
+        // Si ce n'est pas une erreur GPT reconnue, afficher l'erreur existante
+        if (error.response) {
+          // Erreur avec réponse du serveur
+          setError(
+            `${t('documents:upload.errors.analysis_error')}: ${error.response.data?.error || error.message}`,
+          );
+        } else if (error.request) {
+          // Aucune réponse reçue
+          setError(t('documents:upload.errors.no_response'));
+        } else {
+          // Autre erreur
+          setError(t('documents:upload.errors.analysis_error'));
+        }
+
+        message.error(t('documents:upload.errors.analysis_error'));
+      }
     } finally {
       setLoading(false);
     }

@@ -212,6 +212,16 @@
       "analysis_error": "Erreur lors de l'analyse du document",
       "no_response": "Le serveur n'a pas répondu. Veuillez réessayer"
     },
+    "gpt_errors": {
+      "quota_exceeded_title": "Quota GPT épuisé",
+      "quota_exceeded_message": "Les crédits GPT ont été épuisés. Veuillez contacter l'administrateur ou réessayer plus tard.",
+      "auth_error_title": "Erreur d'authentification GPT",
+      "auth_error_message": "Problème d'authentification avec le service GPT. Veuillez contacter l'administrateur.",
+      "rate_limit_title": "Limite de débit dépassée",
+      "rate_limit_message": "Trop de requêtes envoyées au service GPT. Veuillez attendre quelques minutes avant de réessayer.",
+      "service_unavailable_title": "Service GPT indisponible",
+      "service_unavailable_message": "Le service GPT est temporairement indisponible. Veuillez réessayer dans quelques instants."
+    },
     "file_removed": "Fichier supprimé",
     "success": "Document analysé avec succès"
   },
