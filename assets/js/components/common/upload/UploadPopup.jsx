@@ -39,10 +39,8 @@ const PDF_PROCESSOR_URL = (() => {
   ) {
     return 'http://localhost:5000';
   }
-
-  // Pour la production avec reverse proxy Caddy
-  // Le service est accessible via /api/pdf-processor/*
-  return `${window.location.protocol}//${window.location.hostname}/api/pdf-processor`;
+  // Pour la production
+  return `${window.location.protocol}//${window.location.hostname}`;
 })();
 
 const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
@@ -202,11 +200,6 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
     }
     formData.append('language', i18n.language);
 
-    console.warn("🚀 Début de l'upload - URL:", PDF_PROCESSOR_URL);
-    console.warn('📄 Fichier:', file.name, 'Taille:', file.size);
-    console.warn('🎯 KPIs sélectionnés:', selectedKpis);
-    console.warn('📅 Périodicité:', periodicity, 'Année:', selectedYear);
-
     try {
       setLoading(true);
       setError(null);
@@ -216,24 +209,18 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
       try {
         const session = await Auth.currentSession();
         cognitoToken = session.getIdToken().getJwtToken();
-        console.warn('🔐 Token Cognito obtenu');
       } catch (authError) {
-        console.warn('⚠️ Session Cognito non disponible:', authError);
+        console.warn('Session Cognito non disponible:', authError);
       }
 
       // Définir les headers
-      const headers = {};
-      // Ne pas définir Content-Type manuellement pour FormData - laisser axios le faire
+      const headers = {
+        'Content-Type': 'multipart/form-data',
+      };
 
       if (cognitoToken) {
         headers['X-Cognito-Id'] = cognitoToken;
       }
-
-      console.warn(
-        '📡 Envoi de la requête vers:',
-        `${PDF_PROCESSOR_URL}/upload`,
-      );
-      console.warn('📋 Headers envoyés:', headers);
 
       // Appel vers le service Python PDF Processor au lieu de l'API Textract
       const response = await axios.post(
@@ -243,20 +230,6 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
           headers,
           timeout: 600000, // 10 minutes pour les gros PDFs
         },
-      );
-
-      console.warn('✅ Réponse reçue:', response.status, response.statusText);
-      console.warn('📋 Headers de réponse:', response.headers);
-      console.warn(
-        '📊 Type de contenu reçu:',
-        response.headers['content-type'],
-      );
-      console.warn('📊 Données de réponse (type):', typeof response.data);
-      console.warn(
-        '📊 Données de réponse (aperçu):',
-        typeof response.data === 'string'
-          ? response.data.substring(0, 200) + '...'
-          : response.data,
       );
 
       if (
@@ -270,8 +243,8 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
 
         // Construction de l'objet de données analysées dans le format attendu par TextractResults
         const analyzedData = {
-          // Données fournies par le PDF Processor
-          extracted_data: response.data.data, // Les données sont dans response.data.data
+          // Les données KPI doivent être dans extracted_data pour ExtractResult
+          extracted_data: response.data.data,
           // Métadonnées supplémentaires
           company,
           selectedKpis,
@@ -282,63 +255,50 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
           imageUrls: response.data.image_urls || [],
           // ID de traitement pour référence future
           processingId: processingId,
-          // Ajouter d'autres champs utiles
+          // Autres champs utiles
           periods: response.data.periods || [],
           text: response.data.text || '',
         };
 
-        console.warn('📋 Données analysées préparées:', analyzedData);
-
         // Vérifier que nous avons des données valides avant de rediriger
         const hasValidData =
           analyzedData.extracted_data &&
-          (analyzedData.extracted_data.kpi ||
-            analyzedData.extracted_data.periods);
+          (analyzedData.extracted_data.kpi || analyzedData.extracted_data.data);
 
         if (hasValidData) {
           setAnalyzedData(analyzedData);
-          console.warn('🔄 Redirection vers extract-results');
           navigate(`/${lng}/extract-results`);
           setFileList([]);
           onClose();
         } else {
           console.error('❌ Données extraites invalides ou vides');
-          console.error('📊 Structure des données reçues:', response.data);
+          console.error('📊 Structure complète:', response.data);
           setError(t('documents:upload.errors.no_data'));
           message.error(t('documents:upload.errors.no_data'));
         }
       } else {
         console.error('❌ Réponse invalide - pas de message de succès');
-        console.error('📊 Structure complète de la réponse:', response.data);
         setError(t('documents:upload.errors.no_data'));
         message.error(t('documents:upload.errors.no_data'));
       }
     } catch (error) {
-      console.error('💥 Erreur lors du téléchargement:', error);
+      console.error('Erreur lors du téléchargement:', error);
 
       if (error.response) {
         // Erreur avec réponse du serveur
-        console.error(
-          "📤 Réponse d'erreur du serveur:",
-          error.response.status,
-          error.response.data,
-        );
         setError(
           `${t('documents:upload.errors.analysis_error')}: ${error.response.data?.error || error.message}`,
         );
       } else if (error.request) {
         // Aucune réponse reçue
-        console.error('📡 Aucune réponse reçue:', error.request);
         setError(t('documents:upload.errors.no_response'));
       } else {
         // Autre erreur
-        console.error('⚠️ Erreur de configuration:', error.message);
         setError(t('documents:upload.errors.analysis_error'));
       }
 
       message.error(t('documents:upload.errors.analysis_error'));
     } finally {
-      console.warn("🏁 Fin du processus d'upload");
       setLoading(false);
     }
   };

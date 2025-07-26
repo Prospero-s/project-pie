@@ -352,6 +352,10 @@ def upload_file():
                 # Définir l'URL de base
                 host = request.host_url.rstrip('/')
                 
+                # Corriger le protocole pour HTTPS en production
+                if 'tryprospero.fr' in host and host.startswith('http://'):
+                    host = host.replace('http://', 'https://')
+                
                 # Construire les URLs pour le frontend
                 pdf_url = f"{host}/uploads/{saved_filename}"
                 

@@ -380,6 +380,11 @@ const ExtractResult = ({ i18n }) => {
         numericKpiData = data.data.numeric_kpi;
       } else if (data.numeric_kpi && typeof data.numeric_kpi === 'object') {
         numericKpiData = data.numeric_kpi;
+      } else if (
+        data.extracted_data?.numeric_kpi &&
+        typeof data.extracted_data.numeric_kpi === 'object'
+      ) {
+        numericKpiData = data.extracted_data.numeric_kpi;
       } else {
         numericKpiData = {};
       }
