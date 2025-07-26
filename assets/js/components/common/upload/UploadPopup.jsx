@@ -40,12 +40,12 @@ const PDF_PROCESSOR_URL = (() => {
     return 'http://localhost:5000';
   }
 
-  // Pour la production, utiliser une variable d'environnement ou le port 5000 par défaut
+  // Pour la production, utiliser une variable d'environnement ou le reverse proxy
   if (window.REACT_APP_PDF_PROCESSOR_URL) {
     return window.REACT_APP_PDF_PROCESSOR_URL;
   }
 
-  // Fallback pour la production avec port spécifique
+  // Pour tryprospero.fr, utiliser le reverse proxy (sans port)
   return `${window.location.protocol}//${window.location.hostname}`;
 })();
 
@@ -226,9 +226,8 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
       }
 
       // Définir les headers
-      const headers = {
-        'Content-Type': 'multipart/form-data',
-      };
+      const headers = {};
+      // Ne pas définir Content-Type manuellement pour FormData - laisser axios le faire
 
       if (cognitoToken) {
         headers['X-Cognito-Id'] = cognitoToken;
@@ -238,6 +237,7 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
         '📡 Envoi de la requête vers:',
         `${PDF_PROCESSOR_URL}/upload`,
       );
+      console.warn('📋 Headers envoyés:', headers);
 
       // Appel vers le service Python PDF Processor au lieu de l'API Textract
       const response = await axios.post(
@@ -250,7 +250,18 @@ const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
       );
 
       console.warn('✅ Réponse reçue:', response.status, response.statusText);
-      console.warn('📊 Données de réponse:', response.data);
+      console.warn('📋 Headers de réponse:', response.headers);
+      console.warn(
+        '📊 Type de contenu reçu:',
+        response.headers['content-type'],
+      );
+      console.warn('📊 Données de réponse (type):', typeof response.data);
+      console.warn(
+        '📊 Données de réponse (aperçu):',
+        typeof response.data === 'string'
+          ? response.data.substring(0, 200) + '...'
+          : response.data,
+      );
 
       if (response.data && response.data.extracted_data) {
         // Stocker l'ID de traitement pour le nettoyage ultérieur si nécessaire
