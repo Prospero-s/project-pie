@@ -41,6 +41,9 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
+    networks:
+      - default
+      - symfony-vite-network
 
   vite:
     image: node:20

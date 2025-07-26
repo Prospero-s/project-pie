@@ -40,13 +40,9 @@ const PDF_PROCESSOR_URL = (() => {
     return 'http://localhost:5000';
   }
 
-  // Pour la production, utiliser une variable d'environnement ou le reverse proxy
-  if (window.REACT_APP_PDF_PROCESSOR_URL) {
-    return window.REACT_APP_PDF_PROCESSOR_URL;
-  }
-
-  // Pour tryprospero.fr, utiliser le reverse proxy (sans port)
-  return `${window.location.protocol}//${window.location.hostname}`;
+  // Pour la production avec reverse proxy Caddy
+  // Le service est accessible via /api/pdf-processor/*
+  return `${window.location.protocol}//${window.location.hostname}/api/pdf-processor`;
 })();
 
 const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
