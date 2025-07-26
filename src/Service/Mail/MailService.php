@@ -26,7 +26,7 @@ class MailService
         $this->twig = $twig;
         $this->logger = $logger;
         $this->sender = 'postmaster@tryprospero.fr';
-        $this->fromAddress = new Address('no-reply@tryprospero.fr', 'Prospero');
+        $this->fromAddress = new Address('postmaster@tryprospero.fr', 'Prospero');
         $this->supportEmail = 'tryprospero@gmail.com';
     }
 
