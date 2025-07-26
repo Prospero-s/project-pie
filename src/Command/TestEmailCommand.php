@@ -44,7 +44,8 @@ class TestEmailCommand extends Command
                 $email,
                 $name,
                 'Test depuis commande Symfony',
-                'Ceci est un email de test envoyé depuis une commande Symfony pour vérifier que le système fonctionne correctement.'
+                'Ceci est un email de test envoyé depuis une commande Symfony pour vérifier ' .
+                'que le système fonctionne correctement.'
             );
 
             $io->success('Email sent successfully!');
