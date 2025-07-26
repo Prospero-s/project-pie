@@ -40,7 +40,7 @@ const PDF_PROCESSOR_URL = (() => {
     return 'http://localhost:5000';
   }
   // Pour la production
-  return `${window.location.protocol}//${window.location.hostname}`;
+  return `${window.location.protocol}//${window.location.hostname}/api/pdf-processor`;
 })();
 
 const UploadPopup = ({ visible, onClose, company, i18n, lng }) => {
