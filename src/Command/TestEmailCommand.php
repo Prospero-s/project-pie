@@ -25,23 +25,38 @@ class TestEmailCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('email', InputArgument::REQUIRED, 'Email address to send test email to')
-            ->setHelp('This command allows you to test email sending functionality');
+            ->addArgument('email', InputArgument::REQUIRED, 'Email address to send test to')
+            ->addArgument('name', InputArgument::OPTIONAL, 'Name of recipient', 'Test User');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $email = $input->getArgument('email');
+        $name = $input->getArgument('name');
 
-        $io->note(sprintf('Sending test email to: %s', $email));
+        $io->title('Test Email Sending');
 
         try {
-            $this->mailService->sendWelcomeEmail($email, 'Test User');
+            $io->info('Sending test support email...');
+            
+            $this->mailService->sendSupportRequestEmail(
+                $email,
+                $name,
+                'Test depuis commande Symfony',
+                'Ceci est un email de test envoyé depuis une commande Symfony pour vérifier ' .
+                'que le système fonctionne correctement.'
+            );
+
             $io->success('Email sent successfully!');
+            $io->note('Check your mailbox (and spam folder) for the email.');
+
             return Command::SUCCESS;
+
         } catch (\Exception $e) {
             $io->error('Failed to send email: ' . $e->getMessage());
+            $io->note('Error details: ' . $e->getTraceAsString());
+            
             return Command::FAILURE;
         }
     }

@@ -93,3 +93,7 @@ services:
     arguments:
       $notificationsRepository: '@App\Repository\NotificationsRepository'
       $userNotificationsRepository: '@App\Repository\UserNotificationsRepository'
+
+  # Service de mail - déclaré comme public pour les tests
+  App\Service\Mail\MailService:
+    public: true
