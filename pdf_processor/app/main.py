@@ -356,8 +356,8 @@ def upload_file():
                 if 'tryprospero.fr' in host and host.startswith('http://'):
                     host = host.replace('http://', 'https://')
                 
-                # Construire les URLs pour le frontend
-                pdf_url = f"{host}/uploads/{saved_filename}"
+                # Construire les URLs pour le frontend avec le bon préfixe pour le reverse proxy
+                pdf_url = f"{host}/api/pdf-processor/uploads/{saved_filename}"
                 
                 # Vérifier et ajuster les URLs des images
                 image_urls = []
@@ -365,7 +365,7 @@ def upload_file():
                     for img_url in processing_result.get("image_urls"):
                         # Extraire le nom du fichier de l'URL si nécessaire
                         img_filename = os.path.basename(img_url)
-                        full_img_url = f"{host}/processed/{img_filename}"
+                        full_img_url = f"{host}/api/pdf-processor/processed/{img_filename}"
                         # Vérifier que l'image existe avant de l'ajouter
                         img_path = os.path.join(app.config['PROCESSED_FOLDER'], img_filename)
                         if os.path.exists(img_path):
