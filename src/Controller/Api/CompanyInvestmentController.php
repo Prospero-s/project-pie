@@ -266,6 +266,71 @@ class CompanyInvestmentController extends AbstractController
         }
     }
 
+    /**
+     * Récupère tous les investissements d'une entreprise spécifique
+     */
+    #[Route('/company/{companyId}/investments', name: 'get_company_investments', methods: ['GET'])]
+    public function getCompanyInvestments(Request $request, int $companyId): JsonResponse
+    {
+        try {
+            $cognitoId = $request->headers->get('x-cognito-id');
+            $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
+            if (!$cognitoId || !$user) {
+                throw new \Exception('Utilisateur non authentifié ou non trouvé');
+            }
+
+            $investments = $this->companyInvestmentRepository->findInvestmentsByCompanyId(
+                $companyId,
+                $user->getUserGroup()
+            );
+
+            return new JsonResponse($investments);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'error' => $e->getMessage(),
+                'details' => 'Une erreur est survenue lors de la récupération des investissements'
+            ], 400);
+        }
+    }
+
+    /**
+     * Met à jour un investissement
+     */
+    #[Route('/investments/update/{id}', name: 'update_investment', methods: ['PUT'])]
+    public function updateInvestment(Request $request, int $id): JsonResponse
+    {
+        try {
+            $cognitoId = $request->headers->get('x-cognito-id');
+            $user = $this->userRepository->findOneBy(['cognitoId' => $cognitoId]);
+            if (!$cognitoId || !$user) {
+                throw new \Exception('Utilisateur non authentifié ou non trouvé');
+            }
+
+            $data = json_decode($request->getContent(), true);
+            if (!$data) {
+                throw new \Exception('Données JSON invalides');
+            }
+
+            $updatedInvestment = $this->companyInvestmentRepository->updateInvestment(
+                $id,
+                $data,
+                $user->getUserGroup()
+            );
+
+            return new JsonResponse([
+                'success' => true,
+                'investment' => $updatedInvestment,
+                'message' => 'Investissement mis à jour avec succès'
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'error' => $e->getMessage(),
+                'details' => 'Une erreur est survenue lors de la mise à jour de l\'investissement'
+            ], 400);
+        }
+    }
+
     #[Route('/investments/delete/{id}', methods: ['DELETE'])]
     public function deleteInvestment(Request $request, int $id): JsonResponse
     {

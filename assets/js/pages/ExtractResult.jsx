@@ -75,11 +75,11 @@ const ExtractResult = ({ i18n }) => {
         await documentsService.transformDocumentForEdit(document);
       setEditModeData(transformedData);
     } catch (error) {
-      message.error(t('messages.loading_error'));
       console.error(
         'Erreur lors du chargement du document pour édition:',
         error,
       );
+      message.error(t('messages.loading_error'));
       navigate('/documents');
     } finally {
       setLoadingDocument(false);
@@ -207,6 +207,72 @@ const ExtractResult = ({ i18n }) => {
         // Erreur pendant le nettoyage - on ignore
       }
     }
+  };
+
+  // Fonction pour détecter et gérer les erreurs GPT/OpenAI
+  const handleGptError = error => {
+    const errorMessage = error.message || '';
+    const errorResponse = error.response?.data?.error || '';
+    const fullErrorText = `${errorMessage} ${errorResponse}`.toLowerCase();
+
+    // Détecter les erreurs de crédit GPT
+    if (
+      fullErrorText.includes('credit') ||
+      fullErrorText.includes('quota') ||
+      fullErrorText.includes('billing') ||
+      fullErrorText.includes('insufficient_quota') ||
+      errorResponse.includes('quota_exceeded')
+    ) {
+      openNotificationWithIcon(
+        'error',
+        t('extractresult:gpt_errors.quota_exceeded_title'),
+        t('extractresult:gpt_errors.quota_exceeded_message'),
+      );
+      return true;
+    }
+
+    // Détecter les erreurs d'API Key
+    if (
+      fullErrorText.includes('api_key') ||
+      fullErrorText.includes('unauthorized') ||
+      fullErrorText.includes('authentication')
+    ) {
+      openNotificationWithIcon(
+        'error',
+        t('extractresult:gpt_errors.auth_error_title'),
+        t('extractresult:gpt_errors.auth_error_message'),
+      );
+      return true;
+    }
+
+    // Détecter les erreurs de rate limit
+    if (
+      fullErrorText.includes('rate_limit') ||
+      fullErrorText.includes('too_many_requests')
+    ) {
+      openNotificationWithIcon(
+        'error',
+        t('extractresult:gpt_errors.rate_limit_title'),
+        t('extractresult:gpt_errors.rate_limit_message'),
+      );
+      return true;
+    }
+
+    // Détecter les erreurs de service indisponible
+    if (
+      fullErrorText.includes('service_unavailable') ||
+      fullErrorText.includes('server_error') ||
+      error.response?.status >= 500
+    ) {
+      openNotificationWithIcon(
+        'error',
+        t('extractresult:gpt_errors.service_unavailable_title'),
+        t('extractresult:gpt_errors.service_unavailable_message'),
+      );
+      return true;
+    }
+
+    return false; // Erreur non reconnue comme étant liée à GPT
   };
 
   useEffect(() => {
@@ -891,13 +957,22 @@ const ExtractResult = ({ i18n }) => {
         reader.readAsDataURL(pdfResponse.data);
       }
     } catch (error) {
-      Modal.error({
-        title: t('extractresult:validation.error_title'),
-        content: t('extractresult:validation.error_message', {
-          error: error.message,
-        }),
-        okText: t('common.ok', 'OK'),
-      });
+      console.error('Erreur lors de la soumission:', error);
+
+      // Essayer de gérer l'erreur GPT spécifiquement
+      const isGptError = handleGptError(error);
+
+      if (!isGptError) {
+        // Si ce n'est pas une erreur GPT reconnue, afficher l'erreur générique
+        Modal.error({
+          title: t('extractresult:validation.error_title'),
+          content: t('extractresult:validation.error_message', {
+            error: error.message,
+          }),
+          okText: t('common.ok', 'OK'),
+        });
+      }
+
       setIsValidating(false);
     }
   };
