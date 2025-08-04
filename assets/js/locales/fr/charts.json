@@ -1,0 +1,34 @@
+{
+  "months": {
+    "january": "Janvier",
+    "february": "Février",
+    "march": "Mars",
+    "april": "Avril",
+    "may": "Mai",
+    "june": "Juin",
+    "july": "Juillet",
+    "august": "Août",
+    "september": "Septembre",
+    "october": "Octobre",
+    "november": "Novembre",
+    "december": "Décembre"
+  },
+  "chart": {
+    "investment_evolution": "Évolution des investissements",
+    "previous_year": "← Année précédente",
+    "next_year": "Année suivante →",
+    "no_data_for_year": "Aucune donnée disponible pour l'année {{year}}"
+  },
+  "investmentGlobalChart": {
+    "title": "Évolution des investissements",
+    "totalInvestment": "Investissement total"
+  },
+  "investmentGlobalSectorChart" : {
+    "title": "Évolution des investissements par secteur",
+    "totalInvestment": "Investissement total"
+  },
+  "investmentGlobalFundingChart": {
+    "title": "Évolution des investissements par types de financements",
+    "totalInvestment": "Investissement total"
+  }
+}

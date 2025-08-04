@@ -1,0 +1,56 @@
+{
+  "list_companies": "Companies",
+  "common": {
+    "add": "Add",
+    "cancel": "Cancel",
+    "next": "Next",
+    "finish": "Finish",
+    "previous": "Previous",
+    "loading": "Loading...",
+    "page": "Page",
+    "of": "of",
+    "search": "Search",
+    "back": "Back",
+    "confirm": "Confirm"
+  },
+  "company": {
+    "name": "Company name",
+    "businessStructures": "Business Structure",
+    "sector": "Business sector",
+    "siren": "SIREN",
+    "siret": "SIRET",
+    "created_at": "Created at",
+    "details": "Company Details"
+  },
+  "loading": {
+    "title": "Retrieving company details...",
+    "description": "We are retrieving the company details from official registers"
+  },
+  "actions": {
+    "title": "Actions",
+    "view_details": "View details",
+    "add_investment": "Add investment"
+  },
+  "company_details": {
+    "sectors": {
+      "technology": "Technology",
+      "healthcare": "Healthcare",
+      "finance": "Finance",
+      "retail": "Retail",
+      "manufacturing": "Manufacturing",
+      "energy": "Energy",
+      "education": "Education",
+      "luxury": "Luxury",
+      "beauty_personal_care": "Beauty & Personal Care",
+      "aerospace": "Aerospace",
+      "automotive": "Automotive",
+      "pharmaceuticals": "Pharmaceuticals",
+      "telecommunications": "Telecommunications",
+      "industrial_equipment": "Industrial Equipment",
+      "software": "Software",
+      "technology_services": "Technology Services",
+      "defense_aerospace": "Defense & Aerospace",
+      "other": "Other"
+    }
+  }
+}

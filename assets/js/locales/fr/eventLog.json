@@ -1,0 +1,54 @@
+{
+  "title": "Journal des événements",
+  "description": "Suivi de toutes les activités du groupe : investissements, documents, membres et autres actions.",
+  "by": "par",
+  "no_events": "Aucun événement à afficher pour le moment.",
+  "event_types": {
+    "investment_added": "Investissement ajouté",
+    "investment_deleted": "Investissement supprimé",
+    "document_added": "Document ajouté",
+    "document_deleted": "Document supprimé",
+    "member_added": "Membre ajouté au groupe"
+  },
+  "funding_types": {
+    "seed": "Amorçage (Seed)",
+    "serieA": "Série A",
+    "serieB": "Série B",
+    "serieC": "Série C",
+    "growth": "Croissance (Growth)",
+    "ipo": "Introduction en bourse (IPO)",
+    "debt": "Dette",
+    "grant": "Subvention",
+    "other": "Autre",
+    "Private Equity": "Capital-investissement",
+    "Series A": "Série A",
+    "Series B": "Série B",
+    "Series C": "Série C",
+    "Venture Capital": "Capital-risque",
+    "Strategic Investment": "Investissement stratégique",
+    "Corporate Venture": "Corporate Venture",
+    "Seed": "Amorçage",
+    "Growth": "Croissance",
+    "Bridge Funding": "Financement relais"
+  },
+  "periodicity": {
+    "q": "Trimestriel",
+    "h": "Semestriel",
+    "y": "Annuel",
+    "Q": "Trimestriel",
+    "H": "Semestriel",
+    "Y": "Annuel"
+  },
+  "roles": {
+    "ROLE_OWNER": "Propriétaire",
+    "ROLE_ADMIN": "Administrateur",
+    "ROLE_MEMBER": "Membre"
+  },
+  "pagination": {
+    "showing": "Affichage de {{start}} à {{end}} sur {{total}} événements"
+  },
+  "error": {
+    "title": "Erreur de chargement",
+    "fetch_events": "Impossible de charger les événements. Veuillez réessayer."
+  }
+}

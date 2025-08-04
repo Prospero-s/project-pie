@@ -1,0 +1,18 @@
+monolog:
+  handlers:
+    main:
+      type: stream
+      path: '%kernel.logs_dir%/prod.log'
+      level: info
+      channels: ['!event']
+
+    error:
+      type: stream
+      path: '%kernel.logs_dir%/error.log'
+      level: error
+
+    # Handler pour les erreurs critiques
+    critical:
+      type: stream
+      path: '%kernel.logs_dir%/critical.log'
+      level: critical

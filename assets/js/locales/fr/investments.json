@@ -1,0 +1,216 @@
+{
+  "my_portfolio": "Mon portefeuille",
+  "common": {
+    "error_invalid_data": "Impossible de récupérer les données",
+    "add": "Ajouter",
+    "cancel": "Annuler",
+    "next": "Suivant",
+    "finish": "Terminer",
+    "previous": "Précédent",
+    "loading": "Chargement...",
+    "page": "Page",
+    "of": "sur",
+    "search": "Rechercher",
+    "back": "Retour",
+    "confirm": "Confirmer",
+    "reset_filters": "Réinitialiser les filtres",
+    "reset": "Réinitialiser",
+    "company_name": "Nom de l'entreprise",
+    "business_sector": "Secteur d'activité",
+    "amount_raised": "Montant levé",
+    "funding_type": "Type de levée",
+    "last_update": "Dernière mise à jour",
+    "actions": "Actions",
+    "delete": "Supprimer",
+    "delete_confirmation": "Êtes-vous sûr de vouloir supprimer cet investissement ?",
+    "delete_confirmation_title": "Confirmer la suppression",
+    "delete_confirmation_content": "Êtes-vous sûr de vouloir supprimer cet investissement ? Cette action supprimera également tous les documents liés à cette entreprise pour votre groupe.",
+    "delete_confirmation_cancel": "Annuler",
+    "delete_confirmation_confirm": "Supprimer",
+    "delete_success": "Investissement supprimé avec succès",
+    "delete_success_with_documents": "Investissement et documents associés supprimés avec succès",
+    "delete_error": "Erreur lors de la suppression de l'investissement",
+    "investment_not_found": "Investissement non trouvé",
+    "error_loading": "Erreur lors du chargement",
+    "exportXSLX": "Export en XSLX"
+  },
+  "creation": {
+    "title": "Création d'entreprise",
+    "select_type": "Choisir le type de création",
+    "automatic_creation": "Création automatique",
+    "automatic_description": "Récupérer automatiquement les informations via le SIREN",
+    "manual_creation": "Création manuelle",
+    "manual_description": "Saisir manuellement les informations de l'entreprise"
+  },
+  "company_details": {
+    "title": "Détails de l'entreprise",
+    "others_informations": "Autres informations",
+    "confirmation_title": "Confirmation des détails de l'entreprise",
+    "siren": "Numéro SIREN",
+    "siren_placeholder": "Entrez le numéro SIREN (9 chiffres)",
+    "siren_required": "Veuillez saisir le SIREN",
+    "siren_invalid": "Le SIREN doit contenir exactement 9 chiffres",
+    "error": "Erreur lors de la récupération des données",
+    "company": {
+      "name": "Nom de l'entreprise",
+      "name_placeholder": "Entrez le nom de l'entreprise",
+      "name_required": "Veuillez saisir le nom de l'entreprise",
+      "sector": "Secteur d'activité",
+      "sector_placeholder": "Entrez le secteur d'activité",
+      "sector_required": "Veuillez saisir le secteur d'activité",
+      "description": "Description",
+      "details": {
+        "title": "Détails de l'entreprise",
+        "last_update": "Dernière mise à jour",
+        "legal_form": "Forme juridique",
+        "siren": "SIREN",
+        "siret": "SIRET",
+        "headquarters": "(siège)",
+        "address": {
+          "title": "Adresse du siège social",
+          "street_number": "N°",
+          "street_type": "Type de voie",
+          "street": "Voie",
+          "postal_code": "Code postal",
+          "city": "Ville",
+          "country": "Pays"
+        },
+        "capital": {
+          "amount": "Capital social",
+          "currency": "Devise",
+          "not_available": "Capital social non renseigné"
+        },
+        "ape": {
+          "code": "Code APE",
+          "activity": "Activité principale"
+        },
+        "representatives": {
+          "title": "Représentants",
+          "name": "Nom",
+          "role": "Qualité"
+        }
+      }
+    },
+    "loading": {
+      "title": "Récupération des informations en cours...",
+      "description": "Nous recherchons les détails de l'entreprise auprès des registres officiels",
+      "map": "Chargement de la carte..."
+    },
+    "error_siren": {
+      "title": "Erreur",
+      "message": "Impossible de récupérer les informations de l'entreprise. Votre Siren est peut-être incorrect. Veuillez réessayer ultérieurement."
+    },
+    "sectors": {
+      "technology": "Technologie",
+      "healthcare": "Santé",
+      "finance": "Finance",
+      "retail": "Commerce",
+      "manufacturing": "Industrie",
+      "energy": "Énergie",
+      "education": "Éducation",
+      "luxury": "Luxe",
+      "beauty_personal_care": "Beauté & Soins personnels",
+      "aerospace": "Aéronautique",
+      "automotive": "Automobile",
+      "pharmaceuticals": "Pharmaceutique",
+      "telecommunications": "Télécommunications",
+      "industrial_equipment": "Équipement industriel",
+      "software": "Logiciel",
+      "technology_services": "Services technologiques",
+      "defense_aerospace": "Défense & Aéronautique",
+      "other": "Autre"
+    },
+    "sector_required": "Veuillez sélectionner un secteur d'activité",
+    "select_sector": "Sélectionnez un secteur d'activité"
+  },
+  "funding": {
+    "title": "Détails de la levée",
+    "type": "Type de levée",
+    "select_type": "Sélectionner le type de levée",
+    "type_required": "Veuillez sélectionner le type de levée",
+    "amount": "Montant levé",
+    "amount_required": "Veuillez saisir le montant levé",
+    "currency": "Devise",
+    "currency_required": "Veuillez sélectionner la devise",
+    "types": {
+      "seed": "Amorçage (Seed)",
+      "serieA": "Série A",
+      "serieB": "Série B",
+      "serieC": "Série C",
+      "growth": "Croissance (Growth)",
+      "ipo": "Introduction en bourse (IPO)",
+      "debt": "Dette",
+      "grant": "Subvention",
+      "other": "Autre",
+      "Private Equity": "Capital-investissement",
+      "Series A": "Série A",
+      "Series B": "Série B",
+      "Series C": "Série C",
+      "Venture Capital": "Capital-risque",
+      "Strategic Investment": "Investissement stratégique",
+      "Corporate Venture": "Corporate Venture",
+      "Seed": "Amorçage"
+    }
+  },
+  "funding_types": {
+    "Private Equity": "Capital-investissement",
+    "Series A": "Série A",
+    "Series B": "Série B",
+    "Series C": "Série C",
+    "Venture Capital": "Capital-risque",
+    "Strategic Investment": "Investissement stratégique",
+    "Corporate Venture": "Corporate Venture",
+    "Seed": "Amorçage",
+    "Growth": "Croissance",
+    "Bridge Funding": "Financement relais"
+  },
+  "actions": {
+    "title": "Actions",
+    "view_details": "Voir les détails",
+    "add_investment": "Ajouter un investissement"
+  },
+  "no_investments": {
+    "title": "Aucun investissement",
+    "description": "Vous n'avez pas encore d'investissement. Commencez par en ajouter un !"
+  },
+  "no_results": {
+    "title": "Aucun résultat",
+    "description": "Aucune startup ne correspond à vos filtres. Veuillez réessayer avec des filtres différents."
+  },
+  "select_investor": {
+    "investor": "Investisseur",
+    "investor-required": "Veuillez sélectionner un investisseur",
+    "select-investor": "Sélectionner un investisseur"
+  },
+  "no_data": {
+    "title": "Aucune donnée trouvée"
+  },
+  "company_investments": {
+    "title": "Investissements de l'entreprise",
+    "list_title": "Liste des investissements pour cette entreprise",
+    "table": {
+      "amount": "Montant",
+      "currency": "Devise",
+      "funding_type": "Type de financement",
+      "date": "Date",
+      "investor": "Investisseur",
+      "actions": "Actions"
+    },
+    "edit": {
+      "title": "Modifier l'investissement",
+      "amount_label": "Montant",
+      "currency_label": "Devise",
+      "funding_type_label": "Type de financement",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "success": "Investissement mis à jour avec succès",
+      "error": "Erreur lors de la mise à jour de l'investissement"
+    },
+    "no_investments": {
+      "title": "Aucun investissement",
+      "description": "Aucun investissement n'a encore été effectué pour cette entreprise."
+    },
+    "loading": "Chargement des investissements...",
+    "error_loading": "Erreur lors du chargement des investissements"
+  }
+}

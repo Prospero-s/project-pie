@@ -1,0 +1,99 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+  app.locales: ['en', 'fr']
+  app.default_locale: 'en'
+  app.api_base_url: 'https://localhost' # Valeur par défaut pour le dev
+  api_username: '%env(API_USERNAME)%'
+  api_password: '%env(API_PASSWORD)%'
+  # Paramètres AWS Cognito
+  aws_region: '%env(AWS_REGION)%'
+  aws_user_pool_id: '%env(VITE_AWS_USER_POOL_ID)%'
+  aws_client_id: '%env(VITE_AWS_CLIENT_ID)%'
+  aws_access_key_id: '%env(AWS_ACCESS_KEY_ID)%'
+  aws_secret_access_key: '%env(AWS_SECRET_ACCESS_KEY)%'
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+    bind:
+      # Paramètres AWS Cognito
+      $region: '%aws_region%'
+      $userPoolId: '%aws_user_pool_id%'
+      $accessKeyId: '%aws_access_key_id%'
+      $secretAccessKey: '%aws_secret_access_key%'
+
+  App\:
+    resource: '../src/'
+    exclude:
+      - '../src/DependencyInjection/'
+      - '../src/Entity/'
+      - '../src/Kernel.php'
+      - '../src/Tests/'
+
+  # Configuration du client HTTP
+  Symfony\Contracts\HttpClient\HttpClientInterface:
+    factory: ['Symfony\Component\HttpClient\HttpClient', 'create']
+    arguments:
+      $defaultOptions:
+        timeout: 30
+        verify_peer: false
+        verify_host: false
+
+  # Configuration du client API
+  App\Service\Company\Api\CompanyApiClient:
+    arguments:
+      $httpClient: '@Symfony\Contracts\HttpClient\HttpClientInterface'
+      $apiUsername: '%api_username%'
+      $apiPassword: '%api_password%'
+
+  # Configuration des scrapers avec tag commun et priorité
+  App\Service\Company\Scraper\InpiCompanyScraper:
+    arguments:
+      $client: '@Symfony\Contracts\HttpClient\HttpClientInterface'
+    tags:
+      - { name: 'company.scraper', priority: 100 }
+
+  App\Service\Company\Scraper\PappersCompanyScraper:
+    arguments:
+      $client: '@Symfony\Contracts\HttpClient\HttpClientInterface'
+    tags:
+      - { name: 'company.scraper', priority: 50 }
+
+  App\Service\Company\Scraper\SocieteCompanyScraper:
+    arguments:
+      $client: '@Symfony\Contracts\HttpClient\HttpClientInterface'
+    tags:
+      - { name: 'company.scraper', priority: 25 }
+
+  # Configuration de l'agrégateur de données
+  App\Service\Company\CompanyDataAggregator:
+    arguments:
+      $scrapers: !tagged_iterator company.scraper
+
+  # Alias des interfaces vers leurs implémentations
+  App\Service\Company\CompanyServiceInterface: '@App\Service\Company\CompanyService'
+  App\Service\Company\Api\CompanyApiClientInterface: '@App\Service\Company\Api\CompanyApiClient'
+
+  # Services explicites
+  App\Service\User\AwsCognitoService:
+    arguments:
+      $region: '%aws_region%'
+      $userPoolId: '%aws_user_pool_id%'
+      $accessKeyId: '%aws_access_key_id%'
+      $secretAccessKey: '%aws_secret_access_key%'
+
+  # Service de notifications
+  App\Service\Notification\NotificationService:
+    arguments:
+      $notificationsRepository: '@App\Repository\NotificationsRepository'
+      $userNotificationsRepository: '@App\Repository\UserNotificationsRepository'
+
+  # Service de mail - déclaré comme public pour les tests
+  App\Service\Mail\MailService:
+    public: true

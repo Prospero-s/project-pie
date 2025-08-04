@@ -1,0 +1,215 @@
+{
+  "my_portfolio": "Portfolio",
+  "common": {
+    "error_invalid_data": "Unable to retrieve data",
+    "add": "Add",
+    "cancel": "Cancel",
+    "next": "Next",
+    "finish": "Finish",
+    "previous": "Previous",
+    "loading": "Loading...",
+    "page": "Page",
+    "of": "of",
+    "search": "Search",
+    "back": "Back",
+    "confirm": "Confirm",
+    "reset_filters": "Reset filters",
+    "reset": "Reset",
+    "company_name": "Company name",
+    "business_sector": "Business sector",
+    "amount_raised": "Amount raised",
+    "funding_type": "Funding Type",
+    "last_update": "Last update",
+    "actions": "Actions",
+    "delete": "Delete",
+    "delete_confirmation": "Are you sure you want to delete this investment?",
+    "delete_confirmation_title": "Confirm deletion",
+    "delete_confirmation_content": "Are you sure you want to delete this investment? This action will also delete all related documents for this company in your group.",
+    "delete_confirmation_cancel": "Cancel",
+    "delete_confirmation_confirm": "Delete",
+    "delete_success": "Investment deleted successfully",
+    "delete_success_with_documents": "Investment and associated documents deleted successfully",
+    "delete_error": "Error deleting investment",
+    "investment_not_found": "Investment not found",
+    "error_loading": "Error loading",
+    "exportXSLX": "Export to XSLX"
+  },
+  "creation": {
+    "title": "Company Creation",
+    "select_type": "Choose creation type",
+    "automatic_creation": "Automatic creation",
+    "automatic_description": "Automatically retrieve information via SIREN",
+    "manual_creation": "Manual creation",
+    "manual_description": "Manually enter company information"
+  },
+  "company_details": {
+    "title": "Company Details",
+    "others_informations": "Others informations",
+    "confirmation_title": "Company Details Confirmation",
+    "siren": "SIREN number",
+    "siren_placeholder": "Enter SIREN number (9 digits)",
+    "siren_required": "Please enter SIREN",
+    "siren_invalid": "SIREN must contain exactly 9 digits",
+    "error": "Error retrieving data",
+    "company": {
+      "name": "Company name",
+      "name_placeholder": "Enter company name",
+      "name_required": "Please enter company name",
+      "sector": "Business sector",
+      "sector_placeholder": "Enter business sector",
+      "sector_required": "Please enter business sector",
+      "description": "Description",
+      "details": {
+        "title": "Company Details",
+        "last_update": "Last update",
+        "legal_form": "Legal form",
+        "siren": "SIREN",
+        "siret": "SIRET",
+        "headquarters": "(headquarters)",
+        "address": {
+          "title": "Registered office address",
+          "street_number": "No.",
+          "street_type": "Street type",
+          "street": "Street",
+          "postal_code": "Postal code",
+          "city": "City",
+          "country": "Country"
+        },
+        "capital": {
+          "amount": "Share capital",
+          "currency": "Currency",
+          "not_available": "Share capital not provided"
+        },
+        "ape": {
+          "code": "APE Code",
+          "activity": "Main activity"
+        },
+        "representatives": {
+          "title": "Representatives",
+          "name": "Name",
+          "role": "Role"
+        }
+      }
+    },
+    "loading": {
+      "title": "Retrieving company details...",
+      "description": "We are retrieving the company details from official registers"
+    },
+    "error_siren": {
+      "title": "Error",
+      "message": "Unable to retrieve company details. Your Siren may be incorrect. Please try again later."
+    },
+    "sectors": {
+      "technology": "Technology",
+      "healthcare": "Healthcare",
+      "finance": "Finance",
+      "retail": "Retail",
+      "manufacturing": "Manufacturing",
+      "energy": "Energy",
+      "education": "Education",
+      "luxury": "Luxury",
+      "beauty_personal_care": "Beauty & Personal Care",
+      "aerospace": "Aerospace",
+      "automotive": "Automotive",
+      "pharmaceuticals": "Pharmaceuticals",
+      "telecommunications": "Telecommunications",
+      "industrial_equipment": "Industrial Equipment",
+      "software": "Software",
+      "technology_services": "Technology Services",
+      "defense_aerospace": "Defense & Aerospace",
+      "other": "Other"
+    },
+    "sector_required": "Please select an activity sector",
+    "select_sector": "Select an activity sector"
+  },
+  "funding": {
+    "title": "Funding Details",
+    "type": "Funding Type",
+    "select_type": "Select funding type",
+    "type_required": "Please select funding type",
+    "amount": "Amount raised",
+    "amount_required": "Please enter amount raised",
+    "currency": "Currency",
+    "currency_required": "Please select currency",
+    "types": {
+      "seed": "Seed",
+      "serieA": "Series A",
+      "serieB": "Series B",
+      "serieC": "Series C",
+      "growth": "Growth",
+      "ipo": "Initial Public Offering (IPO)",
+      "debt": "Debt",
+      "grant": "Grant",
+      "other": "Other",
+      "Private Equity": "Private Equity",
+      "Series A": "Series A",
+      "Series B": "Series B",
+      "Series C": "Series C",
+      "Venture Capital": "Venture Capital",
+      "Strategic Investment": "Strategic Investment",
+      "Corporate Venture": "Corporate Venture",
+      "Seed": "Seed"
+    }
+  },
+  "funding_types": {
+    "Private Equity": "Private Equity",
+    "Series A": "Series A",
+    "Series B": "Series B",
+    "Series C": "Series C",
+    "Venture Capital": "Venture Capital",
+    "Strategic Investment": "Strategic Investment",
+    "Corporate Venture": "Corporate Venture",
+    "Seed": "Seed",
+    "Growth": "Growth",
+    "Bridge Funding": "Bridge Funding"
+  },
+  "no_investments": {
+    "title": "No investments",
+    "description": "You have no investments yet. Start by adding one!"
+  },
+  "no_results": {
+    "title": "No results",
+    "description": "No startups match your filters. Please try again with different filters."
+  },
+  "actions": {
+    "title": "Actions",
+    "view_details": "View details",
+    "add_investment": "Add investment"
+  },
+  "select_investor": {
+    "investor": "Investor",
+    "investor-required": "Please select an investor",
+    "select-investor": "Select an investor"
+  },
+  "no_data": {
+    "title": "No data found"
+  },
+  "company_investments": {
+    "title": "Company Investments",
+    "list_title": "List of investments for this company",
+    "table": {
+      "amount": "Amount",
+      "currency": "Currency",
+      "funding_type": "Funding Type",
+      "date": "Date",
+      "investor": "Investor",
+      "actions": "Actions"
+    },
+    "edit": {
+      "title": "Edit Investment",
+      "amount_label": "Amount",
+      "currency_label": "Currency",
+      "funding_type_label": "Funding Type",
+      "save": "Save",
+      "cancel": "Cancel",
+      "success": "Investment updated successfully",
+      "error": "Error updating investment"
+    },
+    "no_investments": {
+      "title": "No investments",
+      "description": "No investments have been made for this company yet."
+    },
+    "loading": "Loading investments...",
+    "error_loading": "Error loading investments"
+  }
+}

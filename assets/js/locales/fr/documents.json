@@ -1,0 +1,239 @@
+{
+  "title": "Documents",
+  "modal": {
+    "upload_title": "Analyser un document financier",
+    "select_file": "Sélectionner un fichier PDF"
+  },
+  "analyze": {
+    "title": "Previsualisation du PDF",
+    "company": "Entreprise",
+    "data_extract": "Données extraites",
+    "file_preview": "Previsualisation du PDF",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "save_draft": "Enregistrer en brouillon"
+  },
+  "empty": {
+    "title": "Aucun document",
+    "description": "Vous n'avez pas encore ajouté de documents. Commencez par télécharger votre premier document.",
+    "action": "Ajouter un document"
+  },
+  "table": {
+    "status": "Statut",
+    "filename": "Nom du fichier",
+    "company": "Nom de l'entreprise",
+    "last_update": "Dernière mise à jour",
+    "actions": "Actions",
+    "unknown_filename": "Nom de fichier inconnu",
+    "unknown_company": "Entreprise inconnue",
+    "statuses": {
+      "draft": "Brouillon",
+      "processed": "Traité",
+      "validated": "Validé"
+    },
+    "tooltips": {
+      "edit": "Modifier",
+      "view": "Voir Détails",
+      "delete": "Supprimer"
+    }
+  },
+  "messages": {
+    "delete_success": "Document supprimé avec succès !",
+    "delete_error": "Erreur lors de la suppression du document.",
+    "delete_confirmation_title": "Confirmer la suppression",
+    "delete_confirmation_content": "Êtes-vous sûr de vouloir supprimer ce document ? Cette action est irréversible.",
+    "delete_confirmation_cancel": "Annuler",
+    "delete_confirmation_confirm": "Supprimer",
+    "loading_error": "Erreur lors du chargement des documents"
+  },
+  "textract_results": {
+    "edit": "Modifier",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "document_source": "Document source",
+    "pdf_available": "PDF disponible",
+    "kpi_table": "Tableau de KPI",
+    "ai_validated": "Validé par IA",
+    "save_changes": "Sauvegarder les modifications",
+    "no_modifications": "Aucune modification à enregistrer",
+    "modifications_saved": "Modifications enregistrées",
+    "modifications_success": "Vos modifications ont été enregistrées avec succès",
+    "periodicity_info": {
+      "year": "Année",
+      "periodicity": "Périodicité",
+      "quarterly": "Trimestrielle",
+      "half_yearly": "Semestrielle",
+      "yearly": "Annuel",
+      "all_years": "Toutes les années",
+      "year_not_specified": "Année non spécifiée",
+      "periods_detected": "périodes détectées"
+    },
+    "year_selection": {
+      "title": "Sélection de l'année requise",
+      "description": "L'année n'a pas pu être détectée automatiquement. Veuillez sélectionner l'année correspondant aux données financières du document.",
+      "select_year": "Sélectionnez l'année",
+      "placeholder": "Choisissez une année",
+      "continue": "Continuer",
+      "change_hint": "Vous pouvez modifier l'année pour retraiter les données",
+      "year_updated": "Année mise à jour: {{year}}. Données retraitées.",
+      "year_cleared": "Année effacée. Données retraitées sans année spécifique."
+    },
+    "validation": {
+      "error_title": "Erreur de validation",
+      "form_failed": "Erreur lors de la validation du formulaire",
+      "year_required_title": "Année requise",
+      "year_required_message": "Une année doit être spécifiée pour pouvoir valider le document. Veuillez sélectionner une année avant de continuer.",
+      "missing_data_title": "Données manquantes",
+      "missing_pdf_message": "Les données du document sont incomplètes. Impossible de procéder à la validation.",
+      "success_title": "Document validé avec succès",
+      "success_message": "Le document a été validé et sauvegardé. Vous allez être redirigé vers la liste des documents.",
+      "error_message": "Une erreur est survenue lors de la validation du document: {{error}}",
+      "pdf_read_error": "Impossible de lire le contenu du document PDF.",
+      "network_error": "Erreur réseau lors de la récupération du document.",
+      "validating": "Validation du document en cours..."
+    },
+    "extracted_document": "Document extrait",
+    "no_periods": "Aucune période détectée",
+    "no_data": "Aucune donnée KPI trouvée",
+    "alerts": {
+      "values_auto_filled": "Les valeurs ont été extraites automatiquement. Vous pouvez les modifier si nécessaire.",
+      "values_modified": "Valeur modifiée",
+      "verification_in_progress": "Vérification des données en cours...",
+      "validation_failed": "Échec de la validation des données"
+    },
+    "kpi_tooltips": {
+      "revenue": "Chiffre d'affaires de l'entreprise",
+      "net_bookings": "Réservations nettes",
+      "gross_margin": "Marge brute (revenus - coûts directs)",
+      "customer_acquisition_cost": "Coût moyen d'acquisition d'un nouveau client",
+      "cac_ratio": "Ratio coût d'acquisition / valeur client",
+      "customer_lifetime_value": "Valeur totale d'un client sur sa durée de vie",
+      "headcount": "Nombre total d'employés",
+      "cash_burn": "Taux de consommation de trésorerie",
+      "cash_balance": "Solde de trésorerie",
+      "ebitda": "Bénéfice avant intérêts, impôts, dépréciation et amortissement",
+      "arr": "Revenu annuel récurrent",
+      "net_arr": "Revenu annuel récurrent net",
+      "arr_base": "Base de revenu annuel récurrent",
+      "organic_arr_growth": "Croissance organique de l'ARR",
+      "enterprise_nrr": "Taux de rétention net des revenus des entreprises",
+      "churn": "Taux d'attrition des clients",
+      "mrr": "Revenu mensuel récurrent",
+      "funding_amount": "Montant total des fonds levés"
+    },
+    "tag_labels": {
+      "not_available": "N/A",
+      "modified": "Modifié",
+      "auto_filled": "Rempli auto",
+      "verified": "Vérifié"
+    },
+    "openai_validation": {
+      "no_content": "Aucun contenu textuel à valider",
+      "no_extracted_data": "Aucune donnée extraite à valider",
+      "success": "Validation OpenAI réussie",
+      "error": "Erreur lors de la validation OpenAI",
+      "communication_error": "Erreur de communication avec OpenAI"
+    },
+    "add_kpi": {
+      "button": "Ajouter un KPI",
+      "modal_title": "Ajouter un nouveau KPI",
+      "kpi_name_label": "Nom du KPI",
+      "kpi_name_placeholder": "Entrez le nom du nouveau KPI",
+      "kpi_name_required": "Le nom du KPI est requis",
+      "add_button": "Ajouter",
+      "duplicate_error": "Un KPI avec ce nom existe déjà.",
+      "success": "KPI '{{kpiName}}' ajouté avec succès.",
+      "validation_error": "Erreur de validation. Vérifiez les champs."
+    }
+  },
+  "upload": {
+    "title": "Télécharger un document",
+    "description": "Téléchargez des documents pour extraire automatiquement les données financières",
+    "select_kpis": "Sélectionnez les KPI à extraire",
+    "select_all_kpis": "Tout sélectionner",
+    "select_kpis_placeholder": "Sélectionnez un ou plusieurs KPI",
+    "select_periodicity": "Sélectionnez la périodicité",
+    "quarterly": "Trimestriel",
+    "half_yearly": "Semestriel",
+    "yearly": "Annuel",
+    "select_year": "Sélectionnez l'année",
+    "select_year_placeholder": "Année à analyser",
+    "year_optional_hint": "L'année est optionnelle. Si non spécifiée, l'IA tentera de la détecter automatiquement.",
+    "analyze": "Analyser le document",
+    "processing": {
+      "title": "Traitement en cours...",
+      "analyzing": "Analyse du document...",
+      "extracting": "Extraction des données...",
+      "finalizing": "Finalisation...",
+      "validating": "Validation des données...",
+      "processing": "Traitement des informations...",
+      "organizing": "Organisation des données...",
+      "preparing": "Préparation du rapport...",
+      "uploading": "Téléchargement en cours...",
+      "scanning": "Scan du document...",
+      "parsing": "Analyse du contenu...",
+      "structuring": "Structuration des données...",
+      "verifying": "Vérification des informations...",
+      "optimizing": "Optimisation...",
+      "completing": "Finalisation en cours...",
+      "message": "Votre document est en cours d'analyse. Merci de patienter.",
+      "file_size_note": "Le traitement peut prendre quelques secondes selon la taille du fichier."
+    },
+    "kpi_labels": {
+      "chiffre_affaire": "Chiffre d'affaires",
+      "marge_brute": "Marge brute",
+      "cout_acquisition": "Coût d'acquisition client",
+      "valeur_vie_client": "Valeur vie client",
+      "nombre_employe": "Nombre d'employés",
+      "argent_brule": "Cash burn",
+      "ebitda": "EBITDA",
+      "revenu_annuel": "Revenu annuel récurrent (ARR)",
+      "revenu_mensuel": "Revenu mensuel récurrent (MRR)",
+      "montant_leve": "Montant levé"
+    },
+    "tooltips": {
+      "revenue": "Revenus générés par les ventes",
+      "gross_margin": "Profit après déduction des coûts directs",
+      "customer_acquisition_cost": "Coût moyen pour acquérir un nouveau client",
+      "customer_lifetime_value": "Valeur totale d'un client sur sa durée de vie",
+      "headcount": "Nombre total d'employés dans l'entreprise",
+      "cash_burn": "Taux auquel l'entreprise dépense son capital",
+      "ebitda": "Bénéfice avant intérêts, impôts, dépréciation et amortissement",
+      "arr": "Revenus récurrents annualisés",
+      "mrr": "Revenus récurrents mensuels",
+      "funding_amount": "Montant total de capital levé"
+    },
+    "errors": {
+      "no_file": "Veuillez sélectionner un fichier à analyser",
+      "no_kpi": "Veuillez sélectionner au moins un KPI à extraire",
+      "file_size_error": "Le fichier est trop volumineux. Taille maximum: 5MB",
+      "auth_error": "Erreur d'authentification",
+      "no_data": "Aucune donnée n'a pu être extraite",
+      "analysis_error": "Erreur lors de l'analyse du document",
+      "no_response": "Le serveur n'a pas répondu. Veuillez réessayer"
+    },
+    "gpt_errors": {
+      "quota_exceeded_title": "Quota GPT épuisé",
+      "quota_exceeded_message": "Les crédits GPT ont été épuisés. Veuillez contacter l'administrateur ou réessayer plus tard.",
+      "auth_error_title": "Erreur d'authentification GPT",
+      "auth_error_message": "Problème d'authentification avec le service GPT. Veuillez contacter l'administrateur.",
+      "rate_limit_title": "Limite de débit dépassée",
+      "rate_limit_message": "Trop de requêtes envoyées au service GPT. Veuillez attendre quelques minutes avant de réessayer.",
+      "service_unavailable_title": "Service GPT indisponible",
+      "service_unavailable_message": "Le service GPT est temporairement indisponible. Veuillez réessayer dans quelques instants."
+    },
+    "file_removed": "Fichier supprimé",
+    "success": "Document analysé avec succès"
+  },
+  "validate_document": "Valider le document",
+  "document_details": {
+    "title": "Détails du document",
+    "general_info": "Informations générales",
+    "edit_document": "Modifier le document",
+    "view_pdf": "Voir le PDF",
+    "status_updated": "Statut mis à jour avec succès",
+    "status_update_error": "Erreur lors de la mise à jour du statut",
+    "no_document": "Aucun document trouvé",
+    "add_date": "Date d'ajout"
+  }
+}

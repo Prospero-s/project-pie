@@ -1,0 +1,27 @@
+{
+  "fundingTypes": [
+    "seed",
+    "serieA",
+    "serieB",
+    "serieC",
+    "growth",
+    "ipo"
+  ],
+  "sectorBaseAmounts": {
+    "technology": 1500000,
+    "healthcare": 2000000,
+    "finance": 2500000,
+    "retail": 1200000,
+    "manufacturing": 1800000,
+    "energy": 3000000,
+    "education": 800000
+  },
+  "investmentRules": {
+    "minInvestmentsPerCompany": 1,
+    "maxInvestmentsPerCompany": 3,
+    "minDaysAgo": 180,
+    "maxDaysAgo": 1095,
+    "roundMultiplier": 0.5,
+    "currency": "EUR"
+  }
+} 

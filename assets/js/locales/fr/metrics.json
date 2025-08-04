@@ -1,0 +1,299 @@
+{
+  "all_metrics": "Toutes les Métriques",
+  "global_metrics": "Métriques Globales",
+  "documents": "Documents",
+  "investment_details": "Détails d'Investissement",
+  "info": "Info",
+  "no_kpi_data": "Aucune donnée KPI disponible pour cette entreprise.",
+  "year_label": "Année",
+  
+  "data": "Données",
+  "no_data": "Aucune donnée disponible",
+  "custom_chart": "Graphique Personnalisé",
+  "unsupported_chart_type": "Type de graphique non pris en charge",
+
+  "empty": {
+    "title": "Aucun metric",
+    "description": "Vous n'avez pas encore ajouté de graphes. Commencez par ajouter votre premier graphe.",
+    "action": "Ajouter un graphe"
+  },
+  
+  "layout": {
+    "columns": "Colonnes",
+    "move": "Déplacer",
+    "resize": "Redimensionner",
+    "edit_layout": "Modifier la disposition",
+    "edit_mode_activated": "Mode édition activé - Vous pouvez maintenant réorganiser les blocs",
+    "layout_saved_successfully": "Disposition sauvegardée avec succès",
+    "error_saving_layout": "Erreur lors de la sauvegarde de la disposition",
+    "changes_cancelled": "Modifications annulées",
+    "save": "Sauvegarder",
+    "reset": "Réinitialiser",
+    "drag_drop_instruction": "Glissez-déposez les blocs pour réorganiser la disposition, puis cliquez sur \"Sauvegarder\"."
+  },
+  
+  "drawer": {
+    "title": "Explorateur de Données",
+    "execute": "Exécuter",
+    "select_query": "Sélectionnez une requête prédéfinie",
+    "results": "Résultats",
+    "add_chart": "Ajouter un Graphique",
+    "chart_title": "Titre du Graphique",
+    "chart_title_placeholder": "Entrez un titre pour le graphique",
+    "chart_type": "Type de Graphique",
+    "add_chart_button": "Ajouter ce graphique",
+    "execute_query": "Exécutez une requête pour voir les résultats",
+    "select_and_execute": "Sélectionnez et exécutez une requête",
+    "graph_added": "Graphique ajouté au tableau de bord",
+    "no_data": "Aucune donnée disponible pour créer un graphique",
+    "x_axis": "Axe X",
+    "y_axes": "Axe(s) Y",
+    "select_x_axis": "Sélectionnez une colonne pour l'axe X",
+    "select_y_axes": "Sélectionnez une ou plusieurs colonnes pour l'axe Y",
+    "chart_preview": "Aperçu du graphique",
+    "missing_axes": "Vous devez sélectionner un axe X et au moins un axe Y"
+  },
+  
+  "chart_types": {
+    "bar": "Barre",
+    "line": "Ligne",
+    "area": "Zone",
+    "pie": "Camembert",
+    "radar": "Radar"
+  },
+  
+  "chart_preview": {
+    "no_data": "Sélectionnez les axes pour voir l'aperçu",
+    "invalid_type": "Type de graphique non valide"
+  },
+  
+  "queries": {
+    "monthly_revenue": {
+      "name": "Revenus par période",
+      "description": "Analyse des KPI de revenus (Revenu Annuel Récurrent) par période"
+    },
+    "clients_by_sector": {
+      "name": "Portefeuille par secteur",
+      "description": "Répartition des entreprises du portefeuille par secteur d'activité"
+    },
+    "burn_rate_evolution": {
+      "name": "Évolution Argent brûlé",
+      "description": "Analyse de l'évolution de l'argent brûlé par période - métrique clé de performance"
+    },
+    "top_clients": {
+      "name": "Top investissements",
+      "description": "Classement des 10 entreprises avec les plus gros investissements"
+    },
+    "headcount": {
+      "name": "Évolution nombre d'employés",
+      "description": "Suivi de l'évolution du nombre d'employés des entreprises du portefeuille"
+    },
+    "quarterly_investments": {
+      "name": "Investissements trimestriels",
+      "description": "Montants investis par trimestre avec types de financement"
+    },
+    "total_investment": {
+      "name": "Synthèse investissements",
+      "description": "Vue d'ensemble des montants totaux investis par type de financement"
+    },
+    "kpi_analysis_by_period": {
+      "name": "Analyse KPI globale",
+      "description": "Vue d'ensemble de tous les KPI disponibles avec métriques par période"
+    }
+  },
+  
+  "default_query": {
+    "name": "Requête par Défaut",
+    "description": "Une requête par défaut"
+  },
+  
+  "errors": {
+    "cannot_load_queries": "Impossible de charger les requêtes prédéfinies. Utilisation des requêtes par défaut.",
+    "select_query": "Veuillez sélectionner une requête à exécuter",
+    "invalid_format": "Format de résultats invalide",
+    "query_execution": "Erreur lors de l'exécution de la requête",
+    "unknown": "Erreur inconnue",
+    "cannot_transform_data": "Impossible de transformer les données pour le graphique",
+    "cannot_create_chart": "Impossible de créer le graphique : ",
+    "custom_error": "{{error}}"
+  },
+  
+  "info": {
+    "no_results": "La requête n'a retourné aucun résultat"
+  },
+  
+  "warnings": {
+    "execute_query_first": "Veuillez d'abord exécuter une requête pour obtenir des données"
+  },
+  
+  "success": {
+    "chart_added": "Graphique ajouté avec succès"
+  },
+  
+  "common": {
+    "loading": "Chargement...",
+    "loading_years": "Chargement des années disponibles...",
+    "close": "Fermer",
+    "yes": "Oui",
+    "no": "Non",
+    "cancel": "Annuler"
+  },
+  
+  "data_explorer": {
+    "add_column": "Ajouter une colonne",
+    "pivot": "Pivot",
+    "visibility": "Visibilité",
+    "create_calculated_column": "Créer une colonne calculée",
+    "column_name": "Nom de la colonne",
+    "column_name_placeholder": "ex: Marge brute",
+    "expression": "Expression",
+    "expression_placeholder": "ex: revenue * 0.7",
+    "display_format": "Format d'affichage",
+    "available_columns": "Colonnes disponibles:",
+    "operators": "Opérateurs: +, -, *, /, >, <, ==, !=, &&, ||, ?",
+    "format_default": "Par défaut",
+    "format_percentage": "Pourcentage",
+    "format_currency": "Devise (€)",
+    "name_expression_required": "Le nom et l'expression sont requis",
+    "name_required": "Le nom de la colonne est requis",
+    "expression_required": "L'expression est requise",
+    "column_added": "Colonne calculée ajoutée",
+    "column_updated": "Colonne calculée modifiée",
+    "column_removed": "Colonne calculée supprimée",
+    "edit_column": "Modifier la colonne",
+    "delete_column": "Supprimer la colonne",
+    "confirm_delete_column": "Supprimer cette colonne ?",
+    "delete_column_warning": "Cette action ne peut pas être annulée.",
+    "column_name_required": "Le nom de la colonne est requis",
+    "show_in_visualization": "Afficher dans la visualisation",
+    "hide_from_visualization": "Masquer dans la visualisation",
+    "remove_pivot": "Supprimer le pivot",
+    "add_pivot": "Pivoter cette colonne",
+    "filter": "Filtrer",
+    "equals": "Égal à...",
+    "not_equals": "Différent de...",
+    "contains": "Contient...",
+    "not_contains": "Ne contient pas...",
+    "greater_than": "Supérieur à...",
+    "greater_equal": "Supérieur ou égal à...",
+    "less_than": "Inférieur à...",
+    "less_equal": "Inférieur ou égal à...",
+    "between": "Entre...",
+    "between_min": "Valeur minimale",
+    "between_max": "Valeur maximale",
+    "starts_with": "Commence par...",
+    "ends_with": "Se termine par...",
+    "equals_number": "Égal à (nombre)...",
+    "contains_short": "contient",
+    "not_contains_short": "ne contient pas",
+    "between_short": "entre",
+    "starts_with_short": "commence par",
+    "ends_with_short": "se termine par",
+    "clear_all_filters": "Effacer tous les filtres",
+    "sort_ascending": "Trier croissant",
+    "sort_descending": "Trier décroissant",
+    "sort": "Tri:",
+    "filter_label": "Filtre:",
+    "column_header": "{{column}}",
+    "data_source": "Source de données",
+    "external_company": "Entreprise externe",
+    "formula": "Formule",
+    "external_company_help": "Choisissez une autre entreprise comme source de données",
+    "formula_help": "Créez une formule avec les colonnes existantes",
+    "select_company": "Sélectionner une entreprise",
+    "select_company_help": "Choisissez une entreprise dont vous souhaitez utiliser les données",
+    "select_company_placeholder": "Sélectionner une entreprise...",
+    "company_required": "Une entreprise doit être sélectionnée",
+    "no_external_data": "Aucune donnée disponible pour cette entreprise",
+    "external_data_error": "Erreur lors de la récupération des données externes"
+  },
+  
+  "type_fixed_for_total_investment": "Graphique en barres recommandé pour cette visualisation",
+  
+  "kpi_comparison": {
+    "title": "Comparaison des KPI",
+    "button_text": "Comparer les KPI",
+    "comparison_mode": "Mode de comparaison",
+    "between_years": "Entre années",
+    "between_companies": "Entre entreprises",
+    "reference_year": "Année de référence",
+    "companies_to_compare": "Entreprises à comparer",
+    "select_years": "Sélectionner les années",
+    "select_years_placeholder": "Choisissez au moins 2 années",
+    "select_year_placeholder": "Choisissez une année",
+    "select_companies_placeholder": "Choisissez des entreprises",
+    "current_company": "Entreprise courante",
+    "metric_column": "Métrique",
+    "evolution": "Évolution",
+    "difference": "Différence",
+    "variation_percent": "Variation %",
+    "difference_percent": "Différence %",
+    "trend": "Tendance",
+    "comparison": "Comparaison",
+    "trend_up": "Hausse",
+    "trend_down": "Baisse",
+    "trend_stable": "Stable",
+    "superior": "Supérieur",
+    "inferior": "Inférieur",
+    "similar": "Similaire",
+    "type_view": "Changer de vue",
+    "table_view": "Vue tableau",
+    "chart_view": "Vue graphique",
+    "chart_type": "Type de graphique",
+    "chart_percentage": "Évolution en %",
+    "chart_radar": "Radar",
+    "chart_separated": "Séparé par échelle",
+    "chart_bar": "Barres",
+    "select_two_years": "Veuillez sélectionner au moins 2 années pour la comparaison",
+    "select_companies_and_year": "Veuillez sélectionner au moins 2 entreprises et une année de référence",
+    "no_valid_data": "Aucune donnée valide à afficher dans le graphique",
+    "year_prefix": "Année",
+    "evolution_chart": "Graphique d'évolution",
+    "evolution_percent": "Évolution %",
+    "absolute_evolution": "Évolution absolue",
+    "important_metrics": "Métriques importantes (Millions)",
+    "medium_metrics": "Métriques moyennes (Milliers)",
+    "detailed_metrics": "Métriques détaillées",
+    "best_performing_company": "Meilleure entreprise",
+    "metrics": "métriques",
+    "metrics_up": "Métriques en hausse",
+    "metrics_down": "Métriques en baisse",
+    "metrics_stable": "Métriques stables",
+    "total_metrics": "Total métriques"
+  },
+  
+  "predefined_queries": {
+    "1": {
+      "name": "Revenus par période",
+      "description": "Analyse des KPI de revenus (Revenu Annuel Récurrent) par période"
+    },
+    "2": {
+      "name": "Portefeuille par secteur", 
+      "description": "Répartition des entreprises du portefeuille par secteur d'activité"
+    },
+    "3": {
+      "name": "Évolution Argent brûlé",
+      "description": "Analyse de l'évolution de l'argent brûlé par période - métrique clé de performance"
+    },
+    "4": {
+      "name": "Top investissements",
+      "description": "Classement des 10 entreprises avec les plus gros investissements"
+    },
+    "5": {
+      "name": "Évolution nombre d'employés",
+      "description": "Suivi de l'évolution du nombre d'employés des entreprises du portefeuille"
+    },
+    "6": {
+      "name": "Investissements trimestriels",
+      "description": "Montants investis par trimestre avec types de financement"
+    },
+    "7": {
+      "name": "Synthèse investissements",
+      "description": "Vue d'ensemble des montants totaux investis par type de financement"
+    },
+    "8": {
+      "name": "Analyse KPI globale",
+      "description": "Vue d'ensemble de tous les KPI disponibles avec métriques par période"
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "title": "Event Log",
+  "description": "Track all group activities: investments, documents, members and other actions.",
+  "by": "by",
+  "no_events": "No events to display at the moment.",
+  "event_types": {
+    "investment_added": "Investment added",
+    "investment_deleted": "Investment deleted",
+    "document_added": "Document added",
+    "document_deleted": "Document deleted",
+    "member_added": "Member added to group"
+  },
+  "funding_types": {
+    "seed": "Seed",
+    "serieA": "Series A",
+    "serieB": "Series B",
+    "serieC": "Series C",
+    "growth": "Growth",
+    "ipo": "Initial Public Offering (IPO)",
+    "debt": "Debt",
+    "grant": "Grant",
+    "other": "Other",
+    "Private Equity": "Private Equity",
+    "Series A": "Series A",
+    "Series B": "Series B",
+    "Series C": "Series C",
+    "Venture Capital": "Venture Capital",
+    "Strategic Investment": "Strategic Investment",
+    "Corporate Venture": "Corporate Venture",
+    "Seed": "Seed",
+    "Growth": "Growth",
+    "Bridge Funding": "Bridge Funding"
+  },
+  "periodicity": {
+    "q": "Quarterly",
+    "h": "Half-yearly",
+    "y": "Yearly",
+    "Q": "Quarterly",
+    "H": "Half-yearly",
+    "Y": "Yearly"
+  },
+  "roles": {
+    "ROLE_OWNER": "Owner",
+    "ROLE_ADMIN": "Administrator",
+    "ROLE_MEMBER": "Member"
+  },
+  "pagination": {
+    "showing": "Showing {{start}} to {{end}} of {{total}} events"
+  },
+  "error": {
+    "title": "Loading error",
+    "fetch_events": "Unable to load events. Please try again."
+  }
+}
